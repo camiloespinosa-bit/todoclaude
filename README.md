@@ -13,12 +13,11 @@ Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA 
 **Estilos y assets:**
 - `assets/css/style.css` — hoja de estilos compartida, con los tokens de color/tipografía oficiales de CCA (ver skill `cca-marca`)
 - `assets/js/main.js` — menú móvil + año dinámico del pie de página
-- `assets/img/oki/` — carpeta reservada para los SVG oficiales de Oki (ver `assets/img/oki/README.md`); mientras tanto el sitio usa un ícono genérico neutro, **nunca** una versión de Oki generada por IA
+- `assets/img/oki/` — los 8 SVG oficiales de Oki (enviados por Camilo el 2026-09-02), usados así en el sitio: `oki-base-saludo` (hero Inicio), `oki-senalando` (CTA final Inicio), `oki-pensando` (CTA final Fases), `oki-ejercitando` (tarjeta Adulto Vital en Fases), `oki-empatia` (hero Sobre Nosotros), `oki-leyendo` (hero Blog), `oki-celebrando` (artículo para padres), `oki-sorpresa` (artículo Adulto Vital). Ver `assets/img/oki/README.md` — regla de marca: nunca generar ni recrear a Oki con IA, solo usar estos archivos originales.
 
 **Contacto:** WhatsApp 301 494 6120 (confirmado con Camilo el 2026-09-02; usar siempre este número, no otro).
 
 **Pendiente:**
-- Reemplazar el ícono genérico del hero por los SVG oficiales de Oki en cuanto Camilo los envíe.
 - Definir si "Sobre Nosotros" incorpora la historia personal del fundador (se dejó fuera intencionalmente por tratarse de información personal/familiar sensible — ver conversación del 2026-09-02).
 - Agregar fotos reales de la sede cuando estén disponibles.
 
