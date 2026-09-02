@@ -1,5 +1,27 @@
 # todoclaude
 
+## Sitio web — CCA / El Gimnasio del Cerebro
+
+Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA — El Gimnasio del Cerebro. Para verlo localmente basta con abrir `index.html` en el navegador; para publicarlo, sirve la raíz del repo en cualquier hosting estático (GitHub Pages, Netlify, Vercel, etc.).
+
+**Páginas:**
+- `index.html` — Inicio
+- `fases.html` — Fases del Programa (Sensorial, Lúdica, Lógica, Crítica + Programa Adulto Vital)
+- `nosotros.html` — Sobre Nosotros
+- `blog/index.html` + `blog/*.html` — Blog (2 artículos iniciales)
+
+**Estilos y assets:**
+- `assets/css/style.css` — hoja de estilos compartida, con los tokens de color/tipografía oficiales de CCA (ver skill `cca-marca`)
+- `assets/js/main.js` — menú móvil + año dinámico del pie de página
+- `assets/img/oki/` — carpeta reservada para los SVG oficiales de Oki (ver `assets/img/oki/README.md`); mientras tanto el sitio usa un ícono genérico neutro, **nunca** una versión de Oki generada por IA
+
+**Contacto:** WhatsApp 301 494 6120 (confirmado con Camilo el 2026-09-02; usar siempre este número, no otro).
+
+**Pendiente:**
+- Reemplazar el ícono genérico del hero por los SVG oficiales de Oki en cuanto Camilo los envíe.
+- Definir si "Sobre Nosotros" incorpora la historia personal del fundador (se dejó fuera intencionalmente por tratarse de información personal/familiar sensible — ver conversación del 2026-09-02).
+- Agregar fotos reales de la sede cuando estén disponibles.
+
 ## Skills instaladas
 
 ### UI/UX Pro Max
