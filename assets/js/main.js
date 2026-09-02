@@ -60,8 +60,21 @@ document.addEventListener("DOMContentLoaded", () => {
     (entradas) => {
       entradas.forEach((entrada) => {
         if (entrada.isIntersecting) {
-          entrada.target.setAttribute("data-visible", "true");
-          observador.unobserve(entrada.target);
+          const el = entrada.target;
+          el.setAttribute("data-visible", "true");
+          observador.unobserve(el);
+          // clip-path recorta al ras de la caja del elemento, incluso ya revelado
+          // (inset(0 0 0 0) no es "sin recorte", es "recorte exacto en el borde").
+          // Eso corta cualquier cosa que sobresalga de la tarjeta, como la insignia
+          // "Más popular" de Inversión. Al terminar la transición lo quitamos del
+          // todo para que ese tipo de detalles vuelvan a verse completos.
+          el.addEventListener(
+            "transitionend",
+            (ev) => {
+              if (ev.propertyName === "clip-path") el.style.clipPath = "none";
+            },
+            { once: true }
+          );
         }
       });
     },
