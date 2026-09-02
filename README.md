@@ -17,6 +17,8 @@ Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA 
 
 **Fase Experta (agregada el 2026-09-02):** programa de inglés para adultos de 18 a 50 años que entrena funciones ejecutivas usando el inglés como vehículo (fuente: skills `gimnasio-bilingue-curriculo`, `gimnasio-cerebro-mallas-adultos`, `gimnasio-cerebro-sesion-adultos`). 5 niveles (Rookie, Rookie+, Gladiator, Gladiator+, Avenger), 100 sesiones de 110 min, 3x/semana, ~8 meses en total. No se publicó precio porque no está documentado en los skills — el CTA dirige a WhatsApp.
 
+**Nota de marca:** el skill `gimnasio-cerebro-sesion-adultos` pide usar "Gimnasio del Cerebro" a secas (sin CCA) en los materiales internos de la Fase Experta, lo que podría leerse como una sub-marca aparte. Camilo confirmó (2026-09-02) que **todo debe estar integrado** bajo una sola marca: CCA — El Gimnasio del Cerebro. El sitio web no fragmenta en sub-marcas — la Fase Experta vive dentro de la misma identidad visual y de navegación que el resto del programa.
+
 **Contacto:** WhatsApp 301 494 6120 en todo el sitio (confirmado con Camilo el 2026-09-02, incluso para la Fase Experta — un skill tenía registrado por separado 301 491 6120, Camilo confirmó que es el mismo número y ese otro estaba mal).
 
 **Pendiente:**
