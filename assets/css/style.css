@@ -208,11 +208,22 @@ ul { padding-left: 1.2em; }
   position: relative;
   aspect-ratio: 1 / 1;
   border-radius: 28px;
-  background: var(--azul-oscuro);
+  background: radial-gradient(circle at 50% 42%, var(--tint-azul) 0%, #DCEBF0 68%, #CFE3E9 100%);
   display: flex; align-items: center; justify-content: center;
   box-shadow: var(--sombra-lg);
+  overflow: hidden;
 }
 .hero__ilustracion svg { width: 78%; height: 78%; }
+.hero__ilustracion img { width: 74%; height: 74%; object-fit: contain; filter: drop-shadow(0 12px 20px rgba(20,83,137,0.18)); }
+
+/* ---------- Ilustraciones de Oki reutilizables (fuera del hero) ---------- */
+.oki-flotante {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+  filter: drop-shadow(0 8px 16px rgba(20,83,137,0.16));
+}
+.oki-flotante--sm { max-width: 120px; }
 
 /* ---------- Blobs decorativos (reemplazan a Oki mientras llegan los SVG oficiales) ---------- */
 .blob { position: absolute; border-radius: 50%; filter: blur(0px); opacity: 0.5; z-index: -1; }
