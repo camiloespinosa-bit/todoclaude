@@ -42,3 +42,13 @@ Fuente: [emilkowalski/skill](https://github.com/emilkowalski/skill) (MIT). Basad
 | `ask-sonner` | Guía de uso de Sonner (librería de toasts de Emil Kowalski). |
 
 Licencia: MIT (ver `.claude/skills/emilkowalski-skill.LICENSE`).
+
+### Impeccable (fluencia de diseño para agentes)
+
+Fuente: [pbakaus/impeccable](https://github.com/pbakaus/impeccable) (v4.1.3, MIT), de Paul Bakaus. Nace como evolución del skill `frontend-design` de Anthropic.
+
+Se instaló la skill (`.claude/skills/impeccable`) y sus 4 subagentes (`.claude/agents/impeccable-*.md`): 23 comandos (`/impeccable polish`, `/impeccable audit`, `/impeccable critique`, `/impeccable craft`, etc.) y 61 reglas deterministas anti-patrón para diseño de UI generado por IA (fuentes sobreusadas, gradientes morado-azul genéricos, cards anidadas, texto gris sobre fondos de color, etc.).
+
+**Nota importante:** el repo original también instala un *hook* de Claude Code (`PostToolUse` en Edit/Write + `Stop`) que ejecuta automáticamente `scripts/hook.mjs` con Node después de cada edición de archivos de UI, para correr las 61 reglas deterministas en vivo. Ese hook **no se instaló** aquí porque configurar ejecución automática de código requiere tu confirmación explícita — ver `.claude/skills/impeccable/reference/hooks.md` si quieres activarlo. Sin el hook, la skill funciona igual invocando los comandos manualmente (`/impeccable <comando> <target>`); solo se pierde la comprobación automática en cada edición.
+
+Licencia: MIT (ver `.claude/skills/pbakaus-impeccable.LICENSE`). Los archivos `reference/ios.md` y `reference/android.md` están adaptados del proyecto `platform-design-skills` de ehmo (MIT).
