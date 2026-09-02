@@ -21,7 +21,12 @@ Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA 
 
 **Contacto:** WhatsApp 301 494 6120 en todo el sitio (confirmado con Camilo el 2026-09-02, incluso para la Fase Experta — un skill tenía registrado por separado 301 491 6120, Camilo confirmó que es el mismo número y ese otro estaba mal).
 
+**Inversión — Programa infantil (corregido el 2026-09-02, según centrocognitivo.co vigente):** precio por estudiante, sesiones de 55 min. Privada 1:1: $130.000/sesión ($480.000 paquete mensual de 4). Semi-privada (grupos de 3): $85.000/sesión ($320.000/mes) — "más popular". Grupos de 5: $55.000/sesión ($200.000/mes). Reemplaza el modelo anterior de "bloque de 2 meses / programa completo" que no correspondía a los precios reales. Se mantiene la evaluación cognitiva gratuita como puerta de entrada, antes de elegir modalidad.
+
+**Nota sobre centrocognitivo.co (la web anterior de Camilo):** se usó como referencia visual (estilo de fotos cálido/candid, desvanecido a blanco en la base de cada foto) y para confirmar precios vigentes. Camilo aclaró que esa web está desactualizada en la sección de fases — ahí "Fase Experta" todavía aparece como la 5ª fase genérica para 16+ años, no como el programa de inglés para adultos 18-50 que se agregó a este sitio nuevo. No se debe tomar esa página como fuente de verdad para nada relacionado con Fase Experta.
+
 **Pendiente:**
+- Reemplazar las fotos de "ícono" en las tarjetas (Para quién es esto, Así entrenamos el cerebro, Fase Experta) por imágenes reales. Se intentó con Higgsfield (IA generativa) y el resultado no fue aceptable (poses raras, texto ilegible inventado en libros/gráficos) — Camilo está evaluando banco de fotos real en su lugar, tomando como referencia el estilo de centrocognitivo.co. Sin resolver aún.
 - Definir si "Sobre Nosotros" incorpora la historia personal del fundador (se dejó fuera intencionalmente por tratarse de información personal/familiar sensible — ver conversación del 2026-09-02).
 - Agregar fotos reales de la sede cuando estén disponibles.
 
