@@ -52,3 +52,25 @@ Se instaló la skill (`.claude/skills/impeccable`) y sus 4 subagentes (`.claude/
 **Nota importante:** el repo original también instala un *hook* de Claude Code (`PostToolUse` en Edit/Write + `Stop`) que ejecuta automáticamente `scripts/hook.mjs` con Node después de cada edición de archivos de UI, para correr las 61 reglas deterministas en vivo. Ese hook **no se instaló** aquí porque configurar ejecución automática de código requiere tu confirmación explícita — ver `.claude/skills/impeccable/reference/hooks.md` si quieres activarlo. Sin el hook, la skill funciona igual invocando los comandos manualmente (`/impeccable <comando> <target>`); solo se pierde la comprobación automática en cada edición.
 
 Licencia: MIT (ver `.claude/skills/pbakaus-impeccable.LICENSE`). Los archivos `reference/ios.md` y `reference/android.md` están adaptados del proyecto `platform-design-skills` de ehmo (MIT).
+
+### Taste Skill (librería de "gusto" para diseño frontend)
+
+Fuente: [leonxlnx/taste-skill](https://github.com/leonxlnx/taste-skill) (v1.0.0, MIT). Colección de skills "anti-slop": evitan que el resultado se vea genérico/plantilla y aplican direcciones de diseño concretas.
+
+| Skill | Para qué sirve |
+|---|---|
+| `taste-skill` (`design-taste-frontend`) | Skill principal v2: lee el brief, infiere la dirección de diseño correcta y evita interfaces con cara de plantilla. |
+| `taste-skill-v1` | Versión v1 original, conservada por compatibilidad hacia atrás. |
+| `gpt-tasteskill` | Motor UX/UI + GSAP avanzado: estructura AIDA, tipografía editorial ancha, bento grids, ScrollTrigger estricto. |
+| `redesign-skill` | Audita un sitio/app existente, detecta patrones genéricos de IA y lo sube de nivel sin romper funcionalidad. |
+| `brutalist-skill` (`industrial-brutalist-ui`) | Estética brutalista industrial: grillas rígidas, tipografía extrema, degradación analógica. Para dashboards/portafolios densos. |
+| `minimalist-skill` | Interfaces editoriales limpias: monocromo cálido, bento grids planos, sin gradientes ni sombras pesadas. |
+| `soft-skill` (`high-end-visual-design`) | Enseña a diseñar como agencia premium: fuentes, espaciado, sombras y estructuras de card que se ven "caras". |
+| `stitch-skill` | Genera `DESIGN.md` semánticos para Google Stitch: tipografía, color y layout anti-genéricos. |
+| `brandkit` | Generación de brand kits: logos, guías de marca, decks de identidad, mockups premium. |
+| `image-to-code-skill` | Genera imágenes de diseño primero y luego implementa el sitio para que coincida (pensado para Codex). |
+| `imagegen-frontend-web` | Genera una imagen de referencia por cada sección de una landing page (nunca comprime varias secciones en una). |
+| `imagegen-frontend-mobile` | Genera conceptos de pantallas de apps móviles (iOS/Android), con mockups de teléfono. Solo genera imágenes, no código. |
+| `output-skill` (`full-output-enforcement`) | Evita truncar código: fuerza salidas completas y prohíbe placeholders. |
+
+Licencia: MIT (ver `.claude/skills/leonxlnx-taste-skill.LICENSE`).
