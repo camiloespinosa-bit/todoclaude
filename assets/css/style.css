@@ -35,6 +35,7 @@
   --naranja-profundo: #D9690A;
   --azul-vivo: #1C6BA8;
   --verde-profundo: #5E9433;
+  --turquesa-profundo: #3B7986;
 
   /* Curvas de animación (ver skill animate) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -350,8 +351,15 @@ ul { padding-left: 1.2em; }
 .tarjeta--foto .tarjeta__foto {
   width: 100%; height: 170px; object-fit: cover; display: block; flex-shrink: 0;
   background: var(--fondo-claro);
+  /* Redondeo propio (no solo el overflow:hidden del padre): en algunos navegadores,
+     el recorte por overflow de una esquina redondeada deja ver una línea de 1px del
+     fondo detrás en el borde — con el radio puesto aquí también, no hay nada que ver. */
+  border-radius: var(--radio) var(--radio) 0 0;
 }
-.tarjeta--foto .tarjeta__cuerpo { padding: 22px 24px; flex: 1; display: flex; flex-direction: column; }
+.tarjeta--foto .tarjeta__cuerpo {
+  padding: 22px 24px; flex: 1; display: flex; flex-direction: column;
+  border-radius: 0 0 var(--radio) var(--radio);
+}
 .tarjeta--foto .tarjeta__cuerpo p { flex: 1; }
 
 /* Marcador temporal mientras se define la foto real (ver Pendiente en README) */
@@ -359,7 +367,7 @@ ul { padding-left: 1.2em; }
 .tarjeta--foto .tarjeta__foto.tarjeta__foto--azul { background: linear-gradient(135deg, var(--azul-vivo), var(--azul-oscuro)); }
 .tarjeta--foto .tarjeta__foto.tarjeta__foto--naranja { background: linear-gradient(135deg, var(--naranja), var(--naranja-profundo)); }
 .tarjeta--foto .tarjeta__foto.tarjeta__foto--verde { background: linear-gradient(135deg, var(--verde), var(--verde-profundo)); }
-.tarjeta--foto .tarjeta__foto.tarjeta__foto--turquesa { background: linear-gradient(135deg, var(--turquesa), var(--azul-oscuro)); }
+.tarjeta--foto .tarjeta__foto.tarjeta__foto--turquesa { background: linear-gradient(135deg, var(--turquesa), var(--turquesa-profundo)); }
 
 /* ---------- Franja de cifras / evidencia ---------- */
 .cifras { display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; text-align: center; }
