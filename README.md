@@ -19,7 +19,7 @@ Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA 
 
 **Nota de marca:** el skill `gimnasio-cerebro-sesion-adultos` pide usar "Gimnasio del Cerebro" a secas (sin CCA) en los materiales internos de la Fase Experta, lo que podría leerse como una sub-marca aparte. Camilo confirmó (2026-09-02) que **todo debe estar integrado** bajo una sola marca: CCA — El Gimnasio del Cerebro. El sitio web no fragmenta en sub-marcas — la Fase Experta vive dentro de la misma identidad visual y de navegación que el resto del programa.
 
-**Contacto:** WhatsApp 301 494 6120 en todo el sitio (confirmado con Camilo el 2026-09-02, incluso para la Fase Experta — un skill tenía registrado por separado 301 491 6120, Camilo confirmó que es el mismo número y ese otro estaba mal).
+**Contacto:** WhatsApp 301 491 6120 en todo el sitio. Corregido el 2026-09-07: Camilo había confirmado el 2026-09-02 que el número correcto era 301 494 6120 (y que 301 491 6120 estaba mal), pero el 2026-09-07 corrigió que en realidad es al revés — el número correcto es **301 491 6120**. Si vuelve a surgir esta duda, confirmar directamente con Camilo antes de tocar el número en el sitio.
 
 **Inversión — Programa infantil (corregido el 2026-09-02, según centrocognitivo.co vigente):** precio por estudiante, sesiones de 55 min. Privada 1:1: $130.000/sesión ($480.000 paquete mensual de 4). Semi-privada (grupos de 3): $85.000/sesión ($320.000/mes) — "más popular". Grupos de 5: $55.000/sesión ($200.000/mes). Reemplaza el modelo anterior de "bloque de 2 meses / programa completo" que no correspondía a los precios reales. Se mantiene la evaluación cognitiva gratuita como puerta de entrada, antes de elegir modalidad.
 
