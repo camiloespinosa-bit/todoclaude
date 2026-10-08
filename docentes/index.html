@@ -377,7 +377,7 @@ function vGate(){
   '<label class="chk" for="c-adult"><input type="checkbox" id="c-adult"'+(S.f.adult?' checked':'')+'>Soy mayor de edad.</label>'+
   '<div style="position:absolute;left:-9999px" aria-hidden="true"><label>Web<input type="text" id="web" tabindex="-1" autocomplete="off"></label></div>'+
   (S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+
-  '<button class="cta" type="submit"'+(S.sending?' disabled':'')+'>'+(S.sending?'Enviando...':'Enviarme el minikit')+'</button></form>';
+  '<button class="cta" type="submit"'+(S.sending?' disabled':'')+'>'+(S.sending?'Enviando, puede tardar unos segundos...':'Enviarme el minikit')+'</button></form>';
 }
 
 function render(){
