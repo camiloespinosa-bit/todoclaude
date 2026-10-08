@@ -1,4 +1,4 @@
-# Rediseño de @somos_cca
+# Rediseño de @gimnasiodelcerebro.co (antes @somos_cca)
 
 Todo el material usa los SVG oficiales de Oki (`assets/img/oki/`) y la paleta del manual de marca.
 El logo del árbol queda retirado.
