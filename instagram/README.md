@@ -52,3 +52,22 @@ Cada portada mide 1080×1920; lo que Instagram muestra es el círculo del centro
 4. Archivar la imagen sin texto del 25 de julio de 2026 (no aporta y rompe el nuevo look).
 
 Para regenerar los PNG: `node build/render.mjs` desde `instagram/build/`.
+
+## 6. Historias para los destacados (`historias/`)
+
+Una historia por destacado, 1080×1920, con zonas seguras arriba y abajo para la interfaz de Instagram.
+El contenido sale de la web (fases, método y estudios citados); no hay testimonios inventados.
+
+| Historia | Destacado | Al subirla, agregar |
+|---|---|---|
+| `1-cca.png` | ¿Qué es CCA? | Nada |
+| `2-familias.png` | Familias | Sticker de enlace a `gimnasiodelcerebro.co/fases.html` |
+| `3-retos.png` | Retos | Sticker de pregunta o encuesta ("¿Lo lograste?") |
+| `4-ciencia.png` | Ciencia | Sticker de enlace al blog |
+| `5-logros.png` | Logros | Nada |
+| `6-contacto.png` | Contacto | Sticker de enlace a WhatsApp, debajo de "Toca el enlace" |
+
+Pasos: subir la historia → tocar "Destacar" (el corazón) → crear el destacado con su nombre →
+Editar destacado → Editar portada → elegir el `hl-*.png` correspondiente.
+
+Para regenerar: `node build/render-historias.mjs` desde `instagram/build/`.
