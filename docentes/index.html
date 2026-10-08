@@ -149,7 +149,6 @@ label,legend{font-size:13px;font-weight:700}
 label.chk a{color:var(--brand);font-weight:600}
 input[type=text],input[type=email],input[type=tel]{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:48px;width:100%}
 fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
-.priv-info{font-size:13px;line-height:1.5;color:var(--ink);background:#fff;border:2px solid var(--line,#cfe3ea);border-radius:12px;padding:12px 14px;margin:4px 0}
 .chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:13px;line-height:1.5}
 .chk input{margin-top:3px;flex:none;width:18px;height:18px;accent-color:var(--brand)}
 .err{background:var(--bad-bg);color:var(--bad-fg);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700}
@@ -356,15 +355,14 @@ function vResult(){
   h+='<button class="cta" data-act="gate">Quiero mi minikit</button>';
   return h;
 }
-function waDigits(v){var d=String(v||'').replace(/\D/g,'');if(d.length===12&&d.indexOf('57')===0)d=d.slice(2);return d;}
-function waOk(v){return /^3\d{9}$/.test(waDigits(v));}
-function waLink(){var t=(S.name?'Hola, soy '+S.name+'. Hice':'Hola, hice')+' el reto de CCA y quiero reservar mi clase de prueba gratis. Elegí la opción: «'+(R().label.replace(/\.$/,''))+'».';return 'https://wa.me/'+WA_NUM+'?text='+encodeURIComponent(t);}
+function waLink(){var t=(S.name?'Hola, soy '+S.name+'. Quiero':'Hola, quiero')+' agendar mi clase de prueba gratuita de CCA. Elegí la opción: «'+(R().label.replace(/\.$/,''))+'».';return 'https://wa.me/'+WA_NUM+'?text='+encodeURIComponent(t);}
 var WA_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.1.1-.3.2-.5.1-.2-.1-1-.4-2-1.2-.7-.7-1.2-1.5-1.4-1.7-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.3.1.2 1.6 2.4 3.9 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.4.1.4-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3Z"/></svg>';
 function vGate(){
   if(S.sent){
     var live=!!ENDPOINT;
-    return '<div class="center">'+oki(2,170,'')+'<h2>'+(S.name?'¡Listo, '+esc(S.name)+'!':'¡Listo!')+'</h2><p class="lead">Tu kit de instrucciones de aula está listo. Reserva tu clase de prueba gratis por WhatsApp.</p></div>'+
+    return '<div class="center">'+oki(2,170,'')+'<h2>'+(S.name?'¡Listo, '+esc(S.name)+'!':'¡Listo!')+'</h2><p class="lead">Tu kit de instrucciones de aula está listo. Si quieres, reserva tu clase de prueba gratis por WhatsApp.</p></div>'+
     '<a class="cta wa" href="'+waLink()+'" target="_blank" rel="noopener">'+WA_ICON+'Reservar mi clase por WhatsApp</a>'+
+    '<p class="muted" style="text-align:center;margin:-4px 0 10px">Al escribirnos por WhatsApp, tratamos tus datos según nuestra <a href="'+POLICY_URL+'" target="_blank" rel="noopener">política de tratamiento de datos</a>.</p>'+
     '<a class="cta ghost" href="'+KIT_BASE+S.route+'.pdf" target="_blank" rel="noopener">Descargar mi kit (PDF)</a>'+
     '<div class="card"><b>Clase de prueba gratuita</b><span>Virtual, 30 minutos, grupos de 10 docentes. Escríbenos por WhatsApp y te decimos las fechas disponibles.</span></div>'+
     (live?'<p class="muted" style="text-align:center">También te enviamos el kit '+(S.mail?'a <b>'+esc(S.mail)+'</b>':'al correo que registraste')+'. Si no lo ves, revisa la carpeta de spam.</p>':'<p class="muted" style="text-align:center">Prototipo: no se envió ni se guardó nada.</p>')+
@@ -375,17 +373,11 @@ function vGate(){
   '<form id="gate" novalidate>'+
   '<div class="f"><label for="nombre">Nombre</label><input type="text" id="nombre" autocomplete="given-name" value="'+esc(S.f.nombre||'')+'"></div>'+
   '<div class="f"><label for="correo">Correo</label><input type="email" id="correo" autocomplete="email" value="'+esc(S.f.correo||'')+'"></div>'+
-  '<fieldset><legend>Sector donde trabajas</legend><label class="chk" for="s-pub"><input type="radio" name="sector" id="s-pub" value="publico"'+(S.f.sector==='publico'?' checked':'')+'>Público</label><label class="chk" for="s-pri"><input type="radio" name="sector" id="s-pri" value="privado"'+(S.f.sector==='privado'?' checked':'')+'>Privado</label></fieldset>'+
-  '<div class="f"><label for="ciudad">Ciudad (opcional)</label><input type="text" id="ciudad" autocomplete="address-level2" value="'+esc(S.f.ciudad||'')+'"></div>'+
-  '<div class="f"><label for="whats">WhatsApp</label><input type="tel" id="whats" inputmode="tel" autocomplete="tel" placeholder="300 123 4567" value="'+esc(S.f.whats||'')+'"></div>'+
-  '<p class="priv-info"><strong>Antes de enviar:</strong> Experiencias Cotidianas SAS (CCA, El Gimnasio del Cerebro) tratará tu nombre, correo, sector, ciudad (opcional), WhatsApp, ruta y resultados en el juego, la campaña por la que llegaste y los mensajes que intercambiemos por WhatsApp, para enviarte el kit por correo y por WhatsApp, coordinar por WhatsApp tu clase de prueba gratuita y mejorar este juego, conforme a la Ley 1581 de 2012. Tu WhatsApp es necesario para agendar tu clase. Tus datos se guardan en servicios de Google y la conversación se hace por WhatsApp (Meta Platforms); ambos pueden operar fuera de Colombia. Puedes conocer, actualizar, rectificar o pedir la supresión de tus datos y revocar tu autorización escribiendo a gerencia@centrocognitivo.co o por WhatsApp al 301 491 6120.</p>'+
-  '<label class="chk" for="c-auth"><input type="checkbox" id="c-auth"'+(S.f.auth?' checked':'')+'><span>Autorizo el tratamiento de mis datos personales según la <a href="'+POLICY_URL+'" target="_blank" rel="noopener">política de tratamiento de datos</a>.</span></label>'+
-  '<label class="chk" for="c-com-mail"><input type="checkbox" id="c-com-mail"'+(S.f.comMail?' checked':'')+'><span>(Opcional) Quiero recibir por <strong>correo electrónico</strong> información y ofertas del curso de inglés para docentes de CCA. Puedo dejar de recibirlas cuando quiera respondiendo BAJA al mensaje.</span></label>'+
-  '<label class="chk" for="c-com-wa"><input type="checkbox" id="c-com-wa"'+(S.f.comWa?' checked':'')+'><span>(Opcional) Quiero recibir por <strong>WhatsApp</strong> información y ofertas del curso de inglés para docentes de CCA. Puedo dejar de recibirlas cuando quiera respondiendo BAJA al mensaje.</span></label>'+
-  '<label class="chk" for="c-adult"><input type="checkbox" id="c-adult"'+(S.f.adult?' checked':'')+'>Soy mayor de edad.</label>'+
+  '<label class="chk" for="c-auth"><input type="checkbox" id="c-auth"'+(S.f.auth?' checked':'')+'><span>Acepto el tratamiento de mis datos personales por Experiencias Cotidianas SAS (CCA) según la <a href="'+POLICY_URL+'" target="_blank" rel="noopener">política de tratamiento de datos</a>.</span></label>'+
   '<div style="position:absolute;left:-9999px" aria-hidden="true"><label>Web<input type="text" id="web" tabindex="-1" autocomplete="off"></label></div>'+
   (S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+
-  '<button class="cta" type="submit"'+(S.sending?' disabled':'')+'>'+(S.sending?'Enviando, puede tardar unos segundos...':'Enviarme el minikit')+'</button></form>';
+  '<button class="cta" type="submit" id="send"'+((S.sending||!S.f.auth)?' disabled':'')+'>'+(S.sending?'Enviando, puede tardar unos segundos...':'Enviarme el minikit')+'</button>'+
+  '<p class="muted" style="text-align:center;margin-top:8px">Usaremos tus datos para enviarte el kit por correo y responder tus preguntas.</p></form>';
 }
 
 function render(){
@@ -445,26 +437,23 @@ document.addEventListener('click',function(e){
   }
   window.scrollTo(0,0);
 });
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='c-auth'){var b=document.getElementById('send');if(b)b.disabled=!e.target.checked||!!S.sending;}});
 document.addEventListener('submit',function(e){
   e.preventDefault();
   var hp=document.getElementById('web');
   var n=document.getElementById('nombre').value.trim(),m=document.getElementById('correo').value.trim();
-  var sec=document.querySelector('input[name="sector"]:checked');
-  S.f={nombre:n,correo:m,sector:sec?sec.value:'',ciudad:document.getElementById('ciudad').value.trim(),whats:document.getElementById('whats').value.trim(),auth:document.getElementById('c-auth').checked,comMail:document.getElementById('c-com-mail').checked,comWa:document.getElementById('c-com-wa').checked,adult:document.getElementById('c-adult').checked};
+  S.f={nombre:n,correo:m,auth:document.getElementById('c-auth').checked};
   if(hp&&hp.value){S.name=n||'';S.mail=m;S.sent=true;render();return;}
   if(!n)S.err='Escribe tu nombre.';
   else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m))S.err='Revisa tu correo: parece incompleto.';
-  else if(!waOk(S.f.whats))S.err='Escribe tu número de WhatsApp: 10 dígitos, por ejemplo 300 123 4567.';
-  else if(!sec)S.err='Elige si trabajas en el sector público o privado.';
-  else if(!document.getElementById('c-auth').checked)S.err='Para enviarte el minikit necesitamos tu autorización de tratamiento de datos.';
-  else if(!document.getElementById('c-adult').checked)S.err='Este reto es solo para personas mayores de edad.';
+  else if(!S.f.auth)S.err='Para enviarte el minikit necesitamos tu autorización de tratamiento de datos.';
   else{
     S.err='';S.name=n;S.mail=m;
     if(!ENDPOINT){S.sent=true;}
     else{
       if(S.sending)return;
       S.sending=true;render();
-      var payload={nombre:n,correo:m,sector:sec.value,ciudad:document.getElementById('ciudad')?document.getElementById('ciudad').value.trim():'',whatsapp:'+57'+waDigits(S.f.whats),ruta:S.route,aciertos1:cnt(S.r1,0,8),aciertos2:cnt(S.r2,0,4),version_aviso:AUTH_VERSION,mayor:true,autoriza:true,autoriza_comercial_correo:S.f.comMail===true,autoriza_comercial_whatsapp:S.f.comWa===true,web:'',origen:origin()};
+      var payload={nombre:n,correo:m,ruta:S.route,aciertos1:cnt(S.r1,0,8),aciertos2:cnt(S.r2,0,4),version_aviso:AUTH_VERSION,autoriza:true,web:'',origen:origin()};
       fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
         .then(function(){S.sending=false;S.sent=true;lockSet({route:S.route,r1:S.r1,r2:S.r2,sent:true});render();window.scrollTo(0,0);})
         .catch(function(){S.sending=false;S.err='No pudimos enviar tus datos. Revisa tu conexión e inténtalo otra vez, o escríbenos por WhatsApp.';render();});
