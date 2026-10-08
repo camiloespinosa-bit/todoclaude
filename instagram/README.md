@@ -7,7 +7,11 @@ El logo del árbol queda retirado.
 
 `perfil.png` (1080×1080). Instagram la recorta en círculo; Oki ya está centrado para eso.
 
-## 2. Nombre (es lo que Instagram indexa en búsquedas)
+## 2. Usuario y nombre
+
+Usuario: `@gimnasiodelcerebro.co` (igual al dominio de la web).
+
+Nombre (es lo que Instagram indexa en búsquedas):
 
 ```
 Gimnasio del Cerebro | CCA Rionegro
@@ -23,7 +27,7 @@ Gimnasio del Cerebro | CCA Rionegro
 👇 Clase de prueba gratis
 ```
 
-- Enlace: `centrocognitivo.co`
+- Enlace: `https://gimnasiodelcerebro.co` (reemplaza a `centrocognitivo.co`, que es la web anterior)
 - Botón de contacto: activar **WhatsApp** (+57 301 491 6120) en Editar perfil → Opciones de contacto.
 
 ## 4. Historias destacadas
