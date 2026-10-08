@@ -21,7 +21,7 @@ Gimnasio del Cerebro | CCA Rionegro
 
 ```
 🧠 El cerebro se entrena como un músculo
-🐙 Para niños, familias y adultos mayores
+🐙 Para niños, jóvenes y adultos
 🔬 Basado en neurociencia
 📍 Rionegro, Antioquia
 👇 Clase de prueba gratis
