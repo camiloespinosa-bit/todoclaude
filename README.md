@@ -9,7 +9,7 @@ Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA 
 - `fases.html` — Fases del Programa (Sensorial, Lúdica, Lógica, Crítica + Fase Experta de inglés para adultos 18-50 + Programa Adulto Vital 65+)
 - `nosotros.html` — Sobre Nosotros
 - `blog/index.html` + `blog/*.html` — Blog (2 artículos iniciales)
-- `docentes/index.html` — Circuito de retos para docentes (embudo del curso de inglés de 200 horas). Autocontenido; el formulario envía a un Google Apps Script que guarda en la hoja "Leads docentes" (Drive > CCA > Embudo docentes) y envía el kit. Tiene `noindex` hasta el lanzamiento. `docentes/kit-ruta-1.pdf` es el kit de la ruta 1. Faltan los kits de las rutas 2 y 3 (esos leads se guardan sin correo).
+- `docentes/index.html` — Circuito de retos para docentes (embudo del curso de inglés de 200 horas). Autocontenido; el formulario envía a un Google Apps Script que guarda en la hoja "Leads docentes" (Drive > CCA > Embudo docentes) y envía el kit. Tiene `noindex` hasta el lanzamiento. `docentes/kit-ruta-1.pdf`, `kit-ruta-2.pdf` y `kit-ruta-3.pdf` son los kits por ruta (las URLs deben coincidir con KIT_URLS en el Apps Script).
 - `privacidad.html` — BORRADOR de la política de tratamiento de datos (Ley 1581). No publicar como oficial hasta que un asesor jurídico la revise y se completen NIT, dirección, fecha y plazo de conservación.
 
 **Estilos y assets:**
