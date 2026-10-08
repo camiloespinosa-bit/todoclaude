@@ -5,7 +5,7 @@ Ritmo: martes y jueves, entre 6:30 y 7:30 a. m. (hora Colombia). Es una hipótes
 
 | Fecha | Día | Tema | Función ejecutiva | Formato | Fuente | Invita al taller |
 |---|---|---|---|---|---|---|
-| 8 oct | Jue | "¿Profe, qué dijo?": el cajón que se llena | Memoria de trabajo | Texto | Píldora 3 | No |
+| 7 oct | Mié | "¿Profe, qué dijo?": el cajón que se llena | Memoria de trabajo | Texto | Píldora 3 | No |
 | 13 oct | Mar | "No quiere" o "no puede" | Memoria de trabajo | Texto | Píldora 4 | No |
 | 15 oct | Jue | Reto Stroop: ¿puede tu cerebro frenar lo automático? | Control inhibitorio | Carrusel PDF | Diapositivas 20 a 43 | No |
 | 20 oct | Mar | Por qué "no interrumpas" es tan difícil + parqueadero de ideas | Control inhibitorio | Texto | Píldora 6 | Sí, en el primer comentario |
