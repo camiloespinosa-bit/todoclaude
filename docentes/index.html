@@ -245,6 +245,12 @@ document.getElementById('lockOki').innerHTML='<img src="'+OKI[1]+'" alt="Oki">';
 var canSpeak=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
 function fresh(){return {screen:'entry',route:null,i:0,r1:[],r2:[],ans:null,reveal:false,streak:0,phase:'show',tray:[],placed:[],checked:false,tk:0,sent:false,sending:false,err:'',name:'',mail:'',f:{}};}
 var S=fresh();
+/* Una sola vez por navegador: al terminar se guarda el resultado y no se puede repetir la prueba. Para probar: agrega ?reset=1 a la URL. */
+var LOCK='cca_docentes_v1';
+function lockGet(){try{return JSON.parse(localStorage.getItem(LOCK)||'null');}catch(e){return null;}}
+function lockSet(o){try{localStorage.setItem(LOCK,JSON.stringify(o));}catch(e){}}
+if(/[?&]reset=1/.test(location.search)){try{localStorage.removeItem(LOCK);}catch(e){}}
+if(ENDPOINT){var lk=lockGet();if(lk&&lk.route&&lk.r1&&lk.r2){S.route=lk.route;S.r1=lk.r1;S.r2=lk.r2;S.sent=!!lk.sent;S.screen=lk.sent?'gate':'result';}}
 
 function speak(t){
   if(!canSpeak)return;
@@ -343,8 +349,8 @@ function vResult(){
 function vGate(){
   if(S.sent){
     var live=!!ENDPOINT;
-    return '<div class="center">'+oki(2,170,'')+'<h2>Gracias, '+esc(S.name)+'.</h2><p class="lead">'+(live?'Te enviaremos el kit de instrucciones de aula a <b>'+esc(S.mail)+'</b>. Si no lo ves en unos minutos, revisa la carpeta de spam.':'En la web real, aquí recibirías por correo el minikit de instrucciones de aula de tu ruta y el enlace para reservar tu clase de prueba gratuita.')+'</p></div>'+
-    '<div class="card"><b>Clase de prueba gratuita</b><span>Virtual, 30 minutos, 10 cupos por clase.</span></div>'+(live?'':'<p class="muted" style="text-align:center">Prototipo: no se envió ni se guardó nada.</p>')+'<button class="cta ghost" data-act="restart">Jugar de nuevo</button>';
+    return '<div class="center">'+oki(2,170,'')+'<h2>Gracias'+(S.name?', '+esc(S.name):'')+'.</h2><p class="lead">'+(live?'Te enviaremos el kit de instrucciones de aula '+(S.mail?'a <b>'+esc(S.mail)+'</b>':'al correo que registraste')+'. Si no lo ves en unos minutos, revisa la carpeta de spam.':'En la web real, aquí recibirías por correo el minikit de instrucciones de aula de tu ruta y el enlace para reservar tu clase de prueba gratuita.')+'</p></div>'+
+    '<div class="card"><b>Clase de prueba gratuita</b><span>Virtual, 30 minutos, 10 cupos por clase.</span></div>'+(live?'':'<p class="muted" style="text-align:center">Prototipo: no se envió ni se guardó nada.</p>')+(live?'':'<button class="cta ghost" data-act="restart">Jugar de nuevo</button>');
   }
   return '<div class="center">'+oki(5,150,'Oki ejercitando')+'<h2>Recibe tu minikit de instrucciones de aula y reserva tu clase de prueba</h2></div>'+
   '<div class="card"><b>Clase de prueba gratuita</b><span>Virtual, 30 minutos, 10 cupos por clase.</span></div>'+
@@ -412,7 +418,7 @@ document.addEventListener('click',function(e){
     case 'next1':if(S.i<7){S.i++;startG1();}else{S.screen='intro2';render();}break;
     case 'hide':S.phase='build';S.tk++;render();break;
     case 'check':var n=Rr.memo[S.i].c.length,good2=S.placed.length===n&&S.placed.every(function(v,q){return v===q;});S.checked=true;S.r2[S.i]=good2;plus(good2);render();return;
-    case 'next2':if(S.i<3){S.i++;startG2();}else{S.screen='result';render();}break;
+    case 'next2':if(S.i<3){S.i++;startG2();}else{S.screen='result';lockSet({route:S.route,r1:S.r1,r2:S.r2,sent:false});render();}break;
     case 'gate':S.screen='gate';S.err='';render();break;
     case 'restart':S=fresh();render();break;
   }
@@ -438,7 +444,7 @@ document.addEventListener('submit',function(e){
       S.sending=true;render();
       var payload={nombre:n,correo:m,sector:sec.value,ciudad:document.getElementById('ciudad')?document.getElementById('ciudad').value.trim():'',whatsapp:document.getElementById('whats')?document.getElementById('whats').value.trim():'',ruta:S.route,aciertos1:cnt(S.r1,0,8),aciertos2:cnt(S.r2,0,4),version_aviso:AUTH_VERSION,mayor:true,autoriza:true,web:'',origen:origin()};
       fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
-        .then(function(){S.sending=false;S.sent=true;render();window.scrollTo(0,0);})
+        .then(function(){S.sending=false;S.sent=true;lockSet({route:S.route,r1:S.r1,r2:S.r2,sent:true});render();window.scrollTo(0,0);})
         .catch(function(){S.sending=false;S.err='No pudimos enviar tus datos. Revisa tu conexión e inténtalo otra vez, o escríbenos por WhatsApp.';render();});
       return;
     }
