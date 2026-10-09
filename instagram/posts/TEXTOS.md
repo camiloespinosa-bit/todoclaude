@@ -2,6 +2,8 @@
 
 Formato: carrusel, 1080×1440 (3:4). Subir las imágenes en orden (1.png, 2.png, ...).
 Una publicación cada 2 o 3 días, no las tres juntas.
+Instagram permite máximo 5 hashtags por publicación; siempre van 2 locales (#Rionegro #OrienteAntioqueño).
+Al publicar, agregar la ubicación "Rionegro, Antioquia".
 
 | Orden | Carpeta | Fecha sugerida |
 |---|---|---|
@@ -26,7 +28,7 @@ Entrenamos a niños de 0 a 15 años, docentes, adultos que quieren aprender ingl
 
 📍 Rionegro, Antioquia
 
-#GimnasioDelCerebro #FuncionesEjecutivas #NeurocienciaAplicada #Rionegro #Antioquia #OrienteAntioqueño #DesarrolloInfantil #EntrenamientoCognitivo
+#GimnasioDelCerebro #FuncionesEjecutivas #DesarrolloInfantil #Rionegro #OrienteAntioqueño
 ```
 
 ## 2. ¿Tu hijo se distrae o se rinde fácil?
@@ -47,7 +49,7 @@ Si te identificaste, tu hijo no tiene nada "malo". Está listo para entrenarse.
 
 ¿Te pasa esto en casa? Cuéntanos en los comentarios 👇
 
-#CrianzaConsciente #FuncionesEjecutivas #DesarrolloInfantil #NeurocienciaAplicada #PapásYMamás #Rionegro #Antioquia #GimnasioDelCerebro
+#CrianzaConsciente #FuncionesEjecutivas #DesarrolloInfantil #Rionegro #OrienteAntioqueño
 ```
 
 ## 3. Reto: di el color, no la palabra
@@ -64,7 +66,7 @@ Lo bueno: ese freno se entrena. Es justo lo que hacemos en el Gimnasio del Cereb
 👇 Cuéntanos en los comentarios: ¿en qué nivel te equivocaste?
 Etiqueta a alguien que creas que no pasa del nivel 2 😉
 
-#RetoMental #EfectoStroop #FuncionesEjecutivas #Autocontrol #GimnasioDelCerebro #Rionegro #Antioquia #NeurocienciaAplicada
+#RetoMental #EfectoStroop #Autocontrol #Rionegro #OrienteAntioqueño
 ```
 
 ---
