@@ -2,6 +2,8 @@
 
 Borrador v1, 2026-10-12. Todo lo necesario para correr el piloto por WhatsApp, sin programar nada. Complementa `CONCEPTO-APP-OKI.md`.
 
+**Enfoque: solo adultos.** Los retos para niños quedaron guardados en `RETOS-NINOS-PARA-DESPUES.md`.
+
 **La pregunta que responde el piloto:** ¿la gente hace los retos sin que la persigamos?
 
 ## 1. Calendario
@@ -11,9 +13,94 @@ Borrador v1, 2026-10-12. Todo lo necesario para correr el piloto por WhatsApp, s
 - **Sin recordatorios individuales.** Solo se permite un recordatorio general al grupo el día siguiente al envío. Si recordamos uno por uno, el piloto deja de medir lo que queremos medir.
 - Semana 0 (antes de empezar): invitaciones, consentimientos firmados y la hoja de registro lista.
 
-## 2. Adultos: grupo Gladiator
+## 2. Cómo se arma el escuadrón en WhatsApp
 
-**Formato:** grupo de WhatsApp del escuadrón (5 personas + docente). Cada reto se responde con **una nota de voz al grupo** y, cuando el reto lo pide, con **una respuesta de voz a un compañero**.
+**Quiénes:** los 5 estudiantes de un mismo grupo de clase Gladiator, más el docente. Ya se conocen y ya hablan inglés juntos en clase, así que mandar notas de voz entre ellos da menos miedo que hacerlo con desconocidos.
+
+**Desde qué número:** el WhatsApp del Gimnasio del Cerebro (301 491 6120), no el número personal del docente. Así el grupo pertenece a la empresa y no se pierde si cambia el docente.
+
+**Paso a paso:**
+
+1. **Antes de crear el grupo,** cada estudiante firma la autorización de datos (sección 7). Nadie entra al grupo sin firmarla.
+2. **Crear el grupo** desde el WhatsApp del Gimnasio:
+   - Nombre: `Escuadrón Gladiator · Retos con Oki`
+   - Foto: Oki saludando (archivo oficial `oki-base-saludo`, nunca una versión hecha con IA).
+   - Descripción: las reglas del escuadrón (abajo).
+3. **Ajustes del grupo** (en *Configuración del grupo*):
+   - *Editar información del grupo:* solo administradores.
+   - *Enviar mensajes:* todos los participantes.
+   - *Aprobar nuevos participantes:* activado.
+   - *Mensajes temporales:* **desactivado**, porque las notas de voz se necesitan para medir.
+4. **Agregar a los estudiantes en la clase presencial,** no por mensaje. Se les comparte el enlace de invitación ahí mismo, se unen, y cada uno graba su primera nota de voz en ese momento: *"Hi, I'm ___ and I'm ready."* Así nadie empieza el lunes con el miedo de la primera nota.
+5. **Fijar el mensaje de reglas** (mantener presionado → *Fijar*).
+
+**Mensaje de reglas, para fijar en el grupo:**
+
+> 🐙 **Escuadrón Gladiator · Retos con Oki**
+>
+> 1. Oki manda un reto los **lunes, miércoles y viernes a las 7:00 a.m.**
+> 2. Respondes con **una nota de voz en inglés**. Tienes hasta el siguiente reto.
+> 3. Cada semana tienes un **compañero asignado**. Cuando él o ella suba su nota, le respondes **con otra nota de voz**, no con stickers ni emojis.
+> 4. Equivocarse es parte del entrenamiento. Aquí nadie corrige a nadie: escuchamos y respondemos.
+> 5. Lo que se dice en el escuadrón se queda en el escuadrón. No se reenvían audios fuera del grupo.
+
+## 3. Cómo funcionan las respuestas de voz (la rueda)
+
+El riesgo de pedir "respondan a alguien" es que todos le respondan al primero que habló, o que nadie le responda a nadie. Por eso cada persona tiene **un compañero asignado por semana**, en rueda:
+
+| Semana | Ana le responde a | Beto a | Carla a | David a | Elena a |
+|---|---|---|---|---|---|
+| 1 | Beto | Carla | David | Elena | Ana |
+| 2 | Carla | David | Elena | Ana | Beto |
+| 3 | David | Elena | Ana | Beto | Carla |
+| 4 | Elena | Ana | Beto | Carla | David |
+
+Así, en 4 semanas cada persona le responde una vez a cada compañero, y **todos reciben siempre una respuesta.**
+
+**Cómo se responde en WhatsApp:** se desliza la nota de voz del compañero hacia la derecha (o se mantiene presionada y se elige *Responder*) y se graba la respuesta. La respuesta queda pegada a ese audio, y el docente puede ver quién le respondió a quién.
+
+**Qué tiene que tener una respuesta:**
+- De 20 a 60 segundos, en inglés.
+- Una reacción a lo que dijo el compañero (*I liked when you said... / I see your point, but...*).
+- **Una pregunta** para él o ella (*What about...? Why do you think...?*).
+
+La pregunta es lo que convierte el reto en una conversación: obliga a escuchar de verdad y le da al otro una razón para volver al grupo.
+
+**Cada lunes,** antes del reto, el docente publica la rueda de la semana:
+
+> 🔄 Rueda de esta semana: Ana → Beto · Beto → Carla · Carla → David · David → Elena · Elena → Ana
+
+## 4. Cómo lograr que lo hagan sin perseguirlos
+
+"Sin perseguirlos" no significa dejarlos solos. Significa que **lo que los mueve a hacer el reto sea el grupo y su propio avance, no el docente escribiéndoles por privado.** Esto es lo que se hace y lo que no.
+
+**Lo que sí se hace:**
+
+1. **Hora fija.** Los retos llegan siempre lunes, miércoles y viernes a las 7:00 a.m. La rutina predecible ayuda a formar el hábito.
+2. **Compromiso en voz alta.** En la clase de arranque, cada uno dice frente al grupo en qué momento del día va a hacer los retos (*"I'll do it on my way to work"*). Decirlo frente a otros aumenta la probabilidad de cumplirlo.
+3. **El compañero asignado es el motor.** Si Beto no sube su nota, Ana no tiene a quién responderle, y eso se nota en el grupo. La presión es entre pares, amable, y no viene del docente.
+4. **El docente responde a quien sí lo hizo.** Cada vez que alguien sube su nota, el docente reacciona con una frase corta (*"Great energy, Carla! 1:12 today."*). Se refuerza a quien cumple, no se regaña a quien no.
+5. **Marcador grupal los viernes en la noche.** Muestra cómo va el escuadrón, nunca quién falló:
+
+> 📊 Escuadrón esta semana: **13 de 15 retos** completados. 🔥
+> Minutos totales hablados en inglés: **14:30**.
+> ¡El lunes viene el reto #4!
+
+6. **Avance personal por privado, cada viernes** (es lo único que va por privado, y es una buena noticia, no un reclamo):
+
+> Carla, tu nota más larga esta semana fue de **1:24**. La semana pasada fue de **0:58**. 💪
+
+**Lo que no se hace:**
+- Escribirle por privado a quien no hizo el reto.
+- Nombrar en el grupo a quien no lo hizo.
+- Mandar más de **un** recordatorio general al grupo por reto (el día siguiente, y sin nombres): *"Recuerden: el reto #2 está abierto hasta el viernes a las 7:00 a.m."*
+
+**Si alguien deja de participar:** se anota en la hoja de registro y no se le persigue. En la semana 4, en la encuesta de cierre, se le pregunta qué lo hizo dejar de participar. Ese dato es tan valioso como el de quien completó todo: dice qué hay que cambiar antes de construir la app.
+
+
+## 5. Los 12 retos: grupo Gladiator
+
+Cada reto se responde con **una nota de voz al grupo** y, con **una respuesta de voz a su compañero de la semana** (ver sección 3).
 
 **Qué mide el docente:** la duración de cada nota de voz (WhatsApp la muestra), si la persona hizo el reto y si le respondió a un compañero.
 
@@ -24,7 +111,7 @@ La duración sube cada semana a propósito: semana 1, 60 a 90 segundos; semana 4
 **Reto 1 (lunes): Hot take** · Planeación
 > 🐙 Oki's challenge #1: Is working from home better than working at the office? Record **60 seconds** with your opinion.
 > Use: *I think... because... For example... That's why...*
-> Bonus: listen to one teammate and reply: *I see your point, but...*
+> Then listen to your **teammate of the week** and reply: *I see your point, but...*
 
 **Reto 2 (miércoles): Palabras prohibidas** · Control inhibitorio
 > 🐙 Oki's challenge #2: Tell us about your weekend for **60 seconds**. Forbidden words: **very, good, nice, thing**. If you say one, keep going!
@@ -43,7 +130,7 @@ La duración sube cada semana a propósito: semana 1, 60 a 90 segundos; semana 4
 **Reto 5 (miércoles): Consultorio** · Interacción (condicional tipo 1)
 > 🐙 Oki's challenge #5: Two parts.
 > 1) Record **30 seconds** about a small real problem (work, traffic, sleep, anything).
-> 2) Listen to the teammate **above you** and give advice for **60 seconds**: *If you..., you'll... / You could try... / Have you thought about...?*
+> 2) Listen to your **teammate of the week** and give advice for **60 seconds**: *If you..., you'll... / You could try... / Have you thought about...?*
 
 **Reto 6 (viernes): Cambio de rumbo** · Flexibilidad cognitiva
 > 🐙 Oki's challenge #6: Talk for **90 seconds**. Start with **food**. Halfway, switch to **travel** without stopping.
@@ -77,73 +164,7 @@ La duración sube cada semana a propósito: semana 1, 60 a 90 segundos; semana 4
 > Then ask **two teammates** one question about their stories.
 > El docente comparte al grupo la duración del reto 1 y la del reto 12 de cada persona (con su permiso).
 
-## 3. Niños de 6 a 15 años: en familia
-
-**Formato:** mensaje privado a cada familia. **Nunca un grupo con datos de niños.** El adulto lee el reto, lo hace con el niño y responde al docente con:
-- ✅ logrado / ❌ no logrado / ➖ no lo hicimos
-- el nivel alcanzado, cuando el reto lo pide
-- opcional: una frase de cómo le fue
-
-**No pedimos videos ni audios del niño.** Así el piloto recoge el mínimo de datos de menores.
-
-Cada reto tiene dos versiones: **Lógica (6 a 10 años)** y **Crítica (11 a 15 años)**. Si en la casa hay hermanos de las dos edades, pueden hacer cada uno su versión. Todos los retos duran entre 3 y 5 minutos y salen de los bloques que el niño ya conoce en sus sesiones.
-
-### Semana 1
-
-**Reto 1: La clave secreta** · Memoria de trabajo
-- **Lógica (Agentes Secretos):** el adulto nombra 3 objetos de la casa. El agente los trae en ese orden. Si lo logra, la clave sube a 4, luego a 5. *Registrar: clave más larga lograda.*
-- **Crítica (La Sala de Guerra):** el adulto dice una lista de mercado. El estratega la repite **al revés**. Empezar con 4 cosas y subir. *Registrar: lista más larga al revés.*
-
-**Reto 2: Oki dice al revés** · Control inhibitorio
-- **Lógica (Ninjas del Autocontrol):** si el adulto dice "manos arriba", el ninja baja las manos; si dice "siéntate", se para. 10 órdenes. *Registrar: aciertos de 10.*
-- **Crítica (Protocolo Frío):** conversación de 2 minutos con un familiar en la que no puede decir "sí" ni "no". *Registrar: logrado o cuántas veces se le escapó.*
-
-**Reto 3: ¿Cómo me sentí hoy?** · Inteligencia emocional
-- **Lógica (Exploradores Internos):** en la noche, el niño elige la emoción del día (alegría, sorpresa, calma, enojo, tristeza) y le cuenta a la familia por qué.
-- **Crítica (Quién Soy Cuando Nadie Mira):** contar 2 cosas que hizo hoy de las que se siente orgulloso, aunque nadie las haya visto.
-
-### Semana 2
-
-**Reto 4: Contar una historia** · Expresión oral
-- **Lógica (Narradores de Aventuras):** escoger 3 cosas de su cuarto y contar una aventura de 1 minuto con ellas.
-- **Crítica (El Tribunal):** defender durante 1 minuto que las tareas deberían ser obligatorias. Luego, 1 minuto defendiendo lo contrario.
-
-**Reto 5: Cambio de regla** · Flexibilidad cognitiva
-- **Lógica (Pilotos de Obstáculos):** ordenar 10 objetos por color. Cuando el adulto diga "¡cambio!", reordenarlos por tamaño.
-- **Crítica (Cambio de Órbita):** decir en 1 minuto todos los usos distintos que se le ocurran para una cuchara. *Registrar: cuántos usos.*
-
-**Reto 6: Hacerlo juntos** · Habilidades sociales
-- **Lógica (Constructores de Equipos):** construir con la familia una torre de 10 objetos, poniendo un objeto por turno. Si se cae, se habla de qué cambiar y se intenta otra vez.
-- **Crítica (Mi Voz):** practicar con un familiar cómo pedir algo importante sin gritar ni rendirse: qué quiero, por qué, qué propongo.
-
-### Semana 3
-
-**Reto 7: Atrapa la palabra** · Atención
-- **Lógica (Rastreadores de Señales):** el adulto lee 20 palabras despacio. El niño aplaude solo cuando escucha un animal. *Registrar: aciertos.*
-- **Crítica (El Analista):** igual, pero aplaude con animales **y** pisa fuerte con frutas. *Registrar: aciertos.*
-
-**Reto 8: Rápido y preciso** · Velocidad / lectura crítica
-- **Lógica (Velocistas Mentales):** nombrar 10 cosas rojas en 30 segundos. *Registrar: cuántas.*
-- **Crítica (Detrás del Titular):** el adulto lee un titular de noticia. El joven dice qué información le falta para creerlo.
-
-**Reto 9: Mi botón de calma** · Autorregulación
-- **Lógica (Ingenieros Emocionales):** practicar 5 veces la respiración del globo: inflar la barriga despacio y soltar. Acordar con la familia cuándo usarla.
-- **Crítica (El Ojo del Huracán):** recordar algo que lo frustró esta semana y explicar los 3 pasos que usaría la próxima vez.
-
-### Semana 4
-
-**Reto 10: La clave secreta nivel 2** · Memoria de trabajo
-- Igual al reto 1, empezando en el nivel que logró la primera vez. *Registrar: clave más larga.*
-- Sirve para comparar con el reto 1. **Ojo:** si mejora, muestra práctica en este juego, no que su memoria haya mejorado en general.
-
-**Reto 11: Resolver en familia** · Resolución de conflictos / planificación
-- **Lógica (Escuadrón Anti-Conflictos):** dos personas quieren ver películas distintas. El niño propone 2 soluciones justas.
-- **Crítica (Año Cero):** planear con la familia el almuerzo del domingo con un presupuesto fijo.
-
-**Reto 12: Ahora el entrenador eres tú** · Integración
-- El niño elige su reto favorito del mes y lo dirige: explica las reglas y la familia lo intenta. *Registrar: qué reto eligió y por qué.*
-
-## 4. Mensajes listos para enviar
+## 6. Mensajes listos para enviar
 
 ### Invitación a los adultos (grupo Gladiator)
 
@@ -155,17 +176,7 @@ Cada reto tiene dos versiones: **Lógica (6 a 10 años)** y **Crítica (11 a 15 
 >
 > ¿Te le mides? Si dices que sí, te enviamos una autorización corta para el uso de tus notas de voz.
 
-### Invitación a las familias
-
-> Hola, [nombre]. En el Gimnasio del Cerebro estamos probando **Retos con Oki en familia**, y queremos invitarlos.
->
-> Son 4 semanas, 3 retos por semana, de 3 a 5 minutos cada uno, para hacer en casa con [nombre del niño]. Son juegos que salen de lo que [él/ella] ya entrena en sus sesiones: memoria, atención, autocontrol, emociones. No necesitan pantallas ni materiales especiales.
->
-> Ustedes solo nos responden si lo lograron o no, con una frase de cómo les fue. **No les vamos a pedir fotos ni videos de [nombre del niño].**
->
-> No tiene costo. ¿Les gustaría participar? Si dicen que sí, les enviamos una autorización corta.
-
-### Cierre de la semana 4 (adultos y familias)
+### Cierre de la semana 4
 
 > ¡Terminamos! Gracias por estas 4 semanas. Nos ayudan muchísimo si respondes estas 5 preguntas (2 minutos):
 > 1. Del 1 al 10, ¿qué tanto te gustaron los retos?
@@ -174,65 +185,44 @@ Cada reto tiene dos versiones: **Lógica (6 a 10 años)** y **Crítica (11 a 15 
 > 4. ¿Seguirías haciéndolos si existieran en una app?
 > 5. ¿Pagarías por esto? Si sí, ¿cuánto al mes te parecería justo?
 
-## 5. Autorización de datos (borrador)
+## 7. Autorización de datos (borrador)
 
 **Este texto es un borrador y debe revisarlo un asesor jurídico antes de usarse.** Sigue la línea de la política de datos ya publicada en `privacidad.html`.
-
-### Versión para adultos
 
 > Autorizo a **Experiencias Cotidianas SAS** (NIT 901364882-1), marca Gimnasio del Cerebro, a recolectar y conservar mis notas de voz y mis respuestas del piloto "Retos con Oki", con estas únicas finalidades: medir mi práctica de inglés, darme retroalimentación y evaluar si el piloto funciona.
 >
 > Entiendo que:
-> - Mis notas de voz las escuchan mis compañeros de escuadrón y el docente, dentro del grupo de WhatsApp. WhatsApp es un servicio de Meta, que puede guardar la información fuera de Colombia.
+> - Mis notas de voz las escuchan mis compañeros de escuadrón y el docente, dentro del grupo de WhatsApp, y que los demás integrantes del grupo pueden ver mi número de celular. WhatsApp es un servicio de Meta, que puede guardar la información fuera de Colombia.
 > - No se publicarán mis audios ni se usarán en publicidad sin una nueva autorización.
 > - Mis notas de voz se borrarán de los registros del Gimnasio del Cerebro a más tardar [plazo] después de terminar el piloto.
 > - Puedo conocer, corregir o pedir que se borren mis datos, y retirar esta autorización cuando quiera, escribiendo al [canal de atención de la política de datos].
 >
 > Nombre, firma y fecha.
 
-### Versión para familias (menores de edad)
-
-> Como representante legal de [nombre del niño o niña], autorizo a **Experiencias Cotidianas SAS** (NIT 901364882-1), marca Gimnasio del Cerebro, a registrar los resultados que yo reporte de los retos del piloto "Retos con Oki en familia" (logrado o no logrado, nivel alcanzado y comentarios), con la única finalidad de evaluar el piloto y ajustar el acompañamiento de mi hijo o hija.
->
-> Entiendo que:
-> - No se recolectarán fotos, videos ni audios de mi hijo o hija.
-> - Los resultados solo los ve el equipo del Gimnasio del Cerebro y no se comparten con otras familias.
-> - Puedo conocer, corregir o pedir que se borren estos datos, y retirar la autorización cuando quiera, escribiendo al [canal de atención de la política de datos].
->
-> Nombre del representante, documento, firma y fecha.
-
-## 6. Hoja de registro del docente
+## 8. Hoja de registro del docente
 
 Una fila por persona y por reto.
-
-**Adultos**
 
 | Persona | Reto | Fecha de envío | ¿Lo hizo? | Fecha en que lo hizo | Duración de la nota de voz | ¿Respondió a un compañero? | Necesitó recordatorio general | Observación |
 |---|---|---|---|---|---|---|---|---|
 
-**Familias**
-
-| Familia | Niño (edad) | Versión | Reto | ¿Lo hizo? | Resultado (✅/❌) | Nivel alcanzado | Comentario del adulto |
-|---|---|---|---|---|---|---|---|
-
-## 7. Cómo leer los resultados
+## 9. Cómo leer los resultados
 
 Los criterios se definen antes de empezar y no se mueven después (ver `CONCEPTO-APP-OKI.md`, sección 4):
 
 | Pregunta | Cómo se calcula | Meta |
 |---|---|---|
 | ¿Lo hacen solos? | Retos hechos en las semanas 3 y 4 ÷ retos enviados en esas semanas | 60 % o más |
-| ¿Hablan más? (adultos) | Duración del reto 12 frente al reto 1, y del reto 10 frente al reto 2 | Que suba en la mayoría |
-| ¿Se escuchan? (adultos) | Retos con respuesta a un compañero ÷ retos que la pedían | 50 % o más |
+| ¿Hablan más? | Duración del reto 12 frente al reto 1, y del reto 10 frente al reto 2 | Que suba en la mayoría |
+| ¿Se escuchan? | Retos con respuesta a un compañero ÷ retos que la pedían | 50 % o más |
 | ¿Les gustó? | Promedio de la pregunta 1 del cierre | 7 o más |
 | ¿Pagarían? | Respuestas a la pregunta 5 | Solo como señal, no como dato duro |
 
-**Límite honesto:** con 5 adultos y unas 10 familias, esto **no es un estudio científico**. No permite afirmar que los retos mejoran el inglés ni las funciones ejecutivas. Sirve para decidir si vale la pena invertir en la app. Si sube la duración de las notas de voz, puede ser por la práctica, por las clases o por perderle el miedo al grupo, y no hay forma de separar esas causas con este diseño.
+**Límite honesto:** con 5 adultos, esto **no es un estudio científico**. No permite afirmar que los retos mejoran el inglés ni las funciones ejecutivas. Sirve para decidir si vale la pena invertir en la app. Si sube la duración de las notas de voz, puede ser por la práctica, por las clases o por perderle el miedo al grupo, y no hay forma de separar esas causas con este diseño.
 
-## 8. Pendientes antes de arrancar
+## 10. Pendientes antes de arrancar
 
-1. Elegir el grupo Gladiator y las 8 a 10 familias.
-2. Que el asesor jurídico revise las dos autorizaciones y defina el plazo de borrado.
+1. Elegir el grupo Gladiator y la fecha de la clase de arranque.
+2. Que el asesor jurídico revise la autorización y defina el plazo de borrado.
 3. Definir quién coordina: quién envía, quién registra y cuántas horas a la semana le toma.
-4. Fecha de inicio.
-5. **Metas de fluidez:** el sitio dice Gladiator 8 a 12 minutos (cifras que Camilo actualizó el 2026-09-02), pero el skill `gimnasio-cerebro-mallas-adultos` todavía dice 4 a 6. Hay que actualizar el skill para que los materiales nuevos no salgan con las cifras viejas.
+4. **Metas de fluidez:** el sitio dice Gladiator 8 a 12 minutos (cifras que Camilo actualizó el 2026-09-02), pero el skill `gimnasio-cerebro-mallas-adultos` todavía dice 4 a 6. Hay que actualizar el skill para que los materiales nuevos no salgan con las cifras viejas.
