@@ -45,7 +45,9 @@ Misma base técnica, mismo Oki, mismo motor de retos. Cambian el contenido, la m
 
 **Fase 2 (solo si el piloto funciona):** Oki conversacional con IA de voz, que hace preguntas de seguimiento y da 1 o 2 correcciones concretas por reto ("dijiste 'I am agree', se dice 'I agree'").
 
-### 3B. Niños 6 a 15: "Retos de Oki" en familia
+### 3B. Niños 6 a 15: "Retos de Oki" en familia (fase posterior)
+
+> **Decisión del 2026-10-12:** el piloto arranca solo con adultos. Esta experiencia queda para después; los retos ya diseñados están en `RETOS-NINOS-PARA-DESPUES.md`.
 
 Aquí el producto **no es de inglés**. El programa infantil entrena Desarrollo Cognitivo (DC), Habilidades Lingüísticas (HL) e Inteligencia Emocional (IE) con formato de retos en las fases Lógica (6 a 10) y Crítica (11 a 15). La app lleva esos mismos retos a la casa.
 
@@ -70,26 +72,24 @@ Se arranca con 6 a 15 años porque esas dos fases ya trabajan con retos de resul
 - Retos de 3 a 5 minutos, máximo uno por día.
 - Diseño amigable con la neurodivergencia: instrucciones predecibles, siempre en el mismo orden; opción de hacer el reto sin cronómetro; sin sonidos ni animaciones bruscas. Esto es una ventaja real frente a apps llenas de estímulos, y vale la pena validarlo con familias de niños autistas o con TDAH en el piloto.
 
-## 4. Piloto de 4 semanas, sin programar nada
+## 4. Piloto de 4 semanas con adultos, sin programar nada
 
 El objetivo es responder una sola pregunta: **¿la gente hace los retos sin que la persigamos?** Si la respuesta es no, ninguna app lo arregla.
 
-| | Adultos | Niños |
-|---|---|---|
-| Quiénes | 1 grupo actual (ideal Gladiator, 5 personas) | 8 a 10 familias de estudiantes actuales de Lógica o Crítica |
-| Canal | Grupo de WhatsApp del escuadrón | Mensaje privado a cada familia (nunca grupo con datos de niños) |
-| Frecuencia | 3 retos por semana | 3 retos por semana |
-| Cómo responden | Nota de voz al grupo + respuesta a un compañero | El adulto responde con una foto o un audio corto del resultado, o simplemente "logrado / no logrado" |
-| Quién mide | El docente anota los minutos de cada nota de voz | El docente registra si se hizo y si se logró |
+- **Quiénes:** un grupo actual de Gladiator (5 personas), que se convierte en escuadrón.
+- **Canal:** un grupo de WhatsApp del escuadrón, creado desde el número del Gimnasio del Cerebro.
+- **Frecuencia:** 3 retos por semana (lunes, miércoles y viernes, 7:00 a.m.).
+- **Cómo responden:** una nota de voz al grupo y una respuesta de voz al compañero asignado de la semana (la "rueda").
+- **Quién mide:** el docente anota la duración de cada nota de voz y si respondió a su compañero.
 
 **Criterios de éxito (definir antes de empezar y no moverlos después):**
 - Adherencia: al menos 60 % de los retos completados en las semanas 3 y 4, sin recordatorio individual.
-- Adultos: la duración de las notas de voz sube entre la semana 1 y la 4.
-- Interacción: en adultos, al menos la mitad de los retos reciben respuesta de un compañero.
+- La duración de las notas de voz sube entre la semana 1 y la 4.
+- Interacción: al menos la mitad de los retos reciben respuesta del compañero asignado.
 - Disposición a pagar: al cierre, preguntar a cada participante si lo pagaría y cuánto (la respuesta verbal sobreestima; tomarla solo como señal).
-- Cualitativo: una entrevista corta de 10 minutos con 3 adultos y 3 familias.
+- Cualitativo: una entrevista corta de 10 minutos con 3 participantes.
 
-Si se cumplen, se pasa a fase 2. Si no, se ajustan los retos o el formato y se repite, antes de gastar en desarrollo.
+Si se cumplen, se pasa a fase 2. Si no, se ajustan los retos o el formato y se repite, antes de gastar en desarrollo. Todo el detalle operativo (cómo se arma el grupo, la rueda, los 12 retos y los mensajes) está en `PILOTO-KIT.md`.
 
 ## 5. Fase 2: web app
 
@@ -116,6 +116,5 @@ Esto no reemplaza la revisión de un abogado, pero estos son los mínimos:
 ## 8. Decisiones pendientes
 
 1. ~~Nombre y marca del producto.~~ Resuelto el 2026-10-12: la marca es **Gimnasio del Cerebro**, sin CCA, para los dos públicos.
-2. Qué grupo de adultos y qué familias participan en el piloto, y quién lo coordina.
+2. Qué grupo Gladiator participa en el piloto y quién lo coordina.
 3. Fecha de inicio del piloto.
-4. Si se invita a familias de niños neurodivergentes de forma explícita para validar el diseño amigable.
