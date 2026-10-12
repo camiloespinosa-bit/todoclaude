@@ -15,6 +15,8 @@ Nombre (es lo que Instagram indexa en búsquedas):
 
 ```
 Gimnasio del Cerebro | CCA Rionegro
+
+> Pendiente (2026-10-12): la marca ya no usa CCA. Cambiar en la app la bio a `Gimnasio del Cerebro | Rionegro` y renombrar el destacado "¿Qué es CCA?" a "¿Qué hacemos?". La imagen de la portada no lleva el texto CCA, así que no hay que volver a generarla.
 ```
 
 ## 3. Bio (máx. 150 caracteres)
