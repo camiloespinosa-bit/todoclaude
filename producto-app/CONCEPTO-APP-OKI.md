@@ -76,8 +76,8 @@ Se arranca con 6 a 15 años porque esas dos fases ya trabajan con retos de resul
 
 El objetivo es responder una sola pregunta: **¿la gente hace los retos sin que la persigamos?** Si la respuesta es no, ninguna app lo arregla.
 
-- **Quiénes:** un grupo actual de Gladiator (5 personas), que se convierte en escuadrón.
-- **Canal:** un grupo de WhatsApp del escuadrón, creado desde el número del Gimnasio del Cerebro.
+- **Quiénes:** de 15 a 20 estudiantes actuales de nivel Rookie+, organizados en escuadrones de 4 o 5.
+- **Canal:** una comunidad de WhatsApp del Gimnasio del Cerebro, con un grupo de anuncios para todos y un grupo por escuadrón.
 - **Frecuencia:** 3 retos por semana (lunes, miércoles y viernes, 7:00 a.m.).
 - **Cómo responden:** una nota de voz al grupo y una respuesta de voz al compañero asignado de la semana (la "rueda").
 - **Quién mide:** el docente anota la duración de cada nota de voz y si respondió a su compañero.
@@ -87,7 +87,7 @@ El objetivo es responder una sola pregunta: **¿la gente hace los retos sin que 
 - La duración de las notas de voz sube entre la semana 1 y la 4.
 - Interacción: al menos la mitad de los retos reciben respuesta del compañero asignado.
 - Disposición a pagar: al cierre, preguntar a cada participante si lo pagaría y cuánto (la respuesta verbal sobreestima; tomarla solo como señal).
-- Cualitativo: una entrevista corta de 10 minutos con 3 participantes.
+- Cualitativo: una entrevista corta de 10 minutos con 3 a 5 participantes.
 
 Si se cumplen, se pasa a fase 2. Si no, se ajustan los retos o el formato y se repite, antes de gastar en desarrollo. Todo el detalle operativo (cómo se arma el grupo, la rueda, los 12 retos y los mensajes) está en `PILOTO-KIT.md`.
 
@@ -116,5 +116,5 @@ Esto no reemplaza la revisión de un abogado, pero estos son los mínimos:
 ## 8. Decisiones pendientes
 
 1. ~~Nombre y marca del producto.~~ Resuelto el 2026-10-12: la marca es **Gimnasio del Cerebro**, sin CCA, para los dos públicos.
-2. Qué grupo Gladiator participa en el piloto y quién lo coordina.
+2. La lista final de estudiantes Rookie+ y quién coordina el piloto.
 3. Fecha de inicio del piloto.

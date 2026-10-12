@@ -13,33 +13,43 @@ Borrador v1, 2026-10-12. Todo lo necesario para correr el piloto por WhatsApp, s
 - **Sin recordatorios individuales.** Solo se permite un recordatorio general al grupo el día siguiente al envío. Si recordamos uno por uno, el piloto deja de medir lo que queremos medir.
 - Semana 0 (antes de empezar): invitaciones, consentimientos firmados y la hoja de registro lista.
 
-## 2. Cómo se arma el escuadrón en WhatsApp
+## 2. Cómo se arma la comunidad y los escuadrones en WhatsApp
 
-**Quiénes:** los 5 estudiantes de un mismo grupo de clase Gladiator, más el docente. Ya se conocen y ya hablan inglés juntos en clase, así que mandar notas de voz entre ellos da menos miedo que hacerlo con desconocidos.
+**Quiénes:** de 15 a 20 estudiantes de nivel Rookie+, de distintos grupos de clase.
 
-**Desde qué número:** el WhatsApp del Gimnasio del Cerebro (301 491 6120), no el número personal del docente. Así el grupo pertenece a la empresa y no se pierde si cambia el docente.
+**Por qué no un solo grupo grande:** con 20 personas serían unas 120 notas de voz por semana en un mismo chat. Nadie las escucha, la gente se esconde ("si no lo hago yo, lo hará otro") y se pierde la presión amable entre compañeros, que es lo que reemplaza el perseguirlos. Por eso se usa la función **Comunidades** de WhatsApp:
+
+| Espacio | Quiénes | Para qué |
+|---|---|---|
+| **Grupo de anuncios** de la comunidad | Todos (15 a 20) | Solo escribe el Gimnasio: los retos de Oki, la rueda de la semana y el marcador de los viernes. |
+| **Un grupo por escuadrón** dentro de la comunidad | 4 o 5 estudiantes + el docente | Ahí cada uno sube su nota de voz y le responde a su compañero asignado. |
+
+**Cómo se arman los escuadrones:** de 4 o 5 personas, mezclando estudiantes de distintos grupos de clase, pero con horarios parecidos. Mezclar grupos hace que se conozcan gente nueva y que la conversación tenga más novedad; tener horarios parecidos ayuda a que las respuestas lleguen a tiempo. Cada escuadrón escoge su nombre en la clase de arranque.
+
+**Desde qué número:** el WhatsApp del Gimnasio del Cerebro (301 491 6120), no el número personal del docente. Así la comunidad pertenece a la empresa.
 
 **Paso a paso:**
 
-1. **Antes de crear el grupo,** cada estudiante firma la autorización de datos (sección 7). Nadie entra al grupo sin firmarla.
-2. **Crear el grupo** desde el WhatsApp del Gimnasio:
-   - Nombre: `Escuadrón Gladiator · Retos con Oki`
+1. **Antes de entrar,** cada estudiante firma la autorización de datos (sección 7).
+2. **Crear la comunidad** desde el WhatsApp del Gimnasio (pestaña *Comunidades* → *Nueva comunidad*):
+   - Nombre: `Retos con Oki · Gimnasio del Cerebro`
    - Foto: Oki saludando (archivo oficial `oki-base-saludo`, nunca una versión hecha con IA).
-   - Descripción: las reglas del escuadrón (abajo).
-3. **Ajustes del grupo** (en *Configuración del grupo*):
+   - Descripción: las reglas (abajo).
+3. **Dentro de la comunidad, crear un grupo por escuadrón:** `Escuadrón [nombre] · Retos con Oki`.
+4. **Ajustes de cada grupo de escuadrón:**
    - *Editar información del grupo:* solo administradores.
    - *Enviar mensajes:* todos los participantes.
    - *Aprobar nuevos participantes:* activado.
    - *Mensajes temporales:* **desactivado**, porque las notas de voz se necesitan para medir.
-4. **Agregar a los estudiantes en la clase presencial,** no por mensaje. Se les comparte el enlace de invitación ahí mismo, se unen, y cada uno graba su primera nota de voz en ese momento: *"Hi, I'm ___ and I'm ready."* Así nadie empieza el lunes con el miedo de la primera nota.
-5. **Fijar el mensaje de reglas** (mantener presionado → *Fijar*).
+5. **Unirse en la clase presencial,** no por mensaje. Se comparte el enlace ahí mismo, cada uno entra a su escuadrón y graba su primera nota de voz en ese momento: *"Hi, I'm ___ and I'm ready."* Así nadie empieza el lunes con el miedo de la primera nota. Si los estudiantes están en distintos horarios, se hace en cada clase durante la semana 0.
+6. **Fijar el mensaje de reglas** en cada grupo de escuadrón (mantener presionado → *Fijar*).
 
-**Mensaje de reglas, para fijar en el grupo:**
+**Mensaje de reglas, para fijar en cada escuadrón:**
 
-> 🐙 **Escuadrón Gladiator · Retos con Oki**
+> 🐙 **Retos con Oki · Escuadrón [nombre]**
 >
-> 1. Oki manda un reto los **lunes, miércoles y viernes a las 7:00 a.m.**
-> 2. Respondes con **una nota de voz en inglés**. Tienes hasta el siguiente reto.
+> 1. Oki manda un reto los **lunes, miércoles y viernes a las 7:00 a.m.** en el grupo de anuncios.
+> 2. Respondes aquí, en tu escuadrón, con **una nota de voz en inglés**. Tienes hasta el siguiente reto.
 > 3. Cada semana tienes un **compañero asignado**. Cuando él o ella suba su nota, le respondes **con otra nota de voz**, no con stickers ni emojis.
 > 4. Equivocarse es parte del entrenamiento. Aquí nadie corrige a nadie: escuchamos y respondemos.
 > 5. Lo que se dice en el escuadrón se queda en el escuadrón. No se reenvían audios fuera del grupo.
@@ -55,7 +65,7 @@ El riesgo de pedir "respondan a alguien" es que todos le respondan al primero qu
 | 3 | David | Elena | Ana | Beto | Carla |
 | 4 | Elena | Ana | Beto | Carla | David |
 
-Así, en 4 semanas cada persona le responde una vez a cada compañero, y **todos reciben siempre una respuesta.**
+Así, en 4 semanas cada persona le responde una vez a cada compañero, y **todos reciben siempre una respuesta.** En un escuadrón de 4 personas, la rueda da la vuelta en 3 semanas y en la semana 4 se repite la de la semana 1.
 
 **Cómo se responde en WhatsApp:** se desliza la nota de voz del compañero hacia la derecha (o se mantiene presionada y se elige *Responder*) y se graba la respuesta. La respuesta queda pegada a ese audio, y el docente puede ver quién le respondió a quién.
 
@@ -66,7 +76,7 @@ Así, en 4 semanas cada persona le responde una vez a cada compañero, y **todos
 
 La pregunta es lo que convierte el reto en una conversación: obliga a escuchar de verdad y le da al otro una razón para volver al grupo.
 
-**Cada lunes,** antes del reto, el docente publica la rueda de la semana:
+**Cada lunes,** antes del reto, el docente publica la rueda de la semana en cada escuadrón:
 
 > 🔄 Rueda de esta semana: Ana → Beto · Beto → Carla · Carla → David · David → Elena · Elena → Ana
 
@@ -80,10 +90,13 @@ La pregunta es lo que convierte el reto en una conversación: obliga a escuchar 
 2. **Compromiso en voz alta.** En la clase de arranque, cada uno dice frente al grupo en qué momento del día va a hacer los retos (*"I'll do it on my way to work"*). Decirlo frente a otros aumenta la probabilidad de cumplirlo.
 3. **El compañero asignado es el motor.** Si Beto no sube su nota, Ana no tiene a quién responderle, y eso se nota en el grupo. La presión es entre pares, amable, y no viene del docente.
 4. **El docente responde a quien sí lo hizo.** Cada vez que alguien sube su nota, el docente reacciona con una frase corta (*"Great energy, Carla! 1:12 today."*). Se refuerza a quien cumple, no se regaña a quien no.
-5. **Marcador grupal los viernes en la noche.** Muestra cómo va el escuadrón, nunca quién falló:
+5. **Marcador de la comunidad los viernes en la noche,** en el grupo de anuncios. Muestra cómo va cada escuadrón, nunca quién falló. La competencia sana entre escuadrones ayuda a que cada grupo se cuide a sí mismo:
 
-> 📊 Escuadrón esta semana: **13 de 15 retos** completados. 🔥
-> Minutos totales hablados en inglés: **14:30**.
+> 📊 **Marcador de la semana 1**
+> 🦅 Escuadrón Águilas: 15 de 15 retos 🔥
+> 🐺 Escuadrón Lobos: 13 de 15 retos
+> 🦁 Escuadrón Leones: 11 de 12 retos
+> Entre todos hablamos **52 minutos** en inglés esta semana.
 > ¡El lunes viene el reto #4!
 
 6. **Avance personal por privado, cada viernes** (es lo único que va por privado, y es una buena noticia, no un reclamo):
@@ -98,83 +111,126 @@ La pregunta es lo que convierte el reto en una conversación: obliga a escuchar 
 **Si alguien deja de participar:** se anota en la hoja de registro y no se le persigue. En la semana 4, en la encuesta de cierre, se le pregunta qué lo hizo dejar de participar. Ese dato es tan valioso como el de quien completó todo: dice qué hay que cambiar antes de construir la app.
 
 
-## 5. Los 12 retos: grupo Gladiator
+## 5. Los 12 retos: nivel Rookie+
 
-Cada reto se responde con **una nota de voz al grupo** y, con **una respuesta de voz a su compañero de la semana** (ver sección 3).
+Cada reto se responde con **una nota de voz en el grupo del escuadrón** y con **una respuesta de voz al compañero de la semana** (ver sección 3).
 
-**Qué mide el docente:** la duración de cada nota de voz (WhatsApp la muestra), si la persona hizo el reto y si le respondió a un compañero.
+**Qué mide el docente:** la duración de cada nota de voz (WhatsApp la muestra sin tener que abrirla), si la persona hizo el reto y si le respondió a su compañero.
 
-La duración sube cada semana a propósito: semana 1, 60 a 90 segundos; semana 4, 2 a 3 minutos. Los retos usan los contenidos del nivel Gladiator (opinión con razones, consejos, condicional tipo 1, reported speech, debate y resolución de problemas).
+**Nivel:** los retos usan lo que Rookie+ ve en clase: pasado simple (regular e irregular), planes con *going to* y predicciones con *will*, *must / should / can*, comparativos y superlativos, y describir personas y lugares. Las instrucciones vienen en inglés sencillo con una línea de apoyo en español, porque en este nivel todavía se usa algo de español como andamio.
+
+**Duración:** sube cada semana a propósito. Semana 1, 45 a 60 segundos; semana 2, 60 a 75; semana 3, 75 a 90; semana 4, de 90 segundos a 2 minutos.
 
 ### Semana 1: arrancar sin miedo
 
-**Reto 1 (lunes): Hot take** · Planeación
-> 🐙 Oki's challenge #1: Is working from home better than working at the office? Record **60 seconds** with your opinion.
-> Use: *I think... because... For example... That's why...*
-> Then listen to your **teammate of the week** and reply: *I see your point, but...*
+**Reto 1 (lunes): Yesterday** · Memoria de trabajo (secuencia)
+> 🐙 Oki's challenge #1: What did you do **yesterday**? Tell us **5 things, in order**. Speak for **45 seconds**.
+> Use: *First, I... Then, I... After that, I... Finally, I...*
+> 👉 Después, escucha a tu compañero de la semana y pregúntale algo: *Did you...? What did you...?*
 
 **Reto 2 (miércoles): Palabras prohibidas** · Control inhibitorio
-> 🐙 Oki's challenge #2: Tell us about your weekend for **60 seconds**. Forbidden words: **very, good, nice, thing**. If you say one, keep going!
-> Al final cuenta cuántas se te escaparon.
+> 🐙 Oki's challenge #2: Tell us about **your last weekend** for **60 seconds**.
+> Forbidden: **good, nice** and **any word in Spanish**. If you say one, keep going!
+> 👉 Al final, di cuántas se te escaparon: *I said "good" two times.*
 
 **Reto 3 (viernes): Relevo** · Memoria de trabajo + interacción
-> 🐙 Oki's challenge #3: I start the story, you continue it. *"When Laura opened the door, the office was completely empty..."*
-> Listen to the **last audio** in the group and continue the story for **45 seconds** from where it stopped.
-> (El docente define el orden: cada uno continúa al anterior.)
+> 🐙 Oki's challenge #3: I start the story, you continue it.
+> *"Last Saturday, María went to the supermarket. When she opened the door..."*
+> Listen to **the last audio** in your squad and continue the story for **45 seconds**. Use the past: *went, saw, said, found...*
+> 👉 El orden lo define la rueda: cada uno continúa la historia de su compañero.
 
 ### Semana 2: más tiempo, más control
 
 **Reto 4 (lunes): Tres palabras en orden** · Memoria de trabajo
-> 🐙 Oki's challenge #4: Tell a story of **90 seconds** using these 3 words **in this order**: **umbrella → promise → elevator**.
+> 🐙 Oki's challenge #4: Tell a story **in the past** for **60 seconds** using these 3 words **in this order**:
+> **phone → rain → birthday**
+> 👉 Si se te olvida el orden, no pares: sigue y retómalo.
 
-**Reto 5 (miércoles): Consultorio** · Interacción (condicional tipo 1)
-> 🐙 Oki's challenge #5: Two parts.
-> 1) Record **30 seconds** about a small real problem (work, traffic, sleep, anything).
-> 2) Listen to your **teammate of the week** and give advice for **60 seconds**: *If you..., you'll... / You could try... / Have you thought about...?*
+**Reto 5 (miércoles): Mis planes** · Planeación
+> 🐙 Oki's challenge #5: Tell us **4 plans** for this weekend and **1 prediction**. Speak for **60 seconds**.
+> Use: *I'm going to... I'm planning to... I think I'll... Maybe I won't...*
+> 👉 Responde a tu compañero con una pregunta: *Are you going to...? Do you think you'll...?*
 
-**Reto 6 (viernes): Cambio de rumbo** · Flexibilidad cognitiva
-> 🐙 Oki's challenge #6: Talk for **90 seconds**. Start with **food**. Halfway, switch to **travel** without stopping.
-> Use a bridge: *Speaking of... / That reminds me...*
+**Reto 6 (viernes): Cambio de tiempo** · Flexibilidad cognitiva
+> 🐙 Oki's challenge #6: Speak for **75 seconds**. First, describe your **normal morning** (present). Then, without stopping, tell us about **last Sunday morning** (past).
+> Bridge: *But last Sunday was different...*
+> 👉 Ojo: el reto es cambiar del presente al pasado sin detenerte.
 
 ### Semana 3: escuchar a otros
 
-**Reto 7 (lunes): Reportero** · Memoria de trabajo + escucha
-> 🐙 Oki's challenge #7: Listen to a teammate's audio from last week. Report it for **90 seconds**: *Carlos told me that... He said that... I think...*
-> Add your own reaction at the end.
+**Reto 7 (lunes): ¿Cuál es mejor?** · Planeación (comparar)
+> 🐙 Oki's challenge #7: **Rionegro or Medellín?** (or your city vs. another one). Speak for **75 seconds**. Use **3 comparisons** and **1 superlative**.
+> Use: *___ is bigger / cheaper / more expensive than ___. The best thing about ___ is...*
+> 👉 Pregúntale a tu compañero: *Which is better for you? Why?*
 
-**Reto 8 (miércoles): El otro lado** · Flexibilidad cognitiva
-> 🐙 Oki's challenge #8: Choose something you **really believe**. Now defend **the opposite** for **2 minutes**.
-> Use: *Some people say... However... The main reason is...*
+**Reto 8 (miércoles): Reportero** · Memoria de trabajo + escucha
+> 🐙 Oki's challenge #8: Listen to **your teammate's audio from challenge #5** (their weekend plans). Now tell us for **75 seconds**: what was **he or she going to do**, and what do you think **they really did**?
+> Use: *Ana was going to... She wanted to... I think she...*
+> 👉 Después, tu compañero te confirma en un audio corto: *Yes, I did! / No, I didn't...*
 
-**Reto 9 (viernes): Plan con presupuesto** · Planeación
-> 🐙 Oki's challenge #9: Think for **20 seconds**, then speak for **2 minutes**: plan a weekend trip for 4 people with **$500,000 COP**. Where, how, what you'll do, and what you'll skip.
-> Use: *First we need to... If we..., we'll... Finally...*
+**Reto 9 (viernes): La gran decisión** · Planeación (decidir)
+> 🐙 Oki's challenge #9: You have **$2,000,000 COP**. Option A: a **new phone**. Option B: a **trip with your family**. Think for 20 seconds, then speak for **90 seconds**.
+> Use: *On one hand... On the other hand... I think the best choice is... because...*
 
 ### Semana 4: demostrar el avance
 
 **Reto 10 (lunes): Prohibidas nivel 2** · Control inhibitorio
-> 🐙 Oki's challenge #10: **2 minutes** about your job or studies. Forbidden: **very, good, nice, thing** and **no Spanish at all**.
-> (Es el reto 2 con más tiempo y más reglas: así comparamos.)
+> 🐙 Oki's challenge #10: Speak for **90 seconds** about **your job or your studies**.
+> Forbidden: **good, nice, very** and **any word in Spanish**.
+> 👉 Es el reto 2 con más tiempo y una palabra prohibida más: así comparamos.
 
-**Reto 11 (miércoles): Noticiero** · Secuencia + reported speech
-> 🐙 Oki's challenge #11: *Have you heard about...?* Tell a recent news story for **2 minutes**: what happened first, then, and finally, and what people say about it.
+**Reto 11 (miércoles): Adivina quién** · Interacción
+> 🐙 Oki's challenge #11: Describe **an important person in your life** for **90 seconds**: how he or she looks, his or her personality, and what you like most about them. **Don't say who it is** (no "my mom", no "my brother").
+> Use: *He / She is... He / She has... What I like most about him / her is...*
+> 👉 Tu compañero responde adivinando: *I think it's your... because...*
 
-**Reto 12 (viernes): La historia que me cambió** · Integración
-> 🐙 Oki's final challenge: **3 minutes**: *This is the story of how... Since then, I've...*
-> Then ask **two teammates** one question about their stories.
-> El docente comparte al grupo la duración del reto 1 y la del reto 12 de cada persona (con su permiso).
+**Reto 12 (viernes): Antes, ahora y después** · Integración
+> 🐙 Oki's final challenge: Speak for **2 minutes** about **your life in 3 times**:
+> *When I was younger, I... Now, I... Next year, I'm going to...*
+> 👉 Después, hazle una pregunta a **dos compañeros** de tu escuadrón sobre sus historias.
+> El docente le envía a cada persona, por privado, la duración de su reto 1 y la de su reto 12.
+
+## 5B. Participantes no inscritos (oportunidad comercial)
+
+Camilo decidió (2026-10-12) invitar también a personas que conoce y que no están inscritas en el programa. Es una buena oportunidad: 4 semanas de contacto real con la metodología es la mejor clase de prueba que existe.
+
+**Reglas para que no se dañe el piloto:**
+
+- **Escuadrones propios.** Los no inscritos van juntos, no mezclados con estudiantes. No tienen las clases que respaldan los retos, y si se mezclan, no se puede saber qué funcionó por los retos y qué por las clases.
+- **Nivel verificado.** Antes de asignarles escuadrón, una conversación corta en inglés de 5 minutos (puede ser por WhatsApp) para confirmar que están cerca de Rookie+. Si están por debajo, mejor un escuadrón Rookie con retos más cortos que dejarlos frustrarse.
+- **Arranque presencial o por videollamada.** Como no tienen clase, se les invita a la sede o a una videollamada de 15 minutos para unirse al escuadrón y grabar juntos la primera nota de voz. Si además conocen la sede, mejor: ya saben a dónde llegar para la clase de prueba.
+- **Misma autorización de datos** que los estudiantes.
+- **Se miden aparte.** En la hoja de registro se marca si la persona es estudiante o no inscrita. **Si un no inscrito hace los retos solo, sin clases y sin pagar, es la señal más fuerte de que la app tiene futuro como producto independiente.**
+
+**Cómo se cierra al final (semana 4):** sin presión y con datos de la persona.
+
+> Hola, [nombre]. ¡Terminaste los 12 retos! Tu primera nota de voz duró **0:42** y la última **1:55**. 💪
+> Eso es lo que pasa cuando el cerebro entrena el inglés con constancia.
+> Si quieres seguir, te regalo una **clase de prueba** del programa completo, en grupo o privada. ¿Te queda bien esta semana o la próxima?
+
+**Qué se registra para el embudo:** quién aceptó la clase de prueba, quién la tomó y quién se inscribió. Ese número (inscritos ÷ no inscritos que terminaron el piloto) dice cuánto vale el piloto como canal de ventas.
 
 ## 6. Mensajes listos para enviar
 
-### Invitación a los adultos (grupo Gladiator)
+### Invitación a los estudiantes
 
-> Hola, [nombre]. En el Gimnasio del Cerebro estamos probando algo nuevo y queremos que tu escuadrón sea el primero: **Retos con Oki**.
+> Hola, [nombre]. En el Gimnasio del Cerebro estamos probando algo nuevo y queremos que seas de los primeros: **Retos con Oki**.
 >
-> Durante 4 semanas te llegan 3 retos por semana (lunes, miércoles y viernes) en el grupo de WhatsApp. Cada uno es una nota de voz corta en inglés: arrancas con 1 minuto y terminas con 3. No tiene costo y no reemplaza tus clases, las complementa.
+> Durante 4 semanas te llegan 3 retos por semana (lunes, miércoles y viernes) por WhatsApp. Vas a estar en un escuadrón de 4 o 5 compañeros, y cada reto es una nota de voz corta en inglés: arrancas con 45 segundos y terminas con 2 minutos. No tiene costo y no reemplaza tus clases, las complementa.
 >
 > Al final vas a poder comparar cuánto hablabas en el reto 1 y cuánto en el reto 12.
 >
 > ¿Te le mides? Si dices que sí, te enviamos una autorización corta para el uso de tus notas de voz.
+
+### Invitación a personas no inscritas
+
+> Hola, [nombre]. Te escribo del Gimnasio del Cerebro. Estamos lanzando **Retos con Oki**: 4 semanas de retos cortos en inglés por WhatsApp, en un escuadrón de 4 o 5 personas.
+>
+> No son clases ni lecciones de repetir frases. Son retos para **hablar**: arrancas con 45 segundos y terminas hablando 2 minutos seguidos. Te van a escuchar y responder tus compañeros, no una máquina.
+>
+> Es **gratis** y te toma unos 10 minutos, tres veces por semana. Me acordé de ti porque me habías dicho que querías soltarte en inglés.
+>
+> ¿Te le mides? Si me dices que sí, te hago una conversación corta para ubicarte en el escuadrón que te queda mejor.
 
 ### Cierre de la semana 4
 
@@ -203,8 +259,8 @@ La duración sube cada semana a propósito: semana 1, 60 a 90 segundos; semana 4
 
 Una fila por persona y por reto.
 
-| Persona | Reto | Fecha de envío | ¿Lo hizo? | Fecha en que lo hizo | Duración de la nota de voz | ¿Respondió a un compañero? | Necesitó recordatorio general | Observación |
-|---|---|---|---|---|---|---|---|---|
+| Persona | Estudiante o no inscrito | Escuadrón | Reto | Fecha de envío | ¿Lo hizo? | Fecha en que lo hizo | Duración de la nota de voz | ¿Respondió a un compañero? | Necesitó recordatorio general | Observación |
+|---|---|---|---|---|---|---|---|---|---|---|
 
 ## 9. Cómo leer los resultados
 
@@ -217,12 +273,16 @@ Los criterios se definen antes de empezar y no se mueven después (ver `CONCEPTO
 | ¿Se escuchan? | Retos con respuesta a un compañero ÷ retos que la pedían | 50 % o más |
 | ¿Les gustó? | Promedio de la pregunta 1 del cierre | 7 o más |
 | ¿Pagarían? | Respuestas a la pregunta 5 | Solo como señal, no como dato duro |
+| ¿Lo hacen sin clases? | Adherencia de los no inscritos, comparada con la de los estudiantes | Que sea parecida |
+| ¿Sirve para vender? | No inscritos que se inscriben ÷ no inscritos que terminaron | Se fija la meta con Camilo antes de empezar |
 
-**Límite honesto:** con 5 adultos, esto **no es un estudio científico**. No permite afirmar que los retos mejoran el inglés ni las funciones ejecutivas. Sirve para decidir si vale la pena invertir en la app. Si sube la duración de las notas de voz, puede ser por la práctica, por las clases o por perderle el miedo al grupo, y no hay forma de separar esas causas con este diseño.
+**Límite honesto:** con 15 a 20 adultos, esto **no es un estudio científico**. No permite afirmar que los retos mejoran el inglés ni las funciones ejecutivas. Sirve para decidir si vale la pena invertir en la app. Si sube la duración de las notas de voz, puede ser por la práctica, por las clases o por perderle el miedo al grupo, y no hay forma de separar esas causas con este diseño.
 
 ## 10. Pendientes antes de arrancar
 
-1. Elegir el grupo Gladiator y la fecha de la clase de arranque.
+1. Confirmar la lista de 15 a 20 estudiantes Rookie+, armar los escuadrones y fijar la semana de las clases de arranque.
 2. Que el asesor jurídico revise la autorización y defina el plazo de borrado.
 3. Definir quién coordina: quién envía, quién registra y cuántas horas a la semana le toma.
-4. **Metas de fluidez:** el sitio dice Gladiator 8 a 12 minutos (cifras que Camilo actualizó el 2026-09-02), pero el skill `gimnasio-cerebro-mallas-adultos` todavía dice 4 a 6. Hay que actualizar el skill para que los materiales nuevos no salgan con las cifras viejas.
+4. **Metas de fluidez:** el sitio dice Rookie+ 4 a 8 minutos (cifras que Camilo actualizó el 2026-09-02), pero el skill `gimnasio-cerebro-mallas-adultos` todavía dice 2 a 4. Hay que actualizar el skill para que los materiales nuevos no salgan con las cifras viejas.
+5. Camilo va a revisar en qué nivel está realmente cada estudiante. Si alguno queda en otro nivel, va en un escuadrón aparte con la duración de los retos ajustada.
+6. Confirmar la lista de personas no inscritas que se van a invitar y medirles el nivel en una conversación corta antes de asignarles escuadrón.
