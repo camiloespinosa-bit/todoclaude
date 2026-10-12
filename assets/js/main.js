@@ -1,4 +1,4 @@
-// CCA — El Gimnasio del Cerebro
+// Gimnasio del Cerebro
 // JS: menú móvil, año dinámico del pie de página, y animaciones de entrada/scroll.
 
 // Marca el documento como "JS activo" ANTES de que el CSS de animación pueda ocultar nada:

@@ -13,7 +13,7 @@ Una app que **no enseña, entrena**: retos cortos con Oki que se hacen entre ses
 | Tocar botones, repetir frases | Producir: hablar, explicar, argumentar |
 | Se aprende solo frente a la pantalla | Siempre hay otra persona: escuadrón, familia o docente |
 | Mide rachas y puntos | Mide un resultado real (minutos de fluidez, retos logrados) |
-| Contenido genérico | Retos que salen de la metodología CCA (competencia estrella + tema envolvente) |
+| Contenido genérico | Retos que salen de la metodología del Gimnasio del Cerebro (competencia estrella + tema envolvente) |
 
 Base científica de la apuesta: la producción oral y la interacción con otros impulsan la adquisición (hipótesis de la interacción, Long; hipótesis del output, Swain), y la práctica de recuperación espaciada mejora la retención.
 
@@ -47,7 +47,7 @@ Misma base técnica, mismo Oki, mismo motor de retos. Cambian el contenido, la m
 
 ### 3B. Niños 6 a 15: "Retos de Oki" en familia
 
-Aquí el producto **no es de inglés**. El programa infantil de CCA entrena Desarrollo Cognitivo (DC), Habilidades Lingüísticas (HL) e Inteligencia Emocional (IE) con formato de retos en las fases Lógica (6 a 10) y Crítica (11 a 15). La app lleva esos mismos retos a la casa.
+Aquí el producto **no es de inglés**. El programa infantil entrena Desarrollo Cognitivo (DC), Habilidades Lingüísticas (HL) e Inteligencia Emocional (IE) con formato de retos en las fases Lógica (6 a 10) y Crítica (11 a 15). La app lleva esos mismos retos a la casa.
 
 Se arranca con 6 a 15 años porque esas dos fases ya trabajan con retos de resultado observable. Sensorial y Lúdica (0 a 5) necesitan co-regulación del adulto todo el tiempo, y no conviene ponerlas frente a una pantalla.
 
@@ -66,7 +66,7 @@ Se arranca con 6 a 15 años porque esas dos fases ya trabajan con retos de resul
 
 **Reglas para niños:**
 - Sin chat abierto, sin perfiles públicos, sin ranking entre niños.
-- El progreso solo lo ven la familia y el docente de CCA.
+- El progreso solo lo ven la familia y el docente.
 - Retos de 3 a 5 minutos, máximo uno por día.
 - Diseño amigable con la neurodivergencia: instrucciones predecibles, siempre en el mismo orden; opción de hacer el reto sin cronómetro; sin sonidos ni animaciones bruscas. Esto es una ventaja real frente a apps llenas de estímulos, y vale la pena validarlo con familias de niños autistas o con TDAH en el piloto.
 
@@ -115,7 +115,7 @@ Esto no reemplaza la revisión de un abogado, pero estos son los mínimos:
 
 ## 8. Decisiones pendientes
 
-1. **Nombre y marca del producto.** El README del sitio dice que todo va integrado bajo "CCA, El Gimnasio del Cerebro" (decisión del 2026-09-02). El skill `cca-fases` todavía dice que el programa de adultos es "Gimnasio del Cerebro, nunca CCA". Hay que confirmar cuál aplica para la app y actualizar el skill que quede desactualizado.
+1. ~~Nombre y marca del producto.~~ Resuelto el 2026-10-12: la marca es **Gimnasio del Cerebro**, sin CCA, para los dos públicos.
 2. Qué grupo de adultos y qué familias participan en el piloto, y quién lo coordina.
 3. Fecha de inicio del piloto.
 4. Si se invita a familias de niños neurodivergentes de forma explícita para validar el diseño amigable.
