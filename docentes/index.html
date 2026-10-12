@@ -14,7 +14,7 @@
 @font-face{font-family:'Poppins';font-style:normal;font-weight:900;font-display:swap;src:url('../assets/fonts/poppins-900.woff') format('woff')}
 @font-face{font-family:'Poppins';font-style:italic;font-weight:400;font-display:swap;src:url('../assets/fonts/poppins-400i.woff') format('woff')}
 
-/* Layout: columna única de 560px. Barra superior con el lockup Oki + nombre, barra de progreso gruesa, tarjetas con borde inferior grueso y hoja de respuesta fija abajo. Marca CCA: Poppins, azul oscuro, turquesa, verde, naranja; amarillo solo sobre azul oscuro. Oki se usa sin modificar. */
+/* Layout: columna única de 560px. Barra superior con el lockup Oki + nombre, barra de progreso gruesa, tarjetas con borde inferior grueso y hoja de respuesta fija abajo. Marca Gimnasio del Cerebro: Poppins, azul oscuro, turquesa, verde, naranja; amarillo solo sobre azul oscuro. Oki se usa sin modificar. */
 :root{
   --bg:#E8F4F7; --surface:#FFFFFF; --ink:#12384D; --muted:#4C6B7A; --line:#C5DDE4;
   --brand:#2C5F7C; --turq:#57A6B5;
@@ -356,7 +356,7 @@ function vResult(){
   h+='<button class="cta" data-act="gate">Quiero mi minikit</button>';
   return h;
 }
-function waLink(){var t=(S.name?'Hola, soy '+S.name+'. Quiero':'Hola, quiero')+' agendar mi clase de prueba gratuita de CCA. Elegí la opción: «'+(R().label.replace(/\.$/,''))+'».';return 'https://wa.me/'+WA_NUM+'?text='+encodeURIComponent(t);}
+function waLink(){var t=(S.name?'Hola, soy '+S.name+'. Quiero':'Hola, quiero')+' agendar mi clase de prueba gratuita del Gimnasio del Cerebro. Elegí la opción: «'+(R().label.replace(/\.$/,''))+'».';return 'https://wa.me/'+WA_NUM+'?text='+encodeURIComponent(t);}
 var WA_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.1.1-.3.2-.5.1-.2-.1-1-.4-2-1.2-.7-.7-1.2-1.5-1.4-1.7-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.3.1.2 1.6 2.4 3.9 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.4.1.4-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3Z"/></svg>';
 function vGate(){
   if(S.sent){
@@ -374,7 +374,7 @@ function vGate(){
   '<form id="gate" novalidate>'+
   '<div class="f"><label for="nombre">Nombre</label><input type="text" id="nombre" autocomplete="given-name" value="'+esc(S.f.nombre||'')+'"></div>'+
   '<div class="f"><label for="correo">Correo</label><input type="email" id="correo" autocomplete="email" value="'+esc(S.f.correo||'')+'"></div>'+
-  '<label class="chk" for="c-auth"><input type="checkbox" id="c-auth"'+(S.f.auth?' checked':'')+'><span>Acepto el tratamiento de mis datos personales por Experiencias Cotidianas SAS (CCA) según la <a href="'+POLICY_URL+'" target="_blank" rel="noopener">política de tratamiento de datos</a>.</span></label>'+
+  '<label class="chk" for="c-auth"><input type="checkbox" id="c-auth"'+(S.f.auth?' checked':'')+'><span>Acepto el tratamiento de mis datos personales por Experiencias Cotidianas SAS (Gimnasio del Cerebro) según la <a href="'+POLICY_URL+'" target="_blank" rel="noopener">política de tratamiento de datos</a>.</span></label>'+
   '<div style="position:absolute;left:-9999px" aria-hidden="true"><label>Web<input type="text" id="web" tabindex="-1" autocomplete="off"></label></div>'+
   (S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+
   '<button class="cta" type="submit" id="send"'+((S.sending||!S.f.auth)?' disabled':'')+'>'+(S.sending?'Enviando, puede tardar unos segundos...':'Enviarme el minikit')+'</button>'+
