@@ -1,23 +1,25 @@
 # todoclaude
 
-## Sitio web — CCA / El Gimnasio del Cerebro
+## Sitio web — Gimnasio del Cerebro
 
-Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA — El Gimnasio del Cerebro. Para verlo localmente basta con abrir `index.html` en el navegador; para publicarlo, sirve la raíz del repo en cualquier hosting estático (GitHub Pages, Netlify, Vercel, etc.).
+Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca Gimnasio del Cerebro. Para verlo localmente basta con abrir `index.html` en el navegador; para publicarlo, sirve la raíz del repo en cualquier hosting estático (GitHub Pages, Netlify, Vercel, etc.).
 
 **Páginas:**
 - `index.html` — Inicio
 - `fases.html` — Fases del Programa (Sensorial, Lúdica, Lógica, Crítica + Fase Experta de inglés para adultos 18-50 + Programa Adulto Vital 65+)
 - `nosotros.html` — Sobre Nosotros
 - `blog/index.html` + `blog/*.html` — Blog (2 artículos iniciales)
+- `docentes/index.html` — Circuito de retos para docentes (embudo del curso de inglés de 200 horas). Autocontenido; el formulario envía a un Google Apps Script que guarda en la hoja "Leads docentes" (Drive > CCA > Embudo docentes) y envía el kit. Tiene `noindex` hasta el lanzamiento. `docentes/kit-ruta-1.pdf`, `kit-ruta-2.pdf` y `kit-ruta-3.pdf` son los kits por ruta (las URLs deben coincidir con KIT_URLS en el Apps Script).
+- `privacidad.html` — BORRADOR de la política de tratamiento de datos (Ley 1581). No publicar como oficial hasta que un asesor jurídico la revise y se completen NIT, dirección, fecha y plazo de conservación.
 
 **Estilos y assets:**
-- `assets/css/style.css` — hoja de estilos compartida, con los tokens de color/tipografía oficiales de CCA (ver skill `cca-marca`)
+- `assets/css/style.css` — hoja de estilos compartida, con los tokens de color/tipografía oficiales de la marca (ver skill `cca-marca`, que conserva su nombre anterior)
 - `assets/js/main.js` — menú móvil + año dinámico del pie de página
 - `assets/img/oki/` — los 8 SVG oficiales de Oki (enviados por Camilo el 2026-09-02), usados así en el sitio: `oki-base-saludo` (hero Inicio), `oki-senalando` (CTA final Inicio), `oki-pensando` (CTA final Fases), `oki-ejercitando` (tarjeta Adulto Vital en Fases), `oki-empatia` (hero Sobre Nosotros), `oki-leyendo` (hero Blog), `oki-celebrando` (artículo para padres), `oki-sorpresa` (artículo Adulto Vital). Ver `assets/img/oki/README.md` — regla de marca: nunca generar ni recrear a Oki con IA, solo usar estos archivos originales.
 
 **Fase Experta (agregada el 2026-09-02):** programa de inglés para adultos de 18 a 50 años que entrena funciones ejecutivas usando el inglés como vehículo (fuente: skills `gimnasio-bilingue-curriculo`, `gimnasio-cerebro-mallas-adultos`, `gimnasio-cerebro-sesion-adultos`). 5 niveles (Rookie, Rookie+, Gladiator, Gladiator+, Avenger), 20 sesiones por nivel, 200 horas en total. Metodología grupal (5 estudiantes) o clase privada 1:1. Metas de fluidez actualizadas el 2026-09-02 (según indicación de Camilo, reemplazan las cifras iniciales que salieron del skill): Rookie 0→4 min, Rookie+ 4→8 min, Gladiator 8→12 min, Gladiator+ 12→16 min, Avenger 16→20 min, todo hablando inglés sin parar. No se publicó precio porque no está documentado en los skills — el CTA dirige a WhatsApp.
 
-**Nota de marca:** el skill `gimnasio-cerebro-sesion-adultos` pide usar "Gimnasio del Cerebro" a secas (sin CCA) en los materiales internos de la Fase Experta, lo que podría leerse como una sub-marca aparte. Camilo confirmó (2026-09-02) que **todo debe estar integrado** bajo una sola marca: CCA — El Gimnasio del Cerebro. El sitio web no fragmenta en sub-marcas — la Fase Experta vive dentro de la misma identidad visual y de navegación que el resto del programa.
+**Nota de marca (actualizada el 2026-10-12):** Camilo decidió que la marca única es **Gimnasio del Cerebro** y que hay que retirar "CCA" (y su nombre largo, "Centro Cognitivo para el Aprendizaje") de todos los materiales. Ya se retiró del sitio web (títulos, metadatos, encabezado, pie de página; la insignia del encabezado pasó de "CCA" a "GC"), del circuito de docentes y de la política de datos (`privacidad.html`: la razón social sigue siendo Experiencias Cotidianas SAS, NIT 901364882-1, y solo cambió el nombre de la marca entre paréntesis; se mantuvo la versión 2026-10-v1 porque no cambian finalidades ni derechos, pero conviene que el asesor jurídico lo confirme), del banner de LinkedIn y del carrusel Stroop del 15 de octubre. Siguen pendientes: la presentación `presentaciones/CCA_Colegios_taller_docente.pptx` (menciona CCA unas 14 veces), la bio y el destacado "¿Qué es CCA?" de Instagram (se cambian a mano en la app) y los skills `cca-*`, que viven fuera del repo. Esto reemplaza la nota anterior del 2026-09-02, que integraba todo bajo "CCA — El Gimnasio del Cerebro". Si en algún documento legal o factura se necesita la razón social, confirmar con Camilo cuál es antes de usarla.
 
 **Contacto:** WhatsApp 301 491 6120 en todo el sitio. Corregido el 2026-09-07: Camilo había confirmado el 2026-09-02 que el número correcto era 301 494 6120 (y que 301 491 6120 estaba mal), pero el 2026-09-07 corrigió que en realidad es al revés — el número correcto es **301 491 6120**. Si vuelve a surgir esta duda, confirmar directamente con Camilo antes de tocar el número en el sitio.
 

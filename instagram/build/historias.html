@@ -1,0 +1,120 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#145389;--azulOscuro:#2C5F7C;--verde:#7CB342;--naranja:#F57C00;--fondoClaro:#F0F4F8;--amarillo:#FDD835;--t1:#EAF4F6;--t2:#F1F8E9;--t3:#FFF3E0;--t4:#1D3F54}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Poppins,sans-serif;background:#999}
+/* Historia 1080x1920. Zonas seguras: 250px arriba y 320px abajo quedan libres para la UI de Instagram */
+.s{width:1080px;height:1920px;position:relative;overflow:hidden;padding:250px 90px 320px;display:flex;flex-direction:column}
+.dark{background:var(--azulOscuro);color:#fff}
+.light{background:var(--fondoClaro);color:var(--azulOscuro)}
+.kicker{font-weight:700;font-size:34px;letter-spacing:4px;text-transform:uppercase}
+.dark .kicker{color:var(--amarillo)} .light .kicker{color:var(--naranja)}
+h1{font-weight:900;font-size:96px;line-height:1.02;margin-top:22px}
+.light h1{color:var(--azul)}
+.lead{font-size:40px;line-height:1.4;margin-top:30px}
+.dark .lead{opacity:.88}
+.oki{position:absolute;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:18px;margin-top:44px}
+.chip{font-weight:700;font-size:36px;padding:16px 30px;border-radius:999px;background:var(--t4);border:3px solid rgba(255,255,255,.18)}
+.foot{margin-top:auto;font-weight:600;font-size:32px;opacity:.85}
+.card{background:#fff;border-radius:22px;box-shadow:0 4px 16px rgba(0,0,0,.08);border:3px solid #E2E8F0;padding:26px 30px;display:flex;align-items:center;gap:28px}
+.badge{flex:none;width:118px;height:118px;border-radius:50%;color:#fff;font-weight:900;font-size:36px;display:flex;align-items:center;justify-content:center;line-height:1}
+.card b{display:block;font-weight:800;font-size:44px;color:var(--azul)}
+.card span{font-size:31px;line-height:1.3;color:#41566A}
+.stack{display:flex;flex-direction:column;gap:20px;margin-top:44px}
+.note{background:var(--t1);border-left:10px solid var(--azul);border-radius:0 20px 20px 0;padding:24px 30px;font-size:33px;line-height:1.35;margin-top:26px}
+.stroop{background:var(--t4);border-radius:30px;padding:46px 30px;margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:30px 20px;text-align:center}
+.stroop div{font-weight:900;font-size:76px;letter-spacing:1px}
+.ref{border-left:10px solid var(--azul)}
+.ref b{font-size:38px}
+.ref span{font-size:32px}
+.cta{background:var(--naranja);color:#fff;font-weight:800;font-size:46px;border-radius:999px;padding:30px 40px;text-align:center;margin-top:40px}
+.row{display:flex;align-items:center;gap:26px;font-size:42px;font-weight:600;margin-top:30px}
+.row i{font-style:normal;font-weight:900;color:var(--azulOscuro);width:64px;height:64px;border-radius:50%;background:var(--amarillo);display:flex;align-items:center;justify-content:center;font-size:42px}
+</style></head><body>
+
+<!-- 1. ¿Qué es CCA? -->
+<section id="st-cca" class="s dark">
+  <div class="kicker">El Gimnasio del Cerebro</div>
+  <h1>El cerebro se entrena como un músculo.</h1>
+  <p class="lead">Retos con movimiento y con sentido, no hojas de ejercicios. Entrenamos:</p>
+  <div class="chips">
+    <div class="chip">Memoria de trabajo</div>
+    <div class="chip">Atención</div>
+    <div class="chip">Autocontrol</div>
+    <div class="chip">Flexibilidad</div>
+  </div>
+  <img class="oki" src="../../assets/img/oki/oki-base-saludo.svg" style="width:560px;right:-10px;bottom:330px">
+  <div class="foot" style="max-width:470px">Neurociencia aplicada · Rionegro, Antioquia</div>
+</section>
+
+<!-- 2. Familias -->
+<section id="st-familias" class="s light">
+  <div class="kicker">Para familias</div>
+  <h1 style="max-width:620px">Un camino para cada edad</h1>
+  <div class="stack">
+    <div class="card"><div class="badge" style="background:var(--azul)">0–2</div><div><b>Sensorial</b><span>Vínculo, exploración y primeras bases de atención y lenguaje</span></div></div>
+    <div class="card"><div class="badge" style="background:var(--verde)">3–5</div><div><b>Lúdica</b><span>Juego simbólico, autocontrol y lenguaje expresivo</span></div></div>
+    <div class="card"><div class="badge" style="background:var(--naranja)">6–10</div><div><b>Lógica</b><span>Memoria de trabajo, atención y lectoescritura</span></div></div>
+    <div class="card"><div class="badge" style="background:var(--azulOscuro)">11–15</div><div><b>Crítica</b><span>Pensamiento abstracto, metacognición e identidad</span></div></div>
+  </div>
+  <div class="note"><b>También:</b> Fase Experta (inglés, 18–50) y Adulto Vital (65+)</div>
+  <img class="oki" src="../../assets/img/oki/oki-empatia.svg" style="width:290px;right:60px;top:250px">
+</section>
+
+<!-- 3. Retos -->
+<section id="st-retos" class="s dark">
+  <div class="kicker">Reto Oki</div>
+  <h1 style="font-size:84px">Di el <span style="color:var(--amarillo)">color</span>, no la palabra.</h1>
+  <div class="stroop">
+    <div style="color:var(--naranja)">VERDE</div>
+    <div style="color:var(--verde)">AMARILLO</div>
+    <div style="color:#fff">NARANJA</div>
+    <div style="color:var(--amarillo)">BLANCO</div>
+    <div style="color:var(--amarillo)">VERDE</div>
+    <div style="color:var(--verde)">NARANJA</div>
+  </div>
+  <p class="lead" style="font-size:36px">Frenar la respuesta automática entrena el <b style="color:var(--amarillo)">autocontrol</b>. ¿Lo lograste sin equivocarte?</p>
+  <img class="oki" src="../../assets/img/oki/oki-ejercitando.svg" style="width:400px;right:30px;bottom:250px">
+</section>
+
+<!-- 4. Ciencia -->
+<section id="st-ciencia" class="s light">
+  <div class="kicker">Con base científica</div>
+  <h1>No es intuición, es evidencia</h1>
+  <div class="stack">
+    <div class="card ref"><div><b>Diamond (2013)</b><span>Las funciones ejecutivas predicen el éxito escolar mejor que el coeficiente intelectual.</span></div></div>
+    <div class="card ref"><div><b>Diamond y Lee (2011)</b><span>Combinar movimiento, reto cognitivo y narrativa funciona mejor que cada uno por separado (4 a 12 años).</span></div></div>
+    <div class="card ref"><div><b>Colcombe y Kramer (2003)</b><span>En adultos mayores, la buena condición física se asocia con mejor atención ejecutiva.</span></div></div>
+  </div>
+  <img class="oki" src="../../assets/img/oki/oki-leyendo.svg" style="width:330px;right:40px;bottom:250px">
+  <div class="foot" style="max-width:560px;font-size:30px">Más en el blog: gimnasiodelcerebro.co</div>
+</section>
+
+<!-- 5. Logros -->
+<section id="st-logros" class="s light" style="background:var(--t2)">
+  <div class="kicker" style="color:var(--verde)">Logros</div>
+  <h1>Aquí celebramos cada avance</h1>
+  <p class="lead">Cada 8 semanas evaluamos el progreso real en tres áreas:</p>
+  <div class="stack">
+    <div class="card"><div class="badge" style="background:var(--azul)">DC</div><div><b>Desarrollo cognitivo</b></div></div>
+    <div class="card"><div class="badge" style="background:var(--verde)">HL</div><div><b>Habilidades lingüísticas</b></div></div>
+    <div class="card"><div class="badge" style="background:var(--naranja)">IE</div><div><b>Inteligencia emocional</b></div></div>
+  </div>
+  <p class="lead" style="font-size:34px;max-width:560px">Pronto, historias reales de nuestras familias, siempre con su permiso.</p>
+  <img class="oki" src="../../assets/img/oki/oki-celebrando.svg" style="width:380px;right:30px;bottom:250px">
+</section>
+
+<!-- 6. Contacto -->
+<section id="st-contacto" class="s dark">
+  <div class="kicker">¿Hablamos?</div>
+  <h1>Agenda tu clase de prueba gratuita</h1>
+  <p class="lead">Empezamos siempre con una evaluación cognitiva gratuita, antes de elegir modalidad.</p>
+  <div class="row"><i>›</i>WhatsApp 301 491 6120</div>
+  <div class="row"><i>›</i>gimnasiodelcerebro.co</div>
+  <div class="row"><i>›</i>Rionegro, Antioquia</div>
+  <img class="oki" src="../../assets/img/oki/oki-senalando.svg" style="width:420px;right:20px;bottom:280px;transform:scaleX(1)">
+  <div class="cta" style="margin-top:auto;max-width:560px">Toca el enlace 👇</div>
+</section>
+</body></html>
