@@ -1,14 +1,14 @@
 # #PensarConOtros 2026: borrador del formulario
 
-**Proyecto:** Gimnasio del Criterio
-**Postulante:** Experiencias Cotidianas SAS (marca Gimnasio del Cerebro)
-**Modalidad:** 1. Capacidades ciudadanas para la participación en asuntos públicos
-**Cierre:** jueves 22 de octubre de 2026, 11:59 p.m. hora Colombia. Formulario: https://form.typeform.com/to/DzsLk4kd
+- **Proyecto:** Gimnasio del Criterio
+- **Postulante:** Experiencias Cotidianas SAS (marca Gimnasio del Cerebro)
+- **Modalidad:** 1. Capacidades ciudadanas para la participación en asuntos públicos
+- **Cierre:** jueves 22 de octubre de 2026, 11:59 p.m. hora Colombia. Formulario: https://form.typeform.com/to/DzsLk4kd
 
 Borrador v1, 2026-10-18. Las respuestas siguen el orden de la guía oficial del formulario. Lo que está entre `[corchetes]` hay que completarlo o confirmarlo antes de enviar.
 
 > **Antes de enviar, revisar:**
-> 1. Verificar las 4 referencias científicas de la sección "Sustentación conceptual" en la fuente original (año, revista, hallazgo).
+> 1. Verificar las referencias científicas de la sección "Sustentación conceptual" en la fuente original (año, revista, hallazgo).
 > 2. Conseguir, si alcanza el tiempo, una carta de intención del colegio Divino Niño y otra de la Secretaría de Educación de Rionegro. Se adjuntan al final del formulario (máximo 10 MB por archivo) y pesan en "viabilidad".
 > 3. Ajustar el presupuesto con los salarios y costos reales (archivo `presupuesto-y-cronograma.xlsx`).
 > 4. Todo lo que se escriba aquí es compromiso de ejecución si el proyecto queda seleccionado. No dejar metas que no se puedan cumplir.
