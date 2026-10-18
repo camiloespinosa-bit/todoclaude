@@ -501,6 +501,41 @@ ul { padding-left: 1.2em; }
   .cerebro3d__pista--raton { display: none; }
   .cerebro3d__pista--tactil { display: inline; }
 }
+/* Oki en la escena: SVG oficiales sin modificar, encima del lienzo (fuera del resplandor del 3D). */
+.cerebro3d__oki {
+  position: absolute; right: 4%; bottom: 9%;
+  width: 34%; max-width: 240px; aspect-ratio: 1;
+  pointer-events: none;
+  transform: translate(calc(var(--ox, 0) * -10px), calc(var(--oy, 0) * -6px));
+  transition: transform 600ms var(--ease-out);
+}
+/* Halo suave del color de la fase, para que Oki se lea sobre el fondo oscuro. */
+.cerebro3d__oki::before {
+  content: ""; position: absolute; inset: -12%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--acento) 30%, transparent), transparent);
+  transition: background 400ms var(--ease-out);
+}
+.cerebro3d__oki-cuerpo { position: absolute; inset: 0; animation: oki-flotar 4.5s ease-in-out infinite; }
+.cerebro3d__oki img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; object-position: center bottom;
+  opacity: 0; transition: opacity 220ms var(--ease-out);
+}
+.cerebro3d__oki img.visible { opacity: 1; }
+.cerebro3d__oki-sombra {
+  position: absolute; left: 22%; right: 22%; bottom: -5%; height: 7%;
+  border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,0.5), transparent);
+  animation: oki-sombra 4.5s ease-in-out infinite;
+}
+.cerebro3d__oki.en-pausa .cerebro3d__oki-cuerpo,
+.cerebro3d__oki.en-pausa .cerebro3d__oki-sombra { animation-play-state: paused; }
+@keyframes oki-flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4%); } }
+@keyframes oki-sombra { 0%, 100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(0.85); opacity: 0.7; } }
+@media (prefers-reduced-motion: reduce) {
+  .cerebro3d__oki-cuerpo, .cerebro3d__oki-sombra { animation: none; }
+  .cerebro3d__oki img { transition: none; }
+}
+
 .cerebro3d__aviso { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #A9BCCB; margin: 0; }
 .cerebro3d__aviso[hidden] { display: none; }
 
@@ -546,4 +581,5 @@ ul { padding-left: 1.2em; }
   .cerebro3d { grid-template-columns: 1fr; }
   .cerebro3d__lienzo { height: min(78vw, 420px); }
   .cerebro3d__panel { padding: 4px 20px 24px; }
+  .cerebro3d__oki { width: 38%; right: 2%; bottom: 12%; }
 }

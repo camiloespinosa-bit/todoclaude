@@ -38,6 +38,8 @@ const tactil = window.matchMedia("(pointer: coarse)").matches;
 const raiz = document.querySelector("[data-c3d]");
 const incrustado = raiz.dataset.c3d === "incrustado";
 const $ = (s) => raiz.querySelector(s);
+// Capa opcional con Oki (solo en fases.html): usa los SVG oficiales tal cual, sin modificarlos.
+const okiCapa = $("[data-c3d-oki]");
 
 // ---------- Renderizador ----------
 const canvas = $("[data-c3d-canvas]");
@@ -349,6 +351,8 @@ function ajustarTamano() {
   // En pantallas angostas alejamos la cámara para que el cerebro quepa completo.
   const angosto = incrustado ? w / h < 1.05 : w < 720;
   camera.fov = angosto ? 66 : incrustado ? 36 : 42;
+  // Con Oki en escena corremos el cerebro hacia la izquierda (y hacia arriba en pantallas angostas) para dejarle espacio.
+  if (okiCapa) camera.setViewOffset(w, h, w * (angosto ? 0.08 : 0.13), angosto ? h * 0.1 : 0, w, h);
   camera.updateProjectionMatrix();
   cerebro.position.y = !incrustado && angosto ? 0.45 : 0;
 }
@@ -397,6 +401,8 @@ function seleccionarFase(i) {
   colorObjetivo = new THREE.Color(f.color);
   densidadObjetivo = f.densidad;
   lanzarOnda();
+  if (i === FASES.length - 1) oki?.momento("celebrando", 2600);
+  else oki?.momento("senalando", 2800);
 }
 
 function lanzarOnda() {
@@ -422,6 +428,8 @@ botonPausa.addEventListener("click", () => {
   botonPausa.textContent = pausado ? "Reanudar" : "Pausar";
   botonPausa.setAttribute("aria-pressed", String(pausado));
   controls.autoRotate = !pausado && !reducirMovimiento;
+  okiCapa?.classList.toggle("en-pausa", pausado);
+  if (pausado) oki?.fijar("leyendo"); else oki?.momento("saludo", 1800);
   reiniciarRecorrido();
 });
 
@@ -437,8 +445,70 @@ canvas.addEventListener("pointerup", (e) => {
   const rayoLocal = raycaster.ray.clone().applyMatrix4(new THREE.Matrix4().copy(cerebro.matrixWorld).invert());
   let mejor = null, mejorD = 0.35;
   nodos.forEach((n) => { const d = rayoLocal.distanceToPoint(n); if (d < mejorD) { mejorD = d; mejor = n; } });
-  if (mejor) { uniformes.uOrigen.value.copy(mejor); uniformes.uInicioOnda.value = uniformes.uTiempo.value; }
+  if (mejor) {
+    uniformes.uOrigen.value.copy(mejor);
+    uniformes.uInicioOnda.value = uniformes.uTiempo.value;
+    if (!pausado) oki?.momento("sorpresa", 1600);
+  }
 });
+
+// ---------- Oki ----------
+// Oki reacciona con sus 8 poses oficiales (assets/img/oki/). Nunca se dibuja ni se deforma:
+// solo se cambia de archivo con un fundido, y la capa flota y se mueve un poco con el puntero.
+const oki = okiCapa ? crearOki(okiCapa) : null;
+
+function crearOki(capa) {
+  const ARCHIVOS = {
+    saludo: "oki-base-saludo", senalando: "oki-senalando", pensando: "oki-pensando",
+    sorpresa: "oki-sorpresa", celebrando: "oki-celebrando", ejercitando: "oki-ejercitando", leyendo: "oki-leyendo"
+  };
+  const url = (pose) => new URL(`../img/oki/${ARCHIVOS[pose]}.svg`, import.meta.url).href;
+  const imagenes = [...capa.querySelectorAll("img")];
+  let activa = 0, poseActual = null, pedido = 0, temporizador;
+
+  // Pose de reposo: en Adulto Vital Oki se queda haciendo ejercicio; en las demás fases, pensando.
+  const reposo = () => (faseActual === FASES.length - 1 ? "ejercitando" : "pensando");
+
+  async function mostrar(pose) {
+    if (pose === poseActual) return;
+    poseActual = pose;
+    const id = ++pedido;
+    const siguiente = imagenes[1 - activa];
+    siguiente.src = url(pose);
+    try { await siguiente.decode(); } catch (e) { /* si falla la decodificación, igual se muestra al cargar */ }
+    if (id !== pedido) return; // llegó otra pose mientras esta cargaba
+    siguiente.classList.add("visible");
+    imagenes[activa].classList.remove("visible");
+    activa = 1 - activa;
+  }
+
+  function fijar(pose) {
+    clearTimeout(temporizador);
+    mostrar(pose);
+  }
+
+  // Muestra una pose un momento y luego vuelve a la de reposo.
+  function momento(pose, ms) {
+    clearTimeout(temporizador);
+    mostrar(pose);
+    temporizador = setTimeout(() => { if (!pausado) mostrar(reposo()); }, ms);
+  }
+
+  // Precarga las poses para que los cambios sean instantáneos.
+  Object.keys(ARCHIVOS).forEach((pose) => { const img = new Image(); img.src = url(pose); });
+
+  // Leve paralaje con el puntero (solo con ratón).
+  if (!tactil && !reducirMovimiento) {
+    raiz.addEventListener("pointermove", (e) => {
+      const r = raiz.getBoundingClientRect();
+      capa.style.setProperty("--ox", (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
+      capa.style.setProperty("--oy", (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
+    });
+    raiz.addEventListener("pointerleave", () => { capa.style.setProperty("--ox", 0); capa.style.setProperty("--oy", 0); });
+  }
+
+  return { fijar, momento };
+}
 
 // ---------- Bucle de animación ----------
 const reloj = new THREE.Clock();
@@ -500,6 +570,7 @@ function animar() {
 }
 
 lanzarOnda();
+oki?.momento("saludo", 2600);
 reiniciarRecorrido();
 cuadro = requestAnimationFrame(animar);
   
