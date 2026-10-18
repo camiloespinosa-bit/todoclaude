@@ -1,0 +1,5 @@
+claude-agent-sdk>=0.2.140
+ipykernel>=6.29.5
+markdown>=3.4
+pandas>=2.2.0
+python-dotenv>=1.1.1
