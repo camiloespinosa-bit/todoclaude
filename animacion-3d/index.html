@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cerebro en 3D | Gimnasio del Cerebro</title>
+  <meta name="description" content="Animación 3D interactiva del Gimnasio del Cerebro: recorre las fases del programa y mira cómo se ilumina la red de conexiones." />
+  <style>
+    @font-face { font-family: "Poppins"; font-weight: 400; font-display: swap; src: url("../assets/fonts/poppins-400.woff") format("woff"); }
+    @font-face { font-family: "Poppins"; font-weight: 600; font-display: swap; src: url("../assets/fonts/poppins-600.woff") format("woff"); }
+    @font-face { font-family: "Poppins"; font-weight: 800; font-display: swap; src: url("../assets/fonts/poppins-800.woff") format("woff"); }
+
+    :root {
+      --azul: #145389;
+      --verde: #7CB342;
+      --naranja: #F57C00;
+      --amarillo: #FDD835;
+      --turquesa: #57A6B5;
+      --fondo: #0B1B28;
+      --panel: rgba(13, 34, 50, 0.72);
+      --borde: rgba(255, 255, 255, 0.12);
+      --texto: #EEF4F8;
+      --texto-suave: #A9BCCB;
+      --acento: #57A6B5;
+      --fuente: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: radial-gradient(120% 90% at 50% 40%, #12324A 0%, var(--fondo) 60%);
+      color: var(--texto);
+      font-family: var(--fuente);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #escena { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+    #escena:active { cursor: grabbing; }
+
+    .capa { position: fixed; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; }
+    .capa > * { pointer-events: auto; }
+
+    .cabecera { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .marca { display: flex; align-items: center; gap: 10px; color: var(--texto); text-decoration: none; font-weight: 600; }
+    .marca__insignia { width: 36px; height: 36px; border-radius: 10px; background: var(--azul); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+    .cabecera__volver { color: var(--texto-suave); text-decoration: none; font-size: 14px; }
+    .cabecera__volver:hover { color: var(--texto); }
+
+    .titular { max-width: 420px; margin-top: 8vh; }
+    .titular__etiqueta { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--acento); font-weight: 600; transition: color 400ms var(--ease-out); }
+    .titular h1 { font-size: clamp(30px, 4.4vw, 52px); line-height: 1.05; margin: 10px 0 12px; font-weight: 800; }
+    .titular p { color: var(--texto-suave); margin: 0; font-size: 15px; line-height: 1.6; }
+
+    .panel {
+      align-self: flex-start;
+      width: min(420px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+      padding: 18px 20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .panel__cabeza { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .panel__nombre { font-weight: 800; font-size: 20px; margin: 0; }
+    .panel__edad { font-size: 13px; color: var(--acento); font-weight: 600; white-space: nowrap; transition: color 400ms var(--ease-out); }
+    .panel__foco { margin: 4px 0 8px; font-weight: 600; font-size: 14px; }
+    .panel__texto { margin: 0; color: var(--texto-suave); font-size: 14px; line-height: 1.55; }
+    .panel__contenido { transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+    .panel__contenido.saliendo { opacity: 0; transform: translateY(6px); }
+
+    .fases { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .fase-btn {
+      font: inherit; font-size: 13px; font-weight: 600;
+      color: var(--texto); background: rgba(255,255,255,0.06);
+      border: 1px solid var(--borde); border-radius: 999px;
+      padding: 8px 14px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background 160ms ease, border-color 160ms ease, transform 120ms var(--ease-out);
+    }
+    .fase-btn:hover { background: rgba(255,255,255,0.12); }
+    .fase-btn:active { transform: scale(0.97); }
+    .fase-btn:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+    .fase-btn[aria-pressed="true"] { background: rgba(255,255,255,0.16); border-color: var(--c); }
+    .fase-btn__punto { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+
+    .pie { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-top: 12px; }
+    .pie__nota { font-size: 12px; color: var(--texto-suave); opacity: 0.8; margin: 0; max-width: 360px; }
+    .pie__controles { display: flex; gap: 8px; }
+    .icono-btn { font: inherit; font-size: 13px; color: var(--texto); background: rgba(255,255,255,0.06); border: 1px solid var(--borde); border-radius: 10px; padding: 8px 12px; cursor: pointer; }
+    .icono-btn:hover { background: rgba(255,255,255,0.12); }
+
+    .abajo { display: flex; flex-direction: column; }
+
+    .sin-webgl[hidden] { display: none; }
+    .sin-webgl { position: fixed; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--texto-suave); }
+
+    @media (max-width: 720px) {
+      .capa { padding: 16px; }
+      .titular { margin-top: 2vh; }
+      .titular p { display: none; }
+      .panel { width: 100%; padding: 14px 16px; }
+      .panel__texto { font-size: 13px; }
+      .fase-btn { padding: 7px 11px; font-size: 12px; }
+      .pie__nota { font-size: 11px; }
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body data-c3d="pantalla">
+  <canvas id="escena" data-c3d-canvas aria-label="Cerebro 3D animado. Arrastra para girarlo." role="img"></canvas>
+
+  <div class="capa">
+    <div>
+      <div class="cabecera">
+        <a class="marca" href="../index.html">
+          <span class="marca__insignia" aria-hidden="true">GC</span>
+          <span>Gimnasio del Cerebro</span>
+        </a>
+        <a class="cabecera__volver" href="../fases.html">Ver las fases →</a>
+      </div>
+      <div class="titular">
+        <span class="titular__etiqueta" data-etiqueta>Entrenamiento cerebral</span>
+        <h1>Cada reto enciende una red.</h1>
+        <p>Recorre las fases del programa y mira cómo la red se vuelve más densa. Arrastra para girar el cerebro y usa la rueda o dos dedos para acercarte.</p>
+      </div>
+    </div>
+
+    <div class="abajo">
+      <section class="panel" aria-live="polite">
+        <div class="panel__contenido" data-c3d-contenido>
+          <div class="panel__cabeza">
+            <h2 class="panel__nombre" data-c3d-nombre>Fase Sensorial</h2>
+            <span class="panel__edad" data-c3d-edad>0–2 años</span>
+          </div>
+          <p class="panel__foco" data-c3d-foco>Vínculo y exploración sensorial</p>
+          <p class="panel__texto" data-c3d-texto></p>
+        </div>
+        <div class="fases" role="group" aria-label="Fases del programa" data-c3d-fases></div>
+      </section>
+      <div class="pie">
+        <p class="pie__nota">Ilustración artística con fines educativos. No representa una imagen médica ni actividad cerebral real.</p>
+        <div class="pie__controles">
+          <button class="icono-btn" type="button" data-c3d-pausa aria-pressed="false">Pausar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sin-webgl" data-c3d-sin-webgl hidden>
+    <p>Tu navegador no pudo iniciar la animación 3D (WebGL). Prueba con una versión reciente de Chrome, Edge, Firefox o Safari.</p>
+  </div>
+
+  <script type="module" src="../assets/js/cerebro-3d.js"></script>
+</body>
+</html>
