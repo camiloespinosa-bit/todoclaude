@@ -16,14 +16,6 @@
   <meta property="og:locale" content="es_CO" />
   <meta name="twitter:card" content="summary_large_image" />
 <link rel="stylesheet" href="assets/css/style.css" />
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -59,45 +51,6 @@
         <span class="etiqueta">Fases del programa</span>
         <h1>Un camino distinto para cada momento de la vida</h1>
         <p class="hero__sub" style="margin:0 auto;">Nada se enseña como clase teórica. En cada fase, la competencia que se entrena se ejecuta primero con el cuerpo y luego se vuelve un reto con historia. Las tres áreas siempre están presentes: <strong>Desarrollo Cognitivo (DC)</strong>, <strong>Habilidades Lingüísticas (HL)</strong> e <strong>Inteligencia Emocional (IE)</strong>.</p>
-      </div>
-    </section>
-
-    <!-- ============ CEREBRO 3D (assets/js/cerebro-3d.js) ============ -->
-    <section class="seccion seccion--cerebro3d" aria-labelledby="cerebro3d-titulo">
-      <div class="contenedor">
-        <div class="cerebro3d" data-c3d="incrustado">
-          <div class="cerebro3d__lienzo">
-            <canvas data-c3d-canvas role="img" aria-label="Cerebro 3D animado: la red de conexiones cambia de color y se vuelve más densa en cada fase del programa."></canvas>
-            <p class="cerebro3d__aviso" data-c3d-sin-webgl hidden>Tu navegador no pudo iniciar la animación 3D (WebGL). La información de cada fase está justo abajo.</p>
-            <div class="cerebro3d__oki" data-c3d-oki aria-hidden="true">
-              <div class="cerebro3d__oki-cuerpo">
-                <img src="assets/img/oki/oki-base-saludo.svg" alt="" class="visible" width="763" height="761" />
-                <img alt="" width="763" height="761" />
-              </div>
-              <span class="cerebro3d__oki-sombra"></span>
-            </div>
-            <span class="cerebro3d__pista cerebro3d__pista--raton" aria-hidden="true">Arrastra para girarlo · haz clic para lanzar una onda</span>
-            <span class="cerebro3d__pista cerebro3d__pista--tactil" aria-hidden="true">Toca el cerebro para lanzar una onda</span>
-          </div>
-          <div class="cerebro3d__panel">
-            <span class="etiqueta">Explora en 3D</span>
-            <h2 id="cerebro3d-titulo">Cada reto enciende una red</h2>
-            <div class="cerebro3d__contenido" data-c3d-contenido aria-live="polite">
-              <div class="cerebro3d__cabeza">
-                <h3 class="cerebro3d__nombre" data-c3d-nombre>Fase Sensorial</h3>
-                <span class="cerebro3d__edad" data-c3d-edad>0–2 años</span>
-              </div>
-              <p class="cerebro3d__foco" data-c3d-foco>Vínculo y exploración sensorial</p>
-              <p class="cerebro3d__texto" data-c3d-texto>El foco es el vínculo cuidador–bebé: atención compartida, co-regulación y las primeras bases de atención y lenguaje.</p>
-            </div>
-            <div class="cerebro3d__fases" role="group" aria-label="Fases del programa" data-c3d-fases></div>
-            <div class="cerebro3d__pie">
-              <a class="cerebro3d__enlace" data-c3d-enlace href="#fase-sensorial">Ver Fase Sensorial en detalle ↓</a>
-              <button class="cerebro3d__pausa" type="button" data-c3d-pausa aria-pressed="false">Pausar</button>
-            </div>
-            <p class="cerebro3d__nota">Ilustración artística con fines educativos. No representa una imagen médica ni actividad cerebral real.</p>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -319,15 +272,5 @@
   </a>
 
   <script src="assets/js/main.js"></script>
-  <script type="module">
-    // La animación 3D (three.js) solo se descarga cuando la sección se acerca a la pantalla.
-    const raiz = document.querySelector("[data-c3d]");
-    const io = new IntersectionObserver((entradas) => {
-      if (!entradas[0].isIntersecting) return;
-      io.disconnect();
-      import("./assets/js/cerebro-3d.js");
-    }, { rootMargin: "300px" });
-    io.observe(raiz);
-  </script>
 </body>
 </html>
