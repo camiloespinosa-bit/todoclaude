@@ -10,6 +10,7 @@ Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca Gimn
 - `nosotros.html` — Sobre Nosotros
 - `blog/index.html` + `blog/*.html` — Blog (2 artículos iniciales)
 - `docentes/index.html` — Circuito de retos para docentes (embudo del curso de inglés de 200 horas). Autocontenido; el formulario envía a un Google Apps Script que guarda en la hoja "Leads docentes" (Drive > CCA > Embudo docentes) y envía el kit. Tiene `noindex` hasta el lanzamiento. `docentes/kit-ruta-1.pdf`, `kit-ruta-2.pdf` y `kit-ruta-3.pdf` son los kits por ruta (las URLs deben coincidir con KIT_URLS en el Apps Script).
+- `animacion-3d/index.html` — Animación 3D interactiva (three.js 0.160.0 desde jsDelivr): cerebro en nube de puntos con red neuronal que se vuelve más densa al recorrer las fases (Sensorial → Adulto Vital). Recorrido automático, arrastrar para girar, tocar el cerebro lanza una onda, botón de pausa y respeto a `prefers-reduced-motion`. Lleva la nota "Ilustración artística, no representa actividad cerebral real". Aún no está enlazada desde el menú.
 - `privacidad.html` — BORRADOR de la política de tratamiento de datos (Ley 1581). No publicar como oficial hasta que un asesor jurídico la revise y se completen NIT, dirección, fecha y plazo de conservación.
 
 **Estilos y assets:**
