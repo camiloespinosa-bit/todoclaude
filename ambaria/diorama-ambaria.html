@@ -1,0 +1,752 @@
+<title>Diorama de Ambaria</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;800&display=swap">
+<style>
+  /* Layout: un marco vertical 9:16 centrado en la ventana; dentro, el diorama 3D a sangre y una carta de vidrio arriba. */
+  :root {
+    --pagina: #E2E4DF;          /* alrededor del marco */
+    --marco: #F3F2EE;           /* blanco roto del video */
+    --tinta: #1C2A36;
+    --tinta-suave: #52606B;
+    --vidrio: rgba(255, 255, 255, 0.52);
+    --vidrio-borde: rgba(255, 255, 255, 0.85);
+    --naranja: #F57C00;
+    --ambar: #E9A93A;
+    --fuente: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    box-sizing: border-box;
+    background: var(--pagina);
+    color: var(--tinta);
+    font-family: var(--fuente);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 12px;
+    overflow: hidden;
+  }
+
+  .marco {
+    position: relative;
+    height: min(calc(100% - 46px), calc((100vw - 32px) * 16 / 9));
+    aspect-ratio: 9 / 16;
+    max-width: 100%;
+    background: var(--marco);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(28, 42, 54, 0.16);
+    container-type: size;
+  }
+  .marco canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  .carta {
+    position: absolute;
+    left: 6cqw; right: 6cqw; top: 5.5cqw;
+    padding: 4.6cqw 5.2cqw 5cqw;
+    border-radius: 5cqw;
+    background: var(--vidrio);
+    border: 1px solid var(--vidrio-borde);
+    box-shadow: 0 2cqw 6cqw rgba(28, 42, 54, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+    backdrop-filter: blur(14px) saturate(1.5);
+  }
+  .carta__eyebrow {
+    display: flex; align-items: center; gap: 2cqw;
+    font-size: 2.9cqw; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--tinta-suave);
+  }
+  .carta__gema {
+    width: 2.4cqw; height: 2.4cqw; transform: rotate(45deg); border-radius: 0.5cqw;
+    background: linear-gradient(135deg, #FFB547, var(--naranja));
+    box-shadow: 0 0 2.4cqw rgba(245, 124, 0, 0.55);
+  }
+  .carta h1 {
+    margin: 1.4cqw 0 3.6cqw;
+    font-size: 11.5cqw; line-height: 1; font-weight: 800; letter-spacing: -0.02em;
+  }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3cqw; }
+  .stat {
+    display: flex; flex-direction: column; gap: 0.6cqw;
+    padding-top: 2.6cqw;
+    border-top: 0.45cqw solid rgba(28, 42, 54, 0.12);
+  }
+  .stat:first-child { border-top-color: var(--naranja); }
+  .stat__valor { font-size: 8.4cqw; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat__nombre { font-size: 3.1cqw; font-weight: 500; color: var(--tinta-suave); }
+
+  .nota {
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px;
+    font-size: 12px; color: var(--tinta-suave); text-align: center;
+  }
+  .nota button {
+    font: inherit; font-weight: 600; color: var(--tinta);
+    background: #F3F2EE; border: 1px solid #C9CCC6; border-radius: 999px;
+    padding: 5px 12px; cursor: pointer;
+  }
+  .nota button:hover { background: #FFFFFF; }
+  .nota button:focus-visible { outline: 2px solid var(--naranja); outline-offset: 2px; }
+
+  /* #video: el marco ocupa toda la ventana, para grabar a 1080×1920 sin bordes. */
+  body.modo-video { padding: 0; gap: 0; }
+  body.modo-video .marco { height: 100%; border-radius: 0; box-shadow: none; }
+  body.modo-video .nota { display: none; }
+
+  .sin-webgl { position: absolute; inset: 0; display: grid; place-items: center; padding: 10cqw; text-align: center; color: var(--tinta-suave); font-size: 4cqw; }
+</style>
+
+<div class="marco" id="marco">
+  <canvas id="lienzo" role="img" aria-label="Diorama animado del continente de Ambaria: Aurelia sellada en el centro y ocho ciudades en anillo, con botes, viajeros y ámbar moviéndose por los caminos."></canvas>
+  <section class="carta" aria-label="Ambaria en cifras">
+    <div class="carta__eyebrow"><span class="carta__gema" aria-hidden="true"></span>Mundo del juego</div>
+    <h1>Ambaria</h1>
+    <div class="stats">
+      <div class="stat"><span class="stat__valor" data-meta="9">9</span><span class="stat__nombre">Ciudades</span></div>
+      <div class="stat"><span class="stat__valor" data-meta="558">558</span><span class="stat__nombre">Retos</span></div>
+      <div class="stat"><span class="stat__valor" data-meta="15">15</span><span class="stat__nombre">Competencias</span></div>
+    </div>
+  </section>
+  <p class="sin-webgl" id="sin-webgl" hidden>Tu navegador no pudo iniciar WebGL. Prueba con una versión reciente de Chrome, Edge, Firefox o Safari.</p>
+</div>
+<div class="nota">
+  <span>Exploración visual para Sebastián · ciudades, nombres y mapa tentativos · bucle de 10 s</span>
+  <button type="button" id="reconstruir">Ver la construcción otra vez</button>
+</div>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+  import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+  import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+  import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
+  import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+  const BUCLE = 10;                   // segundos; todo lo que se mueve repite exactamente cada 10 s
+  const TAU = Math.PI * 2;
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (location.hash === "#video") document.body.classList.add("modo-video");
+
+  // ---------- Datos del mundo (del resumen de Ambaria; nombres y orden tentativos) ----------
+  // Orden del anillo = propuesta de distribución: vecinas con filtraciones quedan pegadas.
+  const CIUDADES = [
+    { nombre: "Petrea",     suelo: ["#A9B1B5", "#9AA3A8", "#B9BEBB"], base: 0.62, techo: "#7E8A93", arboles: 0.12 },
+    { nombre: "Electria",   suelo: ["#DCC793", "#D1BA80", "#E5D4A6"], base: 0.55, techo: "#E8B820", arboles: 0.06 },
+    { nombre: "Mielar",     suelo: ["#6F8D47", "#5F7F3E", "#7D9B52"], base: 0.42, techo: "#D98A1F", arboles: 0.32 },
+    { nombre: "Eteria",     suelo: ["#E6EEF1", "#D7E4E9", "#F0F4F5"], base: 1.25, techo: "#6FAFC9", arboles: 0.10 },
+    { nombre: "Espejara",   suelo: ["#F4F2EB", "#EAE7DE", "#F8F7F2"], base: 0.48, techo: "#9EADBA", arboles: 0.00 },
+    { nombre: "Grietara",   suelo: ["#C97B4F", "#BA6B42", "#D58D60"], base: 0.72, techo: "#A84B2B", arboles: 0.05 },
+    { nombre: "Resplandra", suelo: ["#F0AE3C", "#E89F2C", "#F5BD57"], base: 0.95, techo: "#F08A1C", arboles: 0.05 },
+    { nombre: "Atractia",   suelo: ["#7FA071", "#6F9264", "#8EAB80"], base: 0.82, techo: "#3F7A55", arboles: 0.38 }
+  ];
+  const ORO = ["#F2DFA6", "#ECD592", "#F6E7BC"];
+  const SECTOR = TAU / 8;
+  const A0 = 0.55;                    // giro del anillo: Petrea queda de frente a la cámara
+  const R_CAMINO = 6.0;
+  const NIVEL_MAR = 0.25;
+
+  // ---------- Utilidades ----------
+  let semilla = 77;
+  const rand = () => ((semilla = (semilla * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const mod = (a, n) => ((a % n) + n) % n;
+  const suave = (x) => x * x * (3 - 2 * x);
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const rebote = (x) => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+  const sectorDe = (a) => Math.floor(mod(a - A0, TAU) / SECTOR);
+  const centroSector = (s) => A0 + (s + 0.5) * SECTOR;
+  const costa = (a) => 8.0 + 0.6 * Math.sin(3 * a + 1.3) + 0.35 * Math.sin(7 * a + 0.4);
+  // Altura del camino del anillo: interpola con suavidad entre las alturas base de cada ciudad (rampas, no escalones).
+  function alturaCamino(a) {
+    const u = mod(a - A0, TAU) / SECTOR - 0.5;
+    const s0 = Math.floor(u), f = u - s0;
+    const h0 = CIUDADES[mod(s0, 8)].base, h1 = CIUDADES[mod(s0 + 1, 8)].base;
+    return h0 + (h1 - h0) * suave(f);
+  }
+  const color = (hex) => new THREE.Color(hex);
+  const elegir = (lista) => lista[Math.floor(rand() * lista.length)];
+
+  // ---------- Renderizador, escena y cámara ----------
+  const marco = document.getElementById("marco");
+  const canvas = document.getElementById("lienzo");
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  } catch (e) {
+    document.getElementById("sin-webgl").hidden = false;
+    throw e;
+  }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+
+  const scene = new THREE.Scene();
+  // El fondo pasa por el mapeo de tonos ACES, que oscurece el blanco: se sube para que el resultado sea el blanco roto del marco.
+  scene.background = new THREE.Color("#F3F2EE").multiplyScalar(2.6);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.45;
+
+  const camera = new THREE.PerspectiveCamera(24, 9 / 16, 1, 400);
+
+  scene.add(new THREE.HemisphereLight("#EEF4FF", "#CDBB9C", 1.1));
+  const sol = new THREE.DirectionalLight("#FFF0DA", 2.6);
+  sol.position.set(9, 16, 7);
+  sol.castShadow = true;
+  sol.shadow.mapSize.set(2048, 2048);
+  Object.assign(sol.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 50 });
+  sol.shadow.bias = -0.0004;
+  sol.shadow.normalBias = 0.02;
+  sol.shadow.radius = 5;
+  scene.add(sol);
+
+  const mundo = new THREE.Group();
+  scene.add(mundo);
+
+  // Materiales compartidos
+  const mats = new Map();
+  function mat(hex, extra = {}) {
+    const clave = hex + JSON.stringify(extra);
+    if (!mats.has(clave)) mats.set(clave, new THREE.MeshStandardMaterial({ color: hex, roughness: 0.78, metalness: 0, ...extra }));
+    return mats.get(clave);
+  }
+  const geos = new Map();
+  function caja(w, h, d, r = 0.06, seg = 2) {
+    const clave = [w, h, d, r, seg].join("|");
+    if (!geos.has(clave)) geos.set(clave, new RoundedBoxGeometry(w, h, d, seg, Math.min(r, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001)));
+    return geos.get(clave);
+  }
+  function bloque(w, h, d, hex, extra, r) {
+    const m = new THREE.Mesh(caja(w, h, d, r), mat(hex, extra));
+    m.castShadow = true;
+    m.receiveShadow = true;
+    return m;
+  }
+
+  // Todo lo que "sube" al construirse se registra aquí: objeto, altura final y retraso.
+  const piezas = [];
+  function registrar(obj, retraso) {
+    piezas.push({ obj, y: obj.position.y, retraso });
+    mundo.add(obj);
+    return obj;
+  }
+  const retrasoPorRadio = (x, z) => 0.08 + 0.5 * (Math.hypot(x, z) / 11) + rand() * 0.1;
+
+  // ---------- Losa flotante ----------
+  {
+    const perfil = [new THREE.Vector2(0, -1.5), new THREE.Vector2(10.2, -1.5)];
+    for (let i = 1; i <= 8; i++) { const t = -Math.PI / 2 + (i / 8) * (Math.PI / 2); perfil.push(new THREE.Vector2(10.2 + 0.6 * Math.cos(t), -0.9 + 0.6 * Math.sin(t))); }
+    for (let i = 0; i <= 8; i++) { const t = (i / 8) * (Math.PI / 2); perfil.push(new THREE.Vector2(10.4 + 0.4 * Math.cos(t), -0.4 + 0.4 * Math.sin(t))); }
+    perfil.push(new THREE.Vector2(0, 0));
+    const losa = new THREE.Mesh(new THREE.LatheGeometry(perfil, 128), mat("#EEE9DF", { roughness: 0.9 }));
+    losa.castShadow = losa.receiveShadow = true;
+    registrar(losa, 0);
+
+    const mar = new THREE.Mesh(new THREE.CylinderGeometry(10.15, 10.15, NIVEL_MAR, 128), mat("#2F74B5", { roughness: 0.28, metalness: 0.05 }));
+    mar.position.y = NIVEL_MAR / 2;
+    mar.receiveShadow = true;
+    registrar(mar, 0.04);
+
+    const piso = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity: 0.1 }));
+    piso.rotation.x = -Math.PI / 2;
+    piso.position.y = -3.4;
+    piso.receiveShadow = true;
+    scene.add(piso);
+  }
+
+  // ---------- Terreno: una baldosa redondeada por celda ----------
+  const celdas = new Map();           // "i,j" -> altura superior
+  const tiles = [];                   // { x, z, h, color, espejo }
+  const candidatas = CIUDADES.map(() => []); // celdas libres por ciudad, para árboles y fenómenos
+  const centroCiudad = (s) => { const c = centroSector(s); return new THREE.Vector2(Math.cos(c) * R_CAMINO, Math.sin(c) * R_CAMINO); };
+  const picos = [];
+  for (let s = 0; s < 8; s++) if (s === 7) {
+    const c = centroSector(s);
+    picos.push([Math.cos(c - 0.22) * 7.4, Math.sin(c - 0.22) * 7.4, 1.9], [Math.cos(c + 0.25) * 4.4, Math.sin(c + 0.25) * 4.4, 1.5], [Math.cos(c + 0.05) * 7.6, Math.sin(c + 0.05) * 7.6, 1.2]);
+  }
+
+  for (let i = -10; i <= 10; i++) {
+    for (let j = -10; j <= 10; j++) {
+      const x = i, z = j, r = Math.hypot(x, z), a = Math.atan2(z, x);
+      if (r < 2.1) {
+        celdas.set(`${i},${j}`, r < 1.5 ? 1.15 : 0.95);
+        tiles.push({ x, z, h: r < 1.5 ? 1.15 : 0.95, color: elegir(ORO) });
+        continue;
+      }
+      if (r < 3.7) continue;           // lago que rodea a Aurelia, sellada
+      const borde = costa(a);
+      if (r > borde) continue;
+      const s = sectorDe(a), C = CIUDADES[s];
+      const enCiudad = centroCiudad(s).distanceTo(new THREE.Vector2(x, z)) < 1.75;
+      const enCamino = Math.abs(r - R_CAMINO) < 0.75;
+      let h;
+      if (enCiudad) h = C.base;
+      else if (enCamino) h = alturaCamino(a);
+      else {
+        switch (s) {
+          case 0: h = C.base + (r > borde - 1.3 ? 0.55 : 0) + rand() * 0.12; break;         // acantilados de la costa
+          case 3: h = C.base + rand() * 0.1 - (r > borde - 1 ? 0.35 : 0); break;            // altiplano
+          case 5: if (rand() < 0.2) continue; h = C.base + rand() * 0.85; break;            // cañones con grietas
+          case 7: h = C.base + rand() * 0.1 + picos.reduce((m, [px, pz, ph]) => Math.max(m, ph * Math.exp(-((x - px) ** 2 + (z - pz) ** 2) / 1.1)), 0); break;
+          default: h = C.base + rand() * 0.1;
+        }
+      }
+      const espejo = s === 4 && !enCiudad && !enCamino && rand() < 0.35;
+      celdas.set(`${i},${j}`, h);
+      tiles.push({ x, z, h, color: elegir(C.suelo), espejo });
+      if (!enCiudad && !enCamino && !espejo) candidatas[s].push({ x, z, h, r });
+    }
+  }
+  const alturaEn = (x, z) => celdas.get(`${Math.round(x)},${Math.round(z)}`) ?? NIVEL_MAR;
+
+  // Baldosas instanciadas (normales y espejos de Espejara), con base en y = 0.
+  const geoTile = new RoundedBoxGeometry(0.95, 1, 0.95, 2, 0.1).translate(0, 0.5, 0);
+  const grupoTiles = [];
+  for (const espejo of [false, true]) {
+    const lista = tiles.filter((t) => !!t.espejo === espejo);
+    const material = espejo
+      ? new THREE.MeshStandardMaterial({ color: "#DCE6EC", roughness: 0.06, metalness: 1 })
+      : new THREE.MeshStandardMaterial({ color: "#FFFFFF", roughness: 0.82 });
+    const im = new THREE.InstancedMesh(geoTile, material, lista.length);
+    im.castShadow = im.receiveShadow = true;
+    lista.forEach((t, k) => { if (!espejo) im.setColorAt(k, color(t.color)); t.retraso = retrasoPorRadio(t.x, t.z); });
+    mundo.add(im);
+    grupoTiles.push({ im, lista });
+  }
+  const m4 = new THREE.Matrix4(), v3 = new THREE.Vector3(), q = new THREE.Quaternion(), esc = new THREE.Vector3();
+  function ponerTiles(e) {
+    for (const { im, lista } of grupoTiles) {
+      lista.forEach((t, k) => {
+        const p = clamp01((e - t.retraso) / 0.5);
+        const y = -2.5 * (1 - rebote(p));
+        esc.set(1, Math.max(0.001, t.h * (p > 0 ? 1 : 0.001)), 1);
+        m4.compose(v3.set(t.x, y, t.z), q, esc);
+        im.setMatrixAt(k, m4);
+      });
+      im.instanceMatrix.needsUpdate = true;
+    }
+  }
+
+  // ---------- Edificios con rejilla de ventanas ----------
+  function edificio(w, d, h, techo) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(w, h, d, "#F2F0EB", {}, 0.05);
+    cuerpo.position.y = h / 2;
+    const tapa = bloque(w * 0.86, 0.12, d * 0.86, techo, {}, 0.04);
+    tapa.position.y = h + 0.05;
+    g.add(cuerpo, tapa);
+    const ventanas = [];
+    const filas = Math.max(1, Math.floor((h - 0.22) / 0.22));
+    for (const [ancho, fondo, rot] of [[w, d, 0], [d, w, Math.PI / 2], [w, d, Math.PI], [d, w, -Math.PI / 2]]) {
+      const cols = Math.max(1, Math.floor((ancho - 0.1) / 0.17));
+      for (let f = 0; f < filas; f++) for (let c = 0; c < cols; c++) {
+        const gw = new THREE.BoxGeometry(0.08, 0.1, 0.02);
+        gw.translate((c - (cols - 1) / 2) * 0.17, 0.2 + f * 0.22, fondo / 2 + 0.005);
+        gw.rotateY(rot);
+        ventanas.push(gw);
+      }
+    }
+    const malla = new THREE.Mesh(mergeGeometries(ventanas), mat("#2C4560", { roughness: 0.25, metalness: 0.2 }));
+    g.add(malla);
+    return g;
+  }
+
+  function arbol(escala = 1, tonos = ["#6FAF3E", "#4E9A6A", "#7CB342"]) {
+    const g = new THREE.Group();
+    const tronco = bloque(0.08, 0.26, 0.08, "#8A6A4A", {}, 0.02);
+    tronco.position.y = 0.13;
+    const copa1 = bloque(0.34, 0.26, 0.34, elegir(tonos), {}, 0.08);
+    copa1.position.y = 0.36;
+    const copa2 = bloque(0.22, 0.2, 0.22, elegir(tonos), {}, 0.07);
+    copa2.position.y = 0.56;
+    g.add(tronco, copa1, copa2);
+    g.scale.setScalar(escala);
+    return g;
+  }
+
+  function persona(hexCuerpo) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(0.1, 0.17, 0.08, hexCuerpo, {}, 0.035);
+    cuerpo.position.y = 0.085;
+    const cabeza = bloque(0.08, 0.08, 0.08, "#EFC7A0", {}, 0.03);
+    cabeza.position.y = 0.22;
+    g.add(cuerpo, cabeza);
+    return g;
+  }
+
+  // Marco tangente/radial de cada ciudad: los edificios miran al camino.
+  function enMarco(s, t, n) {
+    const c = centroSector(s);
+    const nx = Math.cos(c), nz = Math.sin(c), tx = -Math.sin(c), tz = Math.cos(c);
+    return { x: Math.cos(c) * R_CAMINO + t * tx + n * nx, z: Math.sin(c) * R_CAMINO + t * tz + n * nz, rot: Math.atan2(-tz, tx) };
+  }
+
+  const animados = [];                // funciones (t, aparicion) que mueven cosas en bucle
+  const COLORES_GENTE = ["#145389", "#F57C00", "#57A6B5", "#7CB342", "#E35D6A", "#3D8BD9"];
+
+  // ---------- Las 8 ciudades ----------
+  const LOTES = [[-1.05, 0.68], [-0.32, 0.8], [0.42, 0.66], [1.12, 0.74], [-1.08, -0.72], [1.02, -0.78], [-0.42, -1.32], [0.5, -1.36]];
+  CIUDADES.forEach((C, s) => {
+    LOTES.forEach(([t, n], k) => {
+      if ((s + k) % 5 === 4) return;  // cada ciudad con un trazado un poco distinto
+      const p = enMarco(s, t, n);
+      const w = 0.48 + rand() * 0.22, d = 0.44 + rand() * 0.2, h = 0.5 + rand() * (s === 3 ? 0.6 : 1.0);
+      const e = edificio(w, d, h, C.techo);
+      e.position.set(p.x, C.base, p.z);
+      e.rotation.y = p.rot;
+      registrar(e, retrasoPorRadio(p.x, p.z) + 0.12);
+    });
+
+    // La pieza del mecanismo de la ciudad, en su plaza: pedestal y cristal ámbar que gira.
+    const plaza = enMarco(s, 0, -0.72);
+    const pieza = new THREE.Group();
+    const pedestal = bloque(0.3, 0.5, 0.3, "#DCD6C8", {}, 0.05);
+    pedestal.position.y = 0.25;
+    const cristal = bloque(0.24, 0.24, 0.24, "#F57C00", { emissive: "#F57C00", emissiveIntensity: 0.55, roughness: 0.3 }, 0.05);
+    cristal.position.y = 0.72;
+    cristal.rotation.set(Math.PI / 4, 0, Math.PI / 4);
+    pieza.add(pedestal, cristal);
+    pieza.position.set(plaza.x, C.base, plaza.z);
+    registrar(pieza, retrasoPorRadio(plaza.x, plaza.z) + 0.2);
+    animados.push((t) => { cristal.rotation.y = (t / BUCLE) * (Math.PI / 2); cristal.position.y = 0.72 + 0.04 * Math.sin((TAU * t) / BUCLE + s); });
+
+    // Gente de la ciudad caminando alrededor de su pieza (una vuelta cada 10 s).
+    for (let k = 0; k < 4; k++) {
+      const per = persona(COLORES_GENTE[(s + k) % COLORES_GENTE.length]);
+      mundo.add(per);
+      const fase = k / 4, sentido = k % 2 ? 1 : -1, rad = 0.42 + (k % 2) * 0.14;
+      animados.push((t, ap) => {
+        const ang = TAU * (fase + sentido * t / BUCLE);
+        per.position.set(plaza.x + Math.cos(ang) * rad, C.base + Math.abs(Math.sin(t * TAU * 1.2)) * 0.02, plaza.z + Math.sin(ang) * rad);
+        per.rotation.y = -ang - sentido * Math.PI / 2;
+        per.scale.setScalar(ap);
+      });
+    }
+
+    // Árboles en las celdas libres
+    candidatas[s].forEach((c) => {
+      if (rand() > C.arboles) return;
+      const a = arbol(0.8 + rand() * 0.4, s === 3 ? ["#5E9E7A", "#4E8F6B"] : undefined);
+      a.position.set(c.x + (rand() - 0.5) * 0.4, c.h, c.z + (rand() - 0.5) * 0.4);
+      a.rotation.y = rand() * TAU;
+      registrar(a, retrasoPorRadio(c.x, c.z) + 0.15);
+    });
+  });
+
+  // ---------- Fenómenos del Ámbar, uno por ciudad ----------
+  const ambarMat = { roughness: 0.25, emissive: "#E08A10", emissiveIntensity: 0.25 };
+  const tomar = (s, n) => candidatas[s].filter((c) => c.r > 4.2 && c.r < 7.6).sort(() => rand() - 0.5).slice(0, n);
+
+  // Petrea: la piedra ámbar avanza por el camino hacia Electria, bloque a bloque.
+  for (let k = 0; k < 6; k++) {
+    const a = centroSector(0) + 0.16 + k * 0.075, r = R_CAMINO + (k % 2 ? 0.45 : -0.45);
+    const b = bloque(0.26, 0.3, 0.26, "#C8A46A", { roughness: 0.6 }, 0.05);
+    const y0 = alturaCamino(a);
+    mundo.add(b);
+    animados.push((t, ap) => {
+      const v = suave(clamp01(1.4 * (0.5 - 0.5 * Math.cos(TAU * (t / BUCLE - k / 9)))));
+      b.position.set(Math.cos(a) * r, y0 + 0.15 * v, Math.sin(a) * r);
+      b.scale.setScalar(Math.max(0.001, v * ap));
+    });
+  }
+  // Electria: torres con chispas que parpadean.
+  tomar(1, 3).forEach((c, k) => {
+    const torre = bloque(0.12, 0.9, 0.12, "#8D8F94", { metalness: 0.4, roughness: 0.4 }, 0.03);
+    torre.position.set(c.x, c.h + 0.45, c.z);
+    registrar(torre, retrasoPorRadio(c.x, c.z) + 0.2);
+    const chispa = new THREE.Mesh(caja(0.16, 0.16, 0.16, 0.04), new THREE.MeshStandardMaterial({ color: "#FFE066", emissive: "#FFD23F", emissiveIntensity: 0.15, roughness: 0.4 }));
+    chispa.position.set(c.x, c.h + 1.0, c.z);
+    mundo.add(chispa);
+    animados.push((t, ap) => {
+      const f = mod((t / BUCLE) * 23 + k * 0.37, 1);
+      chispa.material.emissiveIntensity = f < 0.18 ? 2.2 : 0.15;
+      chispa.scale.setScalar(ap * (f < 0.18 ? 1.25 : 0.7));
+      chispa.rotation.y = t;
+    });
+  });
+  // Mielar: charcos de miel espesa que respiran.
+  tomar(2, 4).forEach((c, k) => {
+    const charco = bloque(0.8, 0.07, 0.6, "#E39B2B", { ...ambarMat, roughness: 0.12 }, 0.03);
+    mundo.add(charco);
+    animados.push((t, ap) => {
+      const w = Math.sin(TAU * (t / BUCLE) * 2 + k);
+      charco.position.set(c.x, c.h + 0.04 + 0.02 * w, c.z);
+      charco.scale.set(ap * (1 + 0.06 * w), ap, ap * (1 - 0.05 * w));
+    });
+  });
+  // Eteria: árboles preservados dentro de cubos de ámbar.
+  tomar(3, 3).forEach((c, k) => {
+    const a = arbol(0.9, ["#5E9E7A", "#4E8F6B"]);
+    a.position.set(c.x, c.h, c.z);
+    registrar(a, retrasoPorRadio(c.x, c.z) + 0.2);
+    const cubo = new THREE.Mesh(caja(0.62, 0.8, 0.62, 0.08), new THREE.MeshStandardMaterial({ color: "#F0A830", transparent: true, opacity: 0.42, roughness: 0.15, emissive: "#E08A10", emissiveIntensity: 0.2, depthWrite: false }));
+    cubo.position.set(c.x, c.h + 0.4, c.z);
+    mundo.add(cubo);
+    animados.push((t, ap) => { cubo.scale.setScalar(ap); cubo.material.emissiveIntensity = 0.15 + 0.15 * (0.5 + 0.5 * Math.sin(TAU * t / BUCLE + k)); });
+  });
+  // Espejara: paneles de espejo que giran (media vuelta por bucle).
+  tomar(4, 2).forEach((c, k) => {
+    const panel = bloque(0.06, 0.7, 0.5, "#DDE6EC", { metalness: 1, roughness: 0.05 }, 0.02);
+    mundo.add(panel);
+    animados.push((t, ap) => { panel.position.set(c.x, c.h + 0.4, c.z); panel.rotation.y = (t / BUCLE) * Math.PI + k; panel.scale.setScalar(ap); });
+  });
+  // Grietara: fragmentos que se desprenden del cañón y vuelven a caer.
+  tomar(5, 5).forEach((c, k) => {
+    const frag = bloque(0.2, 0.14, 0.18, "#B4603A", {}, 0.04);
+    mundo.add(frag);
+    animados.push((t, ap) => {
+      const v = Math.pow(Math.sin(Math.PI * mod(t / BUCLE * 2 + k / 5, 1)), 2);
+      frag.position.set(c.x, c.h + 0.1 + 0.55 * v, c.z);
+      frag.rotation.set(v * 1.2, k + v, v * 0.8);
+      frag.scale.setScalar(ap);
+    });
+  });
+  // Resplandra: cristales que laten de luz.
+  tomar(6, 5).forEach((c, k) => {
+    const alto = 0.35 + rand() * 0.35;
+    const cristal = new THREE.Mesh(caja(0.16, alto, 0.16, 0.04), new THREE.MeshStandardMaterial({ color: "#FFC24A", emissive: "#FF9F1A", emissiveIntensity: 0.6, roughness: 0.3 }));
+    cristal.castShadow = true;
+    cristal.position.set(c.x, c.h + alto / 2, c.z);
+    cristal.rotation.set(0.25 * (rand() - 0.5), rand() * TAU, 0.25 * (rand() - 0.5));
+    registrar(cristal, retrasoPorRadio(c.x, c.z) + 0.2);
+    animados.push((t) => { cristal.material.emissiveIntensity = 0.35 + 0.9 * (0.5 + 0.5 * Math.sin(TAU * (t / BUCLE) * 2 + k * 1.3)); });
+  });
+  // Atractia: rocas que orbitan alrededor de la cumbre más alta.
+  {
+    const [px, pz, ph] = picos[0];
+    const cima = alturaEn(px, pz);
+    for (let k = 0; k < 6; k++) {
+      const roca = bloque(0.18 + rand() * 0.1, 0.14, 0.16, elegir(["#8E9A8C", "#7C8A7A", "#A3AD9F"]), {}, 0.05);
+      mundo.add(roca);
+      const rad = 0.75 + (k % 3) * 0.2, alt = cima + 0.35 + (k % 2) * 0.35;
+      animados.push((t, ap) => {
+        const ang = TAU * (t / BUCLE + k / 6);
+        roca.position.set(px + Math.cos(ang) * rad, alt + 0.08 * Math.sin(ang * 2), pz + Math.sin(ang) * rad);
+        roca.rotation.set(ang, ang * 0.5, 0);
+        roca.scale.setScalar(ap);
+      });
+    }
+  }
+
+  // ---------- Aurelia: ciudad sellada en el centro ----------
+  {
+    const g = new THREE.Group();
+    const base = bloque(2.0, 0.4, 2.0, "#FBF1D6", {}, 0.12); base.position.y = 0.2;
+    const medio = bloque(1.3, 0.75, 1.3, "#F7ECCF", {}, 0.1); medio.position.y = 0.78;
+    const alto = bloque(0.78, 0.9, 0.78, "#FBF4E2", {}, 0.08); alto.position.y = 1.6;
+    g.add(base, medio, alto);
+    for (const [x, z] of [[-0.82, -0.82], [0.82, -0.82], [-0.82, 0.82], [0.82, 0.82]]) {
+      const torre = bloque(0.3, 0.95, 0.3, "#F7ECCF", {}, 0.06); torre.position.set(x, 0.85, z);
+      const remate = bloque(0.22, 0.14, 0.22, "#E8B84A", {}, 0.04); remate.position.set(x, 1.38, z);
+      g.add(torre, remate);
+    }
+    // Las 8 cerraduras del mecanismo, aún vacías: giran despacio (1/8 de vuelta por bucle).
+    const anillo = new THREE.Group();
+    for (let k = 0; k < 8; k++) {
+      const ranura = bloque(0.18, 0.18, 0.18, "#5A5A66", { roughness: 0.5 }, 0.04);
+      ranura.position.set(Math.cos((k / 8) * TAU) * 1.12, 0.52, Math.sin((k / 8) * TAU) * 1.12);
+      anillo.add(ranura);
+    }
+    g.add(anillo);
+    const nucleo = new THREE.Mesh(caja(0.42, 0.42, 0.42, 0.08), new THREE.MeshStandardMaterial({ color: "#FF9A1F", emissive: "#F57C00", emissiveIntensity: 0.9, roughness: 0.25 }));
+    nucleo.castShadow = true;
+    nucleo.rotation.set(Math.PI / 4, 0, Math.PI / 4);
+    g.add(nucleo);
+    g.position.y = 1.15;
+    registrar(g, 0.12);
+    animados.push((t) => {
+      const w = TAU * t / BUCLE;
+      anillo.rotation.y = (t / BUCLE) * (TAU / 8);
+      nucleo.rotation.y = (t / BUCLE) * (Math.PI / 2);
+      nucleo.position.y = 2.45 + 0.08 * Math.sin(w);
+      nucleo.material.emissiveIntensity = 0.7 + 0.35 * (0.5 + 0.5 * Math.sin(w * 2));
+    });
+  }
+
+  // ---------- Camino del anillo ----------
+  {
+    const geo = new RoundedBoxGeometry(0.36, 0.06, 0.24, 2, 0.025);
+    const n = Math.round((TAU * R_CAMINO) / 0.42);
+    const im = new THREE.InstancedMesh(geo, mat("#EDE6D6"), n);
+    im.receiveShadow = true;
+    const datos = [];
+    for (let k = 0; k < n; k++) datos.push({ a: (k / n) * TAU, retraso: 0.4 + rand() * 0.25 });
+    mundo.add(im);
+    const giro = new THREE.Euler();
+    animados.push((t, ap, e) => {
+      if (armado) return;
+      datos.forEach((d, k) => {
+        const p = clamp01((e - d.retraso) / 0.5);
+        giro.set(0, -d.a, 0);
+        q.setFromEuler(giro);
+        m4.compose(v3.set(Math.cos(d.a) * R_CAMINO, alturaCamino(d.a) + 0.03 - 2 * (1 - rebote(p)), Math.sin(d.a) * R_CAMINO), q, esc.set(1, 1, p > 0 ? 1 : 0.001));
+        im.setMatrixAt(k, m4);
+      });
+      im.instanceMatrix.needsUpdate = true;
+    });
+  }
+
+  // Objetos que recorren el anillo. Con n objetos repartidos que avanzan 1/n de vuelta cada 10 s,
+  // el cuadro final es idéntico al inicial: el bucle no tiene salto.
+  function enAnillo(n, crear, { radio = R_CAMINO, sentido = 1, alturaExtra = 0, ocultarEnCiudades = false } = {}) {
+    for (let k = 0; k < n; k++) {
+      const obj = crear(k);
+      mundo.add(obj);
+      const dr = typeof radio === "function" ? radio(k) : radio;
+      animados.push((t, ap) => {
+        const a = (k / n) * TAU + sentido * (t / BUCLE) * (TAU / n);
+        const y = (dr === R_CAMINO || Math.abs(dr - R_CAMINO) < 0.5) ? alturaCamino(a) : NIVEL_MAR;
+        obj.position.set(Math.cos(a) * dr, y + (typeof alturaExtra === "function" ? alturaExtra(k, t) : alturaExtra), Math.sin(a) * dr);
+        obj.rotation.y = -a - sentido * Math.PI / 2;
+        let f = 1;
+        if (ocultarEnCiudades) {
+          // La mitigación de cada ciudad apaga el Ámbar dentro de ella; en los caminos se ve completo.
+          const s = sectorDe(a), dc = Math.abs(mod(a - centroSector(s) + Math.PI, TAU) - Math.PI) * R_CAMINO;
+          f = suave(clamp01((dc - 0.9) / 0.9));
+        }
+        obj.scale.setScalar(Math.max(0.001, ap * f));
+      });
+    }
+  }
+
+  // Carretas que dan la vuelta al continente
+  enAnillo(8, (k) => {
+    const g = new THREE.Group();
+    const cuerpo = bloque(0.34, 0.16, 0.2, ["#F57C00", "#145389", "#57A6B5", "#7CB342"][k % 4], {}, 0.05);
+    cuerpo.position.y = 0.14;
+    const carga = bloque(0.16, 0.1, 0.16, "#F2F0EB", {}, 0.03);
+    carga.position.set(-0.05, 0.27, 0);
+    g.add(cuerpo, carga);
+    for (const [x, z] of [[-0.11, 0.11], [0.11, 0.11], [-0.11, -0.11], [0.11, -0.11]]) {
+      const rueda = bloque(0.08, 0.08, 0.04, "#2B2F36", {}, 0.02);
+      rueda.position.set(x, 0.05, z);
+      g.add(rueda);
+    }
+    return g;
+  }, { radio: (k) => R_CAMINO + (k % 2 ? 0.07 : -0.07) });
+
+  // Viajeros a pie, en sentido contrario
+  enAnillo(16, (k) => persona(COLORES_GENTE[k % COLORES_GENTE.length]), {
+    sentido: -1, radio: (k) => R_CAMINO + (k % 2 ? 0.2 : -0.2), alturaExtra: (k, t) => Math.abs(Math.sin(t * TAU * 1.2 + k)) * 0.02
+  });
+
+  // Ámbar suelto flotando sobre los caminos
+  enAnillo(36, () => bloque(0.1, 0.1, 0.1, "#F0A830", { emissive: "#E08A10", emissiveIntensity: 0.6, roughness: 0.3 }, 0.03), {
+    radio: (k) => R_CAMINO + ((k * 37) % 7 - 3) * 0.1,
+    alturaExtra: (k, t) => 0.32 + 0.12 * Math.sin(TAU * (t / BUCLE) * 2 + k),
+    ocultarEnCiudades: true
+  });
+
+  // Botes alrededor de la costa; el de vela naranja es el niño llegando con OKI por mar.
+  enAnillo(6, (k) => {
+    const g = new THREE.Group();
+    const casco = bloque(0.62, 0.16, 0.24, "#FBFAF6", {}, 0.07);
+    casco.position.y = 0.06;
+    const mastil = bloque(0.03, 0.5, 0.03, "#8A6A4A", {}, 0.01);
+    mastil.position.y = 0.38;
+    const vela = bloque(0.03, 0.4, 0.3, k === 0 ? "#F57C00" : k % 2 ? "#57A6B5" : "#FFFFFF", {}, 0.01);
+    vela.position.set(0, 0.42, -0.02);
+    vela.rotation.y = Math.PI / 2;
+    g.add(casco, mastil, vela);
+    return g;
+  }, { radio: 9.55, sentido: 1, alturaExtra: (k, t) => 0.03 * Math.sin(TAU * (t / BUCLE) * 3 + k) });
+
+  // Nubes que cruzan alto y dejan su sombra en el mapa
+  enAnillo(4, () => {
+    const g = new THREE.Group();
+    const nubeMat = { roughness: 1 };
+    const a = bloque(1.1, 0.34, 0.7, "#FFFFFF", nubeMat, 0.16);
+    const b = bloque(0.7, 0.4, 0.55, "#FFFFFF", nubeMat, 0.16); b.position.set(0.35, 0.16, 0.05);
+    const c = bloque(0.6, 0.3, 0.5, "#FFFFFF", nubeMat, 0.14); c.position.set(-0.45, 0.06, -0.05);
+    g.add(a, b, c);
+    return g;
+  }, { radio: 7.2, sentido: -1, alturaExtra: (k) => 4.6 + (k % 2) * 0.6 });
+
+  // ---------- Postproceso: oclusión ambiental (GTAO) y salida con ACES ----------
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const gtao = new GTAOPass(scene, camera, 1, 1);
+  gtao.updateGtaoMaterial({ radius: 0.5, distanceExponent: 1, thickness: 1, scale: 1.25, samples: 16, distanceFallOff: 1 });
+  gtao.blendIntensity = 0.9;
+  composer.addPass(gtao);
+  composer.addPass(new OutputPass());
+
+  function ajustar() {
+    const w = marco.clientWidth, h = marco.clientHeight;
+    if (!w || !h) return;
+    const pr = Math.min(devicePixelRatio, 2);
+    renderer.setPixelRatio(pr);
+    renderer.setSize(w, h, false);
+    composer.setPixelRatio(pr);
+    composer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(ajustar).observe(marco);
+  ajustar();
+
+  // Cámara: órbita suave de ida y vuelta con un leve acercamiento, en ciclo exacto de 10 s.
+  const objetivo = new THREE.Vector3(0, -0.6, 0);
+  function ponerCamara(t) {
+    const w = TAU * t / BUCLE;
+    const az = 0.62 + 0.32 * Math.sin(w);
+    const dist = 100 * (1 - 0.05 * (0.5 - 0.5 * Math.cos(w)));
+    const elev = 0.6;                 // unos 34°, mirada casi isométrica
+    camera.position.set(Math.sin(az) * Math.cos(elev) * dist, Math.sin(elev) * dist + objetivo.y, Math.cos(az) * Math.cos(elev) * dist);
+    // Encuadre: el diorama un poco por debajo del centro, bajo la carta.
+    camera.lookAt(objetivo.x, objetivo.y + 5.0, objetivo.z);
+  }
+
+  // ---------- Carta: las cifras suben de 0 a su valor ----------
+  const cifras = [...document.querySelectorAll("[data-meta]")].map((el) => ({ el, meta: Number(el.dataset.meta) }));
+  function ponerCifras(e) {
+    const p = quieto ? 1 : clamp01((e - 1.0) / 1.6);
+    const v = 1 - Math.pow(1 - p, 3);
+    cifras.forEach(({ el, meta }) => { el.textContent = Math.round(meta * v).toLocaleString("es-CO"); });
+  }
+
+  // ---------- Bucle ----------
+  let inicio = performance.now();
+  let armado = false;                 // true cuando la construcción terminó y todo quedó en su sitio
+  document.getElementById("reconstruir").addEventListener("click", () => { inicio = performance.now(); armado = false; if (quieto) requestAnimationFrame(cuadro); });
+
+  function cuadro(ahora) {
+    const e = quieto ? 4 : (ahora - inicio) / 1000;   // segundos desde la carga
+    const t = quieto ? 3 : mod(e, BUCLE);             // tiempo dentro del bucle
+    const construyendo = !armado;
+    if (construyendo) {
+      ponerTiles(e);
+      for (const p of piezas) {
+        const k = clamp01((e - p.retraso) / 0.5);
+        p.obj.visible = k > 0;
+        p.obj.position.y = p.y - 2.5 * (1 - rebote(k));
+      }
+    }
+    const aparicion = suave(clamp01((e - 0.85) / 0.45));
+    for (const f of animados) f(t, aparicion, e);
+    if (construyendo && e >= 2.2) armado = true;
+    ponerCifras(e);
+    ponerCamara(quieto ? 0 : t);
+    composer.render();
+    if (!quieto) requestAnimationFrame(cuadro);
+  }
+  requestAnimationFrame(cuadro);
+</script>
