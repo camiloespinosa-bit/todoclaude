@@ -1,0 +1,103 @@
+:root {
+  --fondo: #f7f5f0;
+  --tarjeta: #ffffff;
+  --texto: #1f2a2e;
+  --suave: #5c6b70;
+  --acento: #1f7a8c;
+  --acento-texto: #ffffff;
+  --borde: #d9d4c7;
+  --error: #b3261e;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--texto);
+  background: var(--fondo);
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; }
+
+main {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+h1 { margin: 0 0 0.25rem; font-size: 1.75rem; }
+header p { margin: 0 0 1.5rem; color: var(--suave); }
+
+fieldset {
+  border: 1px solid var(--borde);
+  border-radius: 0.75rem;
+  background: var(--tarjeta);
+  padding: 1rem;
+  margin: 0 0 1rem;
+}
+
+legend { font-weight: 600; padding: 0 0.25rem; }
+
+label { display: block; margin-bottom: 0.75rem; font-size: 0.95rem; }
+
+input:not([type='checkbox']) {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  border: 1px solid var(--borde);
+  border-radius: 0.5rem;
+}
+
+.ayuda { margin: 0 0 0.75rem; font-size: 0.85rem; color: var(--suave); }
+
+.horas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.horas button {
+  padding: 0.6rem;
+  font: inherit;
+  border: 1px solid var(--borde);
+  border-radius: 0.5rem;
+  background: var(--tarjeta);
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.horas button[aria-checked='true'] {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--acento-texto);
+}
+
+.horas button:disabled { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+
+.check { display: flex; gap: 0.5rem; align-items: flex-start; }
+
+.mensaje { color: var(--error); min-height: 1.25rem; }
+
+button[type='submit'],
+#btn-pague {
+  width: 100%;
+  padding: 0.85rem;
+  font: inherit;
+  font-weight: 600;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--acento);
+  color: var(--acento-texto);
+  cursor: pointer;
+}
+
+button:disabled { cursor: wait; }
+
+.llave {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.75rem;
+  border: 2px dashed var(--acento);
+  border-radius: 0.5rem;
+  background: var(--tarjeta);
+}
