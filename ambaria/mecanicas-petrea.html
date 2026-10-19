@@ -1,0 +1,172 @@
+<title>Mecánicas para Petrea</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Pixelify+Sans:wght@500;700&display=swap">
+<style>
+  /* Layout: una columna de lectura; tres fichas de mecánica con la misma estructura, la recomendada marcada en ámbar. */
+  :root {
+    --fondo: #F2F4F1;
+    --papel: #FFFFFF;
+    --tinta: #1C2A36;
+    --tinta-suave: #52606B;
+    --piedra: #A9B1B5;
+    --linea: #D9DED9;
+    --ambar: #C9811A;
+    --ambar-suave: #FBEFD9;
+    --fuente-titulo: "Pixelify Sans", ui-monospace, Menlo, Consolas, monospace;
+    --fuente: "Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --fondo: #141B21; --papel: #1C252D; --tinta: #E8ECEE; --tinta-suave: #A6B2BA;
+      --piedra: #6E7A82; --linea: #2E3943; --ambar: #F0A830; --ambar-suave: #3A2C14;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --fondo: #141B21; --papel: #1C252D; --tinta: #E8ECEE; --tinta-suave: #A6B2BA;
+    --piedra: #6E7A82; --linea: #2E3943; --ambar: #F0A830; --ambar-suave: #3A2C14;
+    color-scheme: dark;
+  }
+  body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--tinta);
+    font-family: var(--fuente);
+    font-size: 17px;
+    line-height: 1.6;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 64px;
+  }
+  .hoja { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+  h1, h2, h3 { font-family: var(--fuente-titulo); font-weight: 700; line-height: 1.1; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.1rem, 6vw, 3rem); }
+  h2 { font-size: 1.6rem; }
+  h3 { font-size: 1.25rem; }
+  p { margin: 0; }
+  .eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tinta-suave); }
+  .intro { display: flex; flex-direction: column; gap: 14px; }
+  .intro p { max-width: 62ch; color: var(--tinta-suave); }
+  .intro strong { color: var(--tinta); }
+
+  .fichas { display: flex; flex-direction: column; gap: 20px; }
+  .ficha {
+    background: var(--papel);
+    border: 1px solid var(--linea);
+    border-radius: 10px;
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .ficha.recomendada { border: 2px solid var(--ambar); }
+  .ficha__cabeza { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .ficha__cabeza > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .chip {
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--ambar-suave); color: var(--ambar); padding: 4px 10px; border-radius: 4px; white-space: nowrap;
+  }
+  .ficha__historia { font-style: italic; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 0; }
+  dt { font-weight: 700; color: var(--tinta-suave); font-size: 0.92rem; }
+  dd { margin: 0; min-width: 0; }
+  @media (max-width: 520px) { dl { grid-template-columns: 1fr; gap: 2px; } dd { margin-bottom: 8px; } }
+
+  .seccion { display: flex; flex-direction: column; gap: 14px; }
+  ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; }
+  .nota {
+    border-left: 4px solid var(--piedra);
+    padding: 4px 0 4px 16px;
+    color: var(--tinta-suave);
+    font-size: 0.95rem;
+  }
+  .pie { font-size: 0.85rem; color: var(--tinta-suave); border-top: 1px solid var(--linea); padding-top: 16px; }
+</style>
+
+<main class="hoja">
+  <header class="intro">
+    <span class="eyebrow">Ambaria · Ciudad 1 · Desarrollo Cognitivo</span>
+    <h1>Mecánicas para Petrea</h1>
+    <p>Tres propuestas de reto de <strong>Memoria de Trabajo</strong> para niños de 6 a 10 años, ligadas a la petrificación de Petrea. Son ideas para decidir qué prototipar primero en el navegador, antes de llevar nada a Unity. Nada de esto está aprobado.</p>
+  </header>
+
+  <section class="fichas" aria-label="Propuestas">
+    <article class="ficha recomendada">
+      <div class="ficha__cabeza">
+        <div><span class="eyebrow">Propuesta 1</span><h2>Las piedras que despiertan</h2></div>
+        <span class="chip">Prototipar primero</span>
+      </div>
+      <p class="ficha__historia">El Ámbar está por petrificar la plaza. Antes de que pase, nueve piedras se iluminan una por una. Si el niño las toca en el mismo orden, despiertan y la plaza se salva.</p>
+      <dl>
+        <dt>Qué entrena</dt><dd>Memoria de trabajo visoespacial: mantener una secuencia de posiciones. Se basa en la tarea de bloques de Corsi, una medida clásica.</dd>
+        <dt>Niveles</dt><dd>Secuencias de 2 a 7 piedras. Arranque por edad: 6-7 años con 2, 8-9 con 3 y 10 con 4. Desde los 8 años, una variante en orden inverso, que además exige reordenar.</dd>
+        <dt>Ajuste</dt><dd>Escalera simple: dos aciertos seguidos suben una piedra; dos errores seguidos bajan una.</dd>
+        <dt>Necesita</dt><dd>Solo tocar la pantalla. No requiere leer ni audio.</dd>
+        <dt>Se puede medir</dt><dd>La secuencia más larga lograda y en qué posición falla el niño.</dd>
+        <dt>Riesgo</dt><dd>Puede volverse repetitiva. Se compensa cambiando la disposición de las piedras y el ritmo.</dd>
+      </dl>
+    </article>
+
+    <article class="ficha">
+      <div class="ficha__cabeza">
+        <div><span class="eyebrow">Propuesta 2</span><h2>El encargo de Lía</h2></div>
+      </div>
+      <p class="ficha__historia">Lía necesita materiales del mercado para reparar la pieza de Petrea. Muestra y dice en voz alta una lista: cuerda, farol, pala. La lista se cubre de piedra y el niño debe traer los objetos en el mismo orden.</p>
+      <dl>
+        <dt>Qué entrena</dt><dd>Memoria de trabajo verbal, con apoyo de imágenes.</dd>
+        <dt>Niveles</dt><dd>Listas de 2 a 6 objetos. A los 9 y 10 años, una variante que pide traerlos ordenados por tamaño.</dd>
+        <dt>Necesita</dt><dd>Voces grabadas, porque a los 6 años muchos niños todavía no leen con fluidez.</dd>
+        <dt>Se puede medir</dt><dd>La lista más larga recordada y los errores de orden.</dd>
+        <dt>Riesgo</dt><dd>Se cruza con Vocabulario Académico (HL). Hay que cuidar que los objetos sean conocidos, para medir memoria y no vocabulario.</dd>
+      </dl>
+    </article>
+
+    <article class="ficha">
+      <div class="ficha__cabeza">
+        <div><span class="eyebrow">Propuesta 3</span><h2>Las carretas de piedra</h2></div>
+      </div>
+      <p class="ficha__historia">Por el camino de Petrea pasan carretas con carga, una tras otra. De repente el Ámbar petrifica el camino y todo se detiene. Lía pregunta: ¿qué llevaban las últimas dos carretas?</p>
+      <dl>
+        <dt>Qué entrena</dt><dd>Actualización: soltar lo viejo y guardar lo nuevo. Como el niño no sabe cuántas carretas van a pasar, tiene que ir actualizando todo el tiempo.</dd>
+        <dt>Niveles</dt><dd>Recordar las últimas 1, 2 o 3 carretas, con más velocidad en los niveles altos.</dd>
+        <dt>Necesita</dt><dd>Solo tocar la pantalla.</dd>
+        <dt>Se puede medir</dt><dd>Cuántas carretas recuerda y con qué velocidad.</dd>
+        <dt>Riesgo</dt><dd>Es la más difícil. La dejaría para 8-10 años o para una instancia posterior de la ciudad.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="seccion">
+    <h2>Por qué empezar por la 1</h2>
+    <ul>
+      <li>No exige leer ni escuchar, así que sirve igual a los 6 que a los 10 años.</li>
+      <li>La petrificación es justo la propiedad de Petrea: la historia y la mecánica son lo mismo.</li>
+      <li>Es la más fácil de medir y de calibrar por edad, y eso ayuda a definir las bandas 6-7, 8-9 y 10.</li>
+      <li>Es la más rápida de construir, así que se puede probar con niños pronto.</li>
+    </ul>
+  </section>
+
+  <section class="seccion">
+    <h2>Lo común a las tres</h2>
+    <ul>
+      <li><strong>Retos cortos.</strong> Sugiero alrededor de 2 a 3 minutos por reto; Camilo lo confirma según lo que funciona en sesión.</li>
+      <li><strong>OKI explica y celebra</strong> con sus poses oficiales, sin animarlo ni recrearlo.</li>
+      <li><strong>El error enseña.</strong> Al fallar se muestra la secuencia correcta y se vuelve a intentar, sin castigo.</li>
+      <li><strong>La dificultad se adapta sola</strong> al niño, dentro de su banda de edad.</li>
+      <li><strong>El prototipo no guarda datos.</strong> Cuando se mida a niños reales, cualquier registro debe pasar por la política de tratamiento de datos, que hoy sigue en borrador pendiente de revisión jurídica.</li>
+    </ul>
+    <p class="nota">Sobre la evidencia: estas tareas son medidas reconocidas de memoria de trabajo. Los metaanálisis sobre su entrenamiento, por ejemplo el de Melby-Lervåg y Hulme (2013), conviene verificarlo, encuentran sobre todo mejoras en tareas parecidas y poca transferencia al rendimiento escolar general. Por eso el juego no debería prometer más que eso.</p>
+  </section>
+
+  <section class="seccion">
+    <h2>Preguntas para Seba</h2>
+    <ul>
+      <li>¿El prototipo va en el estilo pixel del viaje por Ambaria, o en otro?</li>
+      <li>¿En qué dispositivo lo van a jugar los niños: tablet, celular o computador?</li>
+      <li>¿Lía queda como la guía que pide los retos, o lo hace OKI?</li>
+      <li>¿Cuál de las tres propuestas prefiere, o qué cambiaría?</li>
+    </ul>
+  </section>
+
+  <p class="pie">Propuesta de trabajo para el equipo de Ambaria. Nombres, edades de arranque y tiempos son sugerencias por validar.</p>
+</main>
