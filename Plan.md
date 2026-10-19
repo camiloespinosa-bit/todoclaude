@@ -26,6 +26,16 @@ Bre-B es el sistema de pagos inmediatos de Colombia, del Banco de la República.
 - La app no se conecta directo al Banco de la República. Se integra a través de un banco o proveedor de pagos que ofrezca una API de cobros Bre-B. Falta elegir cuál.
 - Flujo: la app genera el cobro de $50.000, el cliente paga, el proveedor avisa a la app (webhook) y solo entonces la reserva queda confirmada.
 - Si el pago no llega en un tiempo límite (por ejemplo 15 minutos), el cupo se libera.
+- La llave Bre-B del negocio ya existe. No se escribe en el código ni en este repositorio: se guarda como configuración privada (variable de entorno) para poder cambiarla sin tocar el código.
+
+**Opción para arrancar (versión 1) sin proveedor:** la app muestra la llave Bre-B y el valor a pagar, el cliente paga desde su banco y Adriana confirma el pago en su dashboard (marca la reserva como "Pagada"). Funciona desde el día uno, pero la confirmación es manual. Cuando haya proveedor con API, la confirmación pasa a ser automática.
+
+## Disponibilidad
+
+- Cada baño dura 1 hora.
+- Caben 2 baños al mismo tiempo, es decir, 2 cupos por cada franja de 1 hora.
+- Una franja está disponible si tiene menos de 2 reservas activas (pagadas o pendientes de pago dentro del tiempo límite).
+- Pendiente: horario de atención (días y horas de apertura y cierre).
 
 ### Recordatorios: WhatsApp
 
@@ -35,9 +45,9 @@ Bre-B es el sistema de pagos inmediatos de Colombia, del Banco de la República.
 
 ## Pendientes por decidir
 
-- Proveedor o banco para cobrar con Bre-B.
+- Proveedor o banco para confirmar pagos Bre-B automáticamente (o arrancar con confirmación manual).
 - Proveedor de WhatsApp Business (Meta directo u otro).
-- Capacidad: cuántos baños por hora y duración de cada uno.
+- Horario de atención.
 
 ## Datos (tienda)
 
