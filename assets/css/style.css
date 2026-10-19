@@ -475,3 +475,75 @@ ul { padding-left: 1.2em; }
   padding: 10px 16px; border-radius: 8px; z-index: 100; transition: top 0.15s ease;
 }
 .skip-link:focus { top: 12px; }
+
+/* ============ Cerebro 3D (fases.html, ver assets/js/cerebro-3d.js) ============ */
+.seccion--cerebro3d { padding: 8px 0 24px; }
+.cerebro3d {
+  --acento: #57A6B5;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  align-items: center;
+  border-radius: 24px;
+  overflow: hidden;
+  background: radial-gradient(120% 100% at 30% 45%, #12324A 0%, #0B1B28 70%);
+  color: #EEF4F8;
+  box-shadow: var(--sombra-lg);
+}
+.cerebro3d__lienzo { position: relative; height: 520px; }
+.cerebro3d__lienzo canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.cerebro3d__lienzo canvas:active { cursor: grabbing; }
+.cerebro3d__pista {
+  position: absolute; left: 20px; bottom: 16px;
+  font-size: 0.78rem; color: #A9BCCB; pointer-events: none;
+}
+.cerebro3d__pista--tactil { display: none; }
+@media (pointer: coarse) {
+  .cerebro3d__pista--raton { display: none; }
+  .cerebro3d__pista--tactil { display: inline; }
+}
+.cerebro3d__aviso { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #A9BCCB; margin: 0; }
+.cerebro3d__aviso[hidden] { display: none; }
+
+.cerebro3d__panel { padding: 36px 36px 32px 8px; }
+.cerebro3d__panel .etiqueta { background: rgba(255,255,255,0.08); color: var(--acento); transition: color 400ms var(--ease-out); }
+.cerebro3d__panel h2 { color: var(--blanco); font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 0 0 18px; }
+.cerebro3d__contenido { min-height: 150px; transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+.cerebro3d__contenido.saliendo { opacity: 0; transform: translateY(6px); }
+.cerebro3d__cabeza { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.cerebro3d__nombre { font-weight: 800; font-size: 1.2rem; margin: 0; color: var(--blanco); }
+.cerebro3d__edad { font-weight: 600; font-size: 0.85rem; color: var(--acento); white-space: nowrap; transition: color 400ms var(--ease-out); }
+.cerebro3d__foco { font-weight: 600; font-size: 0.95rem; margin: 4px 0 6px; color: var(--blanco); }
+.cerebro3d__texto { font-size: 0.92rem; line-height: 1.6; margin: 0; color: #A9BCCB; }
+
+.cerebro3d__fases { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.cerebro3d .fase-btn {
+  font-family: var(--fuente); font-size: 0.82rem; font-weight: 600;
+  color: var(--blanco); background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 999px;
+  padding: 8px 14px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms var(--ease-out);
+}
+.cerebro3d .fase-btn:active { transform: scale(0.97); }
+.cerebro3d .fase-btn:focus-visible { outline: 2px solid var(--amarillo); outline-offset: 2px; }
+.cerebro3d .fase-btn[aria-pressed="true"] { background: rgba(255,255,255,0.16); border-color: var(--c); }
+.cerebro3d .fase-btn__punto { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+@media (hover: hover) and (pointer: fine) {
+  .cerebro3d .fase-btn:hover { background: rgba(255,255,255,0.12); }
+}
+
+.cerebro3d__pie { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.cerebro3d__enlace { color: var(--acento); font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: color 400ms var(--ease-out); }
+.cerebro3d__enlace:hover { text-decoration: underline; }
+.cerebro3d__pausa {
+  font-family: var(--fuente); font-size: 0.82rem; color: var(--blanco);
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px; padding: 7px 12px; cursor: pointer;
+}
+.cerebro3d__nota { font-size: 0.75rem; color: #A9BCCB; opacity: 0.85; margin: 16px 0 0; }
+
+@media (max-width: 860px) {
+  .cerebro3d { grid-template-columns: 1fr; }
+  .cerebro3d__lienzo { height: min(78vw, 420px); }
+  .cerebro3d__panel { padding: 4px 20px 24px; }
+}
