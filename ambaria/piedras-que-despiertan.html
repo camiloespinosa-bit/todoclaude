@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@700&family=Pixelify+Sans:wght@400;600;700&display=swap">
 <style>
   /* Layout: pantalla de celular vertical. Arriba una barra de progreso, al centro la plaza 3D pixelada,
      abajo la caja de diálogo de Lía con los botones. En computador se centra un marco 9:16. */
@@ -17,6 +17,8 @@
     --piedra: #A9B1B5;
     --verde: #5E8F3A;
     --fuente: "Pixelify Sans", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    /* Para cifras: letra hecha para que cada carácter se distinga (en la pixelada el 5 parece una S). */
+    --fuente-cifras: "Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color-scheme: light;
   }
   html, body { height: 100%; }
@@ -81,6 +83,7 @@
   .rondas i.mal { background: var(--piedra); }
   .rondas i.ahora { outline: 0.6cqw solid var(--tinta); outline-offset: 0.3cqw; }
   .largo { font-size: 4cqw; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .largo b { font-family: var(--fuente-cifras); }
   .largo small { font-size: 3cqw; font-weight: 600; color: var(--tinta-suave); }
   .sonido { font: inherit; font-size: 3.4cqw; font-weight: 600; background: #FFFFFF; color: var(--tinta); border: 0.5cqw solid var(--tinta); border-radius: 0.8cqw; padding: 0.6cqw 1.6cqw; cursor: pointer; }
 
@@ -119,7 +122,7 @@
   .boton:focus-visible, .sonido:focus-visible { outline: 0.9cqw solid var(--naranja); outline-offset: 0.6cqw; }
   .resultado { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3cqw; }
   .resultado div { display: flex; flex-direction: column; }
-  .resultado b { font-size: 9cqw; line-height: 1; font-variant-numeric: tabular-nums; }
+  .resultado b { font-family: var(--fuente-cifras); font-size: 9cqw; line-height: 1; font-variant-numeric: tabular-nums; }
   .resultado span { font-size: 3.4cqw; color: var(--tinta-suave); }
 
   .nota { font-size: 12px; color: var(--tinta-suave); text-align: center; }
@@ -132,7 +135,7 @@
 
   <div class="caja barra-sup">
     <div class="rondas" id="rondas" aria-label="Rondas"></div>
-    <span class="largo" id="largo"><small>Piedras</small> 2</span>
+    <span class="largo" id="largo"><small>Piedras</small> <b>2</b></span>
     <button class="sonido" type="button" id="b-sonido" aria-pressed="true" aria-label="Sonido activado">♪ Sí</button>
   </div>
 
@@ -163,8 +166,8 @@
     </div>
 
     <div class="resultado" id="resultado" hidden>
-      <div><b id="r-largo">0</b><span>Secuencia más larga</span></div>
-      <div><b id="r-aciertos">0</b><span>Rondas salvadas</span></div>
+      <div><b id="r-largo">0</b><span>Piedras en tu secuencia más larga</span></div>
+      <div><b id="r-aciertos">0</b><span>Rondas que salvaste, de 12</span></div>
     </div>
     <div class="acciones" id="fin" hidden>
       <button class="boton boton--principal" type="button" id="b-otra">Jugar otra vez</button>
@@ -524,7 +527,7 @@
   function pintarRondas(resultados, actual) {
     elRondas.innerHTML = Array.from({ length: RONDAS }, (_, i) => `<i class="${resultados[i] === true ? "bien" : resultados[i] === false ? "mal" : ""} ${i === actual ? "ahora" : ""}"></i>`).join("");
   }
-  const pintarLargo = (n) => { elLargo.innerHTML = `<small>Piedras</small> ${n}`; };
+  const pintarLargo = (n) => { elLargo.innerHTML = `<small>Piedras</small> <b>${n}</b>`; };
   pintarRondas([], -1);
 
   // ---------- Toques: la piedra más cercana al dedo, con tolerancia generosa para manos pequeñas ----------
@@ -640,7 +643,7 @@
     sonidoBien();
     decir(salvadas >= RONDAS / 2 ? "¡Salvamos la plaza de Petrea! Lo hiciste muy bien." : "¡Lo logramos! La plaza está a salvo. Cada vez te sale mejor.", "celebrando");
     document.getElementById("r-largo").textContent = maximo || "—";
-    document.getElementById("r-aciertos").textContent = `${salvadas}/${RONDAS}`;
+    document.getElementById("r-aciertos").textContent = String(salvadas);
     panelResultado.hidden = false;
     panelFin.hidden = false;
   }
