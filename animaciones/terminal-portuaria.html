@@ -1,0 +1,773 @@
+<title>Terminal Portuaria Viva</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;800&display=swap">
+<style>
+  /* Layout: un marco vertical 9:16 centrado; dentro, el puerto 3D a sangre y una carta de vidrio arriba. */
+  :root {
+    --pagina: #E2E4DF;
+    --marco: #F3F2EE;
+    --tinta: #1C2A36;
+    --tinta-suave: #52606B;
+    --vidrio: rgba(255, 255, 255, 0.52);
+    --vidrio-borde: rgba(255, 255, 255, 0.85);
+    --naranja: #F57C00;
+    --fuente: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    box-sizing: border-box;
+    background: var(--pagina);
+    color: var(--tinta);
+    font-family: var(--fuente);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 12px;
+    overflow: hidden;
+  }
+  .marco {
+    position: relative;
+    height: min(calc(100% - 46px), calc((100vw - 32px) * 16 / 9));
+    aspect-ratio: 9 / 16;
+    max-width: 100%;
+    background: var(--marco);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(28, 42, 54, 0.16);
+    container-type: size;
+  }
+  .marco canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  .carta {
+    position: absolute;
+    left: 6cqw; right: 6cqw; top: 5.5cqw;
+    padding: 4.6cqw 5.2cqw 5cqw;
+    border-radius: 5cqw;
+    background: var(--vidrio);
+    border: 1px solid var(--vidrio-borde);
+    box-shadow: 0 2cqw 6cqw rgba(28, 42, 54, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+    backdrop-filter: blur(14px) saturate(1.5);
+  }
+  .carta__eyebrow {
+    display: flex; align-items: center; gap: 2cqw;
+    font-size: 2.8cqw; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--tinta-suave);
+  }
+  .carta__pulso {
+    width: 2.2cqw; height: 2.2cqw; border-radius: 50%;
+    background: var(--naranja);
+    box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.5);
+    animation: pulso 1.5s ease-out infinite;
+  }
+  @keyframes pulso { to { box-shadow: 0 0 0 2.4cqw rgba(245, 124, 0, 0); } }
+  .carta h1 {
+    margin: 1.4cqw 0 3.6cqw;
+    font-size: 9.6cqw; line-height: 1.02; font-weight: 800; letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3cqw; }
+  .stat {
+    display: flex; flex-direction: column; gap: 0.6cqw;
+    padding-top: 2.6cqw;
+    border-top: 0.45cqw solid rgba(28, 42, 54, 0.12);
+    min-width: 0;
+  }
+  .stat:first-child { border-top-color: var(--naranja); }
+  .stat__valor { font-size: 7cqw; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat__valor.sube { animation: sube 500ms cubic-bezier(0.23, 1, 0.32, 1); }
+  @keyframes sube { from { color: var(--naranja); transform: translateY(-0.8cqw); } }
+  .stat__nombre { font-size: 2.9cqw; font-weight: 500; color: var(--tinta-suave); line-height: 1.25; }
+  .carta__nota { margin: 3.4cqw 0 0; font-size: 2.5cqw; color: var(--tinta-suave); opacity: 0.85; }
+
+  .nota {
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px;
+    font-size: 12px; color: var(--tinta-suave); text-align: center;
+  }
+  .nota button {
+    font: inherit; font-weight: 600; color: var(--tinta);
+    background: #F3F2EE; border: 1px solid #C9CCC6; border-radius: 999px;
+    padding: 5px 12px; cursor: pointer;
+  }
+  .nota button:hover { background: #FFFFFF; }
+  .nota button:focus-visible { outline: 2px solid var(--naranja); outline-offset: 2px; }
+
+  body.modo-video { padding: 0; gap: 0; }
+  body.modo-video .marco { height: 100%; border-radius: 0; box-shadow: none; }
+  body.modo-video .nota { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carta__pulso, .stat__valor.sube { animation: none; }
+  }
+  .sin-webgl { position: absolute; inset: 0; display: grid; place-items: center; padding: 10cqw; text-align: center; color: var(--tinta-suave); font-size: 4cqw; }
+</style>
+
+<div class="marco" id="marco">
+  <canvas id="lienzo" role="img" aria-label="Diorama animado de una terminal portuaria: dos grúas descargan un buque portacontenedores, camiones llevan cada contenedor a una bodega y remolcadores, un velero y gaviotas se mueven alrededor."></canvas>
+  <section class="carta" aria-label="Operación de la terminal">
+    <div class="carta__eyebrow"><span class="carta__pulso" aria-hidden="true"></span>Terminal portuaria</div>
+    <h1>Operación en vivo</h1>
+    <div class="stats">
+      <div class="stat"><span class="stat__valor" data-stat="contenedores">1.248</span><span class="stat__nombre">Contenedores movidos</span></div>
+      <div class="stat"><span class="stat__valor" data-stat="teu">2.496</span><span class="stat__nombre">TEU del día</span></div>
+      <div class="stat"><span class="stat__valor" data-stat="camiones">386</span><span class="stat__nombre">Camiones despachados</span></div>
+    </div>
+    <p class="carta__nota">Datos ilustrativos. Suben con cada contenedor y camión de la animación.</p>
+  </section>
+  <p class="sin-webgl" id="sin-webgl" hidden>Tu navegador no pudo iniciar WebGL. Prueba con una versión reciente de Chrome, Edge, Firefox o Safari.</p>
+</div>
+<div class="nota">
+  <span>Bucle de 15 s · formato 9:16 (1080×1920)</span>
+  <button type="button" id="reconstruir">Ver la construcción otra vez</button>
+</div>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+  import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+  import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+  import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
+  import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+  const BUCLE = 15;                   // segundos; todo lo que se mueve repite exactamente cada 15 s
+  const TAU = Math.PI * 2;
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (location.hash === "#video") document.body.classList.add("modo-video");
+
+  // Paleta: azul real, verde verdoso y verde, con naranja de acento.
+  const AZUL = "#145389", AZUL_VIVO = "#1C6BA8", TURQUESA = "#3E9AA8", VERDE = "#7CB342", VERDE_OSCURO = "#4F8F45", NARANJA = "#F57C00";
+  const COLORES_CONTENEDOR = [AZUL, AZUL_VIVO, TURQUESA, VERDE, VERDE_OSCURO, "#2F6E8F", NARANJA, "#EDEBE5"];
+  const PESOS_CONTENEDOR = [3, 2, 3, 2, 2, 2, 1, 1];
+  const NIVEL_MAR = 0.25, SUELO = 0.7;
+  const CL = 0.9, CW = 0.2, CH = 0.21;  // contenedor de 40 pies (2 TEU), en unidades del diorama
+
+  // ---------- Utilidades ----------
+  let semilla = 4021;
+  const rand = () => ((semilla = (semilla * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const mod = (a, n) => ((a % n) + n) % n;
+  const suave = (x) => x * x * (3 - 2 * x);
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const rebote = (x) => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+  const tramo = (u, a, b) => suave(clamp01((u - a) / (b - a)));
+  const lerp = (a, b, k) => a + (b - a) * k;
+  function colorContenedor() {
+    let r = rand() * PESOS_CONTENEDOR.reduce((s, p) => s + p, 0);
+    for (let i = 0; i < PESOS_CONTENEDOR.length; i++) { r -= PESOS_CONTENEDOR[i]; if (r <= 0) return COLORES_CONTENEDOR[i]; }
+    return AZUL;
+  }
+
+  // ---------- Renderizador ----------
+  const marco = document.getElementById("marco");
+  const canvas = document.getElementById("lienzo");
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  } catch (e) {
+    document.getElementById("sin-webgl").hidden = false;
+    throw e;
+  }
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+  const scene = new THREE.Scene();
+  // El fondo pasa por ACES, que oscurece el blanco: se sube para que salga el blanco roto del marco.
+  scene.background = new THREE.Color("#F3F2EE").multiplyScalar(2.6);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.45;
+
+  const camera = new THREE.PerspectiveCamera(24, 9 / 16, 1, 400);
+  scene.add(new THREE.HemisphereLight("#EEF4FF", "#CDBB9C", 1.1));
+  const sol = new THREE.DirectionalLight("#FFF0DA", 2.6);
+  sol.position.set(-8, 16, 9);
+  sol.castShadow = true;
+  sol.shadow.mapSize.set(2048, 2048);
+  Object.assign(sol.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 50 });
+  sol.shadow.bias = -0.0004;
+  sol.shadow.normalBias = 0.02;
+  scene.add(sol);
+
+  const mundo = new THREE.Group();
+  scene.add(mundo);
+
+  const mats = new Map();
+  function mat(hex, extra = {}) {
+    const clave = hex + JSON.stringify(extra);
+    if (!mats.has(clave)) mats.set(clave, new THREE.MeshStandardMaterial({ color: hex, roughness: 0.75, metalness: 0, ...extra }));
+    return mats.get(clave);
+  }
+  const geos = new Map();
+  function caja(w, h, d, r = 0.05) {
+    const clave = [w, h, d, r].join("|");
+    if (!geos.has(clave)) geos.set(clave, new RoundedBoxGeometry(w, h, d, 2, Math.min(r, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001)));
+    return geos.get(clave);
+  }
+  function bloque(w, h, d, hex, extra, r) {
+    const m = new THREE.Mesh(caja(w, h, d, r), mat(hex, extra));
+    m.castShadow = true;
+    m.receiveShadow = true;
+    return m;
+  }
+  const contenedor = (hex) => bloque(CW, CH, CL, hex, { roughness: 0.55 }, 0.025);
+
+  // Piezas que suben al construirse
+  const piezas = [];
+  const retrasoPorRadio = (x, z) => 0.08 + 0.5 * (Math.hypot(x, z) / 11) + rand() * 0.1;
+  function registrar(obj, retraso = retrasoPorRadio(obj.position.x, obj.position.z)) {
+    piezas.push({ obj, y: obj.position.y, retraso });
+    mundo.add(obj);
+    return obj;
+  }
+  const animados = [];
+
+  // ---------- Losa flotante y mar ----------
+  {
+    const perfil = [new THREE.Vector2(0, -1.5), new THREE.Vector2(10.2, -1.5)];
+    for (let i = 1; i <= 8; i++) { const t = -Math.PI / 2 + (i / 8) * (Math.PI / 2); perfil.push(new THREE.Vector2(10.2 + 0.6 * Math.cos(t), -0.9 + 0.6 * Math.sin(t))); }
+    for (let i = 0; i <= 8; i++) { const t = (i / 8) * (Math.PI / 2); perfil.push(new THREE.Vector2(10.4 + 0.4 * Math.cos(t), -0.4 + 0.4 * Math.sin(t))); }
+    perfil.push(new THREE.Vector2(0, 0));
+    const losa = new THREE.Mesh(new THREE.LatheGeometry(perfil, 128), mat("#EEE9DF", { roughness: 0.9 }));
+    losa.castShadow = losa.receiveShadow = true;
+    registrar(losa, 0);
+    const mar = new THREE.Mesh(new THREE.CylinderGeometry(10.15, 10.15, NIVEL_MAR, 128), mat("#2F74B5", { roughness: 0.28, metalness: 0.05 }));
+    mar.position.y = NIVEL_MAR / 2;
+    mar.receiveShadow = true;
+    registrar(mar, 0.04);
+    const piso = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity: 0.1 }));
+    piso.rotation.x = -Math.PI / 2;
+    piso.position.y = -3.4;
+    piso.receiveShadow = true;
+    scene.add(piso);
+  }
+
+  // ---------- Muelle: adoquines de concreto (una baldosa por celda) ----------
+  const tiles = [];
+  for (let i = -10; i <= 10; i++) for (let j = -10; j <= 10; j++) {
+    const r = Math.hypot(i, j);
+    if (i <= 2 && r < 9.6) tiles.push({ x: i, z: j, h: SUELO, color: rand() < 0.5 ? "#D8D5CE" : "#CFCCC4" });
+    else if (j === -7 && i >= 3 && i <= 6) tiles.push({ x: i, z: j, h: 0.55, color: rand() < 0.5 ? "#9AA3A8" : "#8C959B" }); // rompeolas
+  }
+  const geoTile = new RoundedBoxGeometry(0.97, 1, 0.97, 2, 0.08).translate(0, 0.5, 0);
+  const imTiles = new THREE.InstancedMesh(geoTile, new THREE.MeshStandardMaterial({ color: "#FFFFFF", roughness: 0.88 }), tiles.length);
+  imTiles.castShadow = imTiles.receiveShadow = true;
+  tiles.forEach((t, k) => { imTiles.setColorAt(k, new THREE.Color(t.color)); t.retraso = retrasoPorRadio(t.x, t.z); });
+  mundo.add(imTiles);
+  const m4 = new THREE.Matrix4(), v3 = new THREE.Vector3(), q = new THREE.Quaternion(), esc = new THREE.Vector3();
+  function ponerTiles(e) {
+    tiles.forEach((t, k) => {
+      const p = clamp01((e - t.retraso) / 0.5);
+      m4.compose(v3.set(t.x, -2.5 * (1 - rebote(p)), t.z), q, esc.set(1, p > 0 ? t.h : 0.001, 1));
+      imTiles.setMatrixAt(k, m4);
+    });
+    imTiles.instanceMatrix.needsUpdate = true;
+  }
+  // Borde amarillo de seguridad a lo largo del muelle
+  {
+    const borde = bloque(0.08, 0.04, 17.6, "#F2C230", {}, 0.02);
+    borde.position.set(2.42, SUELO + 0.02, 0);
+    registrar(borde, 0.35);
+  }
+
+  // ---------- Patio de contenedores (instanciado) ----------
+  {
+    const lista = [];
+    for (const bx of [-6.3, -4.6, -2.9]) for (const dx of [-0.24, 0, 0.24]) for (let b = 0; b < 9; b++) {
+      const z = -3.92 + b * 0.98;
+      const pisos = Math.floor(rand() * 4.6);
+      for (let k = 0; k < pisos; k++) lista.push({ x: bx + dx, y: SUELO + CH / 2 + k * CH, z, color: colorContenedor() });
+    }
+    const im = new THREE.InstancedMesh(caja(CW, CH, CL, 0.025), new THREE.MeshStandardMaterial({ color: "#FFFFFF", roughness: 0.55 }), lista.length);
+    im.castShadow = im.receiveShadow = true;
+    lista.forEach((c, k) => { im.setColorAt(k, new THREE.Color(c.color)); c.retraso = 0.35 + retrasoPorRadio(c.x, c.z) * 0.6 + c.y * 0.15; });
+    mundo.add(im);
+    animados.push((t, ap, e, armado) => {
+      if (armado) return;
+      lista.forEach((c, k) => {
+        const p = clamp01((e - c.retraso) / 0.45);
+        m4.compose(v3.set(c.x, c.y - 2.5 * (1 - rebote(p)), c.z), q, esc.set(1, p > 0 ? 1 : 0.001, 1));
+        im.setMatrixAt(k, m4);
+      });
+      im.instanceMatrix.needsUpdate = true;
+    });
+  }
+
+  // ---------- Edificios con rejilla de ventanas ----------
+  function edificio(w, d, h, techo, cuerpoHex = "#F2F0EB") {
+    const g = new THREE.Group();
+    const cuerpo = bloque(w, h, d, cuerpoHex, {}, 0.06);
+    cuerpo.position.y = h / 2;
+    const tapa = bloque(w * 0.9, 0.1, d * 0.9, techo, {}, 0.04);
+    tapa.position.y = h + 0.04;
+    g.add(cuerpo, tapa);
+    const ventanas = [];
+    const filas = Math.max(1, Math.floor((h - 0.22) / 0.22));
+    for (const [ancho, fondo, rot] of [[w, d, 0], [d, w, Math.PI / 2], [w, d, Math.PI], [d, w, -Math.PI / 2]]) {
+      const cols = Math.max(1, Math.floor((ancho - 0.12) / 0.18));
+      for (let f = 0; f < filas; f++) for (let c = 0; c < cols; c++) {
+        const gw = new THREE.BoxGeometry(0.09, 0.1, 0.02);
+        gw.translate((c - (cols - 1) / 2) * 0.18, 0.2 + f * 0.22, fondo / 2 + 0.005);
+        gw.rotateY(rot);
+        ventanas.push(gw);
+      }
+    }
+    g.add(new THREE.Mesh(mergeGeometries(ventanas), mat("#2C4560", { roughness: 0.25, metalness: 0.2 })));
+    return g;
+  }
+  // Bodegas a los extremos del carril de camiones: los camiones entran y salen de ellas.
+  function bodega(z) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(2.3, 1.15, 1.3, "#EDEBE5", {}, 0.08);
+    cuerpo.position.y = 0.575;
+    const techo = bloque(2.4, 0.14, 1.4, TURQUESA, {}, 0.05);
+    techo.position.y = 1.2;
+    const puerta = bloque(1.8, 0.62, 0.04, "#3A4651", {}, 0.02);
+    puerta.position.set(0, 0.32, z > 0 ? -0.66 : 0.66);
+    g.add(cuerpo, techo, puerta);
+    g.position.set(1.15, SUELO, z);
+    return g;
+  }
+  registrar(bodega(-6.95));
+  registrar(bodega(6.95));
+  { const o = edificio(1.0, 1.0, 1.8, NARANJA); o.position.set(-2.0, SUELO, -7.2); registrar(o); }
+  { const o = edificio(0.9, 0.8, 1.1, VERDE); o.position.set(-0.6, SUELO, 7.6); registrar(o); }
+  { const o = edificio(1.2, 0.7, 0.8, AZUL_VIVO); o.position.set(-6.2, SUELO, -6.9); registrar(o); }
+
+  // Árboles y farolas
+  function arbol(escala = 1) {
+    const g = new THREE.Group();
+    const tronco = bloque(0.08, 0.26, 0.08, "#8A6A4A", {}, 0.02); tronco.position.y = 0.13;
+    const copa1 = bloque(0.34, 0.26, 0.34, [VERDE, "#5E9E5A", "#4E9A6A"][Math.floor(rand() * 3)], {}, 0.08); copa1.position.y = 0.36;
+    const copa2 = bloque(0.22, 0.2, 0.22, [VERDE, "#5E9E5A"][Math.floor(rand() * 2)], {}, 0.07); copa2.position.y = 0.56;
+    g.add(tronco, copa1, copa2);
+    g.scale.setScalar(escala);
+    return g;
+  }
+  for (const [x, z] of [[-8.6, 1.6], [-8.4, 3.2], [-7.9, 4.6], [-6.6, 6.6], [-5.3, 7.6], [-3.6, 8.3], [-8.5, -0.2], [-7.6, -5.9], [-3.8, -8.2], [0.6, 8.6], [-1.6, 8.6]]) {
+    const a = arbol(0.85 + rand() * 0.35);
+    a.position.set(x, SUELO, z);
+    a.rotation.y = rand() * TAU;
+    registrar(a);
+  }
+  function farola() {
+    const g = new THREE.Group();
+    const poste = bloque(0.05, 0.9, 0.05, "#5B6670", {}, 0.015); poste.position.y = 0.45;
+    const brazo = bloque(0.22, 0.04, 0.05, "#5B6670", {}, 0.015); brazo.position.set(0.09, 0.9, 0);
+    const luz = bloque(0.1, 0.05, 0.08, "#FFE7B0", { emissive: "#FFD27A", emissiveIntensity: 0.8 }, 0.02); luz.position.set(0.17, 0.87, 0);
+    g.add(poste, brazo, luz);
+    return g;
+  }
+  for (const z of [-5.6, -0.1, 5.6]) { const f = farola(); f.position.set(2.2, SUELO, z); f.rotation.y = Math.PI; registrar(f); }
+  for (const z of [-5.8, 5.8]) for (const x of [-7.4, -1.8]) { const f = farola(); f.position.set(x, SUELO, z); registrar(f); }
+
+  // ---------- Buque portacontenedores atracado ----------
+  const BUQUE_X = 3.9;
+  const buque = new THREE.Group();
+  const huecos = [];                  // ranuras del buque que vacían las grúas
+  {
+    const casco = bloque(1.9, 0.75, 9.2, AZUL, { roughness: 0.5 }, 0.3);
+    casco.position.y = 0.3;
+    const franja = bloque(1.92, 0.12, 9.22, "#E9EEF2", {}, 0.05);
+    franja.position.y = 0.66;
+    const cubierta = bloque(1.8, 0.06, 9.0, "#C8CDD2", {}, 0.03);
+    cubierta.position.y = 0.72;
+    const proa = bloque(1.5, 0.4, 0.6, AZUL, { roughness: 0.5 }, 0.2);
+    proa.position.set(0, 0.62, -4.45);
+    buque.add(casco, franja, cubierta, proa);
+    // Puente de mando con ventanas y chimenea naranja
+    const puente = edificio(1.5, 0.55, 1.15, "#E9EEF2");
+    puente.position.set(0, 0.75, 3.95);
+    const chimenea = bloque(0.34, 0.5, 0.3, NARANJA, {}, 0.06);
+    chimenea.position.set(0, 2.1, 4.1);
+    buque.add(puente, chimenea);
+    // Contenedores en cubierta: bahías a lo largo, filas a lo ancho, 2 o 3 pisos
+    const fila = (r) => -0.66 + r * 0.22;
+    for (let b = 0; b < 7; b++) {
+      const z = -3.55 + b * 0.98;
+      for (let r = 0; r < 7; r++) {
+        const bajoGrua = r === 5 && (b === 2 || b === 5);   // ranuras que vacían las grúas
+        const pisos = bajoGrua ? 3 : 2 + (rand() < 0.55 ? 1 : 0);
+        for (let k = 0; k < pisos; k++) {
+          const c = contenedor(colorContenedor());
+          c.position.set(fila(r), 0.75 + CH / 2 + k * CH, z);
+          buque.add(c);
+        }
+      }
+    }
+    buque.position.set(BUQUE_X, 0, 0);
+    registrar(buque, 0.3);
+    animados.push((t) => { buque.position.y = 0.025 * Math.sin((TAU * t) / BUCLE * 2); buque.rotation.z = 0.006 * Math.sin((TAU * t) / BUCLE * 3); });
+  }
+
+  // ---------- Camiones ----------
+  function camion(colorCabina) {
+    const g = new THREE.Group();
+    const cabina = bloque(0.26, 0.24, 0.26, colorCabina, {}, 0.05);
+    cabina.position.set(0, 0.17, 0.52);
+    const vidrio = bloque(0.22, 0.08, 0.02, "#2C4560", { roughness: 0.2 }, 0.01);
+    vidrio.position.set(0, 0.23, 0.655);
+    const chasis = bloque(0.22, 0.05, 0.92, "#3B434B", {}, 0.02);
+    chasis.position.set(0, 0.075, -0.06);
+    g.add(cabina, vidrio, chasis);
+    for (const [x, z] of [[-0.11, 0.5], [0.11, 0.5], [-0.11, -0.2], [0.11, -0.2], [-0.11, -0.4], [0.11, -0.4]]) {
+      const rueda = bloque(0.05, 0.09, 0.09, "#22262B", {}, 0.02);
+      rueda.position.set(x, 0.045, z);
+      g.add(rueda);
+    }
+    return g;
+  }
+  const ALTURA_CARGA = 0.1 + CH / 2; // centro del contenedor sobre el chasis
+
+  // Camiones del patio: recorren un rectángulo redondeado alrededor de los contenedores.
+  // N camiones repartidos que avanzan 1/N del recorrido por bucle: el último cuadro es igual al primero.
+  {
+    const cx = -4.6, hx = 2.95, hz = 5.05, rc = 0.8;
+    const rectos = [2 * (hz - rc), 2 * (hx - rc), 2 * (hz - rc), 2 * (hx - rc)];
+    const arco = (Math.PI / 2) * rc;
+    const perimetro = rectos.reduce((s, l) => s + l, 0) + 4 * arco;
+    function puntoEn(s) {
+      s = mod(s, perimetro);
+      const tramos = [
+        { l: rectos[0], f: (u) => [cx + hx, -hz + rc + u, 0] },
+        { l: arco, f: (u) => { const a = u / rc; return [cx + hx - rc + rc * Math.cos(a), hz - rc + rc * Math.sin(a), a]; } },
+        { l: rectos[1], f: (u) => [cx + hx - rc - u, hz, Math.PI / 2] },
+        { l: arco, f: (u) => { const a = Math.PI / 2 + u / rc; return [cx - hx + rc + rc * Math.cos(a), hz - rc + rc * Math.sin(a), a]; } },
+        { l: rectos[2], f: (u) => [cx - hx, hz - rc - u, Math.PI] },
+        { l: arco, f: (u) => { const a = Math.PI + u / rc; return [cx - hx + rc + rc * Math.cos(a), -hz + rc + rc * Math.sin(a), a]; } },
+        { l: rectos[3], f: (u) => [cx - hx + rc + u, -hz, 1.5 * Math.PI] },
+        { l: arco, f: (u) => { const a = 1.5 * Math.PI + u / rc; return [cx + hx - rc + rc * Math.cos(a), -hz + rc + rc * Math.sin(a), a]; } }
+      ];
+      for (const tr of tramos) { if (s <= tr.l) return tr.f(s); s -= tr.l; }
+      return tramos[0].f(0);
+    }
+    const N = 4;
+    for (let k = 0; k < N; k++) {
+      const c = camion([NARANJA, AZUL_VIVO, VERDE, TURQUESA][k]);
+      const carga = contenedor(colorContenedor());
+      carga.position.set(0, ALTURA_CARGA, -0.06);
+      c.add(carga);
+      mundo.add(c);
+      animados.push((t, ap) => {
+        const [x, z, rumbo] = puntoEn((k / N) * perimetro + (t / BUCLE) * (perimetro / N));
+        c.position.set(x, SUELO, z);
+        c.rotation.y = -rumbo;   // el frente del camión (+z local) apunta en el sentido de avance
+        c.scale.setScalar(ap);
+      });
+    }
+  }
+
+  // ---------- Grúas pórtico y su ciclo de descarga ----------
+  const stats = { contenedores: 1248, teu: 2496, camiones: 386 };
+  const eventos = [];                 // { cuando (s dentro del bucle), que }
+  function grua(zc, carril, desfase) {
+    const g = new THREE.Group();
+    const naranja = { roughness: 0.55 };
+    for (const x of [0.3, 2.0]) for (const dz of [-0.55, 0.55]) {
+      const pata = bloque(0.14, 3.3, 0.14, NARANJA, naranja, 0.03);
+      pata.position.set(x, 1.65, dz);
+      g.add(pata);
+    }
+    for (const x of [0.3, 2.0]) { const viga = bloque(0.16, 0.14, 1.26, NARANJA, naranja, 0.03); viga.position.set(x, 2.3, 0); g.add(viga); }
+    for (const dz of [-0.55, 0.55]) { const tirante = bloque(1.84, 0.12, 0.12, NARANJA, naranja, 0.03); tirante.position.set(1.15, 3.25, dz); g.add(tirante); }
+    const pluma = bloque(6.6, 0.16, 0.5, NARANJA, naranja, 0.04);
+    pluma.position.set(2.5, 3.45, 0);
+    const sala = bloque(0.5, 0.36, 0.6, "#F2F0EB", {}, 0.05);
+    sala.position.set(-0.55, 3.75, 0);
+    const torre = bloque(0.18, 0.9, 0.18, NARANJA, naranja, 0.03);
+    torre.position.set(1.15, 3.95, 0);
+    g.add(pluma, sala, torre);
+    for (const dz of [-0.55, 0.55]) for (const x of [0.3, 2.0]) { const rueda = bloque(0.22, 0.1, 0.3, "#3B434B", {}, 0.03); rueda.position.set(x, 0.05, dz); g.add(rueda); }
+    const carro = bloque(0.4, 0.14, 0.42, "#F2F0EB", {}, 0.04);
+    const spreader = bloque(CW + 0.06, 0.06, CL + 0.06, "#F2C230", {}, 0.02);
+    const cable = bloque(0.02, 1, 0.02, "#2B2F36", {}, 0.005);
+    const colorCarga = colorContenedor();  // el mismo contenedor pasa del buque a la grúa y al camión
+    const carga = contenedor(colorCarga);
+    g.add(carro, spreader, cable, carga);
+    g.position.set(0, SUELO, zc);
+    registrar(g, 0.45);
+
+    // Camión que recibe el contenedor: sale de la bodega A, espera bajo la grúa y entra a la bodega B.
+    const cam = camion(carril < 1 ? AZUL_VIVO : VERDE);
+    const cargaCam = contenedor(colorCarga);
+    cargaCam.position.set(0, ALTURA_CARGA, -0.06);
+    cam.add(cargaCam);
+    mundo.add(cam);
+
+    // Ranura del buque que vacía: el contenedor de arriba desaparece mientras se lo llevan.
+    const enBuque = contenedor(colorCarga);
+    const XS = 0.44;                  // fila del buque bajo la pluma (relativa al buque)
+    enBuque.position.set(XS, 0.75 + CH / 2 + 3 * CH, zc);
+    buque.add(enBuque);
+
+    const ALTO = 3.0 - SUELO;         // spreader arriba (relativo al suelo del muelle)
+    const sobreBuque = 0.75 + 4 * CH - SUELO + 0.03;
+    const sobreCamion = ALTURA_CARGA + CH / 2 + 0.03;
+    const xBuque = BUQUE_X + XS, xCarril = carril;
+    eventos.push({ cuando: mod(9.0 - desfase, BUCLE), que: "contenedor" }, { cuando: mod(14.2 - desfase, BUCLE), que: "camion" });
+
+    animados.push((t, ap) => {
+      const u = mod(t + desfase, BUCLE);
+      // Carro: sobre el buque, viaja al carril, vuelve.
+      const x = lerp(xBuque, xCarril, tramo(u, 4, 7)) + (xBuque - xCarril) * tramo(u, 10.7, 13.7);
+      // Spreader: baja al buque, sube, baja al camión, sube.
+      let y = ALTO;
+      y = lerp(y, sobreBuque, tramo(u, 0, 1.5));
+      y = lerp(y, ALTO, tramo(u, 2.2, 4));
+      y = lerp(y, sobreCamion, tramo(u, 7, 8.5));
+      y = lerp(y, ALTO, tramo(u, 9.2, 10.7));
+      carro.position.set(x, 3.3, 0);
+      spreader.position.set(x, y, 0);
+      cable.position.set(x, (3.25 + y) / 2, 0);
+      cable.scale.y = Math.max(0.01, 3.25 - y);
+      const llevando = u >= 2.0 && u < 9.0;
+      carga.visible = llevando;
+      carga.position.set(x, y - 0.03 - CH / 2, 0);
+      enBuque.visible = !(u >= 2.0 && u < 14.0);
+      // Camión: entra a escena a los 1.0 s, llega bajo la grúa a los 6.5, se va a los 11 y entra a la bodega B.
+      const zA = -6.7, zB = 6.7;
+      const z = lerp(zA, zc, tramo(u, 1.0, 6.5)) + (zB - zc) * tramo(u, 11, 14.2);
+      cam.position.set(xCarril, SUELO, z);
+      cargaCam.visible = u >= 9.0;
+      // Dentro de las bodegas el camión no se ve: se encoge al cruzar la puerta.
+      const visible = clamp01((z - zA - 0.1) / 0.5) * clamp01((zB - 0.1 - z) / 0.5);
+      cam.scale.setScalar(Math.max(0.001, ap * suave(visible)));
+      cam.visible = u > 0.9 && u < 14.4;
+    });
+  }
+  grua(-3.55 + 2 * 0.98, 0.75, 0);    // alineadas con las bahías 3 y 6 del buque
+  grua(-3.55 + 5 * 0.98, 1.55, 7.5);
+
+  // ---------- Carretillas pórtico (straddle carriers) en los pasillos del patio ----------
+  for (const [x, fase] of [[-5.45, 0], [-3.75, 0.5]]) {
+    const g = new THREE.Group();
+    for (const dx of [-0.17, 0.17]) for (const dz of [-0.3, 0.3]) { const pata = bloque(0.05, 0.62, 0.05, "#F2C230", {}, 0.015); pata.position.set(dx, 0.31, dz); g.add(pata); }
+    const techo = bloque(0.42, 0.08, 0.7, "#F2C230", {}, 0.03); techo.position.y = 0.66;
+    const cab = bloque(0.14, 0.14, 0.16, "#F2F0EB", {}, 0.03); cab.position.set(0.12, 0.77, 0.25);
+    const carga = contenedor(colorContenedor()); carga.position.y = 0.3;
+    g.add(techo, cab, carga);
+    mundo.add(g);
+    animados.push((t, ap) => {
+      const w = TAU * (t / BUCLE + fase);
+      g.position.set(x, SUELO, 3.3 * Math.sin(w));
+      g.rotation.y = Math.cos(w) >= 0 ? 0 : Math.PI;
+      carga.position.y = 0.3 + 0.08 * (0.5 + 0.5 * Math.cos(2 * w));
+      g.scale.setScalar(ap);
+    });
+  }
+
+  // ---------- Trabajadores en el muelle ----------
+  const COLORES_GENTE = [NARANJA, "#F2C230", AZUL_VIVO, VERDE, "#E35D6A"];
+  function persona(hex) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(0.1, 0.17, 0.08, hex, {}, 0.035); cuerpo.position.y = 0.085;
+    const casco = bloque(0.085, 0.05, 0.085, "#F2F0EB", {}, 0.02); casco.position.y = 0.25;
+    const cabeza = bloque(0.075, 0.07, 0.075, "#EFC7A0", {}, 0.025); cabeza.position.y = 0.205;
+    g.add(cuerpo, cabeza, casco);
+    return g;
+  }
+  [[-0.1, -4.6, 0], [-0.1, 4.4, 0.3], [2.3, -3.4, 0.6], [2.3, 3.4, 0.15], [-1.0, -6.0, 0.8], [-1.2, 6.3, 0.45]].forEach(([x, z0, fase], k) => {
+    const p = persona(COLORES_GENTE[k % COLORES_GENTE.length]);
+    mundo.add(p);
+    animados.push((t, ap) => {
+      const w = TAU * (t / BUCLE * 2 + fase);
+      p.position.set(x, SUELO + Math.abs(Math.sin(w * 4)) * 0.015, z0 + 0.6 * Math.sin(w));
+      p.rotation.y = Math.cos(w) >= 0 ? 0 : Math.PI;
+      p.scale.setScalar(ap);
+    });
+  });
+
+  // ---------- Agua: remolcadores, velero y estelas ----------
+  function remolcador(hex) {
+    const g = new THREE.Group();
+    const casco = bloque(0.34, 0.16, 0.7, hex, {}, 0.08); casco.position.y = 0.06;
+    const cabina = bloque(0.24, 0.18, 0.26, "#F2F0EB", {}, 0.05); cabina.position.set(0, 0.23, 0.05);
+    const chim = bloque(0.08, 0.14, 0.08, NARANJA, {}, 0.02); chim.position.set(0, 0.38, -0.05);
+    g.add(casco, cabina, chim);
+    return g;
+  }
+  function estela() {
+    const piezasEstela = [];
+    for (let k = 0; k < 5; k++) { const b = bloque(0.14, 0.02, 0.14, "#FFFFFF", { roughness: 0.4 }, 0.01); b.castShadow = false; mundo.add(b); piezasEstela.push(b); }
+    return piezasEstela;
+  }
+  [[0, AZUL_VIVO], [0.5, VERDE_OSCURO]].forEach(([fase, hex]) => {
+    const r = remolcador(hex);
+    mundo.add(r);
+    const espuma = estela();
+    const pos = (s) => { const a = TAU * (s / BUCLE + fase); return [7.3 + 1.0 * Math.cos(a), 3.2 * Math.sin(a), a]; };
+    animados.push((t, ap) => {
+      const [x, z, a] = pos(t);
+      r.position.set(x, NIVEL_MAR, z);
+      r.rotation.y = Math.atan2(-1.0 * Math.sin(a), 3.2 * Math.cos(a));   // rumbo según la tangente de la elipse
+      r.scale.setScalar(ap);
+      espuma.forEach((b, k) => {
+        const [ex, ez] = pos(t - 0.18 * (k + 1));
+        b.position.set(ex, NIVEL_MAR + 0.005, ez);
+        b.scale.setScalar(Math.max(0.001, ap * (1 - k * 0.17)));
+      });
+    });
+  });
+  {
+    const g = new THREE.Group();
+    const casco = bloque(0.22, 0.1, 0.55, "#FBFAF6", {}, 0.05); casco.position.y = 0.04;
+    const mastil = bloque(0.03, 0.62, 0.03, "#8A6A4A", {}, 0.01); mastil.position.y = 0.4;
+    const vela = bloque(0.02, 0.48, 0.3, NARANJA, {}, 0.01); vela.position.set(0, 0.42, -0.08);
+    g.add(casco, mastil, vela);
+    mundo.add(g);
+    animados.push((t, ap) => {
+      const a = -TAU * (t / BUCLE);
+      g.position.set(6.0 + 0.95 * Math.cos(a), NIVEL_MAR + 0.02 * Math.sin(a * 3), 5.6 + 0.95 * Math.sin(a));
+      g.rotation.y = Math.atan2(Math.sin(a), -Math.cos(a));
+      g.rotation.z = 0.08;
+      g.scale.setScalar(ap);
+    });
+  }
+
+  // ---------- Faro en la punta del rompeolas ----------
+  {
+    const g = new THREE.Group();
+    const base = bloque(0.5, 0.2, 0.5, "#DCD6C8", {}, 0.06); base.position.y = 0.1;
+    g.add(base);
+    for (let k = 0; k < 4; k++) {
+      const anillo = bloque(0.34 - k * 0.03, 0.26, 0.34 - k * 0.03, k % 2 ? NARANJA : "#FBFAF6", {}, 0.06);
+      anillo.position.y = 0.33 + k * 0.26;
+      g.add(anillo);
+    }
+    const lampara = new THREE.Mesh(caja(0.26, 0.2, 0.26, 0.05), new THREE.MeshStandardMaterial({ color: "#FFE9A8", emissive: "#FFC94A", emissiveIntensity: 1.2 }));
+    lampara.position.y = 1.4;
+    const tapa = bloque(0.3, 0.08, 0.3, AZUL, {}, 0.03); tapa.position.y = 1.54;
+    const haz = new THREE.Mesh(new THREE.ConeGeometry(0.45, 2.4, 24, 1, true), new THREE.MeshBasicMaterial({ color: "#FFE3A0", transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }));
+    haz.rotation.z = Math.PI / 2;
+    haz.position.x = 1.2;
+    const pivote = new THREE.Group();
+    pivote.position.y = 1.4;
+    pivote.add(haz);
+    g.add(lampara, tapa, pivote);
+    g.position.set(6, 0.55, -7);
+    registrar(g, 0.5);
+    animados.push((t, ap) => { pivote.rotation.y = -(t / BUCLE) * TAU * 3; haz.material.opacity = 0.22 * ap; });
+  }
+
+  // ---------- Gaviotas ----------
+  for (let k = 0; k < 6; k++) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(0.06, 0.05, 0.16, "#FBFAF6", {}, 0.02);
+    const alaI = bloque(0.2, 0.015, 0.07, "#E9ECEE", {}, 0.006); alaI.position.x = -0.12;
+    const alaD = bloque(0.2, 0.015, 0.07, "#E9ECEE", {}, 0.006); alaD.position.x = 0.12;
+    const pivI = new THREE.Group(); pivI.add(alaI);
+    const pivD = new THREE.Group(); pivD.add(alaD);
+    g.add(cuerpo, pivI, pivD);
+    mundo.add(g);
+    const radio = 2.2 + (k % 3) * 0.8, alt = 4.0 + (k % 2) * 0.7, sentido = k % 2 ? 1 : -1;
+    animados.push((t, ap) => {
+      const a = sentido * TAU * (t / BUCLE) + (k / 6) * TAU;
+      g.position.set(3.4 + Math.cos(a) * radio, alt + 0.15 * Math.sin(a * 2), Math.sin(a) * radio);
+      g.rotation.y = Math.atan2(-Math.sin(a) * sentido, Math.cos(a) * sentido);
+      const aleteo = 0.5 * Math.sin(TAU * (t / BUCLE) * 20 + k);
+      pivI.rotation.z = aleteo;
+      pivD.rotation.z = -aleteo;
+      g.scale.setScalar(ap);
+    });
+  }
+
+  // ---------- Postproceso: GTAO y salida con ACES ----------
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const gtao = new GTAOPass(scene, camera, 1, 1);
+  gtao.updateGtaoMaterial({ radius: 0.45, distanceExponent: 1, thickness: 1, scale: 1.25, samples: 16, distanceFallOff: 1 });
+  gtao.blendIntensity = 0.9;
+  composer.addPass(gtao);
+  composer.addPass(new OutputPass());
+
+  function ajustar() {
+    const w = marco.clientWidth, h = marco.clientHeight;
+    if (!w || !h) return;
+    const pr = Math.min(devicePixelRatio, 2);
+    renderer.setPixelRatio(pr);
+    renderer.setSize(w, h, false);
+    composer.setPixelRatio(pr);
+    composer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(ajustar).observe(marco);
+  ajustar();
+
+  // Cámara: órbita suave de ida y vuelta con un leve acercamiento, en ciclo exacto de 15 s.
+  function ponerCamara(t) {
+    const w = TAU * t / BUCLE;
+    const az = 0.78 + 0.3 * Math.sin(w);
+    const dist = 95 * (1 - 0.05 * (0.5 - 0.5 * Math.cos(w)));
+    const elev = 0.6;
+    camera.position.set(Math.sin(az) * Math.cos(elev) * dist, Math.sin(elev) * dist - 0.6, Math.cos(az) * Math.cos(elev) * dist);
+    camera.lookAt(0, 5.6, 0);
+  }
+
+  // ---------- Carta: los contadores suben con los eventos de la animación ----------
+  const celdasStat = Object.fromEntries([...document.querySelectorAll("[data-stat]")].map((el) => [el.dataset.stat, el]));
+  const formato = new Intl.NumberFormat("es-CO");
+  function pintarStat(clave) {
+    const el = celdasStat[clave];
+    el.textContent = formato.format(stats[clave]);
+    el.classList.remove("sube");
+    void el.offsetWidth;
+    el.classList.add("sube");
+  }
+  function disparar(que) {
+    if (que === "contenedor") { stats.contenedores += 1; stats.teu += 2; pintarStat("contenedores"); pintarStat("teu"); }
+    else { stats.camiones += 1; pintarStat("camiones"); }
+  }
+
+  // ---------- Bucle ----------
+  let inicio = performance.now();
+  let armado = false;
+  let tAnterior = null;
+  document.getElementById("reconstruir").addEventListener("click", () => { inicio = performance.now(); armado = false; tAnterior = null; if (quieto) requestAnimationFrame(cuadro); });
+
+  function cuadro(ahora) {
+    const e = quieto ? 4 : (ahora - inicio) / 1000;
+    const t = quieto ? 5 : mod(e, BUCLE);
+    const construyendo = !armado;
+    if (construyendo) {
+      ponerTiles(e);
+      for (const p of piezas) {
+        const k = clamp01((e - p.retraso) / 0.5);
+        p.obj.visible = k > 0;
+        p.obj.position.y = p.y - 2.5 * (1 - rebote(k));
+      }
+    }
+    const aparicion = suave(clamp01((e - 0.85) / 0.45));
+    for (const f of animados) f(t, aparicion, e, armado);
+    if (construyendo && e >= 2.2) armado = true;
+    // Eventos que cruzan este cuadro (también al dar la vuelta al bucle)
+    if (tAnterior !== null && !quieto && e > 1.2) {
+      for (const ev of eventos) {
+        const cruzo = tAnterior <= t ? (ev.cuando > tAnterior && ev.cuando <= t) : (ev.cuando > tAnterior || ev.cuando <= t);
+        if (cruzo) disparar(ev.que);
+      }
+    }
+    tAnterior = t;
+    ponerCamara(quieto ? 0 : t);
+    composer.render();
+    if (!quieto) requestAnimationFrame(cuadro);
+  }
+  requestAnimationFrame(cuadro);
+</script>

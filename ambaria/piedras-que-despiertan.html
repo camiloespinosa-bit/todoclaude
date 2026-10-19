@@ -1,0 +1,684 @@
+<title>Las piedras que despiertan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@700&family=Pixelify+Sans:wght@400;600;700&display=swap">
+<style>
+  /* Layout: pantalla de celular vertical. Arriba una barra de progreso, al centro la plaza 3D pixelada,
+     abajo la caja de diálogo de Lía con los botones. En computador se centra un marco 9:16. */
+  :root {
+    --pagina: #E2E4DF;
+    --marco: #F3F2EE;
+    --caja: #FBF7EA;
+    --tinta: #1C2A36;
+    --tinta-suave: #4E5A63;
+    --ambar: #F0A830;
+    --naranja: #F57C00;
+    --piedra: #A9B1B5;
+    --verde: #5E8F3A;
+    --fuente: "Pixelify Sans", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    /* Para cifras: letra hecha para que cada carácter se distinga (en la pixelada el 5 parece una S). */
+    --fuente-cifras: "Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    box-sizing: border-box;
+    background: var(--pagina);
+    color: var(--tinta);
+    font-family: var(--fuente);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 10px;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .marco {
+    position: relative;
+    height: min(calc(100% - 30px), calc((100vw - 32px) * 16 / 9));
+    aspect-ratio: 9 / 16;
+    max-width: 100%;
+    background: var(--marco);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 0 4px var(--tinta), 0 18px 50px rgba(28, 42, 54, 0.2);
+    container-type: size;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* En el celular el juego ocupa toda la pantalla */
+  @media (max-width: 560px) {
+    body { padding: 0; gap: 0; }
+    .marco { height: 100%; width: 100%; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
+    .nota { display: none; }
+  }
+  .marco canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  .caja {
+    background: var(--caja);
+    border: 0.9cqw solid var(--tinta);
+    box-shadow: 0 1.2cqw 0 var(--tinta), inset 0 0 0 0.6cqw #FFFFFF, inset 0 0 0 1.1cqw #E6DCC0;
+    border-radius: 1.6cqw;
+  }
+
+  .barra-sup {
+    position: absolute; left: 4cqw; right: 4cqw; top: calc(4cqw + env(safe-area-inset-top, 0px));
+    display: flex; align-items: center; justify-content: space-between; gap: 2cqw;
+    padding: 2cqw 3cqw;
+  }
+  .rondas { display: flex; gap: 1cqw; flex-wrap: wrap; }
+  .rondas i { width: 3.4cqw; height: 3.4cqw; background: #DCD3B8; box-shadow: inset 0 -0.6cqw 0 rgba(0, 0, 0, 0.12); }
+  .rondas i.bien { background: var(--ambar); }
+  .rondas i.mal { background: var(--piedra); }
+  .rondas i.ahora { outline: 0.6cqw solid var(--tinta); outline-offset: 0.3cqw; }
+  .largo { font-size: 4cqw; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .largo b { font-family: var(--fuente-cifras); }
+  .largo small { font-size: 3cqw; font-weight: 600; color: var(--tinta-suave); }
+  .sonido { font: inherit; font-size: 3.4cqw; font-weight: 600; background: #FFFFFF; color: var(--tinta); border: 0.5cqw solid var(--tinta); border-radius: 0.8cqw; padding: 0.6cqw 1.6cqw; cursor: pointer; }
+
+  .dialogo {
+    position: absolute; left: 4cqw; right: 4cqw; bottom: calc(5cqw + env(safe-area-inset-bottom, 0px));
+    padding: 5.2cqw 4.6cqw 4.4cqw;
+    display: flex; flex-direction: column; gap: 3cqw;
+  }
+  .dialogo__nombre {
+    position: absolute; top: -4.2cqw; left: 4cqw;
+    background: var(--ambar); color: var(--tinta);
+    font-size: 4cqw; font-weight: 700; letter-spacing: 0.06em;
+    padding: 0.8cqw 3cqw; border: 0.7cqw solid var(--tinta); border-radius: 1cqw;
+  }
+  .dialogo__texto { margin: 0; font-size: 5.2cqw; line-height: 1.3; min-height: 2.6em; }
+  .dialogo__fila { display: flex; align-items: center; gap: 3cqw; }
+  .dialogo__fila .dialogo__texto { flex: 1; min-width: 0; }
+  .dialogo[data-habla="oki"] .dialogo__nombre { background: #8FC1D6; }
+  /* Retrato de OKI: SVG oficiales sin modificar (fuera del filtro de píxeles). */
+  .retrato { width: 21cqw; height: 21cqw; flex: none; object-fit: contain; }
+  .retrato[hidden] { display: none; }
+  .mision { margin: 0; font-size: 3.6cqw; color: var(--tinta-suave); }
+  .acciones { display: flex; flex-wrap: wrap; gap: 2.4cqw; }
+  .acciones[hidden] { display: none; }
+  .grupo { display: flex; flex-direction: column; gap: 1.4cqw; }
+  .grupo__titulo { font-size: 3.4cqw; font-weight: 600; color: var(--tinta-suave); text-transform: uppercase; letter-spacing: 0.06em; }
+  .boton {
+    font: inherit; font-size: 4.6cqw; font-weight: 700; color: var(--tinta);
+    background: #FFFFFF; border: 0.7cqw solid var(--tinta); border-radius: 1cqw;
+    padding: 1.8cqw 3.6cqw; cursor: pointer; min-height: 11cqw;
+    box-shadow: 0 0.9cqw 0 var(--tinta);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  .boton:active { transform: translateY(0.8cqw); box-shadow: 0 0.1cqw 0 var(--tinta); }
+  .boton[aria-pressed="true"], .boton--principal { background: var(--ambar); }
+  .boton:focus-visible, .sonido:focus-visible { outline: 0.9cqw solid var(--naranja); outline-offset: 0.6cqw; }
+  .resultado { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3cqw; }
+  .resultado div { display: flex; flex-direction: column; }
+  .resultado b { font-family: var(--fuente-cifras); font-size: 9cqw; line-height: 1; font-variant-numeric: tabular-nums; }
+  .resultado span { font-size: 3.4cqw; color: var(--tinta-suave); }
+
+  .nota { font-size: 12px; color: var(--tinta-suave); text-align: center; }
+  @media (prefers-reduced-motion: reduce) { .boton { transition: none; } }
+  .sin-webgl { position: absolute; inset: 0; display: grid; place-items: center; padding: 10cqw; text-align: center; color: var(--tinta-suave); font-size: 4cqw; }
+</style>
+
+<div class="marco" id="marco">
+  <canvas id="lienzo" aria-hidden="true"></canvas>
+
+  <div class="caja barra-sup">
+    <div class="rondas" id="rondas" aria-label="Rondas"></div>
+    <span class="largo" id="largo"><small>Piedras</small> <b>2</b></span>
+    <button class="sonido" type="button" id="b-sonido" aria-pressed="true" aria-label="Sonido activado">♪ Sí</button>
+  </div>
+
+  <section class="caja dialogo" id="dialogo" data-habla="lia" aria-live="polite">
+    <span class="dialogo__nombre" id="quien">LÍA</span>
+    <div class="dialogo__fila">
+      <img class="retrato" id="retrato" alt="" hidden>
+      <p class="dialogo__texto" id="texto">Misión en Petrea: el Ámbar avanza sobre la plaza y sus piedras guardianas se están quedando dormidas. Ve con OKI y despiértalas.</p>
+    </div>
+
+    <div class="acciones" id="inicio">
+      <div class="grupo">
+        <span class="grupo__titulo">Edad del niño</span>
+        <div class="acciones">
+          <button class="boton" type="button" data-edad="0" aria-pressed="true">6 a 7</button>
+          <button class="boton" type="button" data-edad="1" aria-pressed="false">8 a 9</button>
+          <button class="boton" type="button" data-edad="2" aria-pressed="false">10</button>
+        </div>
+      </div>
+      <div class="grupo" id="grupo-modo" hidden>
+        <span class="grupo__titulo">¿Cómo juegas?</span>
+        <div class="acciones">
+          <button class="boton" type="button" data-modo="directo" aria-pressed="true">En orden</button>
+          <button class="boton" type="button" data-modo="inverso" aria-pressed="false">Al revés</button>
+        </div>
+      </div>
+      <button class="boton boton--principal" type="button" id="b-empezar">¡Vamos a Petrea!</button>
+    </div>
+
+    <div class="resultado" id="resultado" hidden>
+      <div><b id="r-largo">0</b><span>Piedras en tu secuencia más larga</span></div>
+      <div><b id="r-aciertos">0</b><span>Rondas que salvaste, de 12</span></div>
+    </div>
+    <div class="acciones" id="fin" hidden>
+      <button class="boton boton--principal" type="button" id="b-otra">Jugar otra vez</button>
+    </div>
+  </section>
+
+  <p class="sin-webgl" id="sin-webgl" hidden>Este navegador no pudo iniciar WebGL. Prueba con una versión reciente de Chrome o Safari.</p>
+</div>
+<p class="nota">Prototipo para Sebastián · reto de Memoria de Trabajo de Petrea · no guarda ningún dato</p>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+  import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+  import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+  import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
+  import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+  import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const TAU = Math.PI * 2;
+
+  // ---------- Reglas del reto (sugerencias por validar con Camilo) ----------
+  const EDADES = [
+    { nombre: "6 a 7", largoInicial: 2, encendido: 900 },
+    { nombre: "8 a 9", largoInicial: 3, encendido: 750 },
+    { nombre: "10",    largoInicial: 4, encendido: 650 }
+  ];
+  const PAUSA_ENTRE = 350;           // ms apagada entre una piedra y la siguiente
+  const RONDAS = 12;
+  const LARGO_MIN = 2, LARGO_MAX = 8;
+  // Escalera simple: dos aciertos seguidos suben una piedra; dos errores seguidos bajan una.
+
+  // Posiciones irregulares de las 9 piedras (como en la tarea de bloques de Corsi, nunca en cuadrícula)
+  const POSICIONES = [[-2.05, -1.75], [0.15, -2.25], [2.15, -1.35], [-0.95, -0.35], [1.2, 0.05], [-2.25, 1.25], [0.05, 1.55], [2.1, 1.95], [-0.85, 3.0]];
+
+  // ---------- Utilidades ----------
+  let semilla = 1972;
+  const rand = () => ((semilla = (semilla * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const suave = (x) => x * x * (3 - 2 * x);
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+  const elegir = (l) => l[Math.floor(rand() * l.length)];
+
+  // ---------- Renderizador ----------
+  const marco = document.getElementById("marco");
+  const canvas = document.getElementById("lienzo");
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+  } catch (e) {
+    document.getElementById("sin-webgl").hidden = false;
+    throw e;
+  }
+  renderer.setPixelRatio(1);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("#F3F2EE").multiplyScalar(2.6);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.45;
+  const camera = new THREE.PerspectiveCamera(46, 9 / 16, 0.5, 200);
+  scene.add(new THREE.HemisphereLight("#EEF4FF", "#CDBB9C", 1.1));
+  const sol = new THREE.DirectionalLight("#FFF0DA", 2.6);
+  sol.position.set(6, 14, 5);
+  sol.castShadow = true;
+  sol.shadow.mapSize.set(1024, 1024);
+  Object.assign(sol.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40 });
+  sol.shadow.bias = -0.0004;
+  sol.shadow.normalBias = 0.02;
+  scene.add(sol);
+
+  const mats = new Map();
+  function mat(hex, extra = {}) {
+    const clave = hex + JSON.stringify(extra);
+    if (!mats.has(clave)) mats.set(clave, new THREE.MeshStandardMaterial({ color: hex, roughness: 0.78, ...extra }));
+    return mats.get(clave);
+  }
+  const geos = new Map();
+  function caja(w, h, d, r = 0.06) {
+    const clave = [w, h, d, r].join("|");
+    if (!geos.has(clave)) geos.set(clave, new RoundedBoxGeometry(w, h, d, 2, Math.min(r, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001)));
+    return geos.get(clave);
+  }
+  function bloque(w, h, d, hex, extra, r) {
+    const m = new THREE.Mesh(caja(w, h, d, r), mat(hex, extra));
+    m.castShadow = m.receiveShadow = true;
+    return m;
+  }
+  function edificio(w, d, h, techo) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(w, h, d, "#F2F0EB", {}, 0.06); cuerpo.position.y = h / 2;
+    const tapa = bloque(w * 0.86, 0.16, d * 0.86, techo, {}, 0.05); tapa.position.y = h + 0.07;
+    g.add(cuerpo, tapa);
+    const ventanas = [];
+    const filas = Math.max(1, Math.floor((h - 0.3) / 0.32));
+    for (const [ancho, fondo, rot] of [[w, d, 0], [d, w, Math.PI / 2], [w, d, Math.PI], [d, w, -Math.PI / 2]]) {
+      const cols = Math.max(1, Math.floor((ancho - 0.14) / 0.26));
+      for (let f = 0; f < filas; f++) for (let c = 0; c < cols; c++) {
+        const gw = new THREE.BoxGeometry(0.12, 0.15, 0.03);
+        gw.translate((c - (cols - 1) / 2) * 0.26, 0.3 + f * 0.32, fondo / 2 + 0.006);
+        gw.rotateY(rot);
+        ventanas.push(gw);
+      }
+    }
+    g.add(new THREE.Mesh(mergeGeometries(ventanas), mat("#2C4560", { roughness: 0.25, metalness: 0.2 })));
+    return g;
+  }
+
+  // ---------- La plaza de Petrea ----------
+  const SUELO = 0.4;
+  const PIEDRA_SUELO = ["#E6E2D6", "#DDD8CA", "#EAE7DE"];
+  const AMBAR_PIEDRA = "#C8A46A";
+  // Baldosas de la plaza: se tiñen de ámbar desde los bordes cuando el Ámbar avanza.
+  const baldosas = [];
+  for (let i = -4; i <= 4; i++) for (let j = -5; j <= 6; j++) baldosas.push({ x: i * 0.98, z: j * 0.98, color: elegir(PIEDRA_SUELO) });
+  baldosas.forEach((b) => { b.borde = Math.max(Math.abs(b.x) / 4, Math.abs(b.z - 0.5) / 5.5); });
+  const geoBaldosa = new RoundedBoxGeometry(0.975, SUELO, 0.975, 2, 0.03).translate(0, SUELO / 2, 0);
+  const imBaldosas = new THREE.InstancedMesh(geoBaldosa, new THREE.MeshStandardMaterial({ color: "#FFFFFF", roughness: 0.85 }), baldosas.length);
+  imBaldosas.receiveShadow = imBaldosas.castShadow = true;
+  const m4 = new THREE.Matrix4();
+  baldosas.forEach((b, k) => { m4.makeTranslation(b.x, 0, b.z); imBaldosas.setMatrixAt(k, m4); imBaldosas.setColorAt(k, new THREE.Color(b.color)); });
+  scene.add(imBaldosas);
+  function pintarAmenaza(nivel) {
+    // nivel de 0 a 3: cuánto del borde de la plaza ya es ámbar
+    const umbral = 1 - nivel * 0.12;
+    baldosas.forEach((b, k) => imBaldosas.setColorAt(k, new THREE.Color(b.borde > umbral ? AMBAR_PIEDRA : b.color)));
+    imBaldosas.instanceColor.needsUpdate = true;
+  }
+
+  // Mar y acantilados detrás (Petrea es costa rocosa)
+  const mar = new THREE.Mesh(new THREE.BoxGeometry(40, 0.2, 20), mat("#2F74B5", { roughness: 0.3 }));
+  mar.position.set(0, -0.2, -13);
+  scene.add(mar);
+  for (let i = -5; i <= 5; i++) {
+    const alto = 0.6 + rand() * 0.9;
+    const roca = bloque(1.0, alto, 1.0, elegir(["#9AA3A8", "#8C959B", "#A9B1B5"]), {}, 0.1);
+    roca.position.set(i * 0.98, alto / 2 - 0.1, -6.6 - rand() * 0.6);
+    scene.add(roca);
+  }
+  // Edificios a los lados, sin tapar las piedras
+  [[-4.5, -3.5, 1.6], [-4.6, -1.6, 1.1], [4.5, -3.2, 1.8], [4.6, -1.0, 1.2], [-4.6, 3.6, 1.3], [4.6, 3.9, 1.5]].forEach(([x, z, h]) => {
+    const e = edificio(0.9, 0.9, h, "#7E8A93");
+    e.position.set(x, SUELO, z);
+    scene.add(e);
+  });
+  // La pieza del mecanismo de Petrea, al fondo de la plaza
+  const pieza = new THREE.Group();
+  { const p = bloque(0.5, 0.9, 0.5, "#DCD6C8", {}, 0.06); p.position.y = 0.45; pieza.add(p); }
+  const cristalPieza = new THREE.Mesh(caja(0.42, 0.42, 0.42, 0.08), new THREE.MeshStandardMaterial({ color: "#F57C00", emissive: "#F57C00", emissiveIntensity: 0.5, roughness: 0.3 }));
+  cristalPieza.rotation.set(Math.PI / 4, 0, Math.PI / 4);
+  cristalPieza.position.y = 1.3;
+  cristalPieza.castShadow = true;
+  pieza.add(cristalPieza);
+  pieza.position.set(0, SUELO, -4.4);
+  scene.add(pieza);
+
+  // ---------- Las 9 piedras ----------
+  const COLOR_PIEDRA = new THREE.Color("#5F6B74"), COLOR_LUZ = new THREE.Color("#FFC24A"), COLOR_ERROR = new THREE.Color(AMBAR_PIEDRA);
+  const marcaMat = new THREE.MeshStandardMaterial({ color: "#E9EEF0", roughness: 0.6 });
+  const piedras = POSICIONES.map(([x, z], i) => {
+    const material = new THREE.MeshStandardMaterial({ color: COLOR_PIEDRA.clone(), emissive: "#FF9F1A", emissiveIntensity: 0, roughness: 0.7 });
+    const g = new THREE.Group();
+    const cuerpo = new THREE.Mesh(caja(0.95, 0.5, 0.85, 0.16), material);
+    cuerpo.castShadow = cuerpo.receiveShadow = true;
+    cuerpo.position.y = 0.25;
+    const tapa = new THREE.Mesh(caja(0.6, 0.18, 0.55, 0.08), material);
+    tapa.castShadow = true;
+    tapa.position.y = 0.56;
+    const marca = new THREE.Mesh(caja(0.3, 0.05, 0.12, 0.02), marcaMat);
+    marca.position.y = 0.66;
+    g.add(cuerpo, tapa, marca);
+    g.position.set(x, SUELO, z);
+    g.rotation.y = (rand() - 0.5) * 0.6;
+    scene.add(g);
+    return { g, material, luz: 0, error: 0, salto: 0 };
+  });
+
+  // Chispas de ámbar al despertar
+  const chispas = [];
+  for (let k = 0; k < 40; k++) {
+    const c = new THREE.Mesh(caja(0.12, 0.12, 0.12, 0.03), new THREE.MeshStandardMaterial({ color: "#FFC24A", emissive: "#FF9F1A", emissiveIntensity: 1 }));
+    c.visible = false;
+    scene.add(c);
+    chispas.push({ m: c, vida: 0, v: new THREE.Vector3() });
+  }
+  function soltarChispas(i, n = 6) {
+    const p = piedras[i].g.position;
+    let k = 0;
+    for (const ch of chispas) {
+      if (ch.vida > 0) continue;
+      ch.vida = 1;
+      ch.m.position.set(p.x, p.y + 0.6, p.z);
+      ch.v.set((rand() - 0.5) * 2.4, 2.6 + rand() * 1.5, (rand() - 0.5) * 2.4);
+      ch.m.visible = true;
+      if (++k >= n) break;
+    }
+  }
+
+  // ---------- Postproceso pixel (mismo filtro que el viaje por Ambaria) ----------
+  function srgb(hex) { const n = parseInt(hex.slice(1), 16); return new THREE.Vector3(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255); }
+  const PALETA = [
+    "#F3F2EE", "#FFFFFF", "#E2E0D8", "#C9C4B8", "#9A9488",
+    "#CFE4EE", "#8FC1D6", "#5B9AD0", "#2F74B5", "#1E5A93", "#123E66",
+    "#C9DC8A", "#A8C66C", "#7CB342", "#5E8F3A", "#3F6B2E", "#2C4A24", "#5FA08A", "#3E7A68",
+    "#F6E7BC", "#EED9A6", "#D6BC84", "#B59A63", "#8A6A4A", "#5C4430",
+    "#FFE066", "#F6D27A", "#F0A830", "#E07F18", "#C25F12",
+    "#F0B7A0", "#D58D60", "#B05A36", "#7E3A24", "#E35D6A",
+    "#D0D5D8", "#A9B1B5", "#7E8A93", "#4E5A63", "#2C3640", "#151C24", "#EFC7A0"
+  ].map(srgb);
+  const FiltroPixel = {
+    uniforms: {
+      tDiffuse: { value: null },
+      resolucion: { value: new THREE.Vector2(1, 1) },
+      paleta: { value: PALETA },
+      fondo: { value: srgb("#F3F2EE") },
+      tramado: { value: 0.045 },
+      contorno: { value: 0.14 }
+    },
+    vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `
+      uniform sampler2D tDiffuse; uniform vec2 resolucion; uniform vec3 paleta[${PALETA.length}];
+      uniform vec3 fondo; uniform float tramado; uniform float contorno; varying vec2 vUv;
+      float luma(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
+      float bayer4(vec2 p) {
+        int x = int(mod(p.x, 4.0)), y = int(mod(p.y, 4.0));
+        float m[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
+        return m[x + y * 4] / 16.0 - 0.5;
+      }
+      void main() {
+        vec2 px = 1.0 / resolucion;
+        vec3 c = texture2D(tDiffuse, vUv).rgb;
+        if (distance(c, fondo) < 0.035) { gl_FragColor = vec4(fondo, 1.0); return; }
+        float l = luma(c);
+        float v = max(max(luma(texture2D(tDiffuse, vUv + vec2(px.x, 0.0)).rgb), luma(texture2D(tDiffuse, vUv - vec2(px.x, 0.0)).rgb)),
+                      max(luma(texture2D(tDiffuse, vUv + vec2(0.0, px.y)).rgb), luma(texture2D(tDiffuse, vUv - vec2(0.0, px.y)).rgb)));
+        if (v - l > contorno) c *= 0.55;
+        c += bayer4(gl_FragCoord.xy) * tramado;
+        vec3 mejor = paleta[0]; float dmin = 1e9;
+        for (int k = 0; k < ${PALETA.length}; k++) {
+          vec3 d = (c - paleta[k]) * vec3(0.9, 1.2, 0.8);
+          float dd = dot(d, d);
+          if (dd < dmin) { dmin = dd; mejor = paleta[k]; }
+        }
+        gl_FragColor = vec4(mejor, 1.0);
+      }`
+  };
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const gtao = new GTAOPass(scene, camera, 1, 1);
+  gtao.updateGtaoMaterial({ radius: 0.6, distanceExponent: 1, thickness: 1, scale: 1.2, samples: 16, distanceFallOff: 1 });
+  composer.addPass(gtao);
+  composer.addPass(new OutputPass());
+  const pixel = new ShaderPass(FiltroPixel);
+  composer.addPass(pixel);
+
+  function ajustar() {
+    const w = marco.clientWidth, h = marco.clientHeight;
+    if (!w || !h) return;
+    const alto = Math.min(420, h);
+    const ancho = Math.round(alto * (w / h));
+    renderer.setSize(ancho, alto, false);
+    composer.setSize(ancho, alto);
+    pixel.uniforms.resolucion.value.set(ancho, alto);
+    camera.aspect = w / h;
+    // La plaza debe caber a lo ancho en cualquier proporción de pantalla
+    const anchoNecesario = 7.2, distancia = 15.5;
+    const fovH = 2 * Math.atan(anchoNecesario / 2 / distancia);
+    camera.fov = Math.max(40, THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(fovH / 2) / camera.aspect)));
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(ajustar).observe(marco);
+  ajustar();
+  camera.position.set(0, 12.6, 9.2);
+  camera.lookAt(0, 0, 1.6);
+
+  // ---------- Sonido (sencillo, se puede apagar) ----------
+  let audio = null, conSonido = true;
+  function sonar(frecuencia, dur = 0.14, tipo = "square", volumen = 0.05) {
+    if (!conSonido) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = tipo; o.frequency.value = frecuencia;
+      g.gain.setValueAtTime(volumen, audio.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + dur);
+      o.connect(g).connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + dur);
+    } catch (e) { /* sin audio, el juego sigue igual */ }
+  }
+  // Todas las piedras suenan igual: el reto es de memoria espacial, el sonido no debe dar pistas de cuál es.
+  const sonidoPiedra = () => sonar(660, 0.12);
+  const sonidoBien = () => { sonar(523, 0.1); setTimeout(() => sonar(659, 0.1), 110); setTimeout(() => sonar(784, 0.18), 220); };
+  const sonidoMal = () => sonar(196, 0.28, "triangle", 0.06);
+  const bSonido = document.getElementById("b-sonido");
+  bSonido.addEventListener("click", () => {
+    conSonido = !conSonido;
+    bSonido.textContent = conSonido ? "♪ Sí" : "♪ No";
+    bSonido.setAttribute("aria-pressed", String(conSonido));
+    bSonido.setAttribute("aria-label", conSonido ? "Sonido activado" : "Sonido apagado");
+  });
+
+  // ---------- Interfaz ----------
+  const texto = document.getElementById("texto");
+  const dialogo = document.getElementById("dialogo"), quien = document.getElementById("quien"), retrato = document.getElementById("retrato");
+  // Lía da la misión al inicio; OKI acompaña al niño durante el reto.
+  // OKI usa sus poses oficiales (assets/img/oki); si la ruta publicada no existe, se prueba la del repositorio.
+  const POSES_OKI = { pensando: "oki-pensando", senalando: "oki-senalando", celebrando: "oki-celebrando", empatia: "oki-empatia", sorpresa: "oki-sorpresa" };
+  Object.values(POSES_OKI).forEach((n) => { const i = new Image(); i.src = `oki/${n}.svg`; });
+  retrato.addEventListener("error", () => {
+    const n = retrato.dataset.pose;
+    if (n && !retrato.src.includes("assets/img/oki")) retrato.src = `../assets/img/oki/${n}.svg`;
+  });
+  function hablaLia(t) {
+    dialogo.dataset.habla = "lia";
+    quien.textContent = "LÍA";
+    retrato.hidden = true;
+    texto.textContent = t;
+  }
+  function decir(t, pose = "pensando") {
+    dialogo.dataset.habla = "oki";
+    quien.textContent = "OKI";
+    const n = POSES_OKI[pose];
+    if (retrato.dataset.pose !== n) { retrato.dataset.pose = n; retrato.src = `oki/${n}.svg`; }
+    retrato.hidden = false;
+    texto.textContent = t;
+  }
+  const elRondas = document.getElementById("rondas");
+  const elLargo = document.getElementById("largo");
+  const panelInicio = document.getElementById("inicio"), panelResultado = document.getElementById("resultado"), panelFin = document.getElementById("fin");
+  let edad = 0, modo = "directo";
+  document.querySelectorAll("[data-edad]").forEach((b) => b.addEventListener("click", () => {
+    edad = Number(b.dataset.edad);
+    document.querySelectorAll("[data-edad]").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+    // El modo "al revés" solo se ofrece desde los 8 años
+    document.getElementById("grupo-modo").hidden = edad === 0;
+    if (edad === 0) elegirModo("directo");
+  }));
+  function elegirModo(m) {
+    modo = m;
+    document.querySelectorAll("[data-modo]").forEach((o) => o.setAttribute("aria-pressed", String(o.dataset.modo === m)));
+  }
+  document.querySelectorAll("[data-modo]").forEach((b) => b.addEventListener("click", () => elegirModo(b.dataset.modo)));
+  function pintarRondas(resultados, actual) {
+    elRondas.innerHTML = Array.from({ length: RONDAS }, (_, i) => `<i class="${resultados[i] === true ? "bien" : resultados[i] === false ? "mal" : ""} ${i === actual ? "ahora" : ""}"></i>`).join("");
+  }
+  const pintarLargo = (n) => { elLargo.innerHTML = `<small>Piedras</small> <b>${n}</b>`; };
+  pintarRondas([], -1);
+
+  // ---------- Toques: la piedra más cercana al dedo, con tolerancia generosa para manos pequeñas ----------
+  let esperandoToque = null;
+  const v = new THREE.Vector3();
+  canvas.addEventListener("pointerdown", (ev) => {
+    if (!esperandoToque) return;
+    const r = canvas.getBoundingClientRect();
+    let mejor = -1, dmin = r.width * 0.13;
+    piedras.forEach((p, i) => {
+      v.copy(p.g.position); v.y += 0.4;
+      v.project(camera);
+      const sx = (v.x + 1) / 2 * r.width, sy = (1 - v.y) / 2 * r.height;
+      const d = Math.hypot(ev.clientX - r.left - sx, ev.clientY - r.top - sy);
+      if (d < dmin) { dmin = d; mejor = i; }
+    });
+    if (mejor >= 0) esperandoToque(mejor);
+  });
+  const siguienteToque = () => new Promise((r) => { esperandoToque = (i) => { esperandoToque = null; r(i); }; });
+
+  async function encender(i, ms, conSonidoPiedra = true) {
+    piedras[i].luz = 1;
+    piedras[i].salto = 1;
+    if (conSonidoPiedra) sonidoPiedra();
+    await esperar(ms);
+    piedras[i].luz = 0;
+  }
+
+  // Modo de prueba (solo con #prueba en el enlace): permite que un script juegue el reto para verificarlo.
+  let esperadoActual = [];
+  if (location.hash === "#prueba") {
+    window.__reto = {
+      esperado: () => esperadoActual.slice(),
+      pantalla: (i) => {
+        const r = canvas.getBoundingClientRect();
+        v.copy(piedras[i].g.position); v.y += 0.4; v.project(camera);
+        return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
+      },
+      largo: () => Number(elLargo.textContent.replace(/\D/g, ""))
+    };
+  }
+
+  // ---------- Una sesión ----------
+  async function jugar() {
+    panelInicio.hidden = true;
+    panelResultado.hidden = true;
+    panelFin.hidden = true;
+    const E = EDADES[edad];
+    let largo = E.largoInicial, aciertosSeguidos = 0, erroresSeguidos = 0, maximo = 0, salvadas = 0;
+    const resultados = [];
+    let amenaza = 0;
+    pintarAmenaza(0);
+    decir(modo === "inverso"
+      ? "¡Llegamos! Las piedras se van a encender. Cuando te diga, tócalas al revés: de la última a la primera."
+      : "¡Llegamos! Las piedras se van a encender una por una. Cuando te diga, tócalas en el mismo orden.", "senalando");
+    await esperar(3200);
+
+    for (let ronda = 0; ronda < RONDAS; ronda++) {
+      pintarRondas(resultados, ronda);
+      pintarLargo(largo);
+      // Secuencia sin repetir piedras
+      const orden = [...piedras.keys()].sort(() => rand() - 0.5).slice(0, largo);
+      decir("Mira con atención…", "pensando");
+      await esperar(900);
+      for (const i of orden) { await encender(i, E.encendido); await esperar(PAUSA_ENTRE); }
+      decir(modo === "inverso" ? "¡Tu turno! Al revés." : "¡Tu turno!", "senalando");
+      const esperado = modo === "inverso" ? [...orden].reverse() : orden;
+      esperadoActual = esperado;
+      let bien = true;
+      for (let paso = 0; paso < esperado.length; paso++) {
+        const i = await siguienteToque();
+        if (i === esperado[paso]) {
+          encender(i, 320);
+        } else {
+          bien = false;
+          piedras[i].error = 1;
+          sonidoMal();
+          break;
+        }
+      }
+      resultados.push(bien);
+      if (bien) {
+        salvadas++;
+        maximo = Math.max(maximo, largo);
+        await esperar(380);
+        orden.forEach((i, k) => setTimeout(() => { piedras[i].salto = 1; soltarChispas(i); }, k * 70));
+        sonidoBien();
+        amenaza = Math.max(0, amenaza - 1);
+        aciertosSeguidos++; erroresSeguidos = 0;
+        let mensaje = elegir(["¡Vas muy bien!", "¡Eso! Las despertaste.", "¡Muy bien! El Ámbar retrocede."]);
+        let pose = "celebrando";
+        if (aciertosSeguidos >= 2 && largo < LARGO_MAX && ronda < RONDAS - 1) { largo++; aciertosSeguidos = 0; mensaje += " ¡Ahora una piedra más!"; pose = "sorpresa"; }
+        decir(mensaje, pose);
+        pintarAmenaza(amenaza);
+        await esperar(1700);
+      } else {
+        amenaza = Math.min(3, amenaza + 1);
+        pintarAmenaza(amenaza);
+        erroresSeguidos++; aciertosSeguidos = 0;
+        decir("Casi. Mira cómo era:", "empatia");
+        await esperar(900);
+        piedras.forEach((p) => { p.error = 0; });
+        for (const i of esperado) { await encender(i, 520, false); await esperar(220); }
+        if (erroresSeguidos >= 2 && largo > LARGO_MIN && ronda < RONDAS - 1) { largo--; erroresSeguidos = 0; decir("Tranquilo, probemos con una piedra menos.", "empatia"); }
+        else decir("¡Inténtalo otra vez! Tú puedes.", "empatia");
+        await esperar(1500);
+      }
+    }
+    pintarRondas(resultados, -1);
+    // Al final la plaza queda limpia: el cierre siempre es positivo
+    pintarAmenaza(0);
+    piedras.forEach((p, i) => setTimeout(() => { p.salto = 1; soltarChispas(i, 4); }, i * 90));
+    sonidoBien();
+    decir(salvadas >= RONDAS / 2 ? "¡Salvamos la plaza de Petrea! Lo hiciste muy bien." : "¡Lo logramos! La plaza está a salvo. Cada vez te sale mejor.", "celebrando");
+    document.getElementById("r-largo").textContent = maximo || "—";
+    document.getElementById("r-aciertos").textContent = String(salvadas);
+    panelResultado.hidden = false;
+    panelFin.hidden = false;
+  }
+  document.getElementById("b-empezar").addEventListener("click", () => { sonar(523, 0.05); jugar(); });
+  document.getElementById("b-otra").addEventListener("click", () => {
+    panelResultado.hidden = true;
+    panelFin.hidden = true;
+    panelInicio.hidden = false;
+    pintarRondas([], -1);
+    hablaLia("¿Otra misión en la plaza? Elige y vuelve cuando quieras.");
+  });
+
+  // ---------- Bucle de dibujo ----------
+  const reloj = new THREE.Clock();
+  function cuadro() {
+    const dt = Math.min(reloj.getDelta(), 0.05);
+    const t = reloj.elapsedTime;
+    piedras.forEach((p) => {
+      p.material.color.copy(COLOR_PIEDRA).lerp(COLOR_LUZ, p.luz).lerp(COLOR_ERROR, p.error);
+      p.material.emissiveIntensity = p.luz * 1.1;
+      p.salto = Math.max(0, p.salto - dt * 3);
+      p.g.position.y = SUELO + (quieto ? 0 : Math.sin(p.salto * Math.PI) * 0.35) + p.luz * 0.08;
+    });
+    chispas.forEach((c) => {
+      if (c.vida <= 0) return;
+      c.vida -= dt * 1.2;
+      c.v.y -= 7 * dt;
+      c.m.position.addScaledVector(c.v, dt);
+      c.m.scale.setScalar(Math.max(0.001, c.vida));
+      if (c.vida <= 0) c.m.visible = false;
+    });
+    cristalPieza.rotation.y = quieto ? 0 : t * 0.6;
+    cristalPieza.position.y = 1.3 + (quieto ? 0 : 0.06 * Math.sin(t * 1.6));
+    composer.render();
+    requestAnimationFrame(cuadro);
+  }
+  requestAnimationFrame(cuadro);
+</script>

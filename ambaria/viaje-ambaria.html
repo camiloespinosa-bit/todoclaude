@@ -1,0 +1,1031 @@
+<title>El viaje por Ambaria</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap">
+<style>
+  /* Layout: marco vertical 9:16; el 3D se dibuja en baja resolución y se amplía sin suavizar.
+     Encima, cajas de diálogo de juego clásico: cartel de la ciudad arriba y minimapa abajo. */
+  :root {
+    --pagina: #E2E4DF;
+    --marco: #F3F2EE;
+    --caja: #FBF7EA;
+    --tinta: #1C2A36;
+    --tinta-suave: #4E5A63;
+    --naranja: #F57C00;
+    --ambar: #F0A830;
+    --azul: #1E5A93;
+    --verde: #5E8F3A;
+    --fuente: "Pixelify Sans", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    box-sizing: border-box;
+    background: var(--pagina);
+    color: var(--tinta);
+    font-family: var(--fuente);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 12px;
+    overflow: hidden;
+  }
+  .marco {
+    position: relative;
+    height: min(calc(100% - 46px), calc((100vw - 32px) * 16 / 9));
+    aspect-ratio: 9 / 16;
+    max-width: 100%;
+    background: var(--marco);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 0 4px var(--tinta), 0 18px 50px rgba(28, 42, 54, 0.2);
+    container-type: size;
+  }
+  .marco canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  /* Caja de diálogo: borde grueso, esquinas en escalón y sombra dura */
+  .caja {
+    position: absolute;
+    background: var(--caja);
+    border: 0.9cqw solid var(--tinta);
+    box-shadow: 0 1.2cqw 0 var(--tinta), inset 0 0 0 0.6cqw #FFFFFF, inset 0 0 0 1.1cqw #E6DCC0;
+    border-radius: 1.6cqw;
+  }
+
+  .cartel {
+    left: 5cqw; right: 5cqw; top: 5cqw;
+    padding: 3.6cqw 4.4cqw 3.8cqw;
+    transition: opacity 260ms cubic-bezier(0.23, 1, 0.32, 1), transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .cartel.oculto { opacity: 0; transform: translateY(-2cqw); }
+  .cartel__eyebrow {
+    display: flex; align-items: center; gap: 1.8cqw;
+    font-size: 3.2cqw; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tinta-suave);
+  }
+  .cartel__gema { width: 2.4cqw; height: 2.4cqw; background: var(--acento, var(--naranja)); box-shadow: 0.5cqw 0.5cqw 0 var(--tinta); }
+  .cartel h1 { margin: 1cqw 0 1.4cqw; font-size: 10.5cqw; line-height: 1; font-weight: 700; letter-spacing: 0.01em; }
+  .cartel__linea { margin: 0; font-size: 3.9cqw; line-height: 1.3; color: var(--tinta); }
+  .cartel__pie { display: flex; align-items: center; gap: 2.4cqw; margin-top: 2.4cqw; flex-wrap: wrap; }
+  .barra { display: flex; gap: 0.7cqw; }
+  .barra i { width: 3.2cqw; height: 3.2cqw; background: #DCD3B8; box-shadow: inset 0 -0.6cqw 0 rgba(0, 0, 0, 0.12); }
+  .barra i.lleno { background: var(--acento, var(--naranja)); }
+  .cartel__dato { font-size: 3.6cqw; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .chip { font-size: 3cqw; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.6cqw 1.6cqw; background: #E35D3A; color: #FFFFFF; box-shadow: 0.5cqw 0.5cqw 0 var(--tinta); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2cqw; margin-top: 2.6cqw; }
+  .stat { display: flex; flex-direction: column; gap: 0.4cqw; }
+  .stat b { font-size: 7.4cqw; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 3.2cqw; color: var(--tinta-suave); }
+
+  .panel {
+    left: 5cqw; right: 5cqw; bottom: 5.5cqw;
+    padding: 2.6cqw 3.4cqw;
+    display: grid;
+    grid-template-columns: 27cqw 1fr;
+    gap: 3cqw;
+    align-items: center;
+  }
+  .mapa { position: relative; width: 27cqw; aspect-ratio: 1; }
+  .mapa__mar { position: absolute; inset: 0; border-radius: 50%; background: #5B9AD0; box-shadow: inset 0 0 0 0.6cqw var(--tinta); }
+  .mapa__anillo { position: absolute; inset: 22%; border-radius: 50%; border: 1.6cqw solid #A8C66C; }
+  .punto {
+    position: absolute; width: 5.4cqw; height: 5.4cqw; margin: -2.7cqw 0 0 -2.7cqw;
+    background: var(--c); border: 0.6cqw solid var(--tinta); border-radius: 0.8cqw;
+    cursor: pointer; padding: 0;
+    transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .punto:hover { transform: scale(1.15); }
+  .punto:active { transform: scale(0.95); }
+  .punto[aria-current="true"] { box-shadow: 0 0 0 0.8cqw #FFFFFF, 0 0 0 1.5cqw var(--tinta); transform: scale(1.12); }
+  .punto:focus-visible { outline: 0.8cqw solid var(--naranja); outline-offset: 0.6cqw; }
+
+  .controles { display: flex; flex-direction: column; gap: 2cqw; min-width: 0; }
+  .fila { display: flex; gap: 1.6cqw; flex-wrap: wrap; }
+  .boton {
+    font: inherit; font-size: 3.5cqw; font-weight: 600; color: var(--tinta);
+    background: #FFFFFF; border: 0.6cqw solid var(--tinta); border-radius: 0.8cqw;
+    padding: 1cqw 2.2cqw; cursor: pointer;
+    box-shadow: 0 0.7cqw 0 var(--tinta);
+    transition: transform 100ms ease, box-shadow 100ms ease;
+  }
+  .boton:active { transform: translateY(0.6cqw); box-shadow: 0 0.1cqw 0 var(--tinta); }
+  .boton[aria-pressed="true"] { background: var(--ambar); }
+  .boton:focus-visible { outline: 0.8cqw solid var(--naranja); outline-offset: 0.6cqw; }
+  .progreso { height: 2.2cqw; background: #DCD3B8; border: 0.5cqw solid var(--tinta); position: relative; }
+  .progreso i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--naranja); }
+  .ayuda { margin: 0; font-size: 3cqw; color: var(--tinta-suave); line-height: 1.25; }
+
+  .nota {
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px;
+    font-size: 13px; color: var(--tinta-suave); text-align: center;
+  }
+
+  body.modo-video { padding: 0; gap: 0; }
+  body.modo-video .marco { height: 100%; border-radius: 0; box-shadow: none; }
+  body.modo-video .nota, body.modo-video .panel { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cartel, .punto, .boton { transition: none; }
+  }
+  .sin-webgl { position: absolute; inset: 0; display: grid; place-items: center; padding: 10cqw; text-align: center; color: var(--tinta-suave); font-size: 4cqw; }
+</style>
+
+<div class="marco" id="marco">
+  <canvas id="lienzo" role="img" aria-label="Recorrido animado en estilo pixel art por el continente de Ambaria: la llegada por mar a Petrea, las ocho ciudades en anillo con su fenómeno del Ámbar y Aurelia sellada en el centro."></canvas>
+
+  <section class="caja cartel" id="cartel" aria-live="polite">
+    <div class="cartel__eyebrow"><span class="cartel__gema" aria-hidden="true"></span><span id="c-eyebrow">Mundo del juego</span></div>
+    <h1 id="c-nombre">Ambaria</h1>
+    <p class="cartel__linea" id="c-linea">Un continente, nueve ciudades y el Ámbar.</p>
+    <div class="cartel__pie" id="c-pie"></div>
+  </section>
+
+  <nav class="caja panel" aria-label="Recorrido y mapa">
+    <div class="mapa" id="mapa">
+      <span class="mapa__mar" aria-hidden="true"></span>
+      <span class="mapa__anillo" aria-hidden="true"></span>
+    </div>
+    <div class="controles">
+      <div class="fila">
+        <button class="boton" type="button" id="b-recorrido" aria-pressed="true">▶ Recorrido</button>
+        <button class="boton" type="button" id="b-pixel" aria-label="Cambiar tamaño de píxel">Píxel: M</button>
+      </div>
+      <div class="progreso" aria-hidden="true"><i id="progreso"></i></div>
+      <p class="ayuda" id="ayuda">Toca una ciudad en el mapa para explorarla. Flechas ← → para moverte entre ciudades.</p>
+    </div>
+  </nav>
+
+  <p class="sin-webgl" id="sin-webgl" hidden>Tu navegador no pudo iniciar WebGL. Prueba con una versión reciente de Chrome, Edge, Firefox o Safari.</p>
+</div>
+<div class="nota">
+  <span>Exploración visual para Sebastián · nombres, orden y mapa tentativos · recorrido de 75 s en bucle</span>
+</div>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+  import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+  import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+  import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
+  import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+  import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+
+  const VIDA = 15;                    // periodo de todo lo que se mueve en el mundo (s)
+  const RECORRIDO = 75;               // periodo del recorrido de cámara (s); 75 = 5 × 15, así el bucle no salta
+  const TAU = Math.PI * 2;
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (location.hash === "#video") document.body.classList.add("modo-video");
+
+  // ---------- Datos del mundo (resumen de Ambaria; nombres, orden y cifras de mitigación tentativos) ----------
+  const CIUDADES = [
+    { nombre: "Petrea",     propiedad: "Petrificación",        zona: "Costa rocosa",   mitigacion: 70, trimestre: 1, suelo: ["#A9B1B5", "#9AA3A8", "#B9BEBB"], base: 0.62, techo: "#7E8A93", arboles: 0.12, mapa: "#A9B1B5" },
+    { nombre: "Electria",   propiedad: "Descargas eléctricas", zona: "Llanura seca",   mitigacion: 80, trimestre: 1, suelo: ["#DCC793", "#D1BA80", "#E5D4A6"], base: 0.55, techo: "#E8B820", arboles: 0.06, mapa: "#FFE066" },
+    { nombre: "Mielar",     propiedad: "Viscosidad",           zona: "Pantanos",       mitigacion: 45, trimestre: 1, suelo: ["#6F8D47", "#5F7F3E", "#7D9B52"], base: 0.42, techo: "#D98A1F", arboles: 0.32, mapa: "#E39B2B", averiada: true },
+    { nombre: "Eteria",     propiedad: "Preservación",         zona: "Altiplano frío", mitigacion: 60, trimestre: 2, suelo: ["#E6EEF1", "#D7E4E9", "#F0F4F5"], base: 1.25, techo: "#6FAFC9", arboles: 0.10, mapa: "#CFE4EE" },
+    { nombre: "Espejara",   propiedad: "Distorsión óptica",    zona: "Salares",        mitigacion: 65, trimestre: 2, suelo: ["#F4F2EB", "#EAE7DE", "#F8F7F2"], base: 0.48, techo: "#9EADBA", arboles: 0.00, mapa: "#FFFFFF" },
+    { nombre: "Grietara",   propiedad: "Fragilidad",           zona: "Cañones",        mitigacion: 50, trimestre: 2, suelo: ["#C97B4F", "#BA6B42", "#D58D60"], base: 0.72, techo: "#A84B2B", arboles: 0.05, mapa: "#C97B4F", averiada: true },
+    { nombre: "Resplandra", propiedad: "Resplandor",           zona: "Meseta solar",   mitigacion: 75, trimestre: 3, suelo: ["#F0AE3C", "#E89F2C", "#F5BD57"], base: 0.95, techo: "#F08A1C", arboles: 0.05, mapa: "#F0AE3C" },
+    { nombre: "Atractia",   propiedad: "Atracción",            zona: "Montañas",       mitigacion: 80, trimestre: 3, suelo: ["#7FA071", "#6F9264", "#8EAB80"], base: 0.82, techo: "#3F7A55", arboles: 0.38, mapa: "#5E8F3A" }
+  ];
+  const ORO = ["#F2DFA6", "#ECD592", "#F6E7BC"];
+  const SECTOR = TAU / 8;
+  const A0 = 0.55;                    // giro del anillo: Petrea queda de frente a la cámara al inicio
+  const R_CAMINO = 6.0;
+  const NIVEL_MAR = 0.25;
+
+  // ---------- Utilidades ----------
+  let semilla = 77;
+  const rand = () => ((semilla = (semilla * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const mod = (a, n) => ((a % n) + n) % n;
+  const suave = (x) => x * x * (3 - 2 * x);
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const rebote = (x) => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+  const sectorDe = (a) => Math.floor(mod(a - A0, TAU) / SECTOR);
+  const centroSector = (s) => A0 + (s + 0.5) * SECTOR;
+  const costa = (a) => 8.0 + 0.6 * Math.sin(3 * a + 1.3) + 0.35 * Math.sin(7 * a + 0.4);
+  function alturaCamino(a) {
+    const u = mod(a - A0, TAU) / SECTOR - 0.5;
+    const s0 = Math.floor(u), f = u - s0;
+    const h0 = CIUDADES[mod(s0, 8)].base, h1 = CIUDADES[mod(s0 + 1, 8)].base;
+    return h0 + (h1 - h0) * suave(f);
+  }
+  const color = (hex) => new THREE.Color(hex);
+  const elegir = (lista) => lista[Math.floor(rand() * lista.length)];
+
+  // ---------- Renderizador ----------
+  const marco = document.getElementById("marco");
+  const canvas = document.getElementById("lienzo");
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+  } catch (e) {
+    document.getElementById("sin-webgl").hidden = false;
+    throw e;
+  }
+  renderer.setPixelRatio(1);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("#F3F2EE").multiplyScalar(2.6);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.45;
+
+  const camera = new THREE.PerspectiveCamera(24, 9 / 16, 0.5, 400);
+  scene.add(new THREE.HemisphereLight("#EEF4FF", "#CDBB9C", 1.1));
+  const sol = new THREE.DirectionalLight("#FFF0DA", 2.6);
+  sol.position.set(9, 16, 7);
+  sol.castShadow = true;
+  sol.shadow.mapSize.set(2048, 2048);
+  Object.assign(sol.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 50 });
+  sol.shadow.bias = -0.0004;
+  sol.shadow.normalBias = 0.02;
+  scene.add(sol);
+
+  const mundo = new THREE.Group();
+  scene.add(mundo);
+
+  const mats = new Map();
+  function mat(hex, extra = {}) {
+    const clave = hex + JSON.stringify(extra);
+    if (!mats.has(clave)) mats.set(clave, new THREE.MeshStandardMaterial({ color: hex, roughness: 0.78, metalness: 0, ...extra }));
+    return mats.get(clave);
+  }
+  const geos = new Map();
+  function caja(w, h, d, r = 0.06) {
+    const clave = [w, h, d, r].join("|");
+    if (!geos.has(clave)) geos.set(clave, new RoundedBoxGeometry(w, h, d, 2, Math.min(r, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001)));
+    return geos.get(clave);
+  }
+  function bloque(w, h, d, hex, extra, r) {
+    const m = new THREE.Mesh(caja(w, h, d, r), mat(hex, extra));
+    m.castShadow = true;
+    m.receiveShadow = true;
+    return m;
+  }
+
+  const piezas = [];
+  function registrar(obj, retraso) {
+    piezas.push({ obj, y: obj.position.y, retraso });
+    mundo.add(obj);
+    return obj;
+  }
+  const retrasoPorRadio = (x, z) => 0.08 + 0.5 * (Math.hypot(x, z) / 11) + rand() * 0.1;
+  const animados = [];                // funciones (t, aparicion, e, T) llamadas en cada cuadro
+
+  // ---------- Losa flotante y mar ----------
+  {
+    const perfil = [new THREE.Vector2(0, -1.5), new THREE.Vector2(10.2, -1.5)];
+    for (let i = 1; i <= 8; i++) { const t = -Math.PI / 2 + (i / 8) * (Math.PI / 2); perfil.push(new THREE.Vector2(10.2 + 0.6 * Math.cos(t), -0.9 + 0.6 * Math.sin(t))); }
+    for (let i = 0; i <= 8; i++) { const t = (i / 8) * (Math.PI / 2); perfil.push(new THREE.Vector2(10.4 + 0.4 * Math.cos(t), -0.4 + 0.4 * Math.sin(t))); }
+    perfil.push(new THREE.Vector2(0, 0));
+    const losa = new THREE.Mesh(new THREE.LatheGeometry(perfil, 128), mat("#EEE9DF", { roughness: 0.9 }));
+    losa.castShadow = losa.receiveShadow = true;
+    registrar(losa, 0);
+    const mar = new THREE.Mesh(new THREE.CylinderGeometry(10.15, 10.15, NIVEL_MAR, 128), mat("#2F74B5", { roughness: 0.28, metalness: 0.05 }));
+    mar.position.y = NIVEL_MAR / 2;
+    mar.receiveShadow = true;
+    registrar(mar, 0.04);
+    const piso = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity: 0.1 }));
+    piso.rotation.x = -Math.PI / 2;
+    piso.position.y = -3.4;
+    piso.receiveShadow = true;
+    scene.add(piso);
+  }
+
+  // ---------- Terreno ----------
+  const celdas = new Map();
+  const tiles = [];
+  const candidatas = CIUDADES.map(() => []);
+  const centroCiudad = (s) => { const c = centroSector(s); return new THREE.Vector2(Math.cos(c) * R_CAMINO, Math.sin(c) * R_CAMINO); };
+  const picos = [];
+  { const c = centroSector(7); picos.push([Math.cos(c - 0.22) * 7.4, Math.sin(c - 0.22) * 7.4, 1.9], [Math.cos(c + 0.25) * 4.4, Math.sin(c + 0.25) * 4.4, 1.5], [Math.cos(c + 0.05) * 7.6, Math.sin(c + 0.05) * 7.6, 1.2]); }
+
+  for (let i = -10; i <= 10; i++) {
+    for (let j = -10; j <= 10; j++) {
+      const x = i, z = j, r = Math.hypot(x, z), a = Math.atan2(z, x);
+      if (r < 2.1) {
+        const h = r < 1.5 ? 1.15 : 0.95;
+        celdas.set(`${i},${j}`, h);
+        tiles.push({ x, z, h, color: elegir(ORO) });
+        continue;
+      }
+      if (r < 3.7) continue;          // lago que rodea a Aurelia, sellada
+      const borde = costa(a);
+      if (r > borde) continue;
+      const s = sectorDe(a), C = CIUDADES[s];
+      const enCiudad = centroCiudad(s).distanceTo(new THREE.Vector2(x, z)) < 1.75;
+      const enCamino = Math.abs(r - R_CAMINO) < 0.75;
+      let h;
+      if (enCiudad) h = C.base;
+      else if (enCamino) h = alturaCamino(a);
+      else {
+        switch (s) {
+          case 0: h = C.base + (r > borde - 1.3 ? 0.55 : 0) + rand() * 0.12; break;
+          case 3: h = C.base + rand() * 0.1 - (r > borde - 1 ? 0.35 : 0); break;
+          case 5: if (rand() < 0.2) continue; h = C.base + rand() * 0.85; break;
+          case 7: h = C.base + rand() * 0.1 + picos.reduce((m, [px, pz, ph]) => Math.max(m, ph * Math.exp(-((x - px) ** 2 + (z - pz) ** 2) / 1.1)), 0); break;
+          default: h = C.base + rand() * 0.1;
+        }
+      }
+      const espejo = s === 4 && !enCiudad && !enCamino && rand() < 0.35;
+      celdas.set(`${i},${j}`, h);
+      tiles.push({ x, z, h, color: elegir(C.suelo), espejo });
+      if (!enCiudad && !enCamino && !espejo) candidatas[s].push({ x, z, h, r });
+    }
+  }
+  const alturaEn = (x, z) => celdas.get(`${Math.round(x)},${Math.round(z)}`) ?? NIVEL_MAR;
+
+  const geoTile = new RoundedBoxGeometry(0.95, 1, 0.95, 2, 0.1).translate(0, 0.5, 0);
+  const grupoTiles = [];
+  for (const espejo of [false, true]) {
+    const lista = tiles.filter((t) => !!t.espejo === espejo);
+    const material = espejo
+      ? new THREE.MeshStandardMaterial({ color: "#DCE6EC", roughness: 0.06, metalness: 1 })
+      : new THREE.MeshStandardMaterial({ color: "#FFFFFF", roughness: 0.82 });
+    const im = new THREE.InstancedMesh(geoTile, material, lista.length);
+    im.castShadow = im.receiveShadow = true;
+    lista.forEach((t, k) => { if (!espejo) im.setColorAt(k, color(t.color)); t.retraso = retrasoPorRadio(t.x, t.z); });
+    mundo.add(im);
+    grupoTiles.push({ im, lista });
+  }
+  const m4 = new THREE.Matrix4(), v3 = new THREE.Vector3(), q = new THREE.Quaternion(), esc = new THREE.Vector3();
+  function ponerTiles(e) {
+    for (const { im, lista } of grupoTiles) {
+      lista.forEach((t, k) => {
+        const p = clamp01((e - t.retraso) / 0.5);
+        m4.compose(v3.set(t.x, -2.5 * (1 - rebote(p)), t.z), q, esc.set(1, p > 0 ? t.h : 0.001, 1));
+        im.setMatrixAt(k, m4);
+      });
+      im.instanceMatrix.needsUpdate = true;
+    }
+  }
+
+  // ---------- Piezas reutilizables ----------
+  function edificio(w, d, h, techo) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(w, h, d, "#F2F0EB", {}, 0.05);
+    cuerpo.position.y = h / 2;
+    const tapa = bloque(w * 0.86, 0.12, d * 0.86, techo, {}, 0.04);
+    tapa.position.y = h + 0.05;
+    g.add(cuerpo, tapa);
+    const ventanas = [];
+    const filas = Math.max(1, Math.floor((h - 0.22) / 0.22));
+    for (const [ancho, fondo, rot] of [[w, d, 0], [d, w, Math.PI / 2], [w, d, Math.PI], [d, w, -Math.PI / 2]]) {
+      const cols = Math.max(1, Math.floor((ancho - 0.1) / 0.17));
+      for (let f = 0; f < filas; f++) for (let c = 0; c < cols; c++) {
+        const gw = new THREE.BoxGeometry(0.08, 0.1, 0.02);
+        gw.translate((c - (cols - 1) / 2) * 0.17, 0.2 + f * 0.22, fondo / 2 + 0.005);
+        gw.rotateY(rot);
+        ventanas.push(gw);
+      }
+    }
+    g.add(new THREE.Mesh(mergeGeometries(ventanas), mat("#2C4560", { roughness: 0.25, metalness: 0.2 })));
+    return g;
+  }
+  function arbol(escala = 1, tonos = ["#6FAF3E", "#4E9A6A", "#7CB342"]) {
+    const g = new THREE.Group();
+    const tronco = bloque(0.08, 0.26, 0.08, "#8A6A4A", {}, 0.02); tronco.position.y = 0.13;
+    const copa1 = bloque(0.34, 0.26, 0.34, elegir(tonos), {}, 0.08); copa1.position.y = 0.36;
+    const copa2 = bloque(0.22, 0.2, 0.22, elegir(tonos), {}, 0.07); copa2.position.y = 0.56;
+    g.add(tronco, copa1, copa2);
+    g.scale.setScalar(escala);
+    return g;
+  }
+  function persona(hexCuerpo) {
+    const g = new THREE.Group();
+    const cuerpo = bloque(0.1, 0.17, 0.08, hexCuerpo, {}, 0.035); cuerpo.position.y = 0.085;
+    const cabeza = bloque(0.08, 0.08, 0.08, "#EFC7A0", {}, 0.03); cabeza.position.y = 0.22;
+    g.add(cuerpo, cabeza);
+    return g;
+  }
+  function enMarco(s, t, n) {
+    const c = centroSector(s);
+    const nx = Math.cos(c), nz = Math.sin(c), tx = -Math.sin(c), tz = Math.cos(c);
+    return { x: Math.cos(c) * R_CAMINO + t * tx + n * nx, z: Math.sin(c) * R_CAMINO + t * tz + n * nz, rot: Math.atan2(-tz, tx) };
+  }
+  const COLORES_GENTE = ["#145389", "#F57C00", "#57A6B5", "#7CB342", "#E35D6A", "#3D8BD9"];
+
+  // ---------- Las 8 ciudades ----------
+  const LOTES = [[-1.05, 0.68], [-0.32, 0.8], [0.42, 0.66], [1.12, 0.74], [-1.08, -0.72], [1.02, -0.78], [-0.42, -1.32], [0.5, -1.36]];
+  CIUDADES.forEach((C, s) => {
+    LOTES.forEach(([t, n], k) => {
+      if ((s + k) % 5 === 4) return;
+      const p = enMarco(s, t, n);
+      const w = 0.48 + rand() * 0.22, d = 0.44 + rand() * 0.2, h = 0.5 + rand() * (s === 3 ? 0.6 : 1.0);
+      const e = edificio(w, d, h, C.techo);
+      e.position.set(p.x, C.base, p.z);
+      e.rotation.y = p.rot;
+      registrar(e, retrasoPorRadio(p.x, p.z) + 0.12);
+    });
+    // La pieza del mecanismo en la plaza
+    const plaza = enMarco(s, 0, -0.72);
+    const pieza = new THREE.Group();
+    const pedestal = bloque(0.3, 0.5, 0.3, "#DCD6C8", {}, 0.05); pedestal.position.y = 0.25;
+    const cristal = bloque(0.24, 0.24, 0.24, "#F57C00", { emissive: "#F57C00", emissiveIntensity: 0.55, roughness: 0.3 }, 0.05);
+    cristal.position.y = 0.72;
+    cristal.rotation.set(Math.PI / 4, 0, Math.PI / 4);
+    pieza.add(pedestal, cristal);
+    pieza.position.set(plaza.x, C.base, plaza.z);
+    registrar(pieza, retrasoPorRadio(plaza.x, plaza.z) + 0.2);
+    animados.push((t) => { cristal.rotation.y = (t / VIDA) * Math.PI; cristal.position.y = 0.72 + 0.04 * Math.sin((TAU * t) / VIDA * 2 + s); });
+    // Gente alrededor de la pieza: dos vueltas por ciclo, en ambos sentidos
+    for (let k = 0; k < 6; k++) {
+      const per = persona(COLORES_GENTE[(s + k) % COLORES_GENTE.length]);
+      mundo.add(per);
+      const fase = k / 6, sentido = k % 2 ? 1 : -1, rad = 0.42 + (k % 3) * 0.13;
+      animados.push((t, ap) => {
+        const ang = TAU * (fase + sentido * 2 * t / VIDA);
+        per.position.set(plaza.x + Math.cos(ang) * rad, C.base + Math.abs(Math.sin(TAU * t / VIDA * 30)) * 0.02, plaza.z + Math.sin(ang) * rad);
+        per.rotation.y = -ang - sentido * Math.PI / 2;
+        per.scale.setScalar(ap);
+      });
+    }
+    candidatas[s].forEach((c) => {
+      if (rand() > C.arboles) return;
+      const a = arbol(0.8 + rand() * 0.4, s === 3 ? ["#5E9E7A", "#4E8F6B"] : undefined);
+      a.position.set(c.x + (rand() - 0.5) * 0.4, c.h, c.z + (rand() - 0.5) * 0.4);
+      a.rotation.y = rand() * TAU;
+      registrar(a, retrasoPorRadio(c.x, c.z) + 0.15);
+    });
+  });
+
+  // ---------- Fenómenos del Ámbar ----------
+  const tomar = (s, n) => candidatas[s].filter((c) => c.r > 4.2 && c.r < 7.6).sort(() => rand() - 0.5).slice(0, n);
+  // Petrea: la piedra ámbar avanza por el camino hacia Electria
+  for (let k = 0; k < 8; k++) {
+    const a = centroSector(0) + 0.16 + k * 0.07, r = R_CAMINO + (k % 2 ? 0.45 : -0.45);
+    const b = bloque(0.26, 0.3, 0.26, "#C8A46A", { roughness: 0.6 }, 0.05);
+    const y0 = alturaCamino(a);
+    mundo.add(b);
+    animados.push((t, ap) => {
+      const v = suave(clamp01(1.4 * (0.5 - 0.5 * Math.cos(TAU * (2 * t / VIDA - k / 11)))));
+      b.position.set(Math.cos(a) * r, y0 + 0.15 * v, Math.sin(a) * r);
+      b.scale.setScalar(Math.max(0.001, v * ap));
+    });
+  }
+  // Electria: torres con chispas
+  tomar(1, 4).forEach((c, k) => {
+    const torre = bloque(0.12, 0.9, 0.12, "#8D8F94", { metalness: 0.4, roughness: 0.4 }, 0.03);
+    torre.position.set(c.x, c.h + 0.45, c.z);
+    registrar(torre, retrasoPorRadio(c.x, c.z) + 0.2);
+    const chispa = new THREE.Mesh(caja(0.16, 0.16, 0.16, 0.04), new THREE.MeshStandardMaterial({ color: "#FFE066", emissive: "#FFD23F", emissiveIntensity: 0.15, roughness: 0.4 }));
+    chispa.position.set(c.x, c.h + 1.0, c.z);
+    mundo.add(chispa);
+    animados.push((t, ap) => {
+      const f = mod((t / VIDA) * 37 + k * 0.37, 1);
+      chispa.material.emissiveIntensity = f < 0.2 ? 2.4 : 0.15;
+      chispa.scale.setScalar(ap * (f < 0.2 ? 1.3 : 0.7));
+      chispa.rotation.y = (t / VIDA) * TAU * 4;
+    });
+  });
+  // Mielar: charcos de miel que respiran y burbujean
+  tomar(2, 4).forEach((c, k) => {
+    const charco = bloque(0.8, 0.07, 0.6, "#E39B2B", { roughness: 0.12, emissive: "#E08A10", emissiveIntensity: 0.25 }, 0.03);
+    const burbuja = bloque(0.1, 0.1, 0.1, "#F0B04A", { roughness: 0.15 }, 0.04);
+    mundo.add(charco, burbuja);
+    animados.push((t, ap) => {
+      const w = Math.sin(TAU * (t / VIDA) * 3 + k);
+      charco.position.set(c.x, c.h + 0.04 + 0.02 * w, c.z);
+      charco.scale.set(ap * (1 + 0.06 * w), ap, ap * (1 - 0.05 * w));
+      const b = mod((t / VIDA) * 5 + k / 4, 1);
+      burbuja.position.set(c.x + 0.15, c.h + 0.08 + b * 0.35, c.z);
+      burbuja.scale.setScalar(Math.max(0.001, ap * (1 - b)));
+    });
+  });
+  // Eteria: árboles preservados en cubos de ámbar
+  tomar(3, 3).forEach((c, k) => {
+    const a = arbol(0.9, ["#5E9E7A", "#4E8F6B"]);
+    a.position.set(c.x, c.h, c.z);
+    registrar(a, retrasoPorRadio(c.x, c.z) + 0.2);
+    const cubo = new THREE.Mesh(caja(0.62, 0.8, 0.62, 0.08), new THREE.MeshStandardMaterial({ color: "#F0A830", transparent: true, opacity: 0.45, roughness: 0.15, emissive: "#E08A10", emissiveIntensity: 0.2, depthWrite: false }));
+    cubo.position.set(c.x, c.h + 0.4, c.z);
+    mundo.add(cubo);
+    animados.push((t, ap) => { cubo.scale.setScalar(ap); cubo.material.emissiveIntensity = 0.15 + 0.2 * (0.5 + 0.5 * Math.sin(TAU * t / VIDA * 2 + k)); });
+  });
+  // Espejara: paneles de espejo que giran
+  tomar(4, 3).forEach((c, k) => {
+    const panel = bloque(0.06, 0.7, 0.5, "#DDE6EC", { metalness: 1, roughness: 0.05 }, 0.02);
+    mundo.add(panel);
+    animados.push((t, ap) => { panel.position.set(c.x, c.h + 0.4, c.z); panel.rotation.y = (t / VIDA) * TAU + k; panel.scale.setScalar(ap); });
+  });
+  // Grietara: fragmentos que se desprenden y caen
+  tomar(5, 6).forEach((c, k) => {
+    const frag = bloque(0.2, 0.14, 0.18, "#B4603A", {}, 0.04);
+    mundo.add(frag);
+    animados.push((t, ap) => {
+      const v = Math.pow(Math.sin(Math.PI * mod((t / VIDA) * 3 + k / 6, 1)), 2);
+      frag.position.set(c.x, c.h + 0.1 + 0.6 * v, c.z);
+      frag.rotation.set(v * 1.2, k + v, v * 0.8);
+      frag.scale.setScalar(ap);
+    });
+  });
+  // Resplandra: cristales que laten de luz
+  tomar(6, 6).forEach((c, k) => {
+    const alto = 0.35 + rand() * 0.35;
+    const cristal = new THREE.Mesh(caja(0.16, alto, 0.16, 0.04), new THREE.MeshStandardMaterial({ color: "#FFC24A", emissive: "#FF9F1A", emissiveIntensity: 0.6, roughness: 0.3 }));
+    cristal.castShadow = true;
+    cristal.position.set(c.x, c.h + alto / 2, c.z);
+    cristal.rotation.set(0.25 * (rand() - 0.5), rand() * TAU, 0.25 * (rand() - 0.5));
+    registrar(cristal, retrasoPorRadio(c.x, c.z) + 0.2);
+    animados.push((t) => { cristal.material.emissiveIntensity = 0.35 + 1.0 * (0.5 + 0.5 * Math.sin(TAU * (t / VIDA) * 3 + k * 1.3)); });
+  });
+  // Atractia: rocas que orbitan la cumbre
+  {
+    const [px, pz] = picos[0];
+    const cima = alturaEn(px, pz);
+    for (let k = 0; k < 8; k++) {
+      const roca = bloque(0.18 + rand() * 0.1, 0.14, 0.16, elegir(["#8E9A8C", "#7C8A7A", "#A3AD9F"]), {}, 0.05);
+      mundo.add(roca);
+      const rad = 0.75 + (k % 3) * 0.2, alt = cima + 0.35 + (k % 2) * 0.35;
+      animados.push((t, ap) => {
+        const ang = TAU * (2 * t / VIDA + k / 8);
+        roca.position.set(px + Math.cos(ang) * rad, alt + 0.08 * Math.sin(ang * 2), pz + Math.sin(ang) * rad);
+        roca.rotation.set(ang, ang * 0.5, 0);
+        roca.scale.setScalar(ap);
+      });
+    }
+  }
+
+  // ---------- Aurelia ----------
+  {
+    const g = new THREE.Group();
+    const base = bloque(2.0, 0.4, 2.0, "#FBF1D6", {}, 0.12); base.position.y = 0.2;
+    const medio = bloque(1.3, 0.75, 1.3, "#F7ECCF", {}, 0.1); medio.position.y = 0.78;
+    const alto = bloque(0.78, 0.9, 0.78, "#FBF4E2", {}, 0.08); alto.position.y = 1.6;
+    g.add(base, medio, alto);
+    for (const [x, z] of [[-0.82, -0.82], [0.82, -0.82], [-0.82, 0.82], [0.82, 0.82]]) {
+      const torre = bloque(0.3, 0.95, 0.3, "#F7ECCF", {}, 0.06); torre.position.set(x, 0.85, z);
+      const remate = bloque(0.22, 0.14, 0.22, "#E8B84A", {}, 0.04); remate.position.set(x, 1.38, z);
+      g.add(torre, remate);
+    }
+    const anillo = new THREE.Group();
+    for (let k = 0; k < 8; k++) {
+      const ranura = bloque(0.18, 0.18, 0.18, "#5A5A66", { roughness: 0.5 }, 0.04);
+      ranura.position.set(Math.cos((k / 8) * TAU) * 1.12, 0.52, Math.sin((k / 8) * TAU) * 1.12);
+      anillo.add(ranura);
+    }
+    g.add(anillo);
+    const nucleo = new THREE.Mesh(caja(0.42, 0.42, 0.42, 0.08), new THREE.MeshStandardMaterial({ color: "#FF9A1F", emissive: "#F57C00", emissiveIntensity: 0.9, roughness: 0.25 }));
+    nucleo.castShadow = true;
+    nucleo.rotation.set(Math.PI / 4, 0, Math.PI / 4);
+    g.add(nucleo);
+    g.position.y = 1.15;
+    registrar(g, 0.12);
+    animados.push((t) => {
+      const w = TAU * t / VIDA;
+      anillo.rotation.y = (t / VIDA) * (TAU / 8);
+      nucleo.rotation.y = (t / VIDA) * Math.PI;
+      nucleo.position.y = 2.45 + 0.08 * Math.sin(w * 2);
+      nucleo.material.emissiveIntensity = 0.7 + 0.35 * (0.5 + 0.5 * Math.sin(w * 3));
+    });
+  }
+
+  // ---------- Camino del anillo ----------
+  {
+    const geo = new RoundedBoxGeometry(0.36, 0.06, 0.24, 2, 0.025);
+    const n = Math.round((TAU * R_CAMINO) / 0.42);
+    const im = new THREE.InstancedMesh(geo, mat("#EDE6D6"), n);
+    im.receiveShadow = true;
+    const datos = [];
+    for (let k = 0; k < n; k++) datos.push({ a: (k / n) * TAU, retraso: 0.4 + rand() * 0.25 });
+    mundo.add(im);
+    const giro = new THREE.Euler();
+    let listo = false;
+    animados.push((t, ap, e) => {
+      if (listo && e > 2.2) return;
+      listo = e > 2.2;
+      datos.forEach((d, k) => {
+        const p = clamp01((e - d.retraso) / 0.5);
+        giro.set(0, -d.a, 0);
+        q.setFromEuler(giro);
+        m4.compose(v3.set(Math.cos(d.a) * R_CAMINO, alturaCamino(d.a) + 0.03 - 2 * (1 - rebote(p)), Math.sin(d.a) * R_CAMINO), q, esc.set(1, 1, p > 0 ? 1 : 0.001));
+        im.setMatrixAt(k, m4);
+      });
+      im.instanceMatrix.needsUpdate = true;
+    });
+  }
+
+  // Objetos que recorren el anillo: n objetos repartidos que avanzan `pasos`/n de vuelta por ciclo.
+  function enAnillo(n, crear, { radio = R_CAMINO, sentido = 1, pasos = 1, alturaExtra = 0, ocultarEnCiudades = false, sobreMar = false } = {}) {
+    for (let k = 0; k < n; k++) {
+      const obj = crear(k);
+      mundo.add(obj);
+      const dr = typeof radio === "function" ? radio(k) : radio;
+      animados.push((t, ap) => {
+        const a = (k / n) * TAU + sentido * pasos * (t / VIDA) * (TAU / n);
+        const y = sobreMar ? NIVEL_MAR : alturaCamino(a);
+        obj.position.set(Math.cos(a) * dr, y + (typeof alturaExtra === "function" ? alturaExtra(k, t) : alturaExtra), Math.sin(a) * dr);
+        obj.rotation.y = -a - sentido * Math.PI / 2;
+        let f = 1;
+        if (ocultarEnCiudades) {
+          const s = sectorDe(a), dc = Math.abs(mod(a - centroSector(s) + Math.PI, TAU) - Math.PI) * R_CAMINO;
+          f = suave(clamp01((dc - 0.9) / 0.9));
+        }
+        obj.scale.setScalar(Math.max(0.001, ap * f));
+      });
+    }
+  }
+  enAnillo(10, (k) => {
+    const g = new THREE.Group();
+    const cuerpo = bloque(0.34, 0.16, 0.2, ["#F57C00", "#145389", "#57A6B5", "#7CB342"][k % 4], {}, 0.05); cuerpo.position.y = 0.14;
+    const carga = bloque(0.16, 0.1, 0.16, "#F2F0EB", {}, 0.03); carga.position.set(-0.05, 0.27, 0);
+    g.add(cuerpo, carga);
+    for (const [x, z] of [[-0.11, 0.11], [0.11, 0.11], [-0.11, -0.11], [0.11, -0.11]]) { const rueda = bloque(0.08, 0.08, 0.04, "#2B2F36", {}, 0.02); rueda.position.set(x, 0.05, z); g.add(rueda); }
+    return g;
+  }, { radio: (k) => R_CAMINO + (k % 2 ? 0.07 : -0.07), pasos: 2 });
+  enAnillo(20, (k) => persona(COLORES_GENTE[k % COLORES_GENTE.length]), {
+    sentido: -1, pasos: 2, radio: (k) => R_CAMINO + (k % 2 ? 0.2 : -0.2), alturaExtra: (k, t) => Math.abs(Math.sin(TAU * t / VIDA * 25 + k)) * 0.02
+  });
+  enAnillo(60, () => bloque(0.12, 0.12, 0.12, "#F0A830", { emissive: "#E08A10", emissiveIntensity: 0.7, roughness: 0.3 }, 0.03), {
+    pasos: 3, radio: (k) => R_CAMINO + ((k * 37) % 7 - 3) * 0.1,
+    alturaExtra: (k, t) => 0.32 + 0.12 * Math.sin(TAU * (t / VIDA) * 3 + k),
+    ocultarEnCiudades: true
+  });
+  enAnillo(5, (k) => {
+    const g = new THREE.Group();
+    const casco = bloque(0.62, 0.16, 0.24, "#FBFAF6", {}, 0.07); casco.position.y = 0.06;
+    const mastil = bloque(0.03, 0.5, 0.03, "#8A6A4A", {}, 0.01); mastil.position.y = 0.38;
+    const vela = bloque(0.03, 0.4, 0.3, k % 2 ? "#57A6B5" : "#FFFFFF", {}, 0.01); vela.position.set(0, 0.42, -0.02); vela.rotation.y = Math.PI / 2;
+    g.add(casco, mastil, vela);
+    return g;
+  }, { radio: 9.55, sobreMar: true, alturaExtra: (k, t) => 0.03 * Math.sin(TAU * (t / VIDA) * 4 + k) });
+  enAnillo(4, () => {
+    const g = new THREE.Group();
+    const a = bloque(1.1, 0.34, 0.7, "#FFFFFF", { roughness: 1 }, 0.16);
+    const b = bloque(0.7, 0.4, 0.55, "#FFFFFF", { roughness: 1 }, 0.16); b.position.set(0.35, 0.16, 0.05);
+    const c = bloque(0.6, 0.3, 0.5, "#FFFFFF", { roughness: 1 }, 0.14); c.position.set(-0.45, 0.06, -0.05);
+    g.add(a, b, c);
+    return g;
+  }, { radio: 7.2, sentido: -1, sobreMar: true, alturaExtra: (k) => 4.6 + (k % 2) * 0.6 });
+
+  // ---------- La llegada: muelle de Petrea y el bote del niño con OKI ----------
+  const A_LLEGADA = centroSector(0);
+  const P_LEJOS = new THREE.Vector2(Math.cos(A_LLEGADA + 0.45) * 9.75, Math.sin(A_LLEGADA + 0.45) * 9.75);
+  const P_MUELLE = new THREE.Vector2(Math.cos(A_LLEGADA) * 9.0, Math.sin(A_LLEGADA) * 9.0);
+  {
+    for (let k = 0; k < 5; k++) {
+      const r = 7.7 + k * 0.32;
+      const tabla = bloque(0.3, 0.07, 0.42, "#A07850", {}, 0.02);
+      tabla.position.set(Math.cos(A_LLEGADA) * r, 0.62, Math.sin(A_LLEGADA) * r);
+      tabla.rotation.y = -A_LLEGADA;
+      const poste = bloque(0.06, 0.4, 0.06, "#7A5A3A", {}, 0.02);
+      poste.position.set(Math.cos(A_LLEGADA) * r + Math.cos(A_LLEGADA + Math.PI / 2) * 0.2, 0.42, Math.sin(A_LLEGADA) * r + Math.sin(A_LLEGADA + Math.PI / 2) * 0.2);
+      registrar(tabla, 0.5);
+      registrar(poste, 0.5);
+    }
+    const bote = new THREE.Group();
+    const casco = bloque(0.7, 0.18, 0.28, "#FBFAF6", {}, 0.08); casco.position.y = 0.06;
+    const franja = bloque(0.72, 0.05, 0.3, "#145389", {}, 0.02); franja.position.y = 0.13;
+    const mastil = bloque(0.03, 0.6, 0.03, "#8A6A4A", {}, 0.01); mastil.position.y = 0.44;
+    const vela = bloque(0.03, 0.48, 0.36, "#F57C00", {}, 0.01); vela.position.set(0.02, 0.5, 0); vela.rotation.y = Math.PI / 2;
+    bote.add(casco, franja, mastil, vela);
+    mundo.add(bote);
+    // Llega entre los 5 y los 10.5 s del recorrido, se queda atracado y vuelve a salir al final, para cerrar el bucle.
+    animados.push((t, ap, e, T) => {
+      const k = suave(clamp01((T - 5) / 5.5)) * (1 - suave(clamp01((T - 70) / 5)));
+      const x = lerp(P_LEJOS.x, P_MUELLE.x, k), z = lerp(P_LEJOS.y, P_MUELLE.y, k);
+      bote.position.set(x, NIVEL_MAR + 0.03 * Math.sin(TAU * (t / VIDA) * 4), z);
+      const llegando = T < 40;
+      const dx = (P_MUELLE.x - P_LEJOS.x) * (llegando ? 1 : -1), dz = (P_MUELLE.y - P_LEJOS.y) * (llegando ? 1 : -1);
+      bote.rotation.y = Math.atan2(-dz, dx);
+      bote.scale.setScalar(ap);
+    });
+  }
+
+  // ---------- Postproceso: GTAO, ACES y el filtro de pixel art ----------
+  // Componentes sRGB tal cual (0 a 1): el filtro trabaja después de la salida, ya en sRGB.
+  function srgb(hex) { const n = parseInt(hex.slice(1), 16); return new THREE.Vector3(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255); }
+  // Paleta fija (sRGB) inspirada en las consolas portátiles: cada píxel toma el color más cercano.
+  const PALETA = [
+    "#F3F2EE", "#FFFFFF", "#E2E0D8", "#C9C4B8", "#9A9488",
+    "#CFE4EE", "#8FC1D6", "#5B9AD0", "#2F74B5", "#1E5A93", "#123E66",
+    "#C9DC8A", "#A8C66C", "#7CB342", "#5E8F3A", "#3F6B2E", "#2C4A24", "#5FA08A", "#3E7A68",
+    "#F6E7BC", "#EED9A6", "#D6BC84", "#B59A63", "#8A6A4A", "#5C4430",
+    "#FFE066", "#F6D27A", "#F0A830", "#E07F18", "#C25F12",
+    "#F0B7A0", "#D58D60", "#B05A36", "#7E3A24", "#E35D6A",
+    "#D0D5D8", "#A9B1B5", "#7E8A93", "#4E5A63", "#2C3640", "#151C24", "#EFC7A0"
+  ].map(srgb);
+
+  const FiltroPixel = {
+    uniforms: {
+      tDiffuse: { value: null },
+      resolucion: { value: new THREE.Vector2(1, 1) },
+      paleta: { value: PALETA },
+      fondo: { value: srgb("#F3F2EE") },
+      tramado: { value: 0.045 },
+      contorno: { value: 0.14 }
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform sampler2D tDiffuse;
+      uniform vec2 resolucion;
+      uniform vec3 paleta[${PALETA.length}];
+      uniform vec3 fondo;
+      uniform float tramado;
+      uniform float contorno;
+      varying vec2 vUv;
+      float luma(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
+      float bayer4(vec2 p) {
+        int x = int(mod(p.x, 4.0)), y = int(mod(p.y, 4.0));
+        int i = x + y * 4;
+        float m[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
+        return m[i] / 16.0 - 0.5;
+      }
+      void main() {
+        vec2 px = 1.0 / resolucion;
+        vec3 c = texture2D(tDiffuse, vUv).rgb;
+        // El fondo queda liso, sin tramado.
+        if (distance(c, fondo) < 0.035) { gl_FragColor = vec4(fondo, 1.0); return; }
+        // Contorno de 1 píxel en el lado oscuro de cada borde.
+        float l = luma(c);
+        float vecinos = max(max(luma(texture2D(tDiffuse, vUv + vec2(px.x, 0.0)).rgb), luma(texture2D(tDiffuse, vUv - vec2(px.x, 0.0)).rgb)),
+                            max(luma(texture2D(tDiffuse, vUv + vec2(0.0, px.y)).rgb), luma(texture2D(tDiffuse, vUv - vec2(0.0, px.y)).rgb)));
+        if (vecinos - l > contorno) c *= 0.55;
+        // Tramado ordenado y color más cercano de la paleta.
+        c += bayer4(gl_FragCoord.xy) * tramado;
+        vec3 mejor = paleta[0];
+        float dmin = 1e9;
+        for (int k = 0; k < ${PALETA.length}; k++) {
+          vec3 d = (c - paleta[k]) * vec3(0.9, 1.2, 0.8);
+          float dd = dot(d, d);
+          if (dd < dmin) { dmin = dd; mejor = paleta[k]; }
+        }
+        gl_FragColor = vec4(mejor, 1.0);
+      }
+    `
+  };
+
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const gtao = new GTAOPass(scene, camera, 1, 1);
+  gtao.updateGtaoMaterial({ radius: 0.5, distanceExponent: 1, thickness: 1, scale: 1.25, samples: 16, distanceFallOff: 1 });
+  gtao.blendIntensity = 0.9;
+  composer.addPass(gtao);
+  composer.addPass(new OutputPass());
+  const pixel = new ShaderPass(FiltroPixel);
+  composer.addPass(pixel);
+
+  const ALTURAS_PIXEL = [{ alto: 540, nombre: "S" }, { alto: 400, nombre: "M" }, { alto: 300, nombre: "L" }];
+  let tamPixel = 1;
+  function ajustar() {
+    const w = marco.clientWidth, h = marco.clientHeight;
+    if (!w || !h) return;
+    const alto = Math.min(ALTURAS_PIXEL[tamPixel].alto, h);
+    const ancho = Math.round(alto * (w / h));
+    renderer.setSize(ancho, alto, false);
+    composer.setSize(ancho, alto);
+    pixel.uniforms.resolucion.value.set(ancho, alto);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(ajustar).observe(marco);
+  ajustar();
+  const bPixel = document.getElementById("b-pixel");
+  bPixel.addEventListener("click", () => {
+    tamPixel = (tamPixel + 1) % ALTURAS_PIXEL.length;
+    bPixel.textContent = `Píxel: ${ALTURAS_PIXEL[tamPixel].nombre}`;
+    ajustar();
+  });
+
+  // ---------- Cámara: planos y recorrido ----------
+  // Un plano = cámara a `d` de distancia horizontal y `h` de altura, en el ángulo `ang`,
+  // mirando a un punto dado en polares (r, ta) y altura ty. Interpolar en polares hace que la cámara
+  // viaje por el anillo en vez de cruzar el continente en línea recta.
+  const plano = (ang, d, h, r, ta, ty) => ({ ang, d, h, r, ta, ty });
+  function mezclar(a, b, k) {
+    return {
+      ang: lerp(a.ang, b.ang, k),
+      d: Math.exp(lerp(Math.log(a.d), Math.log(b.d), k)),
+      h: Math.exp(lerp(Math.log(a.h), Math.log(b.h), k)),
+      r: lerp(a.r, b.r, k),
+      ta: lerp(a.ta, b.ta, k),
+      ty: lerp(a.ty, b.ty, k)
+    };
+  }
+  function aplicarPlano(p) {
+    const tx = Math.cos(p.ta) * p.r, tz = Math.sin(p.ta) * p.r;
+    camera.position.set(tx + Math.cos(p.ang) * p.d, p.ty + p.h, tz + Math.sin(p.ang) * p.d);
+    camera.lookAt(tx, p.ty, tz);
+  }
+  const VISTA = plano(0.95, 92, 63, 0, 0.95, 3.0);
+  const planoCiudad = (s, deriva = 0) => {
+    const c = centroSector(s);
+    return plano(c + deriva, 15, 10, R_CAMINO, c, CIUDADES[s].base + 1.1);
+  };
+  const planoAurelia = (deriva = 0) => plano(centroSector(7) + 0.45 + deriva, 13, 10, 0, centroSector(7) + 0.45 + deriva, 1.9);
+  const LLEGADA_INICIO = 11, POR_CIUDAD = 6.5, VIAJE = 1.6;
+  const claves = [
+    { t: 0, p: VISTA },
+    { t: 5, p: plano(1.2, 84, 57, 0, 1.2, 3.0) },
+    { t: 8.5, p: plano(A_LLEGADA + 0.18, 14, 8, 8.4, A_LLEGADA, 0.9) },
+    { t: 10.6, p: plano(A_LLEGADA + 0.05, 13, 7.5, 8.4, A_LLEGADA, 0.9) }
+  ];
+  CIUDADES.forEach((C, s) => {
+    const inicio = LLEGADA_INICIO + s * POR_CIUDAD;
+    claves.push({ t: inicio + VIAJE, p: planoCiudad(s, -0.12) }, { t: inicio + POR_CIUDAD, p: planoCiudad(s, 0.12) });
+  });
+  claves.push({ t: 65.2, p: planoAurelia(0) }, { t: 69, p: planoAurelia(0.3) });
+  claves.push({ t: RECORRIDO, p: { ...VISTA, ang: VISTA.ang + TAU, ta: VISTA.ta + TAU } });
+  function planoRecorrido(T) {
+    for (let i = 0; i < claves.length - 1; i++) {
+      const a = claves[i], b = claves[i + 1];
+      if (T >= a.t && T <= b.t) return mezclar(a.p, b.p, suave((T - a.t) / (b.t - a.t)));
+    }
+    return VISTA;
+  }
+
+  // Qué muestra el cartel en cada momento del recorrido
+  const DESTINOS = [...CIUDADES.map((C, s) => ({ tipo: "ciudad", s })), { tipo: "aurelia" }, { tipo: "vista" }];
+  function destinoEn(T) {
+    if (T < 6 || T >= 70.5) return "vista";
+    if (T >= 7.5 && T < LLEGADA_INICIO + 0.6) return "llegada";
+    for (let s = 0; s < 8; s++) {
+      const inicio = LLEGADA_INICIO + s * POR_CIUDAD;
+      if (T >= inicio + 1.0 && T < inicio + POR_CIUDAD - 0.2) return s;
+    }
+    if (T >= 64.5 && T < 70.5) return "aurelia";
+    return null;
+  }
+
+  // ---------- Cartel y minimapa ----------
+  const cartel = document.getElementById("cartel");
+  const cEyebrow = document.getElementById("c-eyebrow"), cNombre = document.getElementById("c-nombre"), cLinea = document.getElementById("c-linea"), cPie = document.getElementById("c-pie");
+  function barra(pct) { return `<span class="barra" aria-hidden="true">${Array.from({ length: 10 }, (_, i) => `<i class="${i < Math.round(pct / 10) ? "lleno" : ""}"></i>`).join("")}</span>`; }
+  let cartelActual;
+  function mostrarCartel(id) {
+    if (id === cartelActual) return;
+    cartelActual = id;
+    if (id === null) { cartel.classList.add("oculto"); return; }
+    cartel.classList.add("oculto");
+    setTimeout(() => {
+      if (id === "vista") {
+        cartel.style.setProperty("--acento", "#F57C00");
+        cEyebrow.textContent = "Mundo del juego";
+        cNombre.textContent = "Ambaria";
+        cLinea.textContent = "Un continente, nueve ciudades y el Ámbar.";
+        cPie.innerHTML = `<div class="stats" style="grid-column:1/-1;width:100%"><div class="stat"><b>9</b><span>Ciudades</span></div><div class="stat"><b>558</b><span>Retos</span></div><div class="stat"><b>15</b><span>Competencias</span></div></div>`;
+      } else if (id === "llegada") {
+        cartel.style.setProperty("--acento", "#F57C00");
+        cEyebrow.textContent = "La llegada";
+        cNombre.textContent = "Por mar";
+        cLinea.textContent = "Desde el Cuartel Brújula, el niño y OKI llegan a la costa de Petrea.";
+        cPie.innerHTML = "";
+      } else if (id === "aurelia") {
+        cartel.style.setProperty("--acento", "#E8B84A");
+        cEyebrow.textContent = "Ciudad 9 · Final";
+        cNombre.textContent = "Aurelia";
+        cLinea.textContent = "Centro, sellada. Se abre con las 8 llaves.";
+        cPie.innerHTML = `${barra(100)}<span class="cartel__dato">100%</span>`;
+      } else {
+        const C = CIUDADES[id];
+        cartel.style.setProperty("--acento", C.techo);
+        cEyebrow.textContent = `Ciudad ${id + 1} · Trimestre ${C.trimestre}`;
+        cNombre.textContent = C.nombre;
+        cLinea.textContent = `${C.propiedad} · ${C.zona}`;
+        cPie.innerHTML = `${barra(C.mitigacion)}<span class="cartel__dato">${C.mitigacion}% mitigación</span>${C.averiada ? '<span class="chip">Averiada</span>' : ""}`;
+      }
+      cartel.classList.remove("oculto");
+    }, 180);
+  }
+
+  const mapa = document.getElementById("mapa");
+  const puntos = [];
+  DESTINOS.slice(0, 9).forEach((d, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "punto";
+    let x = 50, y = 50, nombre = "Aurelia";
+    if (d.tipo === "ciudad") {
+      // El minimapa se ve desde el mismo lado que la vista general de la cámara.
+      const rel = centroSector(d.s) - VISTA.ang;
+      x = 50 + Math.sin(rel) * 35;
+      y = 50 + Math.cos(rel) * 35;
+      nombre = CIUDADES[d.s].nombre;
+      b.style.setProperty("--c", CIUDADES[d.s].mapa);
+    } else {
+      b.style.setProperty("--c", "#F2DFA6");
+    }
+    b.style.left = `${x}%`;
+    b.style.top = `${y}%`;
+    b.setAttribute("aria-label", `Explorar ${nombre}`);
+    b.title = nombre;
+    b.addEventListener("click", () => explorar(i));
+    mapa.appendChild(b);
+    puntos.push(b);
+  });
+  function marcarPunto(id) {
+    const i = id === "aurelia" ? 8 : typeof id === "number" ? id : -1;
+    puntos.forEach((b, j) => b.setAttribute("aria-current", String(j === i)));
+  }
+
+  // ---------- Modos: recorrido automático o exploración libre ----------
+  const bRecorrido = document.getElementById("b-recorrido");
+  const barraProgreso = document.getElementById("progreso");
+  let modo = quieto ? "explorar" : "recorrido";
+  let desfaseRecorrido = 0;           // se ajusta al volver al recorrido desde una ciudad
+  let seleccion = 0;                  // índice en DESTINOS mientras se explora
+  let ultimoPlano = VISTA;
+  let transicion = null;              // { desde, inicio, dur }
+
+  function planoDestino(i, tiempo) {
+    const d = DESTINOS[i];
+    const deriva = quieto ? 0 : 0.18 * Math.sin((TAU * tiempo) / VIDA);
+    if (d.tipo === "ciudad") return planoCiudad(d.s, deriva);
+    if (d.tipo === "aurelia") return planoAurelia(deriva);
+    return VISTA;
+  }
+  function explorar(i) {
+    seleccion = i;
+    if (modo !== "explorar") { modo = "explorar"; bRecorrido.setAttribute("aria-pressed", "false"); bRecorrido.textContent = "▶ Recorrido"; }
+    transicion = { desde: ultimoPlano, inicio: performance.now(), dur: quieto ? 0 : 1800 };
+  }
+  bRecorrido.addEventListener("click", () => {
+    if (modo === "recorrido") return;
+    const d = DESTINOS[seleccion];
+    const T = d.tipo === "ciudad" ? LLEGADA_INICIO + d.s * POR_CIUDAD + VIAJE : d.tipo === "aurelia" ? 65.2 : 0;
+    const e = (performance.now() - inicio) / 1000;
+    desfaseRecorrido = mod(e - T, RECORRIDO);
+    modo = "recorrido";
+    bRecorrido.setAttribute("aria-pressed", "true");
+    transicion = { desde: ultimoPlano, inicio: performance.now(), dur: 1200 };
+  });
+  addEventListener("keydown", (ev) => {
+    if (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft") return;
+    const actual = modo === "explorar" ? seleccion : (typeof cartelActual === "number" ? cartelActual : cartelActual === "aurelia" ? 8 : 0);
+    explorar(mod(actual + (ev.key === "ArrowRight" ? 1 : -1), 9));
+    ev.preventDefault();
+  });
+
+  // ---------- Bucle ----------
+  let inicio = performance.now();
+  let armado = false;
+  function cuadro(ahora) {
+    const e = (ahora - inicio) / 1000;
+    const eVida = quieto ? 4 : e;
+    const t = quieto ? 5 : mod(eVida, VIDA);
+    const T = mod(e - desfaseRecorrido, RECORRIDO);
+    const construyendo = !armado;
+    if (construyendo) {
+      ponerTiles(eVida);
+      for (const p of piezas) {
+        const k = clamp01((eVida - p.retraso) / 0.5);
+        p.obj.visible = k > 0;
+        p.obj.position.y = p.y - 2.5 * (1 - rebote(k));
+      }
+    }
+    const aparicion = suave(clamp01((eVida - 0.85) / 0.45));
+    for (const f of animados) f(t, aparicion, eVida, modo === "recorrido" ? T : 40);
+    if (construyendo && eVida >= 2.2) armado = true;
+
+    let objetivo = modo === "recorrido" ? planoRecorrido(T) : planoDestino(seleccion, e);
+    if (transicion) {
+      if (modo === "explorar") {
+        // Gira por el lado corto hacia el destino
+        const dAng = mod(objetivo.ang - transicion.desde.ang + Math.PI, TAU) - Math.PI;
+        const dTa = mod(objetivo.ta - transicion.desde.ta + Math.PI, TAU) - Math.PI;
+        objetivo = { ...objetivo, ang: transicion.desde.ang + dAng, ta: transicion.desde.r < 0.01 ? objetivo.ta : transicion.desde.ta + dTa };
+      }
+      const k = transicion.dur ? clamp01((ahora - transicion.inicio) / transicion.dur) : 1;
+      objetivo = mezclar(transicion.desde, objetivo, suave(k));
+      if (k >= 1) transicion = null;
+    }
+    ultimoPlano = objetivo;
+    aplicarPlano(objetivo);
+
+    const id = modo === "recorrido" ? destinoEn(T) : (DESTINOS[seleccion].tipo === "ciudad" ? DESTINOS[seleccion].s : DESTINOS[seleccion].tipo);
+    mostrarCartel(id);
+    marcarPunto(id);
+    barraProgreso.style.width = modo === "recorrido" ? `${(T / RECORRIDO) * 100}%` : "0%";
+
+    composer.render();
+    requestAnimationFrame(cuadro);
+  }
+  if (quieto) { seleccion = 9; transicion = null; }
+  requestAnimationFrame(cuadro);
+</script>
