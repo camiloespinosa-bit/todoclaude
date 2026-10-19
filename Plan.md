@@ -35,7 +35,10 @@ Bre-B es el sistema de pagos inmediatos de Colombia, del Banco de la República.
 - Cada baño dura 1 hora.
 - Caben 2 baños al mismo tiempo, es decir, 2 cupos por cada franja de 1 hora.
 - Una franja está disponible si tiene menos de 2 reservas activas (pagadas o pendientes de pago dentro del tiempo límite).
-- Pendiente: horario de atención (días y horas de apertura y cierre).
+- Horario de atención: lunes a sábado, de 8:00 a.m. a 6:00 p.m. Domingo cerrado.
+- Franjas por día: 8, 9, 10, 11 a.m., 12 m., 1, 2, 3, 4 y 5 p.m. (10 franjas; la última empieza a las 5:00 p.m. para terminar a las 6:00 p.m.).
+- Capacidad máxima: 20 baños por día y 120 por semana.
+- No se pueden reservar franjas que ya pasaron.
 
 ### Recordatorios: WhatsApp
 
@@ -47,7 +50,8 @@ Bre-B es el sistema de pagos inmediatos de Colombia, del Banco de la República.
 
 - Proveedor o banco para confirmar pagos Bre-B automáticamente (o arrancar con confirmación manual).
 - Proveedor de WhatsApp Business (Meta directo u otro).
-- Horario de atención.
+- ¿Hay hora de almuerzo u otra pausa sin baños?
+- ¿Se atiende en festivos?
 
 ## Datos (tienda)
 
