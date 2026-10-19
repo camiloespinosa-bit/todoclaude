@@ -36,8 +36,11 @@ Bre-B es el sistema de pagos inmediatos de Colombia, del Banco de la República.
 - Caben 2 baños al mismo tiempo, es decir, 2 cupos por cada franja de 1 hora.
 - Una franja está disponible si tiene menos de 2 reservas activas (pagadas o pendientes de pago dentro del tiempo límite).
 - Horario de atención: lunes a sábado, de 8:00 a.m. a 6:00 p.m. Domingo cerrado.
-- Franjas por día: 8, 9, 10, 11 a.m., 12 m., 1, 2, 3, 4 y 5 p.m. (10 franjas; la última empieza a las 5:00 p.m. para terminar a las 6:00 p.m.).
-- Capacidad máxima: 20 baños por día y 120 por semana.
+- Almuerzo de 12:00 m. a 1:00 p.m.: no hay baños en esa franja.
+- No se atiende en festivos de Colombia. Como varios festivos cambian de fecha cada año, la app mantiene una lista de festivos por año.
+- Adriana puede bloquear días o franjas desde su dashboard (vacaciones, imprevistos).
+- Franjas por día: 8, 9, 10, 11 a.m., 1, 2, 3, 4 y 5 p.m. (9 franjas; la última empieza a las 5:00 p.m. para terminar a las 6:00 p.m.).
+- Capacidad máxima: 18 baños por día y 108 por semana (menos en semanas con festivo).
 - No se pueden reservar franjas que ya pasaron.
 
 ### Recordatorios: WhatsApp
@@ -50,8 +53,6 @@ Bre-B es el sistema de pagos inmediatos de Colombia, del Banco de la República.
 
 - Proveedor o banco para confirmar pagos Bre-B automáticamente (o arrancar con confirmación manual).
 - Proveedor de WhatsApp Business (Meta directo u otro).
-- ¿Hay hora de almuerzo u otra pausa sin baños?
-- ¿Se atiende en festivos?
 
 ## Datos (tienda)
 
