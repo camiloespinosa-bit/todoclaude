@@ -13,9 +13,31 @@ Wag & Wash es una tienda para bañar mascotas. Los clientes reservan y pagan el 
 Al crear una reserva, el backend:
 
 1. Chequea que haya disponibilidad.
-2. Toma el pago de $50.000 (50K).
+2. Toma el pago de $50.000 (50K) con **Bre-B**.
 3. Guarda la reserva.
-4. Envía un texto (SMS) de recordación.
+4. Envía un recordatorio por **WhatsApp**.
+
+## Integraciones
+
+### Pagos: Bre-B
+
+Bre-B es el sistema de pagos inmediatos de Colombia, del Banco de la República. El cliente paga en segundos desde su banco o billetera usando la llave Bre-B del negocio.
+
+- La app no se conecta directo al Banco de la República. Se integra a través de un banco o proveedor de pagos que ofrezca una API de cobros Bre-B. Falta elegir cuál.
+- Flujo: la app genera el cobro de $50.000, el cliente paga, el proveedor avisa a la app (webhook) y solo entonces la reserva queda confirmada.
+- Si el pago no llega en un tiempo límite (por ejemplo 15 minutos), el cupo se libera.
+
+### Recordatorios: WhatsApp
+
+- Se envían con la API oficial de WhatsApp Business (Meta), directo o mediante un proveedor.
+- Los mensajes que inicia el negocio deben usar plantillas aprobadas por Meta y el cliente debe haber aceptado recibirlos (casilla de autorización en la página de reserva).
+- Mensajes sugeridos: confirmación al pagar y recordatorio el día anterior a la cita.
+
+## Pendientes por decidir
+
+- Proveedor o banco para cobrar con Bre-B.
+- Proveedor de WhatsApp Business (Meta directo u otro).
+- Capacidad: cuántos baños por hora y duración de cada uno.
 
 ## Datos (tienda)
 
