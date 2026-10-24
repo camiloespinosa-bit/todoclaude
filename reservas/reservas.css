@@ -1,0 +1,186 @@
+/* =========================================================
+   Reservas — El Gimnasio del Cerebro
+   Usa los tokens de ../assets/css/style.css
+   ========================================================= */
+
+body.reservas { background: var(--fondo-claro); }
+
+/* ---------- Pantalla de inicio ---------- */
+.inicio {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: var(--blanco);
+  transition: opacity 420ms var(--ease-out), visibility 420ms;
+}
+.inicio[data-saliendo] { opacity: 0; visibility: hidden; }
+
+.inicio__aro {
+  position: relative;
+  width: 196px;
+  height: 196px;
+  animation: aro-entrada 700ms var(--ease-out) both;
+}
+
+/* El aro: un degradado cónico con los colores de marca que gira detrás del disco.
+   Una copia desenfocada debajo hace de resplandor que "respira". */
+.inicio__brillo,
+.inicio__brillo::after {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--azul), var(--turquesa), var(--verde), var(--amarillo), var(--naranja), var(--azul));
+}
+.inicio__brillo { animation: aro-giro 2.4s linear infinite; }
+.inicio__brillo::after {
+  content: "";
+  filter: blur(18px);
+  animation: aro-respira 1.6s ease-in-out infinite alternate;
+}
+
+.inicio__disco {
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: var(--blanco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.inicio__disco img { width: 78%; height: auto; }
+
+.inicio__nombre {
+  margin: 0;
+  font-weight: 800;
+  color: var(--azul-oscuro);
+  letter-spacing: 0.01em;
+  animation: aparecer 600ms 200ms var(--ease-out) both;
+}
+
+.inicio__barra {
+  width: 140px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--borde);
+  overflow: hidden;
+}
+.inicio__barra span {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--azul);
+  animation: barra-carga 1.1s var(--ease-in-out) infinite;
+}
+
+@keyframes aro-giro { to { transform: rotate(360deg); } }
+@keyframes aro-respira { from { opacity: 0.35; transform: scale(0.96); } to { opacity: 0.9; transform: scale(1.06); } }
+@keyframes aro-entrada { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+@keyframes aparecer { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes barra-carga { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+/* ---------- Formulario ---------- */
+.reserva { max-width: 760px; padding-top: 28px; padding-bottom: 64px; }
+
+.aviso-prototipo {
+  background: var(--tint-naranja);
+  color: var(--naranja-profundo);
+  border-radius: var(--radio-sm);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.paso {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 22px;
+  margin-top: 18px;
+}
+.paso h2 { font-size: 1.15rem; margin: 0 0 16px; display: flex; align-items: center; gap: 10px; color: var(--azul-oscuro); }
+.paso__num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--azul); color: var(--blanco);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; flex-shrink: 0;
+}
+
+.opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.opciones--dos { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 560px) { .opciones { grid-template-columns: 1fr; } }
+
+.opcion, .dia, .hora {
+  font-family: var(--fuente);
+  border: 2px solid var(--borde);
+  background: var(--blanco);
+  border-radius: var(--radio-sm);
+  cursor: pointer;
+  color: var(--texto);
+  transition: border-color 140ms ease, background 140ms ease, transform 140ms var(--ease-out);
+}
+.opcion:active, .dia:active, .hora:active { transform: scale(0.97); }
+.opcion:focus-visible, .dia:focus-visible, .hora:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+.opcion[aria-checked="true"], .dia[aria-checked="true"], .hora[aria-checked="true"] { border-color: var(--azul); background: var(--tint-azul); }
+
+.opcion { position: relative; padding: 16px; text-align: left; display: flex; flex-direction: column; gap: 2px; }
+.opcion strong { font-size: 1rem; }
+.opcion span { font-size: 0.88rem; color: var(--texto-suave); }
+
+.etiqueta { position: absolute; top: 10px; right: 10px; font-style: normal; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.etiqueta--verde { background: var(--tint-verde); color: var(--verde-profundo); }
+
+.dias { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x proximity; }
+.dia { flex: 0 0 64px; padding: 10px 4px; text-align: center; scroll-snap-align: start; }
+.dia span { display: block; }
+.dia .dia-semana { font-size: 0.75rem; color: var(--texto-suave); text-transform: capitalize; }
+.dia .dia-num { font-size: 1.25rem; font-weight: 800; }
+.dia .dia-mes { font-size: 0.72rem; color: var(--texto-suave); text-transform: capitalize; }
+.dia:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.horas { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-top: 14px; }
+.hora { padding: 10px 6px; font-weight: 600; font-size: 0.92rem; }
+.horas__vacio { grid-column: 1 / -1; color: var(--texto-suave); margin: 0; }
+
+.campos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 560px) { .campos { grid-template-columns: 1fr; } }
+.campos label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.9rem; }
+.campos input, .campos select {
+  font: inherit; font-weight: 400;
+  padding: 11px 12px;
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-sm);
+  background: var(--blanco);
+}
+.campos input:focus, .campos select:focus { outline: none; border-color: var(--azul); }
+.casilla { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; font-size: 0.9rem; }
+
+.resumen {
+  position: sticky;
+  bottom: 12px;
+  margin-top: 18px;
+  background: var(--tint-oscuro);
+  color: var(--blanco);
+  border-radius: var(--radio);
+  padding: 16px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--sombra-lg);
+}
+.resumen p { margin: 0; font-weight: 600; color: var(--blanco); }
+.resumen .mensaje { flex-basis: 100%; order: 3; color: #FFD8A8; font-size: 0.9rem; }
+.resumen .mensaje:empty { display: none; }
+
+.listo { text-align: center; background: var(--blanco); border-radius: var(--radio); box-shadow: var(--sombra); padding: 32px 22px; margin-top: 18px; }
+.listo img { display: block; margin: 0 auto 8px; }
+.listo h2 { color: var(--azul-oscuro); }
+.listo .boton { margin: 6px; }

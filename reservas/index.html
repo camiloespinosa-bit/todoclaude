@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reserva tu clase | CCA — El Gimnasio del Cerebro</title>
+  <meta name="description" content="Reserva tu clase en El Gimnasio del Cerebro: clase de prueba gratuita de 30 minutos, clase de 1 hora o bloque de 2 horas, presencial en Rionegro o virtual." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="reservas.css" />
+</head>
+<body class="reservas">
+
+  <!-- Pantalla de inicio: Oki dentro de un aro de marca que gira y se ilumina,
+       con una barra de carga fina debajo (al estilo de la apertura de LinkedIn). -->
+  <div class="inicio" data-inicio aria-hidden="true">
+    <div class="inicio__aro">
+      <div class="inicio__brillo"></div>
+      <div class="inicio__disco">
+        <img src="../assets/img/oki/oki-base-saludo.svg" alt="" width="140" height="140" />
+      </div>
+    </div>
+    <p class="inicio__nombre">El Gimnasio del Cerebro</p>
+    <div class="inicio__barra"><span></span></div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor encabezado__barra">
+      <a class="marca" href="../index.html">
+        <span class="marca__insignia" aria-hidden="true">CCA</span>
+        <span>
+          El Gimnasio del Cerebro
+          <small>Reserva tu clase</small>
+        </span>
+      </a>
+    </div>
+  </header>
+
+  <main id="contenido" class="contenedor reserva">
+    <p class="aviso-prototipo">Prototipo: los horarios son de ejemplo y la reserva todavía no se guarda.</p>
+
+    <form id="form-reserva" novalidate>
+      <section class="paso">
+        <h2><span class="paso__num">1</span> ¿Qué quieres reservar?</h2>
+        <div class="opciones" role="radiogroup" aria-label="Tipo de clase" data-grupo="tipo">
+          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="prueba">
+            <strong>Clase de prueba</strong>
+            <span>30 minutos</span>
+            <em class="etiqueta etiqueta--verde">Gratis</em>
+          </button>
+          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="clase">
+            <strong>Clase</strong>
+            <span>1 hora</span>
+          </button>
+          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="bloque">
+            <strong>Bloque</strong>
+            <span>2 horas</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="paso">
+        <h2><span class="paso__num">2</span> ¿Cómo la quieres tomar?</h2>
+        <div class="opciones opciones--dos" role="radiogroup" aria-label="Modalidad" data-grupo="modalidad">
+          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="presencial">
+            <strong>Presencial</strong>
+            <span>En la sede de Rionegro</span>
+          </button>
+          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="virtual">
+            <strong>Virtual</strong>
+            <span>Por videollamada</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="paso">
+        <h2><span class="paso__num">3</span> Elige día y hora</h2>
+        <div class="dias" id="dias" role="radiogroup" aria-label="Día"></div>
+        <div class="horas" id="horas" role="radiogroup" aria-label="Hora" aria-live="polite"></div>
+      </section>
+
+      <section class="paso">
+        <h2><span class="paso__num">4</span> Tus datos</h2>
+        <div class="campos">
+          <label>Nombre completo
+            <input name="nombre" autocomplete="name" required minlength="2" maxlength="100" />
+          </label>
+          <label>WhatsApp
+            <input name="telefono" type="tel" autocomplete="tel" inputmode="tel" required placeholder="301 234 5678" />
+          </label>
+          <label>Correo (para la invitación de calendario)
+            <input name="correo" type="email" autocomplete="email" required />
+          </label>
+          <label>Programa
+            <select name="programa" required>
+              <option value="">Elige uno</option>
+              <option>Fase Experta (inglés para adultos)</option>
+              <option>Programa infantil (0 a 15 años)</option>
+              <option>Adulto Vital (65+)</option>
+            </select>
+          </label>
+        </div>
+        <label class="casilla">
+          <input type="checkbox" name="whatsapp" />
+          Acepto recibir la confirmación y recordatorios por WhatsApp.
+        </label>
+      </section>
+
+      <div class="resumen">
+        <p id="seleccion">Elige tipo de clase, modalidad, día y hora.</p>
+        <p class="mensaje" id="mensaje" role="alert"></p>
+        <button class="boton boton--primario" id="btn-reservar" type="submit">Reservar</button>
+      </div>
+    </form>
+
+    <section class="listo" id="listo" hidden>
+      <img src="../assets/img/oki/oki-celebrando.svg" alt="" width="160" height="160" />
+      <h2>¡Tu clase quedó reservada!</h2>
+      <p id="listo-detalle"></p>
+      <a class="boton boton--primario" id="btn-calendario" target="_blank" rel="noopener">Agregar a Google Calendar</a>
+      <button class="boton boton--fantasma" id="btn-otra" type="button">Reservar otra clase</button>
+    </section>
+  </main>
+
+  <script src="reservas.js"></script>
+</body>
+</html>
