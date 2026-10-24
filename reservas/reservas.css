@@ -22,38 +22,24 @@ body.reservas { background: var(--fondo-claro); }
 
 .inicio__aro {
   position: relative;
-  width: 196px;
-  height: 196px;
-  animation: aro-entrada 700ms var(--ease-out) both;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  animation: aro-entrada 700ms var(--ease-out) both, aro-resplandor 1.8s ease-in-out 700ms infinite alternate;
 }
+.inicio__aro img { display: block; width: 100%; height: 100%; }
 
-/* El aro: un degradado cónico con los colores de marca que gira detrás del disco.
-   Una copia desenfocada debajo hace de resplandor que "respira". */
-.inicio__brillo,
-.inicio__brillo::after {
+/* Destello de luz que recorre el aro azul. La máscara lo limita a la banda del aro
+   (el disco claro empieza en el 75,7 % del radio). */
+.inicio__brillo {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--azul), var(--turquesa), var(--verde), var(--amarillo), var(--naranja), var(--azul));
+  background: conic-gradient(from 0deg, transparent 0 62%, rgba(87, 166, 181, 0.55) 80%, rgba(255, 255, 255, 0.95) 90%, transparent 97%);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 75.5%, #000 76.5%);
+          mask: radial-gradient(circle closest-side, transparent 75.5%, #000 76.5%);
+  animation: aro-giro 1.6s linear infinite;
 }
-.inicio__brillo { animation: aro-giro 2.4s linear infinite; }
-.inicio__brillo::after {
-  content: "";
-  filter: blur(18px);
-  animation: aro-respira 1.6s ease-in-out infinite alternate;
-}
-
-.inicio__disco {
-  position: absolute;
-  inset: 9px;
-  border-radius: 50%;
-  background: var(--blanco);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.inicio__disco img { width: 78%; height: auto; }
 
 .inicio__nombre {
   margin: 0;
@@ -80,10 +66,12 @@ body.reservas { background: var(--fondo-claro); }
 }
 
 @keyframes aro-giro { to { transform: rotate(360deg); } }
-@keyframes aro-respira { from { opacity: 0.35; transform: scale(0.96); } to { opacity: 0.9; transform: scale(1.06); } }
+@keyframes aro-resplandor { from { box-shadow: 0 0 0 0 rgba(87, 166, 181, 0); } to { box-shadow: 0 0 36px 6px rgba(87, 166, 181, 0.45); } }
 @keyframes aro-entrada { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
 @keyframes aparecer { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes barra-carga { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+.marca__logo { width: 42px; height: 42px; flex-shrink: 0; }
 
 /* ---------- Formulario ---------- */
 .reserva { max-width: 760px; padding-top: 28px; padding-bottom: 64px; }
@@ -146,6 +134,7 @@ body.reservas { background: var(--fondo-claro); }
 
 .horas { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-top: 14px; }
 .hora { padding: 10px 6px; font-weight: 600; font-size: 0.92rem; }
+.hora small { display: block; font-weight: 400; font-size: 0.72rem; color: var(--texto-suave); }
 .horas__vacio { grid-column: 1 / -1; color: var(--texto-suave); margin: 0; }
 
 .campos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }

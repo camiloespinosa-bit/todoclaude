@@ -10,16 +10,17 @@ const TIPOS = {
 };
 
 // Franjas de atención por día de la semana (0 = domingo). Minutos desde medianoche.
-// EJEMPLO: lunes a viernes 8 a.m.–12 m. y 2–8 p.m.; sábado 8 a.m.–12 m.; domingo cerrado.
+// Lunes 8–1; martes y jueves 8–12 y 1–4; miércoles 8–12 y 1–7; viernes 8–12; sábado 8–12 y 1–5.
 const HORARIO = {
-  1: [[480, 720], [840, 1200]],
-  2: [[480, 720], [840, 1200]],
-  3: [[480, 720], [840, 1200]],
-  4: [[480, 720], [840, 1200]],
-  5: [[480, 720], [840, 1200]],
-  6: [[480, 720]],
+  1: [[480, 780]],
+  2: [[480, 720], [780, 960]],
+  3: [[480, 720], [780, 1140]],
+  4: [[480, 720], [780, 960]],
+  5: [[480, 720]],
+  6: [[480, 720], [780, 1020]],
 };
 
+const CUPO_MAXIMO = 5; // estudiantes al mismo tiempo
 const PASO_MINUTOS = 30; // cada cuánto puede empezar una clase
 const DIAS_A_MOSTRAR = 21;
 const ZONA = "America/Bogota";
@@ -55,17 +56,18 @@ function textoHora(minutos) {
 }
 
 // ---------- Disponibilidad de ejemplo ----------
-// Marca de forma fija (siempre igual para la misma fecha) algunos tramos de 30 min como ocupados.
+// Cuántos estudiantes hay ya en cada tramo de 30 min. De ejemplo: fijo para la misma fecha.
 function cuposOcupados(fecha) {
-  const ocupados = new Set();
+  const ocupados = new Map();
   let semilla = [...fecha].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) >>> 0;
   for (let m = 480; m < 1200; m += PASO_MINUTOS) {
     semilla = (semilla * 1103515245 + 12345) >>> 0;
-    if (semilla % 5 === 0) ocupados.add(m);
+    ocupados.set(m, semilla % 7 === 0 ? CUPO_MAXIMO : (semilla >>> 8) % 4);
   }
   return ocupados;
 }
 
+// Devuelve las horas de inicio donde cabe la clase completa, con los cupos que quedan.
 function horasDisponibles(fecha, minutosClase) {
   const franjas = HORARIO[diaSemana(fecha)] ?? [];
   const ocupados = cuposOcupados(fecha);
@@ -74,9 +76,9 @@ function horasDisponibles(fecha, minutosClase) {
   for (const [inicio, fin] of franjas) {
     for (let m = inicio; m + minutosClase <= fin; m += PASO_MINUTOS) {
       if (fecha === ahora.fecha && m <= ahora.minutos) continue;
-      let cabe = true;
-      for (let t = m; t < m + minutosClase; t += PASO_MINUTOS) if (ocupados.has(t)) cabe = false;
-      if (cabe) libres.push(m);
+      let quedan = CUPO_MAXIMO;
+      for (let t = m; t < m + minutosClase; t += PASO_MINUTOS) quedan = Math.min(quedan, CUPO_MAXIMO - (ocupados.get(t) ?? 0));
+      if (quedan > 0) libres.push({ minutos: m, quedan });
     }
   }
   return libres;
@@ -169,13 +171,13 @@ function pintarHoras() {
     contHoras.innerHTML = `<p class="horas__vacio">No quedan horas libres ese día para esta duración. Prueba otro día.</p>`;
     return;
   }
-  for (const m of libres) {
+  for (const { minutos: m, quedan } of libres) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "hora";
     btn.setAttribute("role", "radio");
     btn.setAttribute("aria-checked", "false");
-    btn.textContent = textoHora(m);
+    btn.innerHTML = `${textoHora(m)}<small>${quedan === 1 ? "Queda 1 cupo" : `Quedan ${quedan} cupos`}</small>`;
     btn.addEventListener("click", () => {
       estado.hora = m;
       marcar(contHoras, btn);
@@ -195,7 +197,7 @@ function enlaceCalendario(datos) {
     dates: `${aTexto(estado.hora)}/${aTexto(estado.hora + tipo.minutos)}`,
     ctz: ZONA,
     details: `${datos.programa}. Modalidad: ${estado.modalidad}.`,
-    location: estado.modalidad === "presencial" ? "Rionegro, Antioquia" : "Virtual (te enviamos el enlace)",
+    location: estado.modalidad === "presencial" ? "Rionegro, Antioquia" : "Google Meet",
   });
   return `https://calendar.google.com/calendar/render?${params}`;
 }
