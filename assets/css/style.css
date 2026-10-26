@@ -1,5 +1,12 @@
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/poppins-400.woff') format('woff')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/poppins-500.woff') format('woff')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/poppins-600.woff') format('woff')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url('../fonts/poppins-700.woff') format('woff')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:800;font-display:swap;src:url('../fonts/poppins-800.woff') format('woff')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:900;font-display:swap;src:url('../fonts/poppins-900.woff') format('woff')}
+@font-face{font-family:'Poppins';font-style:italic;font-weight:400;font-display:swap;src:url('../fonts/poppins-400i.woff') format('woff')}
 /* =========================================================
-   CCA — El Gimnasio del Cerebro
+   Gimnasio del Cerebro
    Hoja de estilos compartida (ver skill cca-marca para tokens)
    ========================================================= */
 
@@ -468,8 +475,3 @@ ul { padding-left: 1.2em; }
   padding: 10px 16px; border-radius: 8px; z-index: 100; transition: top 0.15s ease;
 }
 .skip-link:focus { top: 12px; }
-
-/* ---------- Texto legal (política de privacidad) ---------- */
-.texto-legal h2 { font-size: 1.2rem; margin: 32px 0 10px; color: var(--azul-oscuro); }
-.texto-legal li { margin-bottom: 6px; }
-.pendiente { background: var(--amarillo); color: var(--texto); padding: 0 4px; border-radius: 4px; font-weight: 700; }
