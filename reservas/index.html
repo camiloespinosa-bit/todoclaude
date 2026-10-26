@@ -42,20 +42,23 @@
     <form id="form-reserva" novalidate>
       <section class="paso">
         <h2><span class="paso__num">1</span> ¿Qué quieres reservar?</h2>
-        <div class="opciones" role="radiogroup" aria-label="Tipo de clase" data-grupo="tipo">
-          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="prueba">
-            <strong>Clase de prueba</strong>
-            <span>30 minutos</span>
+        <div role="radiogroup" aria-label="Tipo de clase" data-grupo="tipo">
+          <button type="button" class="opcion opcion--prueba" role="radio" aria-checked="false" data-valor="prueba">
             <em class="etiqueta etiqueta--verde">Gratis</em>
+            <strong>¿Es tu primera vez? Clase de prueba</strong>
+            <span>30 minutos, 1 a 1 con el docente. Conoce el método sin compromiso.</span>
           </button>
-          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="clase">
-            <strong>Clase</strong>
-            <span>1 hora</span>
-          </button>
-          <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="bloque">
-            <strong>Bloque</strong>
-            <span>2 horas</span>
-          </button>
+          <p class="opciones__titulo">Ya soy estudiante</p>
+          <div class="opciones opciones--dos">
+            <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="clase">
+              <strong>Clase</strong>
+              <span>1 hora, en grupo</span>
+            </button>
+            <button type="button" class="opcion" role="radio" aria-checked="false" data-valor="bloque">
+              <strong>Bloque</strong>
+              <span>2 horas seguidas, en grupo</span>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -115,7 +118,7 @@
 
     <section class="listo" id="listo" hidden>
       <img src="../assets/img/oki/oki-celebrando.svg" alt="" width="160" height="160" />
-      <h2>¡Tu clase quedó reservada!</h2>
+      <h2 id="listo-titulo">¡Tu clase quedó reservada!</h2>
       <p id="listo-detalle"></p>
       <a class="boton boton--primario" id="btn-calendario" target="_blank" rel="noopener">Agregar a Google Calendar</a>
       <button class="boton boton--fantasma" id="btn-otra" type="button">Reservar otra clase</button>

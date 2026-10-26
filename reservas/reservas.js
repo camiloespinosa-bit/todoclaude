@@ -1,10 +1,10 @@
 // Reservas — El Gimnasio del Cerebro (prototipo sin backend).
 // Los horarios y los cupos ocupados son de ejemplo. Cuando se conecte la base de datos,
-// `cuposOcupados` se reemplaza por la consulta real y `reservar` por la función que guarda.
+// `agendaDelDia` se reemplaza por la consulta real y `reservar` por la función que guarda.
 
 // ---------- Configuración (ajustar con el horario real) ----------
 const TIPOS = {
-  prueba: { nombre: "Clase de prueba", minutos: 30 },
+  prueba: { nombre: "Clase de prueba gratis", minutos: 30 },
   clase: { nombre: "Clase", minutos: 60 },
   bloque: { nombre: "Bloque", minutos: 120 },
 };
@@ -21,7 +21,6 @@ const HORARIO = {
 };
 
 const CUPO_MAXIMO = 5; // estudiantes al mismo tiempo
-const PASO_MINUTOS = 30; // cada cuánto puede empezar una clase
 const DIAS_A_MOSTRAR = 21;
 const ZONA = "America/Bogota";
 
@@ -55,33 +54,65 @@ function textoHora(minutos) {
   return `${h12}:${String(m).padStart(2, "0")} ${sufijo}`;
 }
 
-// ---------- Disponibilidad de ejemplo ----------
-// Cuántos estudiantes hay ya en cada tramo de 30 min. De ejemplo: fijo para la misma fecha.
-function cuposOcupados(fecha) {
-  const ocupados = new Map();
+// ---------- Agenda de ejemplo ----------
+// Como hay un solo docente, las clases son grupos que empiezan en punto (8:00, 9:00...):
+// todos los que reservan esa hora entran al mismo grupo. El primero que reserva define si
+// el grupo es presencial o virtual. Las clases de prueba son 1 a 1, de 30 minutos, y solo
+// van en horas sin grupo. Datos de ejemplo, fijos para la misma fecha.
+function agendaDelDia(fecha) {
+  const grupos = new Map(); // hora en punto -> { modalidad, inscritos }
+  const pruebas = new Set(); // inicio de cada clase de prueba ya reservada
   let semilla = [...fecha].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) >>> 0;
-  for (let m = 480; m < 1200; m += PASO_MINUTOS) {
+  for (let h = 480; h < 1200; h += 60) {
     semilla = (semilla * 1103515245 + 12345) >>> 0;
-    ocupados.set(m, semilla % 7 === 0 ? CUPO_MAXIMO : (semilla >>> 8) % 4);
+    const dado = semilla % 20;
+    if (dado < 6) grupos.set(h, { modalidad: dado % 2 ? "virtual" : "presencial", inscritos: 1 + ((semilla >>> 8) % 5) });
+    else if (dado < 8) pruebas.add(h + (dado % 2) * 30);
   }
-  return ocupados;
+  return { grupos, pruebas };
 }
 
-// Devuelve las horas de inicio donde cabe la clase completa, con los cupos que quedan.
-function horasDisponibles(fecha, minutosClase) {
+const NOMBRE_MODALIDAD = { presencial: "presencial", virtual: "virtual" };
+
+// Devuelve las horas de inicio para el tipo y la modalidad elegidos.
+// Cada opción: { minutos, disponible, detalle }.
+function horasDisponibles(fecha, tipo, modalidad) {
   const franjas = HORARIO[diaSemana(fecha)] ?? [];
-  const ocupados = cuposOcupados(fecha);
+  const { grupos, pruebas } = agendaDelDia(fecha);
   const ahora = hoyEnBogota();
-  const libres = [];
+  const minutosClase = TIPOS[tipo].minutos;
+  const opciones = [];
+
   for (const [inicio, fin] of franjas) {
-    for (let m = inicio; m + minutosClase <= fin; m += PASO_MINUTOS) {
+    const paso = tipo === "prueba" ? 30 : 60;
+    for (let m = inicio; m + minutosClase <= fin; m += paso) {
       if (fecha === ahora.fecha && m <= ahora.minutos) continue;
+
+      if (tipo === "prueba") {
+        const hora = m - (m % 60);
+        if (!grupos.has(hora) && !pruebas.has(m)) opciones.push({ minutos: m, disponible: true, detalle: "Disponible" });
+        continue;
+      }
+
       let quedan = CUPO_MAXIMO;
-      for (let t = m; t < m + minutosClase; t += PASO_MINUTOS) quedan = Math.min(quedan, CUPO_MAXIMO - (ocupados.get(t) ?? 0));
-      if (quedan > 0) libres.push({ minutos: m, quedan });
+      let hayGrupo = false;
+      let bloqueo = null;
+      for (let h = m; h < m + minutosClase; h += 60) {
+        if (pruebas.has(h) || pruebas.has(h + 30)) { bloqueo = "oculta"; break; }
+        const g = grupos.get(h);
+        if (!g) continue;
+        hayGrupo = true;
+        if (g.modalidad !== modalidad) { bloqueo = `Grupo ${NOMBRE_MODALIDAD[g.modalidad]}`; break; }
+        if (g.inscritos >= CUPO_MAXIMO) { bloqueo = "Lleno"; break; }
+        quedan = Math.min(quedan, CUPO_MAXIMO - g.inscritos);
+      }
+      if (bloqueo === "oculta") continue;
+      if (bloqueo) { opciones.push({ minutos: m, disponible: false, detalle: bloqueo }); continue; }
+      const cupos = quedan === 1 ? "queda 1 cupo" : `quedan ${quedan} cupos`;
+      opciones.push({ minutos: m, disponible: true, detalle: hayGrupo ? `Grupo ${NOMBRE_MODALIDAD[modalidad]}, ${cupos}` : `Grupo nuevo, ${cupos}` });
     }
   }
-  return libres;
+  return opciones;
 }
 
 // ---------- Pantalla de inicio ----------
@@ -129,7 +160,7 @@ for (const grupo of document.querySelectorAll("[data-grupo]")) {
     if (!boton) return;
     estado[grupo.dataset.grupo] = boton.dataset.valor;
     marcar(grupo, boton);
-    if (grupo.dataset.grupo === "tipo") pintarHoras();
+    pintarHoras();
     actualizarResumen();
   });
 }
@@ -162,22 +193,25 @@ function pintarDias() {
 function pintarHoras() {
   estado.hora = null;
   contHoras.replaceChildren();
-  if (!estado.fecha || !estado.tipo) {
-    contHoras.innerHTML = `<p class="horas__vacio">${!estado.tipo ? "Primero elige el tipo de clase." : "Elige un día para ver las horas libres."}</p>`;
+  const falta = !estado.tipo || !estado.modalidad ? "Primero elige el tipo de clase y la modalidad."
+    : !estado.fecha ? "Elige un día para ver las horas libres." : null;
+  if (falta) {
+    contHoras.innerHTML = `<p class="horas__vacio">${falta}</p>`;
     return;
   }
-  const libres = horasDisponibles(estado.fecha, TIPOS[estado.tipo].minutos);
-  if (!libres.length) {
-    contHoras.innerHTML = `<p class="horas__vacio">No quedan horas libres ese día para esta duración. Prueba otro día.</p>`;
+  const opciones = horasDisponibles(estado.fecha, estado.tipo, estado.modalidad);
+  if (!opciones.some((o) => o.disponible)) {
+    contHoras.innerHTML = `<p class="horas__vacio">No quedan horas libres ese día para esta opción. Prueba otro día.</p>`;
     return;
   }
-  for (const { minutos: m, quedan } of libres) {
+  for (const { minutos: m, disponible, detalle } of opciones) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "hora";
     btn.setAttribute("role", "radio");
     btn.setAttribute("aria-checked", "false");
-    btn.innerHTML = `${textoHora(m)}<small>${quedan === 1 ? "Queda 1 cupo" : `Quedan ${quedan} cupos`}</small>`;
+    btn.disabled = !disponible;
+    btn.innerHTML = `${textoHora(m)}<small>${detalle}</small>`;
     btn.addEventListener("click", () => {
       estado.hora = m;
       marcar(contHoras, btn);
@@ -215,6 +249,7 @@ form.addEventListener("submit", (e) => {
     return;
   }
   const datos = Object.fromEntries(new FormData(form));
+  document.getElementById("listo-titulo").textContent = estado.tipo === "prueba" ? "¡Tu clase de prueba gratis quedó reservada!" : "¡Tu clase quedó reservada!";
   document.getElementById("listo-detalle").textContent = `${seleccion.textContent.replace(/\.$/, "")}. ${datos.nombre.trim()}, te escribiremos al WhatsApp ${datos.telefono}.`;
   document.getElementById("btn-calendario").href = enlaceCalendario(datos);
   form.hidden = true;

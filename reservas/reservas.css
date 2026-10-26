@@ -121,8 +121,18 @@ body.reservas { background: var(--fondo-claro); }
 .opcion strong { font-size: 1rem; }
 .opcion span { font-size: 0.88rem; color: var(--texto-suave); }
 
+.opcion--prueba {
+  width: 100%;
+  padding: 18px 18px 18px 18px;
+  border-color: var(--verde);
+  background: var(--tint-verde);
+}
+.opcion--prueba strong { font-size: 1.05rem; padding-right: 64px; }
+.opcion--prueba[aria-checked="true"] { border-color: var(--verde-profundo); background: var(--tint-verde); box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.25); }
+.opciones__titulo { margin: 18px 0 8px; font-weight: 700; font-size: 0.85rem; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.04em; }
+
 .etiqueta { position: absolute; top: 10px; right: 10px; font-style: normal; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
-.etiqueta--verde { background: var(--tint-verde); color: var(--verde-profundo); }
+.etiqueta--verde { background: var(--verde); color: var(--blanco); }
 
 .dias { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x proximity; }
 .dia { flex: 0 0 64px; padding: 10px 4px; text-align: center; scroll-snap-align: start; }
@@ -134,6 +144,7 @@ body.reservas { background: var(--fondo-claro); }
 
 .horas { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-top: 14px; }
 .hora { padding: 10px 6px; font-weight: 600; font-size: 0.92rem; }
+.hora:disabled { opacity: 0.45; cursor: not-allowed; background: var(--fondo-claro); }
 .hora small { display: block; font-weight: 400; font-size: 0.72rem; color: var(--texto-suave); }
 .horas__vacio { grid-column: 1 / -1; color: var(--texto-suave); margin: 0; }
 
