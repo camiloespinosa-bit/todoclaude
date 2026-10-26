@@ -329,7 +329,7 @@ form.addEventListener("submit", async (e) => {
     return;
   }
   if (!form.checkValidity()) {
-    mensaje.textContent = "Revisa tus datos: nombre, WhatsApp, correo y programa son obligatorios.";
+    mensaje.textContent = "Revisa tus datos: nombre, WhatsApp, correo, programa y la autorización de datos son obligatorios.";
     form.reportValidity();
     return;
   }
