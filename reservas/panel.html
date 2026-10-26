@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel del docente | El Gimnasio del Cerebro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="reservas.css" />
+  <link rel="stylesheet" href="panel.css" />
+</head>
+<body class="reservas">
+  <header class="encabezado">
+    <div class="contenedor encabezado__barra">
+      <a class="marca" href="./">
+        <img class="marca__logo" src="../assets/img/logo/logo-aro-oki.svg" alt="" width="42" height="42" />
+        <span>
+          El Gimnasio del Cerebro
+          <small>Panel del docente</small>
+        </span>
+      </a>
+      <button class="boton boton--fantasma panel-salir" id="btn-salir" type="button" hidden>Salir</button>
+    </div>
+  </header>
+
+  <main id="contenido" class="contenedor reserva">
+    <section class="paso panel-entrar" id="entrar" hidden>
+      <h2>Entrar al panel</h2>
+      <form id="form-entrar" class="campos campos--uno">
+        <label>Correo
+          <input name="correo" type="email" autocomplete="username" required />
+        </label>
+        <label>Contraseña
+          <input name="clave" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="boton boton--primario" type="submit">Entrar</button>
+        <p class="panel-mensaje" id="mensaje-entrar" role="alert"></p>
+      </form>
+    </section>
+
+    <section id="agenda" hidden>
+      <div class="panel-fecha">
+        <label>Ir a la fecha
+          <input type="date" id="ir-a-fecha" />
+        </label>
+        <p class="panel-resumen" id="resumen" aria-live="polite"></p>
+      </div>
+      <div class="dias" id="dias-panel" role="radiogroup" aria-label="Día"></div>
+      <p class="panel-mensaje" id="mensaje-panel" role="status" aria-live="polite"></p>
+      <h2 class="panel-dia" id="titulo-dia"></h2>
+      <div id="sesiones"></div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="panel.js"></script>
+</body>
+</html>
