@@ -1,6 +1,9 @@
-// Reservas — El Gimnasio del Cerebro (prototipo sin backend).
-// Los horarios y los cupos ocupados son de ejemplo. Cuando se conecte la base de datos,
-// `agendaDelDia` se reemplaza por la consulta real y `reservar` por la función que guarda.
+// Reservas — El Gimnasio del Cerebro.
+// Con los datos de Supabase en config.js la página lee la agenda real y guarda las reservas
+// (que llegan a Google Calendar). Sin esos datos funciona como prototipo con datos de ejemplo.
+
+const CONFIG = window.CONFIG_RESERVAS ?? {};
+const CONECTADO = Boolean(CONFIG.supabaseUrl && CONFIG.supabaseAnonKey);
 
 // ---------- Configuración (ajustar con el horario real) ----------
 const TIPOS = {
@@ -9,7 +12,8 @@ const TIPOS = {
   bloque: { nombre: "Bloque", minutos: 120 },
 };
 
-// Franjas de atención por día de la semana (0 = domingo). Minutos desde medianoche.
+// Franjas de atención por día de la semana (0 = domingo), solo para el modo prototipo:
+// conectada, la página usa el horario guardado en la base de datos. Minutos desde medianoche.
 // Lunes 8–1; martes y jueves 8–12 y 1–4; miércoles 8–12 y 1–7; viernes 8–12; sábado 8–12 y 1–5.
 const HORARIO = {
   1: [[480, 780]],
@@ -76,9 +80,8 @@ const NOMBRE_MODALIDAD = { presencial: "presencial", virtual: "virtual" };
 
 // Devuelve las horas de inicio para el tipo y la modalidad elegidos.
 // Cada opción: { minutos, disponible, detalle }.
-function horasDisponibles(fecha, tipo, modalidad) {
-  const franjas = HORARIO[diaSemana(fecha)] ?? [];
-  const { grupos, pruebas } = agendaDelDia(fecha);
+function horasDisponibles(fecha, tipo, modalidad, { grupos, pruebas }) {
+  const franjas = franjasDe(fecha);
   const ahora = hoyEnBogota();
   const minutosClase = TIPOS[tipo].minutos;
   const opciones = [];
@@ -115,6 +118,44 @@ function horasDisponibles(fecha, tipo, modalidad) {
   return opciones;
 }
 
+// ---------- Datos reales (Supabase) ----------
+let franjasPorFecha = new Map(); // fecha -> [[inicio, fin], ...]
+
+async function llamar(ruta, cuerpo) {
+  const cabeceras = { apikey: CONFIG.supabaseAnonKey, "Content-Type": "application/json" };
+  // Las llaves antiguas (JWT, empiezan por "eyJ") también van en Authorization.
+  if (CONFIG.supabaseAnonKey.startsWith("eyJ")) cabeceras.Authorization = `Bearer ${CONFIG.supabaseAnonKey}`;
+  const r = await fetch(`${CONFIG.supabaseUrl}${ruta}`, { method: "POST", headers: cabeceras, body: JSON.stringify(cuerpo) });
+  const datos = await r.json().catch(() => null);
+  if (!r.ok) throw new Error(datos?.error ?? datos?.message ?? `HTTP_${r.status}`);
+  return datos;
+}
+
+function franjasDe(fecha) {
+  return CONECTADO ? franjasPorFecha.get(fecha) ?? [] : HORARIO[diaSemana(fecha)] ?? [];
+}
+
+async function cargarFranjas(desde, hasta) {
+  const filas = await llamar("/rest/v1/rpc/dias_abiertos", { p_desde: desde, p_hasta: hasta });
+  franjasPorFecha = new Map();
+  for (const { fecha, inicio, fin } of filas) {
+    if (!franjasPorFecha.has(fecha)) franjasPorFecha.set(fecha, []);
+    franjasPorFecha.get(fecha).push([inicio, fin]);
+  }
+}
+
+async function cargarAgenda(fecha) {
+  if (!CONECTADO) return agendaDelDia(fecha);
+  const filas = await llamar("/rest/v1/rpc/agenda_publica", { p_fecha: fecha });
+  const grupos = new Map();
+  const pruebas = new Set();
+  for (const f of filas) {
+    if (f.clase === "grupo") grupos.set(f.inicio, { modalidad: f.modalidad, inscritos: f.ocupados });
+    else pruebas.add(f.inicio);
+  }
+  return { grupos, pruebas };
+}
+
 // ---------- Pantalla de inicio ----------
 // Se muestra una vez por visita. Con movimiento reducido se quita de inmediato.
 (function pantallaInicio() {
@@ -138,6 +179,8 @@ const contHoras = document.getElementById("horas");
 const seleccion = document.getElementById("seleccion");
 const mensaje = document.getElementById("mensaje");
 const seccionListo = document.getElementById("listo");
+const btnReservar = document.getElementById("btn-reservar");
+const campoPersonas = document.querySelector("[data-solo-prueba]");
 
 const estado = { tipo: null, modalidad: null, fecha: null, hora: null };
 
@@ -160,6 +203,7 @@ for (const grupo of document.querySelectorAll("[data-grupo]")) {
     if (!boton) return;
     estado[grupo.dataset.grupo] = boton.dataset.valor;
     marcar(grupo, boton);
+    campoPersonas.hidden = estado.tipo !== "prueba";
     pintarHoras();
     actualizarResumen();
   });
@@ -175,7 +219,7 @@ function pintarDias() {
     btn.setAttribute("role", "radio");
     btn.setAttribute("aria-checked", "false");
     btn.setAttribute("aria-label", formatear(fecha, { weekday: "long", day: "numeric", month: "long" }));
-    btn.disabled = !HORARIO[diaSemana(fecha)];
+    btn.disabled = !franjasDe(fecha).length;
     btn.innerHTML = `
       <span class="dia-semana">${i === 0 ? "Hoy" : formatear(fecha, { weekday: "short" })}</span>
       <span class="dia-num">${formatear(fecha, { day: "numeric" })}</span>
@@ -190,8 +234,11 @@ function pintarDias() {
   }
 }
 
-function pintarHoras() {
+let consulta = 0; // evita pintar una respuesta vieja si cambian de día rápido
+
+async function pintarHoras() {
   estado.hora = null;
+  const mia = ++consulta;
   contHoras.replaceChildren();
   const falta = !estado.tipo || !estado.modalidad ? "Primero elige el tipo de clase y la modalidad."
     : !estado.fecha ? "Elige un día para ver las horas libres." : null;
@@ -199,7 +246,17 @@ function pintarHoras() {
     contHoras.innerHTML = `<p class="horas__vacio">${falta}</p>`;
     return;
   }
-  const opciones = horasDisponibles(estado.fecha, estado.tipo, estado.modalidad);
+  contHoras.innerHTML = `<p class="horas__vacio">Buscando horas libres…</p>`;
+  let agenda;
+  try {
+    agenda = await cargarAgenda(estado.fecha);
+  } catch {
+    if (mia === consulta) contHoras.innerHTML = `<p class="horas__vacio">No pudimos cargar las horas. Revisa tu conexión e intenta de nuevo.</p>`;
+    return;
+  }
+  if (mia !== consulta) return;
+  contHoras.replaceChildren();
+  const opciones = horasDisponibles(estado.fecha, estado.tipo, estado.modalidad, agenda);
   if (!opciones.some((o) => o.disponible)) {
     contHoras.innerHTML = `<p class="horas__vacio">No quedan horas libres ese día para esta opción. Prueba otro día.</p>`;
     return;
@@ -236,7 +293,35 @@ function enlaceCalendario(datos) {
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
-form.addEventListener("submit", (e) => {
+const ERRORES = {
+  HORA_OCUPADA: "Esa hora se acaba de ocupar. Elige otra.",
+  OTRA_MODALIDAD: "Esa hora ya tiene un grupo de la otra modalidad. Elige otra hora.",
+  SIN_CUPO: "Ese grupo se acaba de llenar. Elige otra hora.",
+  YA_RESERVADO: "Ya tienes una reserva en esa hora con este correo.",
+  HORA_PASADA: "Esa hora ya pasó. Elige otra.",
+  FUERA_DE_HORARIO: "Esa hora está fuera del horario de atención.",
+  PERSONAS_INVALIDAS: "Revisa el número de personas (de 1 a 5).",
+};
+const ERRORES_DE_AGENDA = ["HORA_OCUPADA", "OTRA_MODALIDAD", "SIN_CUPO", "HORA_PASADA", "FUERA_DE_HORARIO"];
+
+async function guardarReserva(datos) {
+  if (!CONECTADO) return { ok: true, calendario: false, prototipo: true };
+  return llamar("/functions/v1/reservar", {
+    tipo: estado.tipo,
+    modalidad: estado.modalidad,
+    fecha: estado.fecha,
+    inicio: estado.hora,
+    nombre: datos.nombre,
+    telefono: datos.telefono,
+    correo: datos.correo,
+    programa: datos.programa,
+    personas: estado.tipo === "prueba" ? Number(datos.personas) : 1,
+    acepta_whatsapp: datos.whatsapp === "on",
+    sitio_web: datos.sitio_web,
+  });
+}
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   mensaje.textContent = "";
   if (!estado.tipo || !estado.modalidad || !estado.fecha || estado.hora === null) {
@@ -249,9 +334,37 @@ form.addEventListener("submit", (e) => {
     return;
   }
   const datos = Object.fromEntries(new FormData(form));
+  btnReservar.disabled = true;
+  btnReservar.textContent = "Reservando…";
+  let resultado;
+  try {
+    resultado = await guardarReserva(datos);
+  } catch (error) {
+    mensaje.textContent = ERRORES[error.message] ?? "No pudimos guardar la reserva. Intenta de nuevo o escríbenos por WhatsApp.";
+    if (ERRORES_DE_AGENDA.includes(error.message)) pintarHoras();
+    return;
+  } finally {
+    btnReservar.disabled = false;
+    btnReservar.textContent = "Reservar";
+  }
+
+  const virtual = estado.modalidad === "virtual";
   document.getElementById("listo-titulo").textContent = estado.tipo === "prueba" ? "¡Tu clase de prueba gratis quedó reservada!" : "¡Tu clase quedó reservada!";
   document.getElementById("listo-detalle").textContent = `${seleccion.textContent.replace(/\.$/, "")}. ${datos.nombre.trim()}, te escribiremos al WhatsApp ${datos.telefono}.`;
-  document.getElementById("btn-calendario").href = enlaceCalendario(datos);
+  const nota = document.getElementById("listo-nota");
+  const meet = document.getElementById("btn-meet");
+  const calendario = document.getElementById("btn-calendario");
+  if (resultado.calendario) {
+    nota.textContent = `Te enviamos la invitación de Google Calendar a ${datos.correo}.${virtual ? " Ahí está el enlace de Google Meet." : ""}`;
+    calendario.hidden = true;
+  } else {
+    nota.textContent = resultado.prototipo ? "" : "Tu cupo quedó guardado. La invitación de calendario te llegará en un rato.";
+    calendario.href = enlaceCalendario(datos);
+  }
+  if (resultado.meet) {
+    meet.href = resultado.meet;
+    meet.hidden = false;
+  }
   form.hidden = true;
   seccionListo.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -259,5 +372,16 @@ form.addEventListener("submit", (e) => {
 
 document.getElementById("btn-otra").addEventListener("click", () => location.reload());
 
-pintarDias();
-pintarHoras();
+(async function iniciar() {
+  if (CONECTADO) {
+    document.querySelector(".aviso-prototipo")?.remove();
+    const { fecha: hoy } = hoyEnBogota();
+    try {
+      await cargarFranjas(hoy, sumarDias(hoy, DIAS_A_MOSTRAR));
+    } catch {
+      mensaje.textContent = "No pudimos cargar el horario. Recarga la página o escríbenos por WhatsApp.";
+    }
+  }
+  pintarDias();
+  pintarHoras();
+})();

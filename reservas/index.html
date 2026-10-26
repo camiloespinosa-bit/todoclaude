@@ -94,6 +94,15 @@
           <label>Correo (para la invitación de calendario)
             <input name="correo" type="email" autocomplete="email" required />
           </label>
+          <label data-solo-prueba hidden>¿Cuántas personas vienen?
+            <select name="personas">
+              <option value="1">1 persona</option>
+              <option value="2">2 personas</option>
+              <option value="3">3 personas</option>
+              <option value="4">4 personas</option>
+              <option value="5">5 personas</option>
+            </select>
+          </label>
           <label>Programa
             <select name="programa" required>
               <option value="">Elige uno</option>
@@ -103,6 +112,10 @@
             </select>
           </label>
         </div>
+        <!-- Campo trampa para robots: las personas no lo ven. -->
+        <label class="trampa" aria-hidden="true">Sitio web
+          <input name="sitio_web" tabindex="-1" autocomplete="off" />
+        </label>
         <label class="casilla">
           <input type="checkbox" name="whatsapp" />
           Acepto recibir la confirmación y recordatorios por WhatsApp.
@@ -120,11 +133,14 @@
       <img src="../assets/img/oki/oki-celebrando.svg" alt="" width="160" height="160" />
       <h2 id="listo-titulo">¡Tu clase quedó reservada!</h2>
       <p id="listo-detalle"></p>
+      <p id="listo-nota"></p>
+      <a class="boton boton--primario" id="btn-meet" target="_blank" rel="noopener" hidden>Abrir enlace de Google Meet</a>
       <a class="boton boton--primario" id="btn-calendario" target="_blank" rel="noopener">Agregar a Google Calendar</a>
       <button class="boton boton--fantasma" id="btn-otra" type="button">Reservar otra clase</button>
     </section>
   </main>
 
+  <script src="config.js"></script>
   <script src="reservas.js"></script>
 </body>
 </html>

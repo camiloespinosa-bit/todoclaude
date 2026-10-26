@@ -9,6 +9,7 @@ Sitio estático (HTML/CSS/JS puro, sin build ni dependencias) para la marca CCA 
 - `fases.html` — Fases del Programa (Sensorial, Lúdica, Lógica, Crítica + Fase Experta de inglés para adultos 18-50 + Programa Adulto Vital 65+)
 - `nosotros.html` — Sobre Nosotros
 - `blog/index.html` + `blog/*.html` — Blog (2 artículos iniciales)
+- `reservas/index.html` — Reserva de clases (prueba gratis de 30 min, clase de 1 h, bloque de 2 h; presencial o virtual). Ver `reservas/README.md` para conectarla a Supabase y Google Calendar.
 
 **Estilos y assets:**
 - `assets/css/style.css` — hoja de estilos compartida, con los tokens de color/tipografía oficiales de CCA (ver skill `cca-marca`)
