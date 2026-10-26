@@ -4,10 +4,21 @@
 // Secretos que hay que configurar en Supabase (Edge Functions > Secrets):
 //   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
 //   GOOGLE_CALENDAR_ID (opcional, por defecto "primary": el calendario principal)
-// SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY los pone Supabase automáticamente.
+// SUPABASE_URL y la llave secreta los pone Supabase automáticamente.
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+// Proyectos nuevos: SUPABASE_SECRET_KEYS (JSON con la llave "default").
+// Proyectos con llaves antiguas: SUPABASE_SERVICE_ROLE_KEY.
+const SERVICE_KEY: string = (() => {
+  const nuevas = Deno.env.get("SUPABASE_SECRET_KEYS");
+  if (nuevas) {
+    try {
+      const llave = JSON.parse(nuevas).default;
+      if (llave) return llave;
+    } catch { /* se usa la antigua */ }
+  }
+  return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+})();
 const CALENDARIO = Deno.env.get("GOOGLE_CALENDAR_ID") ?? "primary";
 const ZONA = "America/Bogota";
 const SEDE = "Rionegro, Antioquia";
