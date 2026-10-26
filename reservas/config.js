@@ -3,6 +3,6 @@
 // NUNCA pongas aquí la llave secreta (service_role / secret).
 // Mientras estén vacíos, la página funciona como prototipo con datos de ejemplo.
 window.CONFIG_RESERVAS = {
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://xpqjejiezbxaxsdodkyb.supabase.co",
+  supabaseAnonKey: "sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd",
 };
