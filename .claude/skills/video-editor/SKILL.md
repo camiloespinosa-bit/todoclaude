@@ -137,7 +137,10 @@ corrige suave (`eq`, `curves`) y si hay grano, `hqdn3d` leve. Dile a Camilo con 
 mejoró y si **conviene volver a grabar**: si la cara queda gris, con ruido o se ve "plástica" por
 el filtro, lo honesto es recomendar regrabar con más luz.
 
-**9. Al terminar.** Di dónde quedó el archivo (ruta completa) y recuérdale: **"Míralo una vez
+**9. Al terminar.** Antes de entregar, confirma que el render terminó y que el archivo se lee
+completo: `ffprobe` da duración de video y audio, y `ffmpeg -v error -i salida.mp4 -f null -` no
+da errores. (El 2026-10-27 se entregó un Reel mientras todavía se escribía y llegó incompleto.)
+Mira 3 o 4 cuadros sueltos para revisar subtítulos y encuadre. Luego di dónde quedó el archivo (ruta completa) y recuérdale: **"Míralo una vez
 completo antes de publicarlo. Tú eres el director."**
 
 ## Lo que esta skill no hace
