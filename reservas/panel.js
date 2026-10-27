@@ -114,6 +114,7 @@ const irAFecha = document.getElementById("ir-a-fecha");
 let desde = hoyEnBogota();
 let fechaElegida = desde;
 let sesiones = [];
+let cerrados = new Map(); // fecha -> motivo, en los días que muestra la agenda
 
 function mostrarEntrar(mensaje = "") {
   seccionAgenda.hidden = true;
@@ -126,7 +127,7 @@ function mostrarAgenda() {
   seccionEntrar.hidden = true;
   seccionAgenda.hidden = false;
   btnSalir.hidden = false;
-  cargarAgenda();
+  refrescar();
 }
 
 document.getElementById("form-entrar").addEventListener("submit", async (e) => {
@@ -161,6 +162,7 @@ async function cargarAgenda() {
   try {
     const r = await llamarPanel({ accion: "agenda", desde, hasta: sumarDias(desde, DIAS_A_MOSTRAR - 1) });
     sesiones = r.sesiones ?? [];
+    cerrados = new Map((r.cerrados ?? []).map((c) => [c.fecha, c.motivo]));
     mensajePanel.textContent = "";
     pintarDias();
     pintarDia();
@@ -189,7 +191,11 @@ function pintarDias() {
     );
     const total = personasDelDia(fecha);
     if (total) btn.append(crear("span", "dia-total", String(total)));
-    btn.setAttribute("aria-label", `${formatear(fecha, { weekday: "long", day: "numeric", month: "long" })}: ${total} personas`);
+    if (cerrados.has(fecha)) {
+      btn.classList.add("dia--cerrado");
+      btn.append(crear("span", "dia-cerrado", "Cerrado"));
+    }
+    btn.setAttribute("aria-label", `${formatear(fecha, { weekday: "long", day: "numeric", month: "long" })}: ${cerrados.has(fecha) ? "cerrado" : `${total} personas`}`);
     btn.addEventListener("click", () => {
       fechaElegida = fecha;
       pintarDias();
@@ -212,8 +218,9 @@ function pintarDia() {
     ? `${delDia.length} ${delDia.length === 1 ? "clase" : "clases"} · ${personas} ${personas === 1 ? "persona" : "personas"}`
     : "";
   contSesiones.replaceChildren();
+  if (cerrados.has(fechaElegida)) contSesiones.append(avisoCerrado(fechaElegida));
   if (!delDia.length) {
-    contSesiones.append(crear("p", "horas__vacio", "No hay reservas este día."));
+    if (!cerrados.has(fechaElegida)) contSesiones.append(crear("p", "horas__vacio", "No hay reservas este día."));
     return;
   }
   for (const s of delDia) contSesiones.append(tarjetaSesion(s));
@@ -286,6 +293,11 @@ function filaAsistente(s, a) {
 const MENSAJES_ERROR = {
   RESERVA_YA_CANCELADA: "Esa reserva ya estaba cancelada.",
   RESERVA_NO_EXISTE: "No encontramos esa reserva.",
+  RANGO_INVALIDO: "Revisa las fechas: la final no puede ser antes de la inicial, y el rango es de máximo 2 meses.",
+  MOTIVO_INVALIDO: "Escribe un motivo (entre 2 y 100 letras).",
+  FECHA_PASADA: "No se pueden cerrar días que ya pasaron.",
+  SIN_DIAS_DE_ATENCION: "En esas fechas no hay días de atención (por ejemplo, solo domingos).",
+  DIA_NO_CERRADO: "Ese día ya estaba abierto.",
 };
 
 async function ejecutar(boton, cuerpo, exito) {
@@ -296,7 +308,7 @@ async function ejecutar(boton, cuerpo, exito) {
     const texto = r.calendario === false
       ? `${exito} Pero Google Calendar no respondió: revisa los Logs de la función o usa "Reenviar al calendario".`
       : exito;
-    await cargarAgenda();
+    await refrescar();
     mensajePanel.textContent = texto;
   } catch (error) {
     if (error.message !== "NO_AUTORIZADO") mensajePanel.textContent = MENSAJES_ERROR[error.message] ?? "No se pudo completar. Intenta de nuevo.";
@@ -304,9 +316,83 @@ async function ejecutar(boton, cuerpo, exito) {
   }
 }
 
+// ---------- Días cerrados ----------
+const formCerrar = document.getElementById("form-cerrar");
+const listaCerrados = document.getElementById("lista-cerrados");
+const mensajeCerrar = document.getElementById("mensaje-cerrar");
+
+function avisoCerrado(fecha) {
+  const aviso = crear("div", "panel-aviso-cerrado");
+  aviso.append(crear("strong", "", "Día cerrado: "), crear("span", "", cerrados.get(fecha)));
+  const abrir = crear("button", "boton boton--fantasma boton--chico", "Abrir este día");
+  abrir.type = "button";
+  abrir.addEventListener("click", () => ejecutar(abrir, { accion: "abrir", fecha }, "Día abierto otra vez."));
+  aviso.append(abrir);
+  return aviso;
+}
+
+async function cargarCerrados() {
+  const hoy = hoyEnBogota();
+  try {
+    const r = await llamarPanel({ accion: "cerrados", desde: hoy, hasta: sumarDias(hoy, 400) });
+    listaCerrados.replaceChildren();
+    if (!r.cerrados?.length) {
+      listaCerrados.append(crear("li", "horas__vacio", "No hay días cerrados."));
+      return;
+    }
+    for (const c of r.cerrados) {
+      const fila = crear("li", "panel-cerrado");
+      const texto = crear("div", "");
+      texto.append(crear("strong", "", formatear(c.fecha, { weekday: "short", day: "numeric", month: "short", year: "numeric" })), crear("span", "", ` · ${c.motivo}`));
+      const abrir = crear("button", "panel-cancelar", "Abrir");
+      abrir.type = "button";
+      abrir.addEventListener("click", () => ejecutar(abrir, { accion: "abrir", fecha: c.fecha }, "Día abierto otra vez."));
+      fila.append(texto, abrir);
+      listaCerrados.append(fila);
+    }
+  } catch (error) {
+    if (error.message !== "NO_AUTORIZADO") listaCerrados.replaceChildren(crear("li", "horas__vacio", "No pudimos cargar los días cerrados."));
+  }
+}
+
+async function refrescar() {
+  await Promise.all([cargarAgenda(), cargarCerrados()]);
+}
+
+formCerrar.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const datos = Object.fromEntries(new FormData(formCerrar));
+  const cuerpo = { accion: "cerrar", desde: datos.desde, hasta: datos.hasta || datos.desde, motivo: datos.motivo.trim() };
+  const boton = formCerrar.querySelector("button");
+  boton.disabled = true;
+  mensajeCerrar.textContent = "Un momento…";
+  try {
+    let r = await llamarPanel(cuerpo);
+    if (!r.cerrado && r.reservas_activas) {
+      const n = r.reservas_activas;
+      const seguir = confirm(`En esas fechas hay ${n} ${n === 1 ? "reserva" : "reservas"}. ¿Cerrar los días y cancelar${n === 1 ? "la" : "las"}? Google les avisará por correo.`);
+      if (!seguir) {
+        mensajeCerrar.textContent = "No se cerró ningún día.";
+        return;
+      }
+      r = await llamarPanel({ ...cuerpo, cancelar: true });
+    }
+    let texto = `${r.dias === 1 ? "Se cerró 1 día" : `Se cerraron ${r.dias} días`}.`;
+    if (r.canceladas) texto += ` ${r.canceladas === 1 ? "Se canceló 1 reserva" : `Se cancelaron ${r.canceladas} reservas`}.`;
+    if (r.calendario === false) texto += ' Pero Google Calendar no respondió: revisa los Logs de la función.';
+    formCerrar.reset();
+    await refrescar();
+    mensajeCerrar.textContent = texto;
+  } catch (error) {
+    if (error.message !== "NO_AUTORIZADO") mensajeCerrar.textContent = MENSAJES_ERROR[error.message] ?? "No se pudo completar. Intenta de nuevo.";
+  } finally {
+    boton.disabled = false;
+  }
+});
+
 // Al volver a la pestaña, la agenda se actualiza sola.
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && !seccionAgenda.hidden) cargarAgenda();
+  if (document.visibilityState === "visible" && !seccionAgenda.hidden) refrescar();
 });
 
 if (!CONFIG.supabaseUrl || !CONFIG.supabaseAnonKey) mostrarEntrar("Falta configurar la conexión en config.js.");

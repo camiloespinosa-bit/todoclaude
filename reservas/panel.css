@@ -59,3 +59,22 @@
 .panel-cancelar:hover { background: #FCEEEE; }
 .panel-cancelar:disabled { opacity: 0.5; cursor: wait; }
 .panel-cancelar:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+
+/* ---------- Días cerrados ---------- */
+.dia--cerrado { background: var(--fondo-claro); border-style: dashed; }
+.dia-cerrado { display: block; font-size: 0.65rem; font-weight: 700; color: #B3261E; }
+.panel-aviso-cerrado {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  margin-top: 14px; padding: 14px 16px; border-radius: var(--radio-sm);
+  background: #FCEEEE; color: #8C1D18;
+}
+.panel-aviso-cerrado .boton { margin-left: auto; }
+.panel-cerrar { margin-top: 28px; }
+.panel-cerrar h2 { margin: 0 0 4px; color: var(--azul-oscuro); font-size: 1.15rem; }
+.panel-cerrar h3 { margin: 22px 0 8px; font-size: 1rem; color: var(--azul-oscuro); }
+.panel-ayuda { margin: 0 0 14px; color: var(--texto-suave); font-size: 0.9rem; }
+.campos__ancho { grid-column: 1 / -1; }
+.panel-cerrar form .boton { justify-self: start; }
+.panel-cerrados { list-style: none; margin: 0; padding: 0; }
+.panel-cerrado { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--borde); font-size: 0.92rem; }
+.panel-cerrado strong { text-transform: capitalize; }

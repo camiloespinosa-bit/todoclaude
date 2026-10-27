@@ -52,6 +52,26 @@
       <p class="panel-mensaje" id="mensaje-panel" role="status" aria-live="polite"></p>
       <h2 class="panel-dia" id="titulo-dia"></h2>
       <div id="sesiones"></div>
+
+      <section class="paso panel-cerrar">
+        <h2>Cerrar días</h2>
+        <p class="panel-ayuda">Vacaciones, imprevistos o festivos: esos días no se pueden reservar.</p>
+        <form id="form-cerrar" class="campos">
+          <label>Desde
+            <input type="date" name="desde" required />
+          </label>
+          <label>Hasta (opcional)
+            <input type="date" name="hasta" />
+          </label>
+          <label class="campos__ancho">Motivo
+            <input name="motivo" required minlength="2" maxlength="100" placeholder="Vacaciones, festivo, imprevisto…" />
+          </label>
+          <button class="boton boton--primario" type="submit">Cerrar</button>
+          <p class="panel-mensaje campos__ancho" id="mensaje-cerrar" role="status" aria-live="polite"></p>
+        </form>
+        <h3>Próximos días cerrados</h3>
+        <ul class="panel-cerrados" id="lista-cerrados"></ul>
+      </section>
     </section>
   </main>
 

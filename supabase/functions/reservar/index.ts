@@ -1,7 +1,7 @@
 // Función del servidor (Supabase Edge Function).
 // - Sin "accion": recibe la reserva desde la página, la guarda con las reglas de la base de
 //   datos y la sincroniza con Google Calendar.
-// - Con "accion" (agenda, cancelar, sincronizar): las usa el panel del docente. Exigen la
+// - Con "accion" (agenda, cancelar, sincronizar, cerrados, cerrar, abrir): las usa el panel del docente. Exigen la
 //   sesión iniciada de un usuario que esté en la tabla `docentes`.
 //
 // Secretos que hay que configurar en Supabase (Edge Functions > Secrets):
@@ -230,7 +230,35 @@ async function panel(req: Request, datos: Record<string, unknown>) {
 
   try {
     if (datos.accion === "agenda") {
-      return responder({ sesiones: await rpc("panel_agenda", { p_desde: datos.desde, p_hasta: datos.hasta }) });
+      const [sesiones, cerrados] = await Promise.all([
+        rpc("panel_agenda", { p_desde: datos.desde, p_hasta: datos.hasta }),
+        rpc("dias_cerrados_entre", { p_desde: datos.desde, p_hasta: datos.hasta }),
+      ]);
+      return responder({ sesiones, cerrados });
+    }
+    if (datos.accion === "cerrados") {
+      return responder({ cerrados: await rpc("dias_cerrados_entre", { p_desde: datos.desde, p_hasta: datos.hasta }) });
+    }
+    if (datos.accion === "cerrar") {
+      const r = await rpc("cerrar_dias", {
+        p_desde: datos.desde,
+        p_hasta: datos.hasta,
+        p_motivo: datos.motivo,
+        p_cancelar: Boolean(datos.cancelar),
+      });
+      // Sin cerrar: hay reservas y el docente aún no confirmó cancelarlas.
+      if (!r.cerrado || !r.sesiones?.length) return responder({ ...r, calendario: true });
+      try {
+        await sincronizarVarias(r.sesiones);
+        return responder({ ...r, calendario: true });
+      } catch (e) {
+        console.error(e);
+        return responder({ ...r, calendario: false });
+      }
+    }
+    if (datos.accion === "abrir") {
+      await rpc("abrir_dia", { p_fecha: datos.fecha });
+      return responder({ ok: true });
     }
     if (datos.accion === "cancelar") {
       const { sesiones } = await rpc("cancelar_reserva", { p_reserva: datos.reserva });
