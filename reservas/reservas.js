@@ -25,6 +25,8 @@ const HORARIO = {
 };
 
 const CUPO_MAXIMO = 5; // estudiantes al mismo tiempo
+// Versión de privacidad.html que acepta quien reserva. Cambiarla cuando se publique una nueva.
+const POLITICA_VERSION = "2026-10-v2";
 const DIAS_A_MOSTRAR = 21;
 const ZONA = "America/Bogota";
 
@@ -301,6 +303,7 @@ const ERRORES = {
   HORA_PASADA: "Esa hora ya pasó. Elige otra.",
   FUERA_DE_HORARIO: "Esa hora está fuera del horario de atención.",
   PERSONAS_INVALIDAS: "Revisa el número de personas (de 1 a 5).",
+  AUTORIZACION_REQUERIDA: "Para reservar debes autorizar el tratamiento de tus datos.",
 };
 const ERRORES_DE_AGENDA = ["HORA_OCUPADA", "OTRA_MODALIDAD", "SIN_CUPO", "HORA_PASADA", "FUERA_DE_HORARIO"];
 
@@ -317,6 +320,7 @@ async function guardarReserva(datos) {
     programa: datos.programa,
     personas: estado.tipo === "prueba" ? Number(datos.personas) : 1,
     acepta_whatsapp: datos.whatsapp === "on",
+    politica_version: datos.autoriza_datos === "on" ? POLITICA_VERSION : "",
     sitio_web: datos.sitio_web,
   });
 }

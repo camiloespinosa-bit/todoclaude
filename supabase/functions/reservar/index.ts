@@ -187,6 +187,11 @@ async function sincronizarVarias(sesiones: string[]) {
 async function reservar(datos: Record<string, unknown>) {
   // Campo trampa: las personas no lo ven; si viene lleno, es un robot.
   if (datos.sitio_web) return responder({ ok: true, calendario: false });
+  // Prueba de la autorización de datos (Ley 1581): la página envía la versión de la
+  // política que la persona aceptó. Sin ella no se guarda la reserva.
+  if (typeof datos.politica_version !== "string" || !datos.politica_version) {
+    return responder({ error: "AUTORIZACION_REQUERIDA" }, 409);
+  }
 
   let sesiones: string[];
   try {
@@ -201,6 +206,7 @@ async function reservar(datos: Record<string, unknown>) {
       p_programa: datos.programa,
       p_personas: datos.personas ?? 1,
       p_acepta_whatsapp: Boolean(datos.acepta_whatsapp),
+      p_politica: datos.politica_version.slice(0, 20),
     });
     sesiones = r.sesiones;
   } catch (e) {

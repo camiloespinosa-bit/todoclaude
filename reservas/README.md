@@ -129,9 +129,19 @@ Dirección: **gimnasiodelcerebro.co/reservas/panel.html** (no aparece en buscado
 
 Seguridad: el panel solo muestra datos si el usuario inició sesión **y** está en la tabla `docentes`. El servidor lo revisa en cada acción; los datos de los estudiantes nunca se leen directamente desde el navegador.
 
+## Prueba de la autorización de datos
+
+Cada reserva guarda la versión de la política de privacidad que la persona aceptó (`reservas.politica_version`; la fecha y hora quedan en `creada_en`). La versión vigente está en `POLITICA_VERSION` (al inicio de `reservas/reservas.js`) y debe coincidir con la que muestra `privacidad.html`. Si se publica una nueva versión de la política, hay que cambiar las dos.
+
+Para aplicar `supabase/migrations/003_autorizacion_datos.sql` sin cortar las reservas, en este orden:
+1. Ejecutar 003 en el SQL Editor.
+2. Publicar la página (merge en GitHub).
+3. Desplegar la función `reservar` nueva (desde ese momento rechaza reservas sin autorización).
+
 ## Pendientes
 
 - Desde el panel: bloquear días (vacaciones) y agregar festivos sin entrar al SQL Editor.
+- Borrar automáticamente los datos de reservas con más de 24 meses sin actividad, como promete la política de privacidad v2.
 - Bloquear horas que ya tienes ocupadas en tu Google Calendar personal.
 - Recordatorios por WhatsApp.
 - Hoy cualquiera puede reservar una clase normal sin verificar que sea estudiante (decisión
