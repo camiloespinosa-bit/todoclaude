@@ -63,7 +63,10 @@ No empieces a cortar sin las tres respuestas.
 
 El video terminado se guarda junto al original con nombre nuevo:
 `<nombre-original>__editado-<destino>.mp4` (por ejemplo `clase01__editado-reel.mp4`). En la nube,
-entrégalo además con la herramienta de enviar archivos. **Nunca hagas commit de videos al repo.**
+entrégalo además con la herramienta de enviar archivos. **Esa herramienta acepta hasta 500 MiB**: un
+video largo en calidad máxima (CRF 16) pasa de eso (5:28 en vertical pesó 804 MiB). En ese caso
+guarda el máster y entrega una copia `...-entrega.mp4` a 10 Mbps
+(`-c:v libx264 -preset slow -b:v 10M -maxrate 14M -bufsize 20M -c:a copy`). **Nunca hagas commit de videos al repo.**
 
 **2. Transcribe todo con tiempos por palabra.**
 
