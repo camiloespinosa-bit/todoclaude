@@ -190,7 +190,18 @@ Activarlo (una sola vez):
 
 Para ver que la tarea quedó programada: `select jobname, schedule from cron.job;`. Para borrar ya, sin esperar: `select borrar_datos_vencidos();`.
 
-Ojo: esto borra la base de datos de reservas, no los eventos viejos de tu Google Calendar, que también tienen nombres y correos. Esos se borran a mano en Google Calendar.
+### Eventos viejos de Google Calendar
+
+Los eventos de clases de hace más de 24 meses también tienen nombres y correos. Todos los días a las 3:00 a.m. (15 minutos antes del borrado de la base de datos) la función `reservar` los borra de tu Google Calendar **sin avisar a los invitados**. Al día siguiente, la tarea de la base de datos borra esas sesiones.
+
+Activarlo (una sola vez), en este orden:
+1. Database > Extensions: activar **pg_net**.
+2. SQL Editor: ejecutar `supabase/migrations/009_calendario_24_meses.sql`.
+3. Desplegar la función `reservar` nueva.
+4. SQL Editor: ejecutar `supabase/setup/limpieza_calendario.sql` y copiar la clave que muestra al final.
+5. Edge Functions > Secrets: agregar `TAREAS_CLAVE` con esa clave.
+
+Si Google falla con algún evento, queda en Edge Functions > reservar > Logs y se reintenta al día siguiente.
 
 ## Pendientes
 

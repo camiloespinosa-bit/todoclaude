@@ -3,8 +3,11 @@
 //   datos y la sincroniza con Google Calendar.
 // - Con "accion" (agenda, cancelar, sincronizar, cerrados, cerrar, abrir, aviso): las usa el panel del docente.
 // - Con accion "recordatorios": la llama cada 15 minutos la tarea programada de Supabase
-//   (pg_cron) para enviar los recordatorios de WhatsApp. Exigen la
-//   sesión iniciada de un usuario que esté en la tabla `docentes`.
+//   (pg_cron) para enviar los recordatorios de WhatsApp.
+// - Con accion "limpiar_calendario": la llama una vez al día la tarea programada de Supabase
+//   para borrar de Google Calendar los eventos de clases de hace más de 24 meses.
+// Las acciones del panel exigen la sesión iniciada de un usuario que esté en la tabla
+// `docentes`; las de las tareas programadas, su clave.
 //
 // Secretos que hay que configurar en Supabase (Edge Functions > Secrets):
 //   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
@@ -14,6 +17,7 @@
 //   TWILIO_PLANTILLA_CONFIRMACION, TWILIO_PLANTILLA_DIA_ANTES, TWILIO_PLANTILLA_HORA_ANTES
 //   (los ContentSid "HX..." de las plantillas aprobadas) y RECORDATORIOS_CLAVE (la misma
 //   clave guardada en Vault para la tarea programada).
+// Para la limpieza del calendario: TAREAS_CLAVE (la clave "clave_tareas" de Vault).
 // SUPABASE_URL y la llave secreta los pone Supabase automáticamente.
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -270,6 +274,33 @@ async function recordatorios(req: Request) {
   return responder(resultado);
 }
 
+// Borra de Google Calendar los eventos de clases de hace más de 24 meses, sin avisar a los
+// invitados (la clase ya pasó hace mucho). Después la tarea de la base de datos borra la sesión.
+async function limpiarCalendario(req: Request) {
+  const clave = Deno.env.get("TAREAS_CLAVE");
+  if (!clave || clave.length < 20 || req.headers.get("x-clave-tareas") !== clave) {
+    return responder({ error: "NO_AUTORIZADO" }, 401);
+  }
+  const ids: string[] = await rpc("eventos_vencidos", {});
+  if (!ids.length) return responder({ borrados: 0, errores: 0 });
+  const token = await tokenDeGoogle();
+  const base = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDARIO)}/events`;
+  const resultado = { borrados: 0, errores: 0 };
+  for (const id of ids) {
+    const r = await fetch(`${base}/${id.replaceAll("-", "")}?sendUpdates=none`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    // 404 o 410: ya no estaba en el calendario (por ejemplo, borrado a mano).
+    if (!r.ok && r.status !== 404 && r.status !== 410) {
+      const error = await r.json().catch(() => null);
+      console.error(`Google no borró el evento viejo ${id}: ${error?.error?.message ?? r.status}`);
+      resultado.errores++;
+      continue;
+    }
+    await rpc("quitar_evento", { p_sesion: id });
+    resultado.borrados++;
+  }
+  return responder(resultado);
+}
+
 function codigoDeError(e: unknown) {
   // Las reglas de la base de datos devuelven códigos como SIN_CUPO u OTRA_MODALIDAD.
   const mensaje = (e as Error).message;
@@ -412,5 +443,6 @@ Deno.serve(async (req) => {
   }
 
   if (datos.accion === "recordatorios") return recordatorios(req);
+  if (datos.accion === "limpiar_calendario") return limpiarCalendario(req);
   return datos.accion ? panel(req, datos) : reservar(datos);
 });
