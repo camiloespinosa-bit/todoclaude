@@ -14,13 +14,14 @@ const TIPOS = {
 
 // Franjas de atención por día de la semana (0 = domingo), solo para el modo prototipo:
 // conectada, la página usa el horario guardado en la base de datos. Minutos desde medianoche.
-// Lunes 8–1; martes y jueves 8–12 y 1–4; miércoles 8–12 y 1–7; viernes 8–12; sábado 8–12 y 1–5.
+// Lunes 6–1 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y 1–8 p.m.;
+// viernes 6–12; sábado 8–12 y 1–5.
 const HORARIO = {
-  1: [[480, 780]],
-  2: [[480, 720], [780, 960]],
-  3: [[480, 720], [780, 1140]],
-  4: [[480, 720], [780, 960]],
-  5: [[480, 720]],
+  1: [[360, 780], [1140, 1200]],
+  2: [[360, 720], [780, 960], [1140, 1200]],
+  3: [[360, 720], [780, 1200]],
+  4: [[360, 720], [780, 960], [1140, 1200]],
+  5: [[360, 720]],
   6: [[480, 720], [780, 1020]],
 };
 

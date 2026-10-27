@@ -13,8 +13,9 @@ estudiantes tienen planes mensuales pagados por anticipado.
 - **Bloque de 2 horas:** son dos grupos seguidos; el estudiante queda en los dos.
 - **Clase de prueba:** gratis, 30 minutos, para una familia o grupo de hasta 5 personas.
   Solo cabe en horas sin grupo, y mientras exista, esa hora queda bloqueada para clases.
-- **Horario:** lunes 8–1; martes y jueves 8–12 y 1–4; miércoles 8–12 y 1–7; viernes 8–12;
-  sábado 8–12 y 1–5. Domingo cerrado. Se cambia en la tabla `horario` de Supabase.
+- **Horario:** lunes 6–1 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y
+  1–8 p.m.; viernes 6–12; sábado 8–12 y 1–5. Domingo cerrado. Se cambia en la tabla `horario`
+  de Supabase (ver `supabase/migrations/006_horario_6am.sql`).
 - **Google Calendar (opción B):** un evento por grupo con todos sus estudiantes invitados y un
   solo enlace de Meet si es virtual. Cada clase de prueba es su propio evento. Los estudiantes
   no ven los correos de los demás.
@@ -150,7 +151,7 @@ Con Twilio, solo para quienes marcaron la casilla de WhatsApp al reservar:
 
 - **Confirmación:** apenas se reserva.
 - **Día antes:** desde las 6:00 p.m. del día anterior (solo si se reservó antes de esa hora).
-- **1 hora antes:** entre 70 y 10 minutos antes de la clase (solo si se reservó con 2 horas o más de anticipación).
+- **1 hora antes:** entre 70 y 10 minutos antes de la clase (solo si se reservó con 2 horas o más de anticipación y la clase es a las 7:00 a.m. o después).
 - Un bloque de 2 horas recibe un solo mensaje. Ningún mensaje se repite; si Twilio falla, se reintenta en la siguiente ejecución mientras siga a tiempo, y el error queda en los Logs.
 
 Sin los secretos de Twilio la función no envía nada, así que se puede desplegar antes de tener las plantillas aprobadas.

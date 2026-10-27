@@ -7,7 +7,8 @@
 --   * Recordatorio del día antes: desde las 6:00 p.m. del día anterior a la clase, solo si
 --     se reservó antes de esa hora (si no, la confirmación hace las veces de recordatorio).
 --   * Recordatorio 1 hora antes: entre 70 y 10 minutos antes de empezar, solo si se reservó
---     con al menos 2 horas de anticipación.
+--     con al menos 2 horas de anticipación y la clase empieza a las 7:00 a.m. o después
+--     (para no escribir de madrugada: las de 6:00 a.m. solo reciben el de la noche anterior).
 --   * Un bloque de 2 horas recibe un solo mensaje, con la hora de inicio del bloque.
 
 alter table public.reservas
@@ -62,6 +63,7 @@ as $$
         'modalidad', c.modalidad, 'enlace_meet', c.enlace_meet))
       from con_ids c, ahora a
       where c.empieza between a.t + interval '10 minutes' and a.t + interval '70 minutes'
+        and c.inicio >= 420
         and c.creada_local <= c.empieza - interval '2 hours'
         and c.whatsapp_hora_antes_en is null
     ), '[]'::json)
