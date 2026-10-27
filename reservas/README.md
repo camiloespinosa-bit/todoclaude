@@ -127,6 +127,12 @@ Dirección: **gimnasiodelcerebro.co/reservas/panel.html** (no aparece en buscado
 4. **Edge Functions > reservar > Code:** reemplaza todo el código por el nuevo `supabase/functions/reservar/index.ts` y dale **Deploy**. Revisa que **Verify JWT** siga apagado.
 5. Entra a gimnasiodelcerebro.co/reservas/panel.html con ese correo y contraseña.
 
+### Cerrar días (vacaciones, imprevistos, festivos)
+
+En la sección **Cerrar días** del panel: fecha inicial, fecha final opcional (máximo 2 meses) y motivo. Los domingos se saltan. Si hay reservas en esas fechas, el panel pregunta antes de cancelarlas (Google les avisa a los estudiantes). La lista **Próximos días cerrados** permite abrir cualquier día otra vez. Los días cerrados se ven en gris en la página de reservas y en el panel aparecen marcados como "Cerrado".
+
+Requiere `supabase/migrations/004_dias_cerrados_panel.sql`. Orden para aplicarlo: 1) ejecutar 004 en el SQL Editor, 2) desplegar la función `reservar` nueva, 3) publicar la página (merge).
+
 Seguridad: el panel solo muestra datos si el usuario inició sesión **y** está en la tabla `docentes`. El servidor lo revisa en cada acción; los datos de los estudiantes nunca se leen directamente desde el navegador.
 
 ## Prueba de la autorización de datos
@@ -140,7 +146,6 @@ Para aplicar `supabase/migrations/003_autorizacion_datos.sql` sin cortar las res
 
 ## Pendientes
 
-- Desde el panel: bloquear días (vacaciones) y agregar festivos sin entrar al SQL Editor.
 - Borrar automáticamente los datos de reservas con más de 24 meses sin actividad, como promete la política de privacidad v2.
 - Bloquear horas que ya tienes ocupadas en tu Google Calendar personal.
 - Recordatorios por WhatsApp.
