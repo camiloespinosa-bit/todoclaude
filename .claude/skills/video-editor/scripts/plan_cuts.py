@@ -28,9 +28,16 @@ def main():
     ap.add_argument("--gap", type=float, default=0.5)
     ap.add_argument("--pad", type=float, default=0.12)
     ap.add_argument("--keep-drop", help="usar la lista 'drop' de un plan ya revisado")
+    ap.add_argument("--drop-ranges", help="modo manual: rangos en segundos a quitar, '20.1-26.95,78.7-81.6'. "
+                    "Reemplaza la detección automática de frases (las pausas se recortan igual).")
     a = ap.parse_args()
     d = json.load(open(a.words))
     words = d["words"]
+    # Cuenta regresiva ("3, 2, 1") = Camilo va a repetir. Se avisa; la toma mala la decides tú.
+    nums = [(w["start"], norm(w["word"])) for w in words]
+    for k in range(len(nums) - 2):
+        if [x[1] for x in nums[k:k + 3]] == [["3"], ["2"], ["1"]]:
+            print(f"  cuenta regresiva en {nums[k][0]:7.2f}s: revisa la toma justo antes", file=sys.stderr)
     # Frases propias (cortadas en . ? ! o en un silencio de más de 1 s), no los bloques de Whisper:
     # Whisper a veces une "repito" con la toma buena en el mismo bloque.
     segs, n = [], 0
@@ -43,7 +50,16 @@ def main():
         else:
             segs[n]["end"] = w["end"]; segs[n]["text"] += " " + w["word"]
 
-    if a.keep_drop:
+    if a.drop_ranges:
+        rng = [tuple(float(x) for x in r.split("-")) for r in a.drop_ranges.split(",")]
+        drop = {}
+        for i, (s, e) in enumerate(rng):
+            txt = " ".join(w["word"] for w in words if s <= w["start"] < e)
+            drop[f"r{i}"] = {"i": f"r{i}", "start": s, "end": e, "text": txt, "reason": "rango manual"}
+        for w in words:
+            if any(s <= w["start"] < e for s, e in rng):
+                w["seg"] = next(f"r{i}" for i, (s, e) in enumerate(rng) if s <= w["start"] < e)
+    elif a.keep_drop:
         drop = {x["i"]: x for x in json.load(open(a.keep_drop))["drop"]}
     else:
         drop = {}
@@ -71,7 +87,7 @@ def main():
     keep = [[round(s, 3), round(min(e, d["duration"]), 3)] for s, e in keep]
     total = sum(e - s for s, e in keep)
     plan = {"source": d["source"], "gap": a.gap, "pad": a.pad, "keep": keep,
-            "drop": sorted(drop.values(), key=lambda x: x["i"]),
+            "drop": sorted(drop.values(), key=lambda x: x["start"]),
             "original_s": d["duration"], "edited_s": round(total, 2)}
     json.dump(plan, open(a.out, "w"), ensure_ascii=False, indent=1)
     print(f"original {d['duration']:.1f}s -> editado {total:.1f}s | {len(drop)} frases quitadas | "

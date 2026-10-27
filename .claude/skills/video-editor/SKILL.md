@@ -84,15 +84,30 @@ corrige `palabras.json` si hace falta.
 python3 -I scripts/plan_cuts.py $WORK/palabras.json --gap 0.5 --out $WORK/plan.json
 ```
 
-El script marca: pausas de más de 0,5 s, frases que empiezan igual que la anterior (repetición) y
+**Camilo marca sus repeticiones con una cuenta regresiva: "3, 2, 1"** (no dice "repito"). El
+script avisa cada cuenta regresiva; la toma mala es la que viene justo antes y la decides tú
+mirando las palabras con sus tiempos. Para ese caso usa el modo manual:
+`--drop-ranges "20.10-26.90,78.70-81.60"` (rangos en segundos a quitar).
+
+El script también marca: pausas de más de 0,5 s, frases que empiezan igual que la anterior (repetición) y
 frases como "repito", "otra vez", "de nuevo", "corta", "vamos otra vez", "let's redo that". **Tú
 decides con criterio** cuál toma es la mejor (normalmente la última completa) y editas
 `plan.json` antes de renderizar. Muestra a Camilo la lista de cortes con sus tiempos antes de
 renderizar algo largo.
 
 ```bash
-python3 -I scripts/render_cuts.py entrada.mp4 $WORK/plan.json salida.mp4 [--vertical] [--subs subs.ass]
+python3 -I scripts/render_cuts.py entrada.mp4 $WORK/plan.json salida.mp4 \
+    [--vertical] [--captions palabras.json --fontsdir assets/fonts] [--append tarjeta-final.mp4]
 ```
+
+Renderiza en dos pasos: cada tramo a un archivo temporal y luego todo junto (subtítulos, volumen,
+calidad máxima). Así usa poca memoria: el método de un solo filtro con ~100 tramos agotó la memoria
+del contenedor. Los tramos de `keep` se pegan **en el orden en que están**, así que un Reel puede
+reordenar la toma (por ejemplo, abrir con la escena y después la explicación). Si reordenas, revisa
+mayúsculas de los subtítulos en un `palabras_reel.json` aparte.
+
+**Primer video real (2026-10-27):** 6:48 de grabación quedaron en 5:23 para YouTube (5 tomas
+repetidas, 32 pausas) y un Reel de 24 s. Whisper `medium` tardó 6,5 min para 6,8 min de audio.
 
 **4. Una grabación con varios videos se divide en archivos.** Busca en la transcripción los cortes
 naturales (cambio de tema, "siguiente video", silencios largos con reinicio) y propone los puntos a

@@ -10,7 +10,7 @@
 --fontsdir       carpeta con la fuente Poppins en .ttf/.otf.
 Audio: loudnorm a -16 LUFS (estándar para redes), salvo --no-loudnorm.
 """
-import argparse, json, os, subprocess, sys
+import argparse, json, os, shutil, subprocess, sys, tempfile
 
 def probe(path):
     """Ancho y alto como se ven (con la rotación del celular aplicada) y cuadros por segundo."""
@@ -28,9 +28,14 @@ def ass_time(t):
 
 def remap(t, keep):
     """Tiempo original -> tiempo en el video cortado (None si cae en un corte)."""
+    hit = locate(t, keep)
+    return hit[0] if hit else None
+
+def locate(t, keep):
+    """(tiempo en el video cortado, índice del tramo) o None. Sirve también con tramos reordenados."""
     acc = 0.0
-    for s, e in keep:
-        if s <= t <= e: return acc + (t - s)
+    for i, (s, e) in enumerate(keep):
+        if s <= t <= e: return acc + (t - s), i
         acc += e - s
     return None
 
@@ -42,13 +47,20 @@ def build_ass(words_path, keep, w, h, vertical, path):
     lines, chunk = [], []
     def flush():
         if not chunk: return
-        a, b = remap(chunk[0]["start"], keep), remap(chunk[-1]["end"], keep)
-        if a is not None and b is not None and b > a:
+        # Cada línea vive dentro de un solo tramo: el final se mide desde su propio inicio, no buscando
+        # el tiempo de la última palabra (con tramos reordenados ese tiempo puede caer en otro tramo).
+        i = chunk[0]["_tramo"]
+        a = remap(chunk[0]["start"], keep)
+        b = a + min(chunk[-1]["end"], keep[i][1]) - chunk[0]["start"]
+        if b > a:
             lines.append((a, b, " ".join(x["word"] for x in chunk)))
         chunk.clear()
     for x in words:
-        if remap(x["start"], keep) is None: flush(); continue
-        if chunk and (len(chunk) >= per or x["start"] - chunk[-1]["end"] > 0.6): flush()
+        hit = locate(x["start"], keep)
+        if hit is None: flush(); continue
+        x["_tramo"] = hit[1]
+        if chunk and (len(chunk) >= per or x["start"] - chunk[-1]["end"] > 0.6 or chunk[-1]["_tramo"] != hit[1]):
+            flush()
         chunk.append(x)
         if x["word"][-1:] in ".,;:?!": flush()  # el subtítulo corta donde corta la idea
     flush()
@@ -77,31 +89,49 @@ def main():
     ap.add_argument("--captions")
     ap.add_argument("--fontsdir")
     ap.add_argument("--no-loudnorm", action="store_true")
+    ap.add_argument("--append", help="video que se pega al final (tarjeta de cierre)")
     a = ap.parse_args()
     if os.path.abspath(a.input) == os.path.abspath(a.output):
         sys.exit("La salida no puede ser el archivo original.")
     keep = json.load(open(a.plan))["keep"]
-    sel = "+".join(f"between(t,{s},{e})" for s, e in keep)
     w, h, fps = probe(a.input)
-    # Los celulares graban con cuadros por segundo variables: se fijan antes de cortar para que el
-    # audio no se desfase de los labios.
-    v = f"fps={fps},select='{sel}',setpts=N/FRAME_RATE/TB"
     if a.vertical:
         w, h = 1080, 1920
-        v += ",scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1"
+    # Paso 1: cada tramo a su propio archivo temporal, uno por uno (poca memoria aunque sean cientos
+    # y en cualquier orden). Aquí se fijan los cuadros por segundo (los celulares graban con ritmo
+    # variable y el audio se desfasaría de los labios) y el tamaño final.
+    tmp = tempfile.mkdtemp(prefix="tramos-", dir=os.path.dirname(os.path.abspath(a.output)))
+    norm_v = f"fps={fps},scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1,format=yuv420p"
+    enc = ["-c:v", "libx264", "-crf", "10", "-preset", "veryfast", "-c:a", "pcm_s16le", "-ar", "48000", "-ac", "1"]
+    lista = []
+    for i, (s, e) in enumerate(keep):
+        f = os.path.join(tmp, f"{i:04d}.mkv")
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", str(s), "-t", str(e - s),
+                        "-i", a.input, "-vf", norm_v, *enc, f], check=True)
+        lista.append(f)
+    if a.append:
+        # Tarjeta final (por ejemplo la de HyperFrames), con silencio si no trae audio.
+        f = os.path.join(tmp, "zz-final.mkv")
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", a.append, "-f", "lavfi",
+                        "-i", "anullsrc=r=48000:cl=mono", "-map", "0:v", "-map", "1:a", "-shortest",
+                        "-vf", norm_v, *enc, f], check=True)
+        lista.append(f)
+    concat = os.path.join(tmp, "lista.txt")
+    open(concat, "w").write("".join(f"file '{f}'\n" for f in lista))
+    # Paso 2: se pegan en orden y en una sola pasada final van subtítulos, volumen y calidad máxima.
+    v = "setpts=PTS-STARTPTS"
     if a.captions:
         ass = os.path.splitext(a.output)[0] + ".ass"
         n = build_ass(a.captions, keep, w, h, a.vertical, ass)
         v += f",ass='{ass}'" + (f":fontsdir='{a.fontsdir}'" if a.fontsdir else "")
         print(f"{n} líneas de subtítulos -> {ass}", file=sys.stderr)
-    au = f"aselect='{sel}',asetpts=N/SR/TB" + ("" if a.no_loudnorm else ",loudnorm=I=-16:TP=-1.5:LRA=11")
-    script = os.path.splitext(a.output)[0] + ".filter.txt"
-    open(script, "w").write(f"[0:v]{v}[v];[0:a]{au}[a]")
-    cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", a.input,
-           "-filter_complex_script", script, "-map", "[v]", "-map", "[a]",
+    au = "anull" if a.no_loudnorm else "loudnorm=I=-16:TP=-1.5:LRA=11"
+    cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", concat,
+           "-vf", v, "-af", au + ",aresample=48000",
            "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-pix_fmt", "yuv420p",
            "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-movflags", "+faststart", a.output]
     subprocess.run(cmd, check=True)
+    shutil.rmtree(tmp)
     print(f"listo -> {os.path.abspath(a.output)}", file=sys.stderr)
 
 if __name__ == "__main__":
