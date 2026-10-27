@@ -78,7 +78,10 @@ y 5), `harvey/lead_qualification.md` y `harvey/account_navigation.md`.
   bilingüismo o innovación, publicó vacantes docentes, tiene programa de
   formación docente visible, es cercano a Rionegro. No asignes prioridad por
   intuición sin decir cuál señal la justifica.
-- Lista corta: de 10 a 20 colegios. Calidad antes que volumen.
+- Lista corta: de 10 a 20 colegios. Calidad antes que volumen. Guárdala en
+  `prospectos/` (ya existe `prospectos/colegios-oriente.md`; actualízala en
+  lugar de duplicarla). No la guardes fuera de `.claude/`: el repo publica
+  el sitio web.
 - Colegios oficiales: la decisión suele pasar por la Secretaría de Educación.
   Revisa `convocatorias/pensar-con-otros-2026/` del repo antes de proponer un
   enfoque distinto.
