@@ -1,0 +1,61 @@
+/* =========================================================
+   Panel del docente — usa los tokens de ../assets/css/style.css
+   ========================================================= */
+
+.panel-salir { padding: 8px 18px; font-size: 0.9rem; }
+
+.campos--uno { grid-template-columns: 1fr; max-width: 360px; }
+.panel-entrar h2 { color: var(--azul-oscuro); }
+
+.panel-mensaje { margin: 12px 0 0; font-weight: 600; color: var(--azul-oscuro); }
+.panel-mensaje:empty { display: none; }
+
+.panel-fecha { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.panel-fecha label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 0.85rem; }
+.panel-fecha input { font: inherit; padding: 8px 10px; border: 2px solid var(--borde); border-radius: var(--radio-sm); }
+.panel-resumen { margin: 0; font-weight: 700; color: var(--azul-oscuro); }
+
+.dia { position: relative; }
+.dia-total {
+  position: absolute; top: -6px; right: -6px;
+  min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
+  background: var(--naranja); color: var(--blanco);
+  font-size: 0.75rem; font-weight: 800; line-height: 22px;
+}
+.dias { padding-top: 8px; }
+
+.panel-dia { margin: 18px 0 0; color: var(--azul-oscuro); font-size: 1.2rem; }
+.panel-dia::first-letter { text-transform: uppercase; }
+
+.panel-sesion { border-left: 6px solid var(--azul); }
+.panel-sesion--presencial { border-left-color: var(--naranja); }
+.panel-sesion--prueba { border-left-color: var(--verde); }
+.panel-sesion__cabeza { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.panel-sesion__cabeza h3 { margin: 0; font-size: 1.05rem; }
+.panel-sesion__cupo { margin-left: auto; font-weight: 700; color: var(--texto-suave); font-size: 0.9rem; }
+
+.etiqueta-sesion { font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--tint-azul); color: var(--azul); }
+.panel-sesion--presencial .etiqueta-sesion { background: var(--tint-naranja); color: var(--naranja-profundo); }
+.panel-sesion--prueba .etiqueta-sesion { background: var(--tint-verde); color: var(--verde-profundo); }
+.etiqueta-sesion--bloque { margin-left: 8px; background: var(--fondo-claro); color: var(--texto); }
+
+.panel-sesion__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.boton--chico { padding: 8px 16px; font-size: 0.85rem; }
+.panel-alerta { font-weight: 700; font-size: 0.85rem; color: var(--naranja-profundo); }
+
+.panel-asistentes { list-style: none; margin: 14px 0 0; padding: 0; }
+.panel-asistente { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; padding: 12px 0; border-top: 1px solid var(--borde); }
+.panel-asistente__datos { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; }
+.panel-asistente__datos strong { margin-right: 4px; }
+.panel-asistente__detalle { flex-basis: 100%; font-size: 0.85rem; color: var(--texto-suave); }
+.panel-asistente__contacto { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 0.88rem; }
+.panel-asistente__contacto a { color: var(--azul); font-weight: 600; overflow-wrap: anywhere; }
+
+.panel-cancelar {
+  font: inherit; font-weight: 700; font-size: 0.85rem;
+  background: transparent; color: #B3261E; border: 2px solid #E8B4B0; border-radius: 999px;
+  padding: 5px 14px; cursor: pointer;
+}
+.panel-cancelar:hover { background: #FCEEEE; }
+.panel-cancelar:disabled { opacity: 0.5; cursor: wait; }
+.panel-cancelar:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }

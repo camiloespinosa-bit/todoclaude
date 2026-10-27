@@ -26,7 +26,9 @@ estudiantes tienen planes mensuales pagados por anticipado.
 | `reservas/index.html`, `reservas.css`, `reservas.js` | La página. Sin `config.js` lleno funciona como prototipo con datos de ejemplo. |
 | `reservas/config.js` | Dirección del proyecto de Supabase y su llave pública. |
 | `supabase/migrations/001_reservas_clases.sql` | Tablas y reglas. Las reglas viven en la base de datos: nadie se las puede saltar desde el navegador. |
-| `supabase/functions/reservar/index.ts` | Función del servidor: guarda la reserva y crea o actualiza el evento en Google Calendar con el enlace de Meet. |
+| `supabase/functions/reservar/index.ts` | Función del servidor: guarda la reserva y crea o actualiza el evento en Google Calendar con el enlace de Meet. También atiende el panel del docente (agenda, cancelar, reenviar al calendario). |
+| `reservas/panel.html`, `panel.css`, `panel.js` | Panel del docente: ver las reservas por día, cancelar y reenviar al calendario. |
+| `supabase/migrations/002_panel_docente.sql` | Quién puede entrar al panel (tabla `docentes`) y las funciones de agenda y cancelación. |
 
 Las reglas se probaron con 23 casos en una base de datos Postgres local, y el flujo completo
 (página → servidor → base de datos → calendario) con un Google Calendar simulado.
@@ -103,9 +105,33 @@ Haz una reserva de prueba con tu propio correo y revisa que:
 
 Si la reserva se guarda pero el evento no aparece, revisa **Edge Functions > reservar > Logs**.
 
+## Panel del docente
+
+Dirección: **gimnasiodelcerebro.co/reservas/panel.html** (no aparece en buscadores).
+
+- Muestra 14 días; cada día lleva el número de personas con reserva. Con "Ir a la fecha" se salta a cualquier día.
+- Por cada clase: hora, tipo de grupo, cupo, enlace de Meet y la lista de asistentes con WhatsApp, correo y programa.
+- **Cancelar** una reserva: Google le avisa al estudiante y actualiza el evento. Si el grupo queda vacío, el evento se borra. Si la reserva es un bloque de 2 horas, se cancelan las dos horas. La hora queda libre otra vez en la página de reservas.
+- **Reenviar al calendario:** aparece si una reserva no alcanzó a llegar a Google Calendar (por ejemplo, si Google falló en ese momento).
+
+### Activarlo (una sola vez)
+
+1. **SQL Editor:** pega y ejecuta `supabase/migrations/002_panel_docente.sql`.
+2. **Authentication > Users > Add user > Create new user:** tu correo y una contraseña segura. Marca **Auto Confirm User**.
+3. **SQL Editor:** dale acceso al panel (cambia el correo):
+
+   ```sql
+   insert into docentes (user_id)
+   select id from auth.users where email = 'tu-correo@ejemplo.com';
+   ```
+4. **Edge Functions > reservar > Code:** reemplaza todo el código por el nuevo `supabase/functions/reservar/index.ts` y dale **Deploy**. Revisa que **Verify JWT** siga apagado.
+5. Entra a gimnasiodelcerebro.co/reservas/panel.html con ese correo y contraseña.
+
+Seguridad: el panel solo muestra datos si el usuario inició sesión **y** está en la tabla `docentes`. El servidor lo revisa en cada acción; los datos de los estudiantes nunca se leen directamente desde el navegador.
+
 ## Pendientes
 
-- Panel del docente para ver y cancelar reservas (como el de Adriana en Wag and Wash).
+- Desde el panel: bloquear días (vacaciones) y agregar festivos sin entrar al SQL Editor.
 - Bloquear horas que ya tienes ocupadas en tu Google Calendar personal.
 - Recordatorios por WhatsApp.
 - Hoy cualquiera puede reservar una clase normal sin verificar que sea estudiante (decisión

@@ -1,5 +1,8 @@
-// Función del servidor (Supabase Edge Function): recibe la reserva desde la página,
-// la guarda con las reglas de la base de datos y la sincroniza con Google Calendar.
+// Función del servidor (Supabase Edge Function).
+// - Sin "accion": recibe la reserva desde la página, la guarda con las reglas de la base de
+//   datos y la sincroniza con Google Calendar.
+// - Con "accion" (agenda, cancelar, sincronizar): las usa el panel del docente. Exigen la
+//   sesión iniciada de un usuario que esté en la tabla `docentes`.
 //
 // Secretos que hay que configurar en Supabase (Edge Functions > Secrets):
 //   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
@@ -108,6 +111,19 @@ async function sincronizarSesion(id: string, token: string): Promise<string | nu
   const idEvento = sesion.id.replaceAll("-", "");
   const base = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDARIO)}/events`;
   const cabeceras = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+
+  // Sin asistentes (todos cancelaron): se borra el evento y Google avisa a los invitados.
+  if (sesion.asistentes.length === 0) {
+    const borrar = await fetch(`${base}/${idEvento}?sendUpdates=all`, { method: "DELETE", headers: cabeceras });
+    // 404 o 410: el evento no existía o ya estaba borrado.
+    if (!borrar.ok && borrar.status !== 404 && borrar.status !== 410) {
+      const error = await borrar.json().catch(() => null);
+      throw new Error(`Google no borró el evento: ${error?.error?.message ?? borrar.status}`);
+    }
+    await rpc("quitar_evento", { p_sesion: sesion.id });
+    return null;
+  }
+
   const evento = armarEvento(sesion);
 
   const crear = await fetch(`${base}?conferenceDataVersion=1&sendUpdates=all`, {
@@ -142,17 +158,33 @@ async function sincronizarSesion(id: string, token: string): Promise<string | nu
   return meet;
 }
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return responder({ error: "METODO_INVALIDO" }, 405);
+function codigoDeError(e: unknown) {
+  // Las reglas de la base de datos devuelven códigos como SIN_CUPO u OTRA_MODALIDAD.
+  const mensaje = (e as Error).message;
+  if (/^[A-Z_]+$/.test(mensaje)) return mensaje;
+  console.error(e);
+  return "ERROR";
+}
 
-  let datos;
-  try {
-    datos = await req.json();
-  } catch {
-    return responder({ error: "DATOS_INVALIDOS" }, 400);
-  }
+// Confirma que quien llama inició sesión en Supabase Auth y es docente.
+async function esDocente(req: Request): Promise<boolean> {
+  const token = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
+  if (!token) return false;
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${token}` } });
+  if (!r.ok) return false;
+  const usuario = await r.json();
+  return usuario?.id ? (await rpc("es_docente", { p_user: usuario.id })) === true : false;
+}
 
+async function sincronizarVarias(sesiones: string[]) {
+  const token = await tokenDeGoogle();
+  let meet: string | null = null;
+  // En un bloque cada hora es su propio grupo; se devuelve el enlace de la primera hora.
+  for (const id of sesiones) meet ??= await sincronizarSesion(id, token);
+  return meet;
+}
+
+async function reservar(datos: Record<string, unknown>) {
   // Campo trampa: las personas no lo ven; si viene lleno, es un robot.
   if (datos.sitio_web) return responder({ ok: true, calendario: false });
 
@@ -172,22 +204,59 @@ Deno.serve(async (req) => {
     });
     sesiones = r.sesiones;
   } catch (e) {
-    // Las reglas de la base de datos devuelven códigos como SIN_CUPO u OTRA_MODALIDAD.
-    const codigo = (e as Error).message.match(/^[A-Z_]+$/) ? (e as Error).message : "ERROR";
-    if (codigo === "ERROR") console.error(e);
+    const codigo = codigoDeError(e);
     return responder({ error: codigo }, codigo === "ERROR" ? 500 : 409);
   }
 
-  // La reserva ya quedó guardada. Si Google falla, no se pierde: se informa y se puede
-  // volver a sincronizar después.
+  // La reserva ya quedó guardada. Si Google falla, no se pierde: se informa y el docente
+  // la puede reenviar al calendario desde su panel.
   try {
-    const token = await tokenDeGoogle();
-    let meet: string | null = null;
-    // En un bloque cada hora es su propio grupo; se devuelve el enlace de la primera hora.
-    for (const id of sesiones) meet ??= await sincronizarSesion(id, token);
+    const meet = await sincronizarVarias(sesiones);
     return responder({ ok: true, calendario: true, meet });
   } catch (e) {
     console.error(e);
     return responder({ ok: true, calendario: false });
   }
+}
+
+async function panel(req: Request, datos: Record<string, unknown>) {
+  if (!(await esDocente(req))) return responder({ error: "NO_AUTORIZADO" }, 401);
+
+  try {
+    if (datos.accion === "agenda") {
+      return responder({ sesiones: await rpc("panel_agenda", { p_desde: datos.desde, p_hasta: datos.hasta }) });
+    }
+    if (datos.accion === "cancelar") {
+      const { sesiones } = await rpc("cancelar_reserva", { p_reserva: datos.reserva });
+      try {
+        await sincronizarVarias(sesiones ?? []);
+        return responder({ ok: true, calendario: true });
+      } catch (e) {
+        console.error(e);
+        return responder({ ok: true, calendario: false });
+      }
+    }
+    if (datos.accion === "sincronizar") {
+      const meet = await sincronizarVarias([String(datos.sesion)]);
+      return responder({ ok: true, calendario: true, meet });
+    }
+  } catch (e) {
+    const codigo = codigoDeError(e);
+    return responder({ error: codigo }, codigo === "ERROR" ? 500 : 409);
+  }
+  return responder({ error: "ACCION_INVALIDA" }, 400);
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  if (req.method !== "POST") return responder({ error: "METODO_INVALIDO" }, 405);
+
+  let datos;
+  try {
+    datos = await req.json();
+  } catch {
+    return responder({ error: "DATOS_INVALIDOS" }, 400);
+  }
+
+  return datos.accion ? panel(req, datos) : reservar(datos);
 });
