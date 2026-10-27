@@ -144,10 +144,27 @@ Para aplicar `supabase/migrations/003_autorizacion_datos.sql` sin cortar las res
 2. Publicar la página (merge en GitHub).
 3. Desplegar la función `reservar` nueva (desde ese momento rechaza reservas sin autorización).
 
+## WhatsApp: confirmación y recordatorios
+
+Con Twilio, solo para quienes marcaron la casilla de WhatsApp al reservar:
+
+- **Confirmación:** apenas se reserva.
+- **Día antes:** desde las 6:00 p.m. del día anterior (solo si se reservó antes de esa hora).
+- **1 hora antes:** entre 70 y 10 minutos antes de la clase (solo si se reservó con 2 horas o más de anticipación).
+- Un bloque de 2 horas recibe un solo mensaje. Ningún mensaje se repite; si Twilio falla, se reintenta en la siguiente ejecución mientras siga a tiempo, y el error queda en los Logs.
+
+Sin los secretos de Twilio la función no envía nada, así que se puede desplegar antes de tener las plantillas aprobadas.
+
+Puesta en marcha:
+1. SQL Editor: ejecutar `supabase/migrations/005_whatsapp.sql`.
+2. Desplegar la función `reservar` nueva.
+3. Twilio: crear y enviar a aprobación las 3 plantillas de `reservas/PLANTILLAS_WHATSAPP.md`.
+4. Con las plantillas aprobadas, en Edge Functions > Secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (el número de envío, con +57), `TWILIO_PLANTILLA_CONFIRMACION`, `TWILIO_PLANTILLA_DIA_ANTES`, `TWILIO_PLANTILLA_HORA_ANTES`.
+5. Activar las extensiones `pg_cron` y `pg_net`, ejecutar `supabase/setup/recordatorios_whatsapp.sql` y copiar la clave que muestra al secreto `RECORDATORIOS_CLAVE`.
+
 ## Pendientes
 
 - Borrar automáticamente los datos de reservas con más de 24 meses sin actividad, como promete la política de privacidad v2.
 - Bloquear horas que ya tienes ocupadas en tu Google Calendar personal.
-- Recordatorios por WhatsApp.
 - Hoy cualquiera puede reservar una clase normal sin verificar que sea estudiante (decisión
   tomada: todos pagan plan mensual). Si aparecen reservas falsas, se puede agregar verificación.
