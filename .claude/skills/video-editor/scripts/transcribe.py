@@ -5,7 +5,7 @@
 
 Escribe palabras.json ({"segments": [...], "words": [...]}) y un .srt al lado.
 """
-import argparse, json, os, sys, time
+import argparse, json, os, subprocess, sys, time
 
 def ts(t):
     h, r = divmod(t, 3600); m, s = divmod(r, 60)
@@ -18,10 +18,15 @@ def main():
     ap.add_argument("--model", default="medium")
     ap.add_argument("--lang", default="es")
     a = ap.parse_args()
+    import numpy as np
     from faster_whisper import WhisperModel
     t0 = time.time()
+    # El audio lo decodifica FFmpeg (16 kHz mono), así no dependemos de la versión de PyAV.
+    pcm = subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-i", a.input, "-vn", "-ac", "1",
+                          "-ar", "16000", "-f", "f32le", "-"], capture_output=True, check=True).stdout
+    audio = np.frombuffer(pcm, dtype=np.float32)
     model = WhisperModel(a.model, device="cpu", compute_type="int8")
-    segs, info = model.transcribe(a.input, language=a.lang, word_timestamps=True,
+    segs, info = model.transcribe(audio, language=a.lang, word_timestamps=True,
                                   vad_filter=False, condition_on_previous_text=False)
     segments, words = [], []
     for i, s in enumerate(segs):

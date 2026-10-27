@@ -46,6 +46,7 @@ def build_ass(words_path, keep, w, h, vertical, path):
         if remap(x["start"], keep) is None: flush(); continue
         if chunk and (len(chunk) >= per or x["start"] - chunk[-1]["end"] > 0.6): flush()
         chunk.append(x)
+        if x["word"][-1:] in ".,;:?!": flush()  # el subtítulo corta donde corta la idea
     flush()
     with open(path, "w", encoding="utf-8") as f:
         f.write(f"""[Script Info]

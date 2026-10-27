@@ -30,7 +30,18 @@ def main():
     ap.add_argument("--keep-drop", help="usar la lista 'drop' de un plan ya revisado")
     a = ap.parse_args()
     d = json.load(open(a.words))
-    segs, words = d["segments"], d["words"]
+    words = d["words"]
+    # Frases propias (cortadas en . ? ! o en un silencio de más de 1 s), no los bloques de Whisper:
+    # Whisper a veces une "repito" con la toma buena en el mismo bloque.
+    segs, n = [], 0
+    for k, w in enumerate(words):
+        if k and (words[k - 1]["word"][-1:] in ".?!" or w["start"] - words[k - 1]["end"] > 1.0):
+            n += 1
+        w["seg"] = n
+        if len(segs) <= n:
+            segs.append({"i": n, "start": w["start"], "end": w["end"], "text": w["word"]})
+        else:
+            segs[n]["end"] = w["end"]; segs[n]["text"] += " " + w["word"]
 
     if a.keep_drop:
         drop = {x["i"]: x for x in json.load(open(a.keep_drop))["drop"]}

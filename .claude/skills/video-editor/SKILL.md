@@ -35,8 +35,15 @@ dominio exacto que falló; no inventes una transcripción.
 
 Si algo pide contraseña o `sudo` en el computador de Camilo, para y pregunta antes.
 
-**HyperFrames** (HeyGen, Apache 2.0) sirve para gráficos animados y títulos hechos en HTML. Solo se
-usa si el video lleva gráficos; un corte limpio o con subtítulos se hace solo con FFmpeg.
+**HyperFrames** (HeyGen, Apache 2.0, autorizado por Camilo el 2026-10-27) sirve para gráficos
+animados y títulos hechos en HTML. Sus 4 skills (`hyperframes`, `hyperframes-cli`,
+`hyperframes-registry`, `media-use`) ya están en `.claude/skills/`. El programa corre con
+`npx hyperframes` (probado con la versión 0.8.209). Solo se usa si el video lleva gráficos; un corte
+limpio o con subtítulos se hace solo con FFmpeg.
+
+**Tiempos medidos en la nube (4 núcleos, sin tarjeta gráfica):** `small` tarda más o menos lo mismo
+que dura el audio; `medium` tarda unas 2,6 veces la duración (14,6 s de audio en 38 s). Un video de
+10 minutos con `medium` puede tardar del orden de media hora: avísale a Camilo antes de empezar.
 
 ## Antes de cada edición: 3 preguntas (siempre)
 
@@ -64,7 +71,12 @@ entrégalo además con la herramienta de enviar archivos. **Nunca hagas commit d
 "$WORK/venv/bin/python" -I scripts/transcribe.py entrada.mp4 --model medium --out $WORK/palabras.json
 ```
 
-Usa `medium` para español (más preciso); `small` solo para pruebas rápidas.
+Usa `medium` para español (más preciso); `small` solo para pruebas rápidas. El script decodifica el
+audio con FFmpeg, así que no depende de la versión de PyAV.
+
+**Los subtítulos siempre se revisan.** Whisper se equivoca en palabras sueltas (en la prueba
+escribió "lee" donde se decía "ve"). Antes de quemar subtítulos, muéstrale a Camilo el texto y
+corrige `palabras.json` si hace falta.
 
 **3. Repeticiones y pausas.**
 
