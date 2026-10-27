@@ -107,3 +107,15 @@ Fuente: [leonxlnx/taste-skill](https://github.com/leonxlnx/taste-skill) (v1.0.0,
 | `output-skill` (`full-output-enforcement`) | Evita truncar código: fuerza salidas completas y prohíbe placeholders. |
 
 Licencia: MIT (ver `.claude/skills/leonxlnx-taste-skill.LICENSE`).
+
+### Ventas (basada en Harvey)
+
+Fuente: [ethanplusai/harvey](https://github.com/ethanplusai/harvey) (MIT, commit `4237f07`), de Ethan Rogers. Harvey es una aplicación en Python que prospecta, escribe y envía correos en frío sola. **No se instaló la aplicación**: solo su biblioteca de conocimiento de ventas, como la skill `ventas` (`.claude/skills/ventas/`).
+
+| Ruta | Qué es |
+|---|---|
+| `ventas/SKILL.md` | Instrucciones en español adaptadas a Gimnasio del Cerebro y a Colombia: qué canal usar con cada oferta, flujo para armar listas de colegios, primer mensaje, objeciones y referidos. Nada se envía solo: el usuario revisa y envía cada mensaje. |
+| `ventas/harvey/` | Los 10 documentos originales de Harvey, sin cambios (en inglés): prospección, calificación, correo en frío, señales, objeciones, oferta, LinkedIn. |
+| `ventas/productos/` | Fichas de las tres ofertas (colegios, inglés para adultos y docentes, niños), armadas con lo que hay en este repo. Lo marcado "POR CONFIRMAR" (precios de colegios y de Fase Experta, duración del taller) se debe completar antes de usarlo en mensajes. |
+
+Licencia: MIT (ver `.claude/skills/ethanplusai-harvey.LICENSE`).
