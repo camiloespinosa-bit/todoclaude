@@ -13,8 +13,9 @@ estudiantes tienen planes mensuales pagados por anticipado.
 - **Bloque de 2 horas:** son dos grupos seguidos; el estudiante queda en los dos.
 - **Clase de prueba:** gratis, 30 minutos, para una familia o grupo de hasta 5 personas.
   Solo cabe en horas sin grupo, y mientras exista, esa hora queda bloqueada para clases.
-- **Horario:** lunes 8–1; martes y jueves 8–12 y 1–4; miércoles 8–12 y 1–7; viernes 8–12;
-  sábado 8–12 y 1–5. Domingo cerrado. Se cambia en la tabla `horario` de Supabase.
+- **Horario:** lunes 6–1 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y
+  1–8 p.m.; viernes 6–12; sábado 8–12 y 1–5. Domingo cerrado. Se cambia en la tabla `horario`
+  de Supabase (ver `supabase/migrations/006_horario_6am.sql`).
 - **Google Calendar (opción B):** un evento por grupo con todos sus estudiantes invitados y un
   solo enlace de Meet si es virtual. Cada clase de prueba es su propio evento. Los estudiantes
   no ven los correos de los demás.
@@ -29,6 +30,7 @@ estudiantes tienen planes mensuales pagados por anticipado.
 | `supabase/functions/reservar/index.ts` | Función del servidor: guarda la reserva y crea o actualiza el evento en Google Calendar con el enlace de Meet. También atiende el panel del docente (agenda, cancelar, reenviar al calendario). |
 | `reservas/panel.html`, `panel.css`, `panel.js` | Panel del docente: ver las reservas por día, cancelar y reenviar al calendario. |
 | `supabase/migrations/002_panel_docente.sql` | Quién puede entrar al panel (tabla `docentes`) y las funciones de agenda y cancelación. |
+| `supabase/migrations/007_avisos_whatsapp_panel.sql` | Registro de confirmaciones y recordatorios enviados por WhatsApp desde el panel. |
 
 Las reglas se probaron con 23 casos en una base de datos Postgres local, y el flujo completo
 (página → servidor → base de datos → calendario) con un Google Calendar simulado.
@@ -144,10 +146,43 @@ Para aplicar `supabase/migrations/003_autorizacion_datos.sql` sin cortar las res
 2. Publicar la página (merge en GitHub).
 3. Desplegar la función `reservar` nueva (desde ese momento rechaza reservas sin autorización).
 
+## WhatsApp desde el panel (lo que se usa hoy)
+
+Los mensajes salen de tu propio WhatsApp (301 491 6120), así que si el estudiante responde, la conversación sigue en tu celular. No requiere Twilio, Meta ni pagos.
+
+- Arriba de la agenda, el recuadro verde **WhatsApp pendientes** dice cuántos avisos faltan y en qué días. Tocar uno lleva a ese día.
+- Clases de **hoy y mañana**: botón **Recordar por WhatsApp**. Clases de **pasado mañana en adelante**: botón **Confirmar por WhatsApp**.
+- El botón abre WhatsApp con el mensaje ya escrito (nombre, clase, hora y lugar; si es virtual, el enlace de Meet). Tú solo le das enviar.
+- Al tocarlo queda marcado "✓ Recordado" o "✓ Confirmado" con la hora. Ojo: el panel marca cuando se abre WhatsApp, no puede saber si de verdad le diste enviar.
+- Solo aparece para quienes aceptaron WhatsApp al reservar. En un bloque de 2 horas aparece una sola vez, en la primera hora.
+- Si en tu celular tienes WhatsApp y WhatsApp Business, el teléfono puede preguntar con cuál abrir: elige Business.
+
+Activarlo (una sola vez), en este orden:
+1. SQL Editor: ejecutar `supabase/migrations/007_avisos_whatsapp_panel.sql`.
+2. Desplegar la función `reservar` nueva (Edge Functions > reservar > Code, pegar `supabase/functions/reservar/index.ts`, Deploy; Verify JWT apagado).
+3. Publicar la página (merge en GitHub).
+
+## WhatsApp automático con Twilio (apagado, para más adelante)
+
+Con Twilio, solo para quienes marcaron la casilla de WhatsApp al reservar:
+
+- **Confirmación:** apenas se reserva.
+- **Día antes:** desde las 6:00 p.m. del día anterior (solo si se reservó antes de esa hora).
+- **1 hora antes:** entre 70 y 10 minutos antes de la clase (solo si se reservó con 2 horas o más de anticipación y la clase es a las 7:00 a.m. o después).
+- Un bloque de 2 horas recibe un solo mensaje. Ningún mensaje se repite; si Twilio falla, se reintenta en la siguiente ejecución mientras siga a tiempo, y el error queda en los Logs.
+
+Sin los secretos de Twilio la función no envía nada, así que se puede desplegar antes de tener las plantillas aprobadas.
+
+Puesta en marcha:
+1. SQL Editor: ejecutar `supabase/migrations/005_whatsapp.sql`.
+2. Desplegar la función `reservar` nueva.
+3. Twilio: crear y enviar a aprobación las 3 plantillas de `reservas/PLANTILLAS_WHATSAPP.md`.
+4. Con las plantillas aprobadas, en Edge Functions > Secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (el número de envío, con +57), `TWILIO_PLANTILLA_CONFIRMACION`, `TWILIO_PLANTILLA_DIA_ANTES`, `TWILIO_PLANTILLA_HORA_ANTES`.
+5. Activar las extensiones `pg_cron` y `pg_net`, ejecutar `supabase/setup/recordatorios_whatsapp.sql` y copiar la clave que muestra al secreto `RECORDATORIOS_CLAVE`.
+
 ## Pendientes
 
 - Borrar automáticamente los datos de reservas con más de 24 meses sin actividad, como promete la política de privacidad v2.
 - Bloquear horas que ya tienes ocupadas en tu Google Calendar personal.
-- Recordatorios por WhatsApp.
 - Hoy cualquiera puede reservar una clase normal sin verificar que sea estudiante (decisión
   tomada: todos pagan plan mensual). Si aparecen reservas falsas, se puede agregar verificación.

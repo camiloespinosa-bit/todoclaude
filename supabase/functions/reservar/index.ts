@@ -1,12 +1,19 @@
 // Función del servidor (Supabase Edge Function).
 // - Sin "accion": recibe la reserva desde la página, la guarda con las reglas de la base de
 //   datos y la sincroniza con Google Calendar.
-// - Con "accion" (agenda, cancelar, sincronizar, cerrados, cerrar, abrir): las usa el panel del docente. Exigen la
+// - Con "accion" (agenda, cancelar, sincronizar, cerrados, cerrar, abrir, aviso): las usa el panel del docente.
+// - Con accion "recordatorios": la llama cada 15 minutos la tarea programada de Supabase
+//   (pg_cron) para enviar los recordatorios de WhatsApp. Exigen la
 //   sesión iniciada de un usuario que esté en la tabla `docentes`.
 //
 // Secretos que hay que configurar en Supabase (Edge Functions > Secrets):
 //   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
 //   GOOGLE_CALENDAR_ID (opcional, por defecto "primary": el calendario principal)
+// Para WhatsApp (opcional: sin estos secretos no se envía nada):
+//   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM (número de envío, +57...),
+//   TWILIO_PLANTILLA_CONFIRMACION, TWILIO_PLANTILLA_DIA_ANTES, TWILIO_PLANTILLA_HORA_ANTES
+//   (los ContentSid "HX..." de las plantillas aprobadas) y RECORDATORIOS_CLAVE (la misma
+//   clave guardada en Vault para la tarea programada).
 // SUPABASE_URL y la llave secreta los pone Supabase automáticamente.
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -158,6 +165,111 @@ async function sincronizarSesion(id: string, token: string): Promise<string | nu
   return meet;
 }
 
+// ---------- WhatsApp (Twilio) ----------
+type TipoWhatsApp = "confirmacion" | "dia_antes" | "hora_antes";
+
+const PLANTILLAS: Record<TipoWhatsApp, string | undefined> = {
+  confirmacion: Deno.env.get("TWILIO_PLANTILLA_CONFIRMACION"),
+  dia_antes: Deno.env.get("TWILIO_PLANTILLA_DIA_ANTES"),
+  hora_antes: Deno.env.get("TWILIO_PLANTILLA_HORA_ANTES"),
+};
+
+function whatsappListo(tipo: TipoWhatsApp) {
+  return Boolean(Deno.env.get("TWILIO_ACCOUNT_SID") && Deno.env.get("TWILIO_AUTH_TOKEN") && Deno.env.get("TWILIO_WHATSAPP_FROM") && PLANTILLAS[tipo]);
+}
+
+// Números de Colombia de 10 dígitos reciben el +57.
+function enE164(telefono: string) {
+  const digitos = String(telefono).replace(/\D/g, "");
+  return `+${digitos.length === 10 ? `57${digitos}` : digitos}`;
+}
+
+async function enviarWhatsApp(tipo: TipoWhatsApp, telefono: string, variables: string[]) {
+  const sid = Deno.env.get("TWILIO_ACCOUNT_SID")!;
+  const cuerpo = new URLSearchParams({
+    From: `whatsapp:${enE164(Deno.env.get("TWILIO_WHATSAPP_FROM")!)}`,
+    To: `whatsapp:${enE164(telefono)}`,
+    ContentSid: PLANTILLAS[tipo]!,
+    ContentVariables: JSON.stringify(Object.fromEntries(variables.map((v, i) => [String(i + 1), v]))),
+  });
+  const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+    method: "POST",
+    headers: { Authorization: `Basic ${btoa(`${sid}:${Deno.env.get("TWILIO_AUTH_TOKEN")}`)}`, "Content-Type": "application/x-www-form-urlencoded" },
+    body: cuerpo,
+  });
+  if (!r.ok) {
+    const error = await r.json().catch(() => null);
+    throw new Error(`Twilio no envió el WhatsApp (${tipo}): ${error?.code ?? r.status} ${error?.message ?? ""}`);
+  }
+}
+
+function textoHora(minutos: number) {
+  const h = Math.floor(minutos / 60);
+  const m = minutos % 60;
+  const sufijo = h < 12 ? "a.m." : h === 12 && m === 0 ? "m." : "p.m.";
+  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, "0")} ${sufijo}`;
+}
+
+function fechaLarga(fecha: string) {
+  // Sin la coma que agrega Intl ("miércoles, 4 de noviembre"), que suena rara dentro de una frase.
+  return new Intl.DateTimeFormat("es-CO", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" })
+    .format(new Date(`${fecha}T12:00:00Z`)).replace(",", "");
+}
+
+const NOMBRE_CLASE: Record<string, string> = { prueba: "clase de prueba gratis", clase: "clase de 1 hora", bloque: "bloque de 2 horas" };
+
+function lugar(modalidad: string, meet: string | null) {
+  if (modalidad === "presencial") return "en nuestra sede de Rionegro";
+  return meet ? `por Google Meet: ${meet}` : "por Google Meet (el enlace está en la invitación de tu calendario)";
+}
+
+async function confirmarPorWhatsApp(datos: Record<string, unknown>, sesiones: string[], meet: string | null) {
+  if (!datos.acepta_whatsapp || !whatsappListo("confirmacion")) return;
+  try {
+    await enviarWhatsApp("confirmacion", String(datos.telefono), [
+      String(datos.nombre).trim(),
+      NOMBRE_CLASE[String(datos.tipo)],
+      fechaLarga(String(datos.fecha)),
+      textoHora(Number(datos.inicio)),
+      lugar(String(datos.modalidad), meet),
+    ]);
+    const ids = await rpc("reservas_recientes", { p_sesiones: sesiones, p_correo: datos.correo });
+    if (ids?.length) await rpc("marcar_whatsapp", { p_ids: ids, p_tipo: "confirmacion" });
+  } catch (e) {
+    // El WhatsApp es un extra: si falla, la reserva y el calendario ya quedaron bien.
+    console.error(e);
+  }
+}
+
+type Pendiente = { ids: string[]; tipo: string; nombre: string; telefono: string; fecha: string; inicio: number; modalidad: string; enlace_meet: string | null };
+
+async function recordatorios(req: Request) {
+  const clave = Deno.env.get("RECORDATORIOS_CLAVE");
+  if (!clave || clave.length < 20 || req.headers.get("x-clave-recordatorios") !== clave) {
+    return responder({ error: "NO_AUTORIZADO" }, 401);
+  }
+  const pendientes: Record<"dia_antes" | "hora_antes", Pendiente[]> = await rpc("whatsapp_pendientes", {});
+  const resultado = { dia_antes: 0, hora_antes: 0, errores: 0 };
+  for (const tipo of ["dia_antes", "hora_antes"] as const) {
+    if (!whatsappListo(tipo)) continue;
+    for (const p of pendientes[tipo]) {
+      const variables = tipo === "dia_antes"
+        ? [p.nombre, NOMBRE_CLASE[p.tipo], textoHora(p.inicio), lugar(p.modalidad, p.enlace_meet)]
+        : [p.nombre, textoHora(p.inicio), lugar(p.modalidad, p.enlace_meet)];
+      try {
+        await enviarWhatsApp(tipo, p.telefono, variables);
+        await rpc("marcar_whatsapp", { p_ids: p.ids, p_tipo: tipo });
+        resultado[tipo]++;
+      } catch (e) {
+        // No se marca: se reintenta en la siguiente ejecución mientras siga a tiempo.
+        console.error(e);
+        resultado.errores++;
+      }
+    }
+  }
+  return responder(resultado);
+}
+
 function codigoDeError(e: unknown) {
   // Las reglas de la base de datos devuelven códigos como SIN_CUPO u OTRA_MODALIDAD.
   const mensaje = (e as Error).message;
@@ -216,13 +328,16 @@ async function reservar(datos: Record<string, unknown>) {
 
   // La reserva ya quedó guardada. Si Google falla, no se pierde: se informa y el docente
   // la puede reenviar al calendario desde su panel.
+  let meet: string | null = null;
+  let calendario = true;
   try {
-    const meet = await sincronizarVarias(sesiones);
-    return responder({ ok: true, calendario: true, meet });
+    meet = await sincronizarVarias(sesiones);
   } catch (e) {
     console.error(e);
-    return responder({ ok: true, calendario: false });
+    calendario = false;
   }
+  await confirmarPorWhatsApp(datos, sesiones, meet);
+  return responder({ ok: true, calendario, meet });
 }
 
 async function panel(req: Request, datos: Record<string, unknown>) {
@@ -274,6 +389,10 @@ async function panel(req: Request, datos: Record<string, unknown>) {
       const meet = await sincronizarVarias([String(datos.sesion)]);
       return responder({ ok: true, calendario: true, meet });
     }
+    if (datos.accion === "aviso") {
+      await rpc("marcar_aviso", { p_reserva: datos.reserva, p_tipo: datos.tipo });
+      return responder({ ok: true });
+    }
   } catch (e) {
     const codigo = codigoDeError(e);
     return responder({ error: codigo }, codigo === "ERROR" ? 500 : 409);
@@ -292,5 +411,6 @@ Deno.serve(async (req) => {
     return responder({ error: "DATOS_INVALIDOS" }, 400);
   }
 
+  if (datos.accion === "recordatorios") return recordatorios(req);
   return datos.accion ? panel(req, datos) : reservar(datos);
 });

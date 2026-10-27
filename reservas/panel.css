@@ -78,3 +78,17 @@
 .panel-cerrados { list-style: none; margin: 0; padding: 0; }
 .panel-cerrado { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--borde); font-size: 0.92rem; }
 .panel-cerrado strong { text-transform: capitalize; }
+
+/* ---------- Confirmaciones y recordatorios por WhatsApp ---------- */
+.panel-pendientes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; padding: 12px 14px; border-radius: var(--radio-sm); background: var(--tint-verde); }
+.panel-pendientes__titulo { font-weight: 700; font-size: 0.9rem; color: var(--verde-profundo); }
+.panel-pendiente {
+  font: inherit; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+  padding: 5px 12px; border-radius: 999px; border: 2px solid var(--verde-profundo);
+  background: var(--blanco); color: var(--verde-profundo);
+}
+.panel-pendiente::first-letter { text-transform: uppercase; }
+.panel-pendiente:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+.panel-aviso { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.panel-aviso__hecho { font-weight: 700; font-size: 0.85rem; color: var(--verde-profundo); }
+.panel-aviso__otra { font-size: 0.85rem; font-weight: 600; color: var(--azul); }
