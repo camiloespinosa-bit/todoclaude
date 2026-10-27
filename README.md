@@ -119,3 +119,25 @@ Fuente: [ethanplusai/harvey](https://github.com/ethanplusai/harvey) (MIT, commit
 | `ventas/productos/` | Fichas de las tres ofertas (colegios, inglés para adultos y docentes, niños), armadas con lo que hay en este repo. Lo marcado "POR CONFIRMAR" (precios de colegios y de Fase Experta, duración del taller) se debe completar antes de usarlo en mensajes. |
 
 Licencia: MIT (ver `.claude/skills/ethanplusai-harvey.LICENSE`).
+
+### Instagram Agent (13 skills para manejar una cuenta de Instagram)
+
+Fuente: [Jakeschincariol/instagram-agent-skill](https://github.com/Jakeschincariol/instagram-agent-skill) (commit `d03c56b`, MIT). Mismo autor que las skills `li-*` de LinkedIn. Las skills redactan; nada se publica sin tu aprobación explícita.
+
+| Skill | Para qué sirve |
+|---|---|
+| `ig-reel` | Guion de Reels con 26 fórmulas de hook y puntaje del hook antes de grabar (`hookscore.py`, `beats.py`). |
+| `ig-viral` | Ordena reels de tu nicho según cuánto superaron el promedio de su propia cuenta (`swipe.py`, con datos que tú pegas). |
+| `ig-caption` | Escribe el caption y muestra lo que se ve antes del "... más" (`caption.py`). |
+| `ig-carousel` | Carrusel slide por slide. |
+| `ig-story` | Secuencias de historias. |
+| `ig-profile` | Puntúa el perfil sobre 100 y reescribe lo que pierde puntos. |
+| `ig-plan` | Plan semanal de contenido. |
+| `ig-audit` | Análisis de lo ya publicado: qué funcionó y qué dejar de hacer. |
+| `ig-repurpose` | Convierte un contenido largo en varias piezas para Instagram. |
+| `ig-comment` / `ig-reply` / `ig-dm` | Comentarios en otras cuentas, respuestas en las tuyas y mensajes directos. |
+| `ig-human` | Quita marcas de texto de IA (guiones largos, vocabulario genérico, caracteres invisibles) y lo evalúa (`humanize.py`, `detect.py`). |
+
+Los scripts Python usan solo la librería estándar y no hacen llamadas de red. Las skills leen tu perfil de voz desde `~/.claude/instagram/voice.md`: la plantilla está en `.claude/instagram/voice.template.md`. Ojo: `slop.json` y las fórmulas de hook están pensados para inglés, así que en español el detector puede dar puntajes poco fiables.
+
+Licencia: MIT (ver `.claude/skills/jakeschincariol-instagram-agent.LICENSE`).
