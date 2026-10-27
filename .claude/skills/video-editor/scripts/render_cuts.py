@@ -13,10 +13,14 @@ Audio: loudnorm a -16 LUFS (estándar para redes), salvo --no-loudnorm.
 import argparse, json, os, subprocess, sys
 
 def probe(path):
+    """Ancho y alto como se ven (con la rotación del celular aplicada) y cuadros por segundo."""
     out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
-                          "stream=width,height", "-of", "json", path], capture_output=True, text=True)
+                          "stream=width,height,r_frame_rate:stream_side_data=rotation", "-of", "json",
+                          path], capture_output=True, text=True)
     s = json.loads(out.stdout)["streams"][0]
-    return s["width"], s["height"]
+    rot = next((abs(int(d.get("rotation", 0))) for d in s.get("side_data_list", [])), 0)
+    w, h = (s["height"], s["width"]) if rot in (90, 270) else (s["width"], s["height"])
+    return w, h, s.get("r_frame_rate", "30/1")
 
 def ass_time(t):
     h, r = divmod(max(t, 0), 3600); m, s = divmod(r, 60)
@@ -78,8 +82,10 @@ def main():
         sys.exit("La salida no puede ser el archivo original.")
     keep = json.load(open(a.plan))["keep"]
     sel = "+".join(f"between(t,{s},{e})" for s, e in keep)
-    w, h = probe(a.input)
-    v = f"select='{sel}',setpts=N/FRAME_RATE/TB"
+    w, h, fps = probe(a.input)
+    # Los celulares graban con cuadros por segundo variables: se fijan antes de cortar para que el
+    # audio no se desfase de los labios.
+    v = f"fps={fps},select='{sel}',setpts=N/FRAME_RATE/TB"
     if a.vertical:
         w, h = 1080, 1920
         v += ",scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1"

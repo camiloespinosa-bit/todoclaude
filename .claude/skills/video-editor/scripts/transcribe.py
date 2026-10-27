@@ -31,6 +31,7 @@ def main():
     segments, words = [], []
     for i, s in enumerate(segs):
         segments.append({"i": i, "start": round(s.start, 3), "end": round(s.end, 3), "text": s.text.strip()})
+        print(f"avance {s.end:7.1f}s / {info.duration:.1f}s", file=sys.stderr, flush=True)
         for w in s.words or []:
             words.append({"seg": i, "start": round(w.start, 3), "end": round(w.end, 3),
                           "word": w.word.strip(), "p": round(w.probability, 3)})
