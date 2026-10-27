@@ -12,9 +12,9 @@
 --   * Un bloque de 2 horas recibe un solo mensaje, con la hora de inicio del bloque.
 
 alter table public.reservas
-  add column whatsapp_confirmacion_en timestamptz,
-  add column whatsapp_dia_antes_en    timestamptz,
-  add column whatsapp_hora_antes_en   timestamptz;
+  add column if not exists whatsapp_confirmacion_en timestamptz,
+  add column if not exists whatsapp_dia_antes_en    timestamptz,
+  add column if not exists whatsapp_hora_antes_en   timestamptz;
 
 create function public.whatsapp_pendientes()
 returns json

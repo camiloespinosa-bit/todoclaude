@@ -30,6 +30,7 @@ estudiantes tienen planes mensuales pagados por anticipado.
 | `supabase/functions/reservar/index.ts` | Función del servidor: guarda la reserva y crea o actualiza el evento en Google Calendar con el enlace de Meet. También atiende el panel del docente (agenda, cancelar, reenviar al calendario). |
 | `reservas/panel.html`, `panel.css`, `panel.js` | Panel del docente: ver las reservas por día, cancelar y reenviar al calendario. |
 | `supabase/migrations/002_panel_docente.sql` | Quién puede entrar al panel (tabla `docentes`) y las funciones de agenda y cancelación. |
+| `supabase/migrations/007_avisos_whatsapp_panel.sql` | Registro de confirmaciones y recordatorios enviados por WhatsApp desde el panel. |
 
 Las reglas se probaron con 23 casos en una base de datos Postgres local, y el flujo completo
 (página → servidor → base de datos → calendario) con un Google Calendar simulado.
@@ -145,7 +146,23 @@ Para aplicar `supabase/migrations/003_autorizacion_datos.sql` sin cortar las res
 2. Publicar la página (merge en GitHub).
 3. Desplegar la función `reservar` nueva (desde ese momento rechaza reservas sin autorización).
 
-## WhatsApp: confirmación y recordatorios
+## WhatsApp desde el panel (lo que se usa hoy)
+
+Los mensajes salen de tu propio WhatsApp (301 491 6120), así que si el estudiante responde, la conversación sigue en tu celular. No requiere Twilio, Meta ni pagos.
+
+- Arriba de la agenda, el recuadro verde **WhatsApp pendientes** dice cuántos avisos faltan y en qué días. Tocar uno lleva a ese día.
+- Clases de **hoy y mañana**: botón **Recordar por WhatsApp**. Clases de **pasado mañana en adelante**: botón **Confirmar por WhatsApp**.
+- El botón abre WhatsApp con el mensaje ya escrito (nombre, clase, hora y lugar; si es virtual, el enlace de Meet). Tú solo le das enviar.
+- Al tocarlo queda marcado "✓ Recordado" o "✓ Confirmado" con la hora. Ojo: el panel marca cuando se abre WhatsApp, no puede saber si de verdad le diste enviar.
+- Solo aparece para quienes aceptaron WhatsApp al reservar. En un bloque de 2 horas aparece una sola vez, en la primera hora.
+- Si en tu celular tienes WhatsApp y WhatsApp Business, el teléfono puede preguntar con cuál abrir: elige Business.
+
+Activarlo (una sola vez), en este orden:
+1. SQL Editor: ejecutar `supabase/migrations/007_avisos_whatsapp_panel.sql`.
+2. Desplegar la función `reservar` nueva (Edge Functions > reservar > Code, pegar `supabase/functions/reservar/index.ts`, Deploy; Verify JWT apagado).
+3. Publicar la página (merge en GitHub).
+
+## WhatsApp automático con Twilio (apagado, para más adelante)
 
 Con Twilio, solo para quienes marcaron la casilla de WhatsApp al reservar:
 

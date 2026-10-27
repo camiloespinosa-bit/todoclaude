@@ -1,7 +1,7 @@
 // Función del servidor (Supabase Edge Function).
 // - Sin "accion": recibe la reserva desde la página, la guarda con las reglas de la base de
 //   datos y la sincroniza con Google Calendar.
-// - Con "accion" (agenda, cancelar, sincronizar, cerrados, cerrar, abrir): las usa el panel del docente.
+// - Con "accion" (agenda, cancelar, sincronizar, cerrados, cerrar, abrir, aviso): las usa el panel del docente.
 // - Con accion "recordatorios": la llama cada 15 minutos la tarea programada de Supabase
 //   (pg_cron) para enviar los recordatorios de WhatsApp. Exigen la
 //   sesión iniciada de un usuario que esté en la tabla `docentes`.
@@ -388,6 +388,10 @@ async function panel(req: Request, datos: Record<string, unknown>) {
     if (datos.accion === "sincronizar") {
       const meet = await sincronizarVarias([String(datos.sesion)]);
       return responder({ ok: true, calendario: true, meet });
+    }
+    if (datos.accion === "aviso") {
+      await rpc("marcar_aviso", { p_reserva: datos.reserva, p_tipo: datos.tipo });
+      return responder({ ok: true });
     }
   } catch (e) {
     const codigo = codigoDeError(e);
