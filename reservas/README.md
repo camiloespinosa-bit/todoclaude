@@ -180,9 +180,20 @@ Puesta en marcha:
 4. Con las plantillas aprobadas, en Edge Functions > Secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` (el número de envío, con +57), `TWILIO_PLANTILLA_CONFIRMACION`, `TWILIO_PLANTILLA_DIA_ANTES`, `TWILIO_PLANTILLA_HORA_ANTES`.
 5. Activar las extensiones `pg_cron` y `pg_net`, ejecutar `supabase/setup/recordatorios_whatsapp.sql` y copiar la clave que muestra al secreto `RECORDATORIOS_CLAVE`.
 
+## Borrado automático (24 meses)
+
+La política de privacidad v2 promete conservar los datos de cada reserva hasta 24 meses después de la última reserva o clase de la persona. Todos los días a las 3:15 a.m. la base de datos borra a quienes pasaron ese plazo (por correo, con todas sus reservas, también las canceladas) y los grupos viejos que quedaron vacíos.
+
+Activarlo (una sola vez):
+1. Database > Extensions: activar **pg_cron**.
+2. SQL Editor: ejecutar `supabase/migrations/008_borrado_24_meses.sql`.
+
+Para ver que la tarea quedó programada: `select jobname, schedule from cron.job;`. Para borrar ya, sin esperar: `select borrar_datos_vencidos();`.
+
+Ojo: esto borra la base de datos de reservas, no los eventos viejos de tu Google Calendar, que también tienen nombres y correos. Esos se borran a mano en Google Calendar.
+
 ## Pendientes
 
-- Borrar automáticamente los datos de reservas con más de 24 meses sin actividad, como promete la política de privacidad v2.
 - Bloquear horas que ya tienes ocupadas en tu Google Calendar personal.
 - Hoy cualquiera puede reservar una clase normal sin verificar que sea estudiante (decisión
   tomada: todos pagan plan mensual). Si aparecen reservas falsas, se puede agregar verificación.
