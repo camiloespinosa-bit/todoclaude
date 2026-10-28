@@ -26,6 +26,15 @@ const HORARIO = {
 };
 
 const CUPO_MAXIMO = 5; // estudiantes al mismo tiempo
+
+// Cada grupo es de una sola fase. Debe coincidir con fase_de_programa en la base de datos.
+function faseDe(programa) {
+  const fases = [
+    ["Fase 0 a 2 años", "f0_2"], ["Fase 3 a 5 años", "f3_5"], ["Fase 6 a 10 años", "f6_10"],
+    ["Fase 11 a 15 años", "f11_15"], ["Fase Experta", "experta"], ["Adulto Vital", "vital"],
+  ];
+  return fases.find(([inicio]) => programa.startsWith(inicio))?.[1] ?? null;
+}
 // Versión de privacidad.html que acepta quien reserva. Cambiarla cuando se publique una nueva.
 const POLITICA_VERSION = "2026-10-v2";
 const DIAS_A_MOSTRAR = 21;
@@ -64,16 +73,17 @@ function textoHora(minutos) {
 // ---------- Agenda de ejemplo ----------
 // Como hay un solo docente, las clases son grupos que empiezan en punto (8:00, 9:00...):
 // todos los que reservan esa hora entran al mismo grupo. El primero que reserva define si
-// el grupo es presencial o virtual. Las clases de prueba son 1 a 1, de 30 minutos, y solo
+// el grupo es presencial o virtual y su fase. Las clases de prueba son 1 a 1, de 30 minutos, y solo
 // van en horas sin grupo. Datos de ejemplo, fijos para la misma fecha.
 function agendaDelDia(fecha) {
-  const grupos = new Map(); // hora en punto -> { modalidad, inscritos }
+  const grupos = new Map(); // hora en punto -> { modalidad, fase, inscritos }
+  const fases = ["f0_2", "f3_5", "f6_10", "f11_15", "experta", "vital"];
   const pruebas = new Set(); // inicio de cada clase de prueba ya reservada
   let semilla = [...fecha].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) >>> 0;
   for (let h = 480; h < 1200; h += 60) {
     semilla = (semilla * 1103515245 + 12345) >>> 0;
     const dado = semilla % 20;
-    if (dado < 6) grupos.set(h, { modalidad: dado % 2 ? "virtual" : "presencial", inscritos: 1 + ((semilla >>> 8) % 5) });
+    if (dado < 6) grupos.set(h, { modalidad: dado % 2 ? "virtual" : "presencial", fase: fases[(semilla >>> 4) % 6], inscritos: 1 + ((semilla >>> 8) % 5) });
     else if (dado < 8) pruebas.add(h + (dado % 2) * 30);
   }
   return { grupos, pruebas };
@@ -81,9 +91,9 @@ function agendaDelDia(fecha) {
 
 const NOMBRE_MODALIDAD = { presencial: "presencial", virtual: "virtual" };
 
-// Devuelve las horas de inicio para el tipo y la modalidad elegidos.
+// Devuelve las horas de inicio para el tipo, la modalidad y la fase elegidos.
 // Cada opción: { minutos, disponible, detalle }.
-function horasDisponibles(fecha, tipo, modalidad, { grupos, pruebas }) {
+function horasDisponibles(fecha, tipo, modalidad, fase, { grupos, pruebas }) {
   const franjas = franjasDe(fecha);
   const ahora = hoyEnBogota();
   const minutosClase = TIPOS[tipo].minutos;
@@ -109,6 +119,7 @@ function horasDisponibles(fecha, tipo, modalidad, { grupos, pruebas }) {
         if (!g) continue;
         hayGrupo = true;
         if (g.modalidad !== modalidad) { bloqueo = `Grupo ${NOMBRE_MODALIDAD[g.modalidad]}`; break; }
+        if (g.fase !== fase) { bloqueo = "Grupo de otra fase"; break; }
         if (g.inscritos >= CUPO_MAXIMO) { bloqueo = "Lleno"; break; }
         quedan = Math.min(quedan, CUPO_MAXIMO - g.inscritos);
       }
@@ -153,7 +164,7 @@ async function cargarAgenda(fecha) {
   const grupos = new Map();
   const pruebas = new Set();
   for (const f of filas) {
-    if (f.clase === "grupo") grupos.set(f.inicio, { modalidad: f.modalidad, inscritos: f.ocupados });
+    if (f.clase === "grupo") grupos.set(f.inicio, { modalidad: f.modalidad, fase: f.fase, inscritos: f.ocupados });
     else pruebas.add(f.inicio);
   }
   return { grupos, pruebas };
@@ -185,7 +196,9 @@ const seccionListo = document.getElementById("listo");
 const btnReservar = document.getElementById("btn-reservar");
 const campoPersonas = document.querySelector("[data-solo-prueba]");
 
-const estado = { tipo: null, modalidad: null, fecha: null, hora: null };
+const campoFase = document.getElementById("fase");
+
+const estado = { tipo: null, modalidad: null, programa: null, fecha: null, hora: null };
 
 function marcar(contenedor, elegido) {
   for (const b of contenedor.querySelectorAll("button")) b.setAttribute("aria-checked", String(b === elegido));
@@ -195,9 +208,10 @@ function actualizarResumen() {
   const partes = [];
   if (estado.tipo) partes.push(`${TIPOS[estado.tipo].nombre} (${TIPOS[estado.tipo].minutos} min)`);
   if (estado.modalidad) partes.push(estado.modalidad === "virtual" ? "Virtual" : "Presencial");
+  if (estado.programa) partes.push(estado.programa);
   if (estado.fecha) partes.push(formatear(estado.fecha, { weekday: "long", day: "numeric", month: "long" }));
   if (estado.hora !== null) partes.push(textoHora(estado.hora));
-  seleccion.textContent = partes.length ? partes.join(" · ") : "Elige tipo de clase, modalidad, día y hora.";
+  seleccion.textContent = partes.length ? partes.join(" · ") : "Elige tipo de clase, modalidad, fase, día y hora.";
 }
 
 for (const grupo of document.querySelectorAll("[data-grupo]")) {
@@ -211,6 +225,12 @@ for (const grupo of document.querySelectorAll("[data-grupo]")) {
     actualizarResumen();
   });
 }
+
+campoFase.addEventListener("change", () => {
+  estado.programa = campoFase.value || null;
+  pintarHoras();
+  actualizarResumen();
+});
 
 function pintarDias() {
   const { fecha: hoy } = hoyEnBogota();
@@ -243,7 +263,7 @@ async function pintarHoras() {
   estado.hora = null;
   const mia = ++consulta;
   contHoras.replaceChildren();
-  const falta = !estado.tipo || !estado.modalidad ? "Primero elige el tipo de clase y la modalidad."
+  const falta = !estado.tipo || !estado.modalidad || !estado.programa ? "Primero elige el tipo de clase, la modalidad y la fase."
     : !estado.fecha ? "Elige un día para ver las horas libres." : null;
   if (falta) {
     contHoras.innerHTML = `<p class="horas__vacio">${falta}</p>`;
@@ -259,7 +279,7 @@ async function pintarHoras() {
   }
   if (mia !== consulta) return;
   contHoras.replaceChildren();
-  const opciones = horasDisponibles(estado.fecha, estado.tipo, estado.modalidad, agenda);
+  const opciones = horasDisponibles(estado.fecha, estado.tipo, estado.modalidad, faseDe(estado.programa), agenda);
   if (!opciones.some((o) => o.disponible)) {
     contHoras.innerHTML = `<p class="horas__vacio">No quedan horas libres ese día para esta opción. Prueba otro día.</p>`;
     return;
@@ -299,6 +319,8 @@ function enlaceCalendario(datos) {
 const ERRORES = {
   HORA_OCUPADA: "Esa hora se acaba de ocupar. Elige otra.",
   OTRA_MODALIDAD: "Esa hora ya tiene un grupo de la otra modalidad. Elige otra hora.",
+  OTRA_FASE: "Esa hora ya tiene un grupo de otra fase. Elige otra hora.",
+  PROGRAMA_INVALIDO: "Elige la fase del estudiante.",
   SIN_CUPO: "Ese grupo se acaba de llenar. Elige otra hora.",
   YA_RESERVADO: "Ya tienes una reserva en esa hora con este correo.",
   HORA_PASADA: "Esa hora ya pasó. Elige otra.",
@@ -306,7 +328,7 @@ const ERRORES = {
   PERSONAS_INVALIDAS: "Revisa el número de personas (de 1 a 5).",
   AUTORIZACION_REQUERIDA: "Para reservar debes autorizar el tratamiento de tus datos.",
 };
-const ERRORES_DE_AGENDA = ["HORA_OCUPADA", "OTRA_MODALIDAD", "SIN_CUPO", "HORA_PASADA", "FUERA_DE_HORARIO"];
+const ERRORES_DE_AGENDA = ["HORA_OCUPADA", "OTRA_MODALIDAD", "OTRA_FASE", "SIN_CUPO", "HORA_PASADA", "FUERA_DE_HORARIO"];
 
 async function guardarReserva(datos) {
   if (!CONECTADO) return { ok: true, calendario: false, prototipo: true };
@@ -329,12 +351,12 @@ async function guardarReserva(datos) {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   mensaje.textContent = "";
-  if (!estado.tipo || !estado.modalidad || !estado.fecha || estado.hora === null) {
-    mensaje.textContent = "Te falta elegir tipo de clase, modalidad, día u hora.";
+  if (!estado.tipo || !estado.modalidad || !estado.programa || !estado.fecha || estado.hora === null) {
+    mensaje.textContent = "Te falta elegir tipo de clase, modalidad, fase, día u hora.";
     return;
   }
   if (!form.checkValidity()) {
-    mensaje.textContent = "Revisa tus datos: nombre, WhatsApp, correo, programa y la autorización de datos son obligatorios.";
+    mensaje.textContent = "Revisa tus datos: nombre, WhatsApp, correo y la autorización de datos son obligatorios.";
     form.reportValidity();
     return;
   }
