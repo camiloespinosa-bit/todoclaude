@@ -41,6 +41,12 @@ td.ck{width:24px;font-size:15px}
 .note{flex:1;border:2px dashed #bbb;border-radius:12px;padding:12px 16px;margin:3mm 0;font-size:11.5px;display:flex;flex-direction:column}
 .note .nt{font-weight:800;color:var(--az);font-size:14px;margin-bottom:4px}
 .note ol{padding-left:18px}
+.cards{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;margin:3mm 0}
+.card{border:2px dashed #bbb;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8mm 7mm;position:relative}
+.card .txt{font-weight:800;line-height:1.2}
+.card .num{position:absolute;top:3mm;left:4mm;font-size:12px;font-weight:700;color:#fff;border-radius:10px;padding:1px 8px}
+.card .kind{position:absolute;bottom:3mm;font-size:9.5px;color:#999;letter-spacing:1px}
+.card .easy{position:absolute;top:3mm;right:4mm;font-size:10px;font-weight:700;color:var(--vd)}
 .foot{margin-top:auto;padding-top:5px;border-top:1.5px solid #ddd;font-size:9px;color:#888;display:flex;justify-content:space-between}
 </style>
 </head>
@@ -61,13 +67,13 @@ td.ck{width:24px;font-size:15px}
     <tr><td class="ck">☐</td><td>Conos</td><td>6 a 9</td><td>Estación 3 (5, 7 o 9 según la edad)</td></tr>
     <tr><td class="ck">☐</td><td>Canastas o cajas</td><td>2</td><td>Estación 4. Una MANTENER y una SOLTAR</td></tr>
     <tr><td class="ck">☐</td><td>Pelotas de ping pong</td><td>10</td><td>Estación 4</td></tr>
-    <tr><td class="ck">☐</td><td>Letreros impresos (págs. 2 y 3)</td><td>1 por aro y 1 por canasta</td><td>Pegar con cinta</td></tr>
+    <tr><td class="ck">☐</td><td>Letreros impresos (págs. 6 y 7)</td><td>1 por aro y 1 por canasta</td><td>Pegar con cinta</td></tr>
     <tr><td class="ck">☐</td><td>Cinta de enmascarar</td><td>1 rollo</td><td>Pegar letreros, marcar el circuito</td></tr>
     <tr><td class="ck">☐</td><td>Cronómetro o celular</td><td>1</td><td>Controlar los tiempos</td></tr>
-    <tr><td class="ck">☐</td><td>Esta hoja (Banco de valores)</td><td>1</td><td>La docente lee los valores en voz alta</td></tr>
-    <tr><td class="ck">☐</td><td>Bitácora del Vestier (pág. 4)</td><td>1 por estudiante</td><td>Retos 2 y 3</td></tr>
+    <tr><td class="ck">☐</td><td>Tarjetas de valores y creencias (págs. 2 a 5)</td><td>15 + 10 tarjetas</td><td>Recortar. La docente las lee en voz alta</td></tr>
+    <tr><td class="ck">☐</td><td>Bitácora del Vestier (pág. 8)</td><td>1 por estudiante</td><td>Retos 2 y 3</td></tr>
     <tr><td class="ck">☐</td><td>Lápices</td><td>1 por estudiante</td><td>Bitácora</td></tr>
-    <tr><td class="ck">☐</td><td>Nota para casa (pág. 5, 3 por hoja)</td><td>1 por estudiante</td><td>Cierre</td></tr>
+    <tr><td class="ck">☐</td><td>Nota para casa (pág. 9, 3 por hoja)</td><td>1 por estudiante</td><td>Cierre</td></tr>
   </table>
 
   <div class="warn"><b>NO MOSTRAR A LOS ESTUDIANTES.</b> Los valores y las creencias se dicen en voz alta, una sola vez. No hay respuestas correctas: cada estudiante responde según su propia historia.</div>
@@ -85,7 +91,32 @@ td.ck{width:24px;font-size:15px}
       <div style="font-size:10.5px;margin-top:4px;color:#555">Para 11 a 12 años usa las 1, 2, 5 y 9 (más concretas).</div>
     </div>
   </div>
-  <div class="foot"><span>CRI-IE-B1-S2 · Materiales</span><span>CCA, El Gimnasio del Cerebro · Pág. 1/5</span></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Materiales</span><span>CCA, El Gimnasio del Cerebro · Pág. 1/9</span></div>
+</div>
+
+<!-- TARJETAS Valores -->
+<div class="page">
+  <div class="cut">✂ Valores · Recortar por la línea punteada · Para la mano de la docente</div>
+  <div class="cards" style="grid-template-rows:repeat(4,1fr)"><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">1</span><div class="txt" style="font-size:30px;color:var(--tq)">Decir la verdad</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">2</span><div class="txt" style="font-size:30px;color:var(--tq)">Respetar a los mayores</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">3</span><div class="txt" style="font-size:30px;color:var(--tq)">Ser puntual</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">4</span><div class="txt" style="font-size:30px;color:var(--tq)">Esforzarme en lo que hago</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">5</span><div class="txt" style="font-size:30px;color:var(--tq)">Ser leal con mis amigos</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">6</span><div class="txt" style="font-size:30px;color:var(--tq)">Ayudar en la casa</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">7</span><div class="txt" style="font-size:30px;color:var(--tq)">Compartir lo que tengo</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">8</span><div class="txt" style="font-size:30px;color:var(--tq)">Ser justo con los demás</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Tarjetas: Valores</span><span>Pág. 2/9</span></div>
+</div>
+<!-- TARJETAS Valores -->
+<div class="page">
+  <div class="cut">✂ Valores · Recortar por la línea punteada · Para la mano de la docente</div>
+  <div class="cards" style="grid-template-rows:repeat(4,1fr)"><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">9</span><div class="txt" style="font-size:30px;color:var(--tq)">Cuidar los animales y el planeta</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">10</span><div class="txt" style="font-size:30px;color:var(--tq)">Mantener las tradiciones de mi familia</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">11</span><div class="txt" style="font-size:30px;color:var(--tq)">Ser ordenado</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">12</span><div class="txt" style="font-size:30px;color:var(--tq)">Defender a quien lo necesita</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">13</span><div class="txt" style="font-size:30px;color:var(--tq)">Trabajar en equipo</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">14</span><div class="txt" style="font-size:30px;color:var(--tq)">Ser valiente</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div class="card" style="border-color:var(--tq)"><span class="num" style="background:var(--tq)">15</span><div class="txt" style="font-size:30px;color:var(--tq)">Dar las gracias</div><span class="kind">VALOR · ESTACIONES 1, 2, 3 Y 5</span></div><div></div></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Tarjetas: Valores</span><span>Pág. 3/9</span></div>
+</div>
+<!-- TARJETAS Creencias heredadas -->
+<div class="page">
+  <div class="cut">✂ Creencias heredadas · Recortar por la línea punteada · Para la mano de la docente</div>
+  <div class="cards" style="grid-template-rows:repeat(3,1fr)"><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">1</span><span class="easy">★ 11 a 12</span><div class="txt" style="font-size:28px;color:var(--na)">Primero las tareas, después el juego.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">2</span><span class="easy">★ 11 a 12</span><div class="txt" style="font-size:28px;color:var(--na)">Hay que ganar siempre.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">3</span><div class="txt" style="font-size:28px;color:var(--na)">Equivocarse es malo.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">4</span><div class="txt" style="font-size:28px;color:var(--na)">Pedir ayuda es de débiles.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">5</span><span class="easy">★ 11 a 12</span><div class="txt" style="font-size:28px;color:var(--na)">Hay que saludar a todos al llegar.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">6</span><div class="txt" style="font-size:28px;color:var(--na)">Lo que pasa en la familia se queda en la familia.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Tarjetas: Creencias heredadas</span><span>Pág. 4/9</span></div>
+</div>
+<!-- TARJETAS Creencias heredadas -->
+<div class="page">
+  <div class="cut">✂ Creencias heredadas · Recortar por la línea punteada · Para la mano de la docente</div>
+  <div class="cards" style="grid-template-rows:repeat(3,1fr)"><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">7</span><div class="txt" style="font-size:28px;color:var(--na)">El que madruga rinde más.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">8</span><div class="txt" style="font-size:28px;color:var(--na)">Si alguien te molesta, respóndele igual.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">9</span><span class="easy">★ 11 a 12</span><div class="txt" style="font-size:28px;color:var(--na)">Hay que terminar lo que se empieza.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div class="card" style="border-color:var(--na)"><span class="num" style="background:var(--na)">10</span><div class="txt" style="font-size:28px;color:var(--na)">Llorar es de débiles.</div><span class="kind">CREENCIA HEREDADA · ESTACIÓN 4</span></div><div></div><div></div></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Tarjetas: Creencias heredadas</span><span>Pág. 5/9</span></div>
 </div>
 
 <!-- 2. LETREROS AROS -->
@@ -93,7 +124,7 @@ td.ck{width:24px;font-size:15px}
   <div class="cut">✂ Imprimir tantas veces como aros tengas · Recortar por la línea punteada</div>
   <div class="sign" style="border-color:var(--tq)"><div class="ico">🎁</div><div class="big" style="color:var(--tq)">HEREDADO</div><div class="small">Lo recibí sin elegirlo</div></div>
   <div class="sign" style="border-color:var(--na)"><div class="ico">✋</div><div class="big" style="color:var(--na)">ELEGIDO</div><div class="small">Lo decidí yo</div></div>
-  <div class="foot"><span>CRI-IE-B1-S2 · Letreros estación 1</span><span>Pág. 2/5</span></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Letreros estación 1</span><span>Pág. 6/9</span></div>
 </div>
 
 <!-- 3. LETREROS CANASTAS -->
@@ -101,7 +132,7 @@ td.ck{width:24px;font-size:15px}
   <div class="cut">✂ Un letrero por canasta · Recortar por la línea punteada</div>
   <div class="sign" style="border-color:var(--vd)"><div class="ico">🎽</div><div class="big" style="color:var(--vd)">MANTENER</div><div class="small">Me quedo con esta parte del uniforme</div></div>
   <div class="sign" style="border-color:var(--az)"><div class="ico">🔄</div><div class="big" style="color:var(--az)">SOLTAR</div><div class="small">Esta parte la quiero cambiar</div></div>
-  <div class="foot"><span>CRI-IE-B1-S2 · Letreros estación 4</span><span>Pág. 3/5</span></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Letreros estación 4</span><span>Pág. 7/9</span></div>
 </div>
 
 <!-- 4. BITÁCORA -->
@@ -132,7 +163,7 @@ td.ck{width:24px;font-size:15px}
   <div class="line"></div><div class="line"></div>
 
   <div class="warn" style="margin-top:14px">Recuerda: quedarte con un valor de tu familia a propósito es una decisión tan válida como cambiarlo.</div>
-  <div class="foot"><span>CRI-IE-B1-S2 · Bitácora del Vestier</span><span>Pág. 4/5</span></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Bitácora del Vestier</span><span>Pág. 8/9</span></div>
 </div>
 
 <!-- 5. NOTA PARA CASA -->
@@ -153,7 +184,7 @@ td.ck{width:24px;font-size:15px}
     Hoy hablamos de los valores que recibimos de la familia y los que cada uno decide. Ideas para conversar esta semana:
     <ol><li><b>Sin juicio, solo curiosidad:</b> pregúntele qué valor eligió observar y escuche sin corregir.</li><li><b>Comparta su historia:</b> cuéntele un valor que usted heredó y mantuvo, y uno que decidió cambiar.</li><li><b>El valor en acción:</b> cuando lo vea practicar un valor, nómbrelo: "eso fue honestidad".</li></ol>
   </div>
-  <div class="foot"><span>CRI-IE-B1-S2 · Nota para casa</span><span>Pág. 5/5</span></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Nota para casa</span><span>Pág. 9/9</span></div>
 </div>
 </body>
 </html>
