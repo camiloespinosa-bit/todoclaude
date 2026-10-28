@@ -10,6 +10,11 @@ estudiantes tienen planes mensuales pagados por anticipado.
   Todos los que reservan esa hora entran al mismo grupo, **hasta 5 estudiantes**.
 - **Presencial o virtual, nunca las dos a la vez.** El primero que reserva una hora define el
   tipo de grupo; los demás solo pueden unirse a ese mismo tipo.
+- **Una sola fase por grupo.** Fases: 0 a 2 años, 3 a 5, 6 a 10, 11 a 15, Fase Experta (16 en
+  adelante y adultos) y Adulto Vital (65+). El primero que reserva una hora define la fase; los
+  demás solo pueden unirse si son de la misma fase. Si esa persona cancela, la fase pasa a la
+  siguiente reserva del grupo. Las reservas viejas con "Programa infantil (0 a 15 años)" no dicen
+  la edad: esos grupos quedan cerrados para nuevas reservas (`supabase/migrations/010_grupos_por_fase.sql`).
 - **Bloque de 2 horas:** son dos grupos seguidos; el estudiante queda en los dos.
 - **Clase de prueba:** gratis, 30 minutos, para una familia o grupo de hasta 5 personas.
   Solo cabe en horas sin grupo, y mientras exista, esa hora queda bloqueada para clases.
