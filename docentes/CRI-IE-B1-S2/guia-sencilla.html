@@ -11,42 +11,59 @@
 body{font-family:'Poppins',sans-serif;background:#ddd;display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px;color:#222}
 @page{size:A4;margin:0}
 @media print{body{background:#fff;padding:0;gap:0}.page{box-shadow:none;height:297mm;overflow:hidden}}
-.page{width:210mm;min-height:297mm;padding:10mm 13mm;background:#fff;display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.12);page-break-after:always;font-size:12.5px;line-height:1.5}
-.header{background:linear-gradient(135deg,var(--azD),var(--az));color:#fff;border-radius:11px;padding:14px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.page{width:210mm;min-height:297mm;padding:10mm 13mm;background:#fff;display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.12);page-break-after:always;font-size:12px;line-height:1.45}
+.header{background:linear-gradient(135deg,var(--azD),var(--az));color:#fff;border-radius:11px;padding:12px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .code{font-size:10.5px;opacity:.8;letter-spacing:1px}
-.title{font-size:21px;font-weight:800;line-height:1.2;margin-top:2px}
+.title{font-size:20px;font-weight:800;line-height:1.2;margin-top:2px}
 .title span{color:var(--am)}
 .dur{font-size:18px;font-weight:800;color:var(--am);text-align:right}
 .hr{font-size:11px;text-align:right;opacity:.9}
-.idea{background:var(--tqL);border-left:5px solid var(--tq);padding:8px 14px;border-radius:0 8px 8px 0;margin-bottom:10px}
+h2{font-size:14px;color:var(--az);margin:4px 0 6px;font-weight:800}
+.idea{background:var(--tqL);border-left:5px solid var(--tq);padding:9px 14px;border-radius:0 8px 8px 0;margin-bottom:8px}
 .idea b{color:var(--az)}
-.row{display:flex;gap:8px;margin-bottom:10px}
-.box{flex:1;border-radius:8px;padding:9px 13px;font-size:11.5px}
+.two{display:flex;gap:8px;margin-bottom:8px}
+.def{flex:1;border-radius:8px;padding:9px 12px;font-size:11.5px}
+.def .h{font-weight:800;font-size:13px;margin-bottom:2px}
+.def.her{background:var(--tqL);border:2px solid var(--tq)}.def.her .h{color:var(--tq)}
+.def.ele{background:var(--naL);border:2px solid var(--na)}.def.ele .h{color:var(--na)}
+.ex{background:var(--vdL);border-left:5px solid var(--vd);padding:8px 14px;border-radius:0 8px 8px 0;margin-bottom:8px;font-size:11.5px}
+.ex b{color:#558B2F}
+.row{display:flex;gap:8px;margin-bottom:8px}
+.box{flex:1;border-radius:8px;padding:8px 12px;font-size:11px}
 .box.mat{background:var(--fc);border-left:5px solid var(--tq)}
 .box.prep{background:var(--naL);border-left:5px solid var(--na)}
-.box b.t{display:block;font-size:11px;letter-spacing:.5px;margin-bottom:3px}
+.box b.t{display:block;font-size:11px;letter-spacing:.5px;margin-bottom:2px}
 .box ul{padding-left:16px}
-.timeline{display:flex;border-radius:8px;overflow:hidden;margin-bottom:12px;font-size:10.5px;color:#fff;font-weight:600;text-align:center}
-.timeline div{padding:6px 2px}
+.timeline{display:flex;border-radius:8px;overflow:hidden;margin-bottom:10px;font-size:10.5px;color:#fff;font-weight:600;text-align:center}
+.timeline div{padding:5px 2px}
 .m{border:2px solid;border-radius:11px;overflow:hidden;margin-bottom:8px}
-.mh{color:#fff;font-weight:700;font-size:14px;padding:7px 15px;display:flex;justify-content:space-between}
+.mh{color:#fff;font-weight:700;font-size:14px;padding:6px 15px;display:flex;justify-content:space-between}
 .mb{padding:7px 15px}
 .c-az{border-color:var(--az)}.c-az .mh{background:var(--az)}
 .c-tq{border-color:var(--tq)}.c-tq .mh{background:var(--tq)}
 .c-vd{border-color:var(--vd)}.c-vd .mh{background:var(--vd)}
 .c-na{border-color:var(--na)}.c-na .mh{background:var(--na)}
-.di{font-style:italic;background:var(--fc);padding:7px 11px;border-radius:7px;margin:5px 0}
+.di{font-style:italic;background:var(--fc);padding:6px 11px;border-radius:7px;margin:5px 0}
 .di::before{content:"Di: ";font-style:normal;font-weight:700;color:var(--az)}
 ol.st{padding-left:18px;margin:4px 0}
-ol.st li{margin-bottom:5px}
+ol.st li{margin-bottom:4px}
 ol.st b{color:var(--az)}
 .tip{background:var(--naL);border-left:4px solid var(--na);padding:6px 11px;border-radius:0 6px 6px 0;font-size:11px;margin-top:6px}
 .tip b{color:var(--na)}
-table{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:6px}
+.station{display:flex;border:2px solid #dde5eb;border-radius:10px;margin-bottom:7px;overflow:hidden}
+.snum{flex:0 0 46px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff}
+.sbody{flex:1;padding:7px 12px;font-size:11.2px}
+.stitle{font-weight:800;font-size:13px;color:var(--azD);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{font-size:9.5px;font-weight:700;color:#fff;border-radius:10px;padding:1px 8px;letter-spacing:.5px}
+.pill.v{background:var(--tq)}.pill.c{background:var(--na)}.pill.n{background:#888}
+.sgrid{display:grid;grid-template-columns:90px 1fr;gap:1px 8px;margin-top:3px}
+.sgrid .k{font-weight:700;color:var(--az)}
+.sgrid .say{font-style:italic}
+table{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:4px}
 th{background:var(--az);color:#fff;text-align:left;padding:4px 7px}
 td{padding:4px 7px;border-bottom:1px solid #eee;vertical-align:top}
 tr:nth-child(even) td{background:var(--fc)}
-.grid2{display:flex;gap:8px;margin-bottom:10px}
+.grid2{display:flex;gap:8px;margin-bottom:8px}
 .si{flex:1;background:var(--vdL);border-radius:8px;padding:8px 12px;font-size:11px}
 .no{flex:1;background:#FFF0F0;border-radius:8px;padding:8px 12px;font-size:11px}
 .si b,.no b{display:block;margin-bottom:3px}
@@ -55,6 +72,7 @@ tr:nth-child(even) td{background:var(--fc)}
 </head>
 <body>
 
+<!-- PÁGINA 1: ENTENDER LA IDEA -->
 <div class="page">
   <div class="header">
     <div>
@@ -64,15 +82,22 @@ tr:nth-child(even) td{background:var(--fc)}
     <div><div class="dur">55 min</div><div class="hr">Docente: __________<br>Fecha: __________</div></div>
   </div>
 
-  <div class="idea"><b>💡 La idea de hoy en una frase:</b> algunos valores los recibimos de la familia, la cultura o el entorno (<b>heredados</b>) y otros los decidimos nosotros (<b>elegidos</b>). Un valor heredado se puede <b>mantener</b> o <b>cambiar</b>: las dos opciones son válidas. Lo importante es darse cuenta, no juzgar.</div>
+  <h2>1. Antes de empezar: entiende la idea (lee esto primero)</h2>
+  <div class="idea"><b>¿Qué es "el uniforme"?</b> Cuando un niño entra a un equipo, le entregan una camiseta. No la escogió: se la dieron. Con los <b>valores</b> pasa igual: muchos los recibimos de la familia, el colegio o el barrio sin escogerlos. Esa es la <b>camiseta heredada</b>. Al crecer, cada persona puede mirar esa camiseta y decidir qué partes se queda porque de verdad las cree, y qué partes quiere cambiar. Eso es <b>el uniforme que elijo</b>.<br><b>El objetivo de la clase:</b> que los estudiantes se den cuenta de dónde vienen sus valores. No se trata de juzgar ni de rechazar lo que viene de la familia.</div>
+
+  <div class="two">
+    <div class="def her"><div class="h">🎁 HEREDADO</div>Un valor que aprendí de otros, sin decidirlo yo.<br><i>"Mi abuela siempre dice que hay que saludar. Yo saludo porque así me criaron."</i></div>
+    <div class="def ele"><div class="h">✋ ELEGIDO</div>Un valor que yo decidí, porque pensé en él y me convence.<br><i>"Decidí defender a los compañeros cuando los molestan, aunque nadie me lo enseñó."</i></div>
+  </div>
+
+  <div class="ex"><b>⚠️ La parte que más confunde:</b> un valor puede ser <b>las dos cosas</b>. "Decir la verdad me lo enseñó mi mamá (heredado) y hoy yo también lo elijo (elegido)." Esa es una respuesta excelente. Si un estudiante dice "las dos", felicítalo.</div>
 
   <div class="row">
-    <div class="box mat"><b class="t">🎒 NECESITAS</b>
-      <ul><li>4 a 8 aros con letreros HEREDADO / ELEGIDO</li><li>1 disco de balance</li><li>6 a 9 conos</li><li>2 canastas (MANTENER / SOLTAR) + 10 pelotas de ping pong</li><li>Banco de valores (solo para ti)</li><li>1 Bitácora del Vestier por estudiante + lápices</li></ul>
-      <div style="margin-top:4px;font-size:10.5px">Detalle completo en el documento <b>Materiales</b>.</div>
+    <div class="box mat"><b class="t">🎒 NECESITAS (ver documento Materiales)</b>
+      <ul><li>1 camiseta o peto deportivo (para mostrar la idea)</li><li>4 aros + letreros HEREDADO / ELEGIDO</li><li>1 disco de balance</li><li>5 a 9 conos</li><li>2 canastas + letreros MANTENER / SOLTAR + 10 pelotas de ping pong</li><li>Tarjetas de <b>valores</b> (turquesa) y de <b>creencias</b> (naranja)</li><li>Bitácora y lápiz para cada estudiante</li></ul>
     </div>
     <div class="box prep"><b class="t">⏱️ ANTES DE LA CLASE (15 min)</b>
-      <ul><li>Arma las 5 estaciones en circuito en el patio.</li><li>Ten a mano el Banco de valores. <b>Tú los dices en voz alta, los estudiantes nunca los ven escritos.</b></li><li>Deja las bitácoras y lápices en el salón.</li></ul>
+      <ul><li>Arma las 5 estaciones en fila en el patio, en orden del 1 al 5 (ver página 2).</li><li>Pega los letreros en los aros y las canastas.</li><li>Separa las tarjetas: turquesa para las estaciones 1, 2 y 3. Naranja para la 4.</li><li>Las tarjetas las tienes tú y las lees en voz alta. <b>Los estudiantes no las ven.</b></li></ul>
     </div>
   </div>
 
@@ -85,61 +110,93 @@ tr:nth-child(even) td{background:var(--fc)}
   </div>
 
   <div class="m c-az">
-    <div class="mh"><span>👋 BIENVENIDA</span><span>7 min</span></div>
+    <div class="mh"><span>👋 BIENVENIDA (salón)</span><span>7 min</span></div>
     <div class="mb">
-      Recibe al grupo con actitud de entrenador o entrenadora.
-      <div class="di">"Hoy hablamos de la camiseta con la que empezamos a jugar. Todos arrancamos con el uniforme que nos dio nuestro primer equipo: la familia, la cultura, el barrio. Eso es normal. Pero un buen deportista, con el tiempo, decide qué partes de ese uniforme se queda y cuáles cambia, a propósito."</div>
-      <div class="tip"><b>OJO:</b> no expliques la teoría todavía. El concepto se cierra después del circuito, cuando ya lo vivieron en el cuerpo.</div>
+      Muestra la camiseta o el peto mientras hablas.
+      <div class="di">"Cuando entraste a tu primer equipo, ¿escogiste tu camiseta? No, te la entregaron. Con los valores pasa lo mismo: muchos te los dio tu familia, tu colegio, tu barrio, sin preguntarte. Eso no es malo, es normal. Hoy vamos a mirar esa camiseta con calma y descubrir qué partes vienen de otros y qué partes ya escogiste tú."</div>
+      Pregunta rápida: <b>"¿Alguien me dice algo que le enseñaron en su casa?"</b> (2 o 3 respuestas, sin comentar). Luego salen al patio.
     </div>
   </div>
 
-  <div class="m c-tq">
-    <div class="mh"><span>💪 RETO 1: CIRCUITO DEL VESTIER (patio)</span><span>15 min</span></div>
-    <div class="mb">
-      <div class="di">"En cada estación va a aparecer un valor. No se trata de decir si es bueno o malo. Se trata de notar si lo recibiste sin elegirlo o si lo elegirías hoy."</div>
-      <ol class="st">
-        <li><b>Aros.</b> Dices un valor. El estudiante salta al aro HEREDADO o ELEGIDO, según cómo le llegó ese valor.</li>
-        <li><b>Disco de balance.</b> Mientras se equilibra, dices un valor y responde en voz alta: <i>"me lo quedo"</i> o <i>"lo estoy pensando"</i>. No hay que rechazar nada.</li>
-        <li><b>Zigzag de conos.</b> En cada cono dices un valor y el estudiante dice "heredado" o "elegido" mientras avanza.</li>
-        <li><b>Lanzamiento.</b> Dices una creencia de la lista y el estudiante lanza la pelota a la canasta MANTENER o SOLTAR, según lo que piensa de verdad.</li>
-        <li><b>Un pie.</b> En un pie (ojos cerrados si se siente seguro), dice <b>un valor heredado que se queda</b> y <b>uno que eligió por su cuenta</b>.</li>
-      </ol>
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="si"><b>✅ SÍ</b>Decir cada valor una sola vez.<br>Bajar el nivel sin humillar.<br>Hablar como entrenador.<br>Preguntar antes de explicar.</div>
-    <div class="no"><b>❌ NO</b>Mostrar la lista de valores.<br>Comparar estudiantes en público.<br>Calificar un valor como "malo".<br>Dar la teoría antes del circuito.</div>
-  </div>
-
-  <div class="foot"><span>CRI-IE-B1-S2 · Guía docente sencilla</span><span>CCA, El Gimnasio del Cerebro · Pág. 1/2</span></div>
+  <div class="foot"><span>CRI-IE-B1-S2 · Guía docente</span><span>CCA, El Gimnasio del Cerebro · Pág. 1/3</span></div>
 </div>
 
+<!-- PÁGINA 2: EL CIRCUITO -->
 <div class="page">
   <div class="m c-tq">
-    <div class="mh"><span>📊 RETO 1: AJUSTA SEGÚN LA EDAD</span><span>&nbsp;</span></div>
+    <div class="mh"><span>💪 RETO 1: EL CIRCUITO DE LAS 5 ESTACIONES (patio)</span><span>15 min</span></div>
     <div class="mb">
-      <table>
-        <tr><th>Estación</th><th>11 a 12 años</th><th>13 años</th><th>14 a 15 años</th></tr>
-        <tr><td><b>1. Aros</b></td><td>3 valores fáciles</td><td>5 valores</td><td>5 valores + explicar por qué un valor heredado también lo elegiría hoy</td></tr>
-        <tr><td><b>2. Disco</b></td><td>3 valores, sin afán</td><td>5 valores</td><td>5 valores + qué tendría que pasar para decidirse</td></tr>
-        <tr><td><b>3. Conos</b></td><td>5 conos</td><td>7 conos</td><td>9 conos + un ejemplo personal</td></tr>
-        <tr><td><b>4. Lanzamiento</b></td><td>3 creencias, sin afán</td><td>5 creencias</td><td>5 creencias + explicar un lanzamiento</td></tr>
-        <tr><td><b>5. Un pie</b></td><td>Un valor que se queda</td><td>Uno que se queda y uno elegido</td><td>Los dos + por qué son distintos</td></tr>
-      </table>
-      <div class="tip"><b>SI SE EQUIVOCA O SE BLOQUEA:</b> baja un nivel sin hacerlo sentir mal. El error es información, no fracaso. <b>SEGURIDAD:</b> en el disco y en la estación 5, ten a alguien cerca o una pared al lado.</div>
-      <div class="di">"¿Con cuál valor te resultó más fácil decir: este lo elijo yo?"</div>
+      <b>Cómo funciona:</b> <b>todo el grupo va junto</b> de estación en estación, del 1 al 5, unos <b>3 minutos en cada una</b>. Tú lees una tarjeta en voz alta y pasan 3 o 4 estudiantes a la vez. El resto espera su turno y observa. En la siguiente estación pasan otros.
+      <div class="di">"En cada estación les voy a decir un valor. No hay respuestas buenas ni malas. Solo respondan con la verdad: ¿de dónde les viene ese valor?"</div>
     </div>
   </div>
 
+  <div class="station"><div class="snum" style="background:var(--tq)">1</div><div class="sbody">
+    <div class="stitle">AROS: ¿Cómo me llegó? <span class="pill v">TARJETAS DE VALORES</span></div>
+    <div class="sgrid">
+      <span class="k">Material</span><span>4 aros en el piso: 2 con letrero HEREDADO y 2 con letrero ELEGIDO.</span>
+      <span class="k">Tú dices</span><span class="say">"Decir la verdad." (lees una tarjeta turquesa)</span>
+      <span class="k">Estudiante</span><span>Salta al aro HEREDADO si se lo enseñaron, o al aro ELEGIDO si lo decidió. Si siente que son las dos, se para con un pie en cada aro.</span>
+    </div></div></div>
+
+  <div class="station"><div class="snum" style="background:var(--tq)">2</div><div class="sbody">
+    <div class="stitle">DISCO DE BALANCE: ¿Me lo quedo? <span class="pill v">TARJETAS DE VALORES</span></div>
+    <div class="sgrid">
+      <span class="k">Material</span><span>1 disco de balance. Un estudiante a la vez, con un compañero al lado.</span>
+      <span class="k">Tú dices</span><span class="say">"Ser puntual."</span>
+      <span class="k">Estudiante</span><span>Mientras mantiene el equilibrio, responde en voz alta: <b>"Me lo quedo"</b> o <b>"Lo estoy pensando"</b>. Las dos respuestas valen.</span>
+    </div></div></div>
+
+  <div class="station"><div class="snum" style="background:var(--tq)">3</div><div class="sbody">
+    <div class="stitle">ZIGZAG DE CONOS: ¿Quién me lo enseñó? <span class="pill v">TARJETAS DE VALORES</span></div>
+    <div class="sgrid">
+      <span class="k">Material</span><span>5 a 9 conos en zigzag.</span>
+      <span class="k">Tú dices</span><span class="say">"Ayudar en la casa."</span>
+      <span class="k">Estudiante</span><span>Hace el zigzag y, al llegar a cada cono, dice de dónde le vino ese valor: <b>familia, amigos, colegio, deporte o "lo decidí yo"</b>. Le dices un valor nuevo en cada cono.</span>
+    </div></div></div>
+
+  <div class="station"><div class="snum" style="background:var(--na)">4</div><div class="sbody">
+    <div class="stitle">LANZAMIENTO: ¿Mantener o soltar? <span class="pill c">TARJETAS DE CREENCIAS</span></div>
+    <div class="sgrid">
+      <span class="k">Material</span><span>2 canastas a 2 o 3 pasos: una MANTENER y otra SOLTAR. Pelotas de ping pong.</span>
+      <span class="k">Tú dices</span><span class="say">"Hay que ganar siempre." (lees una tarjeta naranja)</span>
+      <span class="k">Estudiante</span><span>Lanza la pelota a MANTENER si está de acuerdo con esa frase, o a SOLTAR si quiere cambiarla. Si no la mete, no importa: cuenta la intención.</span>
+    </div></div></div>
+
+  <div class="station"><div class="snum" style="background:#888">5</div><div class="sbody">
+    <div class="stitle">EN UN PIE: Mi uniforme <span class="pill n">SIN TARJETAS</span></div>
+    <div class="sgrid">
+      <span class="k">Material</span><span>Ninguno. Al lado de una pared o con un compañero cerca.</span>
+      <span class="k">Tú dices</span><span class="say">"Dime un valor que te dio tu familia y que te quieres quedar, y uno que escogiste tú."</span>
+      <span class="k">Estudiante</span><span>En un pie (ojos cerrados solo si se siente seguro), responde con sus propias palabras.</span>
+    </div></div></div>
+
+  <div class="m c-tq" style="margin-bottom:0">
+    <div class="mb">
+      <b>📊 Según la edad</b>
+      <table>
+        <tr><th></th><th>11 a 12 años</th><th>13 años</th><th>14 a 15 años</th></tr>
+        <tr><td><b>Estaciones 1 a 4</b></td><td>Tarjetas fáciles (las creencias con ★)</td><td>Cualquier tarjeta</td><td>Además, explica <b>por qué</b> respondió así</td></tr>
+        <tr><td><b>Estación 3</b></td><td>5 conos</td><td>7 conos</td><td>9 conos</td></tr>
+        <tr><td><b>Estación 5</b></td><td>Solo el valor que se queda</td><td>Los dos valores</td><td>Los dos + por qué son distintos</td></tr>
+      </table>
+      <div class="tip"><b>SI SE BLOQUEA:</b> dale un ejemplo o una tarjeta más fácil, sin hacerlo sentir mal. <b>AL TERMINAR EL CIRCUITO PREGUNTA:</b> "¿Con cuál valor fue más fácil decir: este lo elijo yo?"</div>
+    </div>
+  </div>
+
+  <div class="foot"><span>CRI-IE-B1-S2 · Guía docente</span><span>CCA, El Gimnasio del Cerebro · Pág. 2/3</span></div>
+</div>
+
+<!-- PÁGINA 3: CIERRE EN EL SALÓN -->
+<div class="page">
   <div class="m c-vd">
     <div class="mh"><span>🧠 RETO 2: BITÁCORA DEL VESTIER (salón)</span><span>15 min</span></div>
     <div class="mb">
-      <div class="di">"Acabas de mirar tu uniforme sin sentir culpa. Quedarte con un valor heredado a propósito es una decisión tan real como cambiarlo. La diferencia es que hoy lo miraste, en vez de usarlo sin pensar."</div>
+      <div class="di">"Acaban de mirar su camiseta. Quedarse con un valor de la familia porque uno lo decide es tan válido como cambiarlo. Lo importante es que hoy lo miraron, en vez de usarlo sin pensar."</div>
       <ol class="st">
-        <li><b>Tu ejemplo (3 min).</b> Cuenta un valor que heredaste y decidiste mantener, y uno que decidiste cambiar. Corto y sencillo.</li>
-        <li><b>En parejas (5 min).</b> Cada uno comparte un valor sobre el que "lo está pensando" y por qué.</li>
-        <li><b>Bitácora (7 min).</b> Cada uno escribe un valor heredado que mantiene y uno que está eligiendo por su cuenta.</li>
+        <li><b>Tu ejemplo (3 min).</b> Cuenta un valor que te enseñaron y decidiste mantener, y uno que decidiste cambiar. Ejemplo: <i>"En mi casa me enseñaron a ser puntual y lo sigo eligiendo. También me enseñaron que no se debe llorar, y eso lo cambié: hoy creo que llorar está bien."</i></li>
+        <li><b>En parejas (5 min).</b> Cada uno le cuenta al otro un valor que todavía "está pensando" y por qué.</li>
+        <li><b>Bitácora (7 min).</b> Cada uno llena las preguntas 1, 2 y 3 de su hoja.</li>
       </ol>
       <div class="tip"><b>MUY IMPORTANTE:</b> nunca empujes a "rechazar" lo que viene de la familia. El objetivo es darse cuenta, no un resultado.</div>
     </div>
@@ -148,11 +205,11 @@ tr:nth-child(even) td{background:var(--fc)}
   <div class="m c-na">
     <div class="mh"><span>🎯 RETO 3: MI VALOR ESTA SEMANA</span><span>14 min</span></div>
     <div class="mb">
-      <div class="di">"Esto también pasa fuera del gimnasio: en cómo tratas a la gente, en lo que te parece justo, en lo que quieres para tu futuro. Esta semana fíjate en UN valor en acción y pregúntate de dónde vino."</div>
+      <div class="di">"Esto no pasa solo en el patio. Pasa en cómo tratan a la gente y en lo que les parece justo. Esta semana, fíjense en UN valor que usen y pregúntense de dónde vino."</div>
       <ol class="st">
-        <li>Cada uno escribe en la bitácora un valor que puso en práctica (honestidad, esfuerzo, lealtad...).</li>
-        <li>Enseña la pregunta clave: <b>"¿De dónde vino esto, y lo elegiría otra vez hoy?"</b></li>
-        <li>Cada uno responde esa pregunta en voz alta sobre su valor. 11 a 12 años: con tu ejemplo como guía. 14 a 15: lo comparten con el grupo.</li>
+        <li>Enseña la pregunta clave y escríbela en el tablero: <b>"¿De dónde vino esto, y lo elegiría otra vez hoy?"</b></li>
+        <li>Cada estudiante llena la parte <b>"Mi valor esta semana"</b> de la bitácora.</li>
+        <li>Algunos voluntarios responden la pregunta clave en voz alta. Con 11 a 12 años, da tu ejemplo primero.</li>
       </ol>
     </div>
   </div>
@@ -160,13 +217,25 @@ tr:nth-child(even) td{background:var(--fc)}
   <div class="m c-az">
     <div class="mh"><span>🏁 CIERRE</span><span>4 min</span></div>
     <div class="mb">
-      Tres preguntas al grupo: <b>1.</b> ¿Qué valor heredado te enorgullece seguir usando? <b>2.</b> ¿Está bien estar todavía pensando sobre un valor? ¿Por qué? <b>3.</b> ¿Qué valor vas a observar esta semana?
-      <div class="di">"La próxima sesión se llama: Parte del Equipo, Sin Perder mi Número."</div>
+      Tres preguntas al grupo:
+      <ol class="st">
+        <li>¿Qué valor de tu familia te hace sentir orgulloso seguir usando?</li>
+        <li>¿Está bien no tener claro todavía un valor? ¿Por qué?</li>
+        <li>¿Qué valor vas a observar esta semana?</li>
+      </ol>
+      <div class="di">"La próxima clase se llama: Parte del Equipo, Sin Perder mi Número."</div>
       Entrega la <b>Nota para casa</b>.
     </div>
   </div>
 
-  <div class="foot"><span>CRI-IE-B1-S2 · Guía docente sencilla</span><span>CCA, El Gimnasio del Cerebro · Pág. 2/2</span></div>
+  <div class="grid2">
+    <div class="si"><b>✅ SÍ</b>Leer cada tarjeta una sola vez.<br>Aceptar "las dos" y "lo estoy pensando" como buenas respuestas.<br>Dar ejemplos cuando alguien se bloquea.<br>Hablar como entrenador o entrenadora.</div>
+    <div class="no"><b>❌ NO</b>Mostrar las tarjetas a los estudiantes.<br>Decir que un valor o una creencia es "malo".<br>Comparar estudiantes en público.<br>Explicar la teoría antes del circuito.</div>
+  </div>
+
+  <div class="idea" style="margin-bottom:0"><b>📝 Cómo saber si la clase funcionó:</b> al final, cada estudiante puede nombrar <b>un valor que heredó</b> y <b>uno que eligió</b>, y entiende que quedarse con un valor de la familia también puede ser una decisión propia.</div>
+
+  <div class="foot"><span>CRI-IE-B1-S2 · Guía docente</span><span>CCA, El Gimnasio del Cerebro · Pág. 3/3</span></div>
 </div>
 </body>
 </html>
