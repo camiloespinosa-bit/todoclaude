@@ -7,10 +7,20 @@
 --vertical       1080x1920 (Reels, TikTok, Shorts). Si la fuente es horizontal, recorta el centro.
 --captions       subtítulos con la marca (Poppins 700, blanco con borde azul #145389), tomados de
                  palabras.json y ajustados a la línea de tiempo ya cortada.
---fontsdir       carpeta con la fuente Poppins en .ttf/.otf.
+--fontsdir       carpeta con la fuente Poppins (.woff/.ttf/.otf).
+                 Una palabra entre asteriscos en palabras.json ("*mesita*") sale en amarillo #FDD835:
+                 una palabra clave por frase, como en los Reels de referencia.
+--title          título fijo arriba durante el gancho: "texto|etiqueta|hasta_s". En el texto,
+                 *palabras* entre asteriscos van en amarillo; la etiqueta va en una caja amarilla.
 Audio: loudnorm a -16 LUFS (estándar para redes), salvo --no-loudnorm.
 """
-import argparse, json, os, shutil, subprocess, sys, tempfile
+import argparse, json, os, re, shutil, subprocess, sys, tempfile
+
+AMARILLO, BLANCO = r"{\c&H0035D8FD&}", r"{\c&H00FFFFFF&}"
+
+def destacar(t):
+    """*palabra* -> palabra en amarillo (colores ASS en orden BGR)."""
+    return re.sub(r"\*([^*]+)\*", lambda m: AMARILLO + m.group(1) + BLANCO, t)
 
 def probe(path):
     """Ancho y alto como se ven (con la rotación del celular aplicada) y cuadros por segundo."""
@@ -39,7 +49,7 @@ def locate(t, keep):
         acc += e - s
     return None
 
-def build_ass(words_path, keep, w, h, vertical, path):
+def build_ass(words_path, keep, w, h, vertical, path, title=None):
     words = json.load(open(words_path))["words"]
     per = 3 if vertical else 6
     size = round(h * (0.058 if vertical else 0.055))
@@ -53,7 +63,7 @@ def build_ass(words_path, keep, w, h, vertical, path):
         a = remap(chunk[0]["start"], keep)
         b = a + min(chunk[-1]["end"], keep[i][1]) - chunk[0]["start"]
         if b > a:
-            lines.append((a, b, " ".join(x["word"] for x in chunk)))
+            lines.append((a, b, destacar(" ".join(x["word"] for x in chunk))))
         chunk.clear()
     for x in words:
         hit = locate(x["start"], keep)
@@ -64,6 +74,11 @@ def build_ass(words_path, keep, w, h, vertical, path):
         chunk.append(x)
         if x["word"][-1:] in ".,;:?!": flush()  # el subtítulo corta donde corta la idea
     flush()
+    # Título grande (como en los Reels de referencia); "\\N" en el texto parte la línea y la etiqueta
+    # va justo debajo de la última línea.
+    t_size, t_top = round(h * 0.056), round(h * 0.07)
+    n_lineas = title.split("|")[0].count("\\N") + 1 if title else 1
+    e_top = round(t_top + n_lineas * t_size * 1.22 + h * 0.014)
     with open(path, "w", encoding="utf-8") as f:
         f.write(f"""[Script Info]
 ScriptType: v4.00+
@@ -74,10 +89,18 @@ WrapStyle: 0
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: GC,Poppins,{size},&H00FFFFFF,&H0035D8FD,&H00895314,&H64000000,-1,0,0,0,100,100,0,0,1,{max(3, size // 10)},2,2,{round(w * 0.08)},{round(w * 0.08)},{margin_v},1
+Style: Titulo,Poppins,{t_size},&H00FFFFFF,&H0035D8FD,&H00895314,&H64000000,-1,0,0,0,100,100,0,0,1,{round(h * 0.005)},3,8,{round(w * 0.06)},{round(w * 0.06)},{t_top},1
+Style: Etiqueta,Poppins,{round(h * 0.028)},&H00895314,&H0035D8FD,&H0035D8FD,&H0035D8FD,-1,0,0,0,100,100,0,0,3,{round(h * 0.008)},0,8,{round(w * 0.06)},{round(w * 0.06)},{e_top},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """)
+        if title:
+            texto, etiqueta, hasta = title.split("|")
+            fin = ass_time(float(hasta))
+            f.write(f"Dialogue: 1,0:00:00.00,{fin},Titulo,,0,0,0,,{{\\fad(150,250)}}{destacar(texto)}\n")
+            if etiqueta:
+                f.write(f"Dialogue: 1,0:00:00.15,{fin},Etiqueta,,0,0,0,,{{\\fad(150,250)}}{etiqueta}\n")
         for a, b, t in lines:
             f.write(f"Dialogue: 0,{ass_time(a)},{ass_time(b)},GC,,0,0,0,,{t}\n")
     return len(lines)
@@ -90,6 +113,7 @@ def main():
     ap.add_argument("--fontsdir")
     ap.add_argument("--no-loudnorm", action="store_true")
     ap.add_argument("--append", help="video que se pega al final (tarjeta de cierre)")
+    ap.add_argument("--title", help='título del gancho: "texto con *clave*|etiqueta|hasta_segundos"')
     a = ap.parse_args()
     if os.path.abspath(a.input) == os.path.abspath(a.output):
         sys.exit("La salida no puede ser el archivo original.")
@@ -122,7 +146,7 @@ def main():
     v = "setpts=PTS-STARTPTS"
     if a.captions:
         ass = os.path.splitext(a.output)[0] + ".ass"
-        n = build_ass(a.captions, keep, w, h, a.vertical, ass)
+        n = build_ass(a.captions, keep, w, h, a.vertical, ass, a.title)
         v += f",ass='{ass}'" + (f":fontsdir='{a.fontsdir}'" if a.fontsdir else "")
         print(f"{n} líneas de subtítulos -> {ass}", file=sys.stderr)
     au = "anull" if a.no_loudnorm else "loudnorm=I=-16:TP=-1.5:LRA=11"

@@ -103,6 +103,12 @@ python3 -I scripts/render_cuts.py entrada.mp4 $WORK/plan.json salida.mp4 \
     [--vertical] [--captions palabras.json --fontsdir assets/fonts] [--append tarjeta-final.mp4]
 ```
 
+**Estilo de Reel aprendido de una referencia (2026-10-28):** una palabra clave por frase en amarillo
+(márcala en `palabras.json` como `*mesita*`), un título grande fijo arriba durante el gancho con una
+etiqueta amarilla debajo (`--title '¿Desobediencia o\N*mesita pequeña*?|Memoria de trabajo, explicada|8.31'`),
+pausas a 0,3 s (`plan_cuts.py --gap 0.3`) y un cierre animado (en el repo de trabajo hay una
+tarjeta de chat hecha con HyperFrames). Nunca pruebas sociales inventadas (vistas, likes, comentarios).
+
 Renderiza en dos pasos: cada tramo a un archivo temporal y luego todo junto (subtítulos, volumen,
 calidad máxima). Así usa poca memoria: el método de un solo filtro con ~100 tramos agotó la memoria
 del contenedor. Los tramos de `keep` se pegan **en el orden en que están**, así que un Reel puede
