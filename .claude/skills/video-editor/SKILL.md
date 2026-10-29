@@ -109,6 +109,15 @@ etiqueta amarilla debajo (`--title '¿Desobediencia o\N*mesita pequeña*?|Memori
 pausas a 0,3 s (`plan_cuts.py --gap 0.3`) y un cierre animado (en el repo de trabajo hay una
 tarjeta de chat hecha con HyperFrames). Nunca pruebas sociales inventadas (vistas, likes, comentarios).
 
+**Tarjetas encima del video (2026-10-29):** se diseñan en HyperFrames con fondo transparente
+(`html, body { background: transparent }`), se renderizan con `--format mov` (ProRes 4444 con
+transparencia) y se ponen encima con `--overlay capa.mov`, que arranca en el segundo 0 del video
+cortado. Los momentos de cada animación salen de las palabras: busca en `palabras.json` el segundo
+en que se dice cada cosa y conviértelo al tiempo del video cortado. Hay una plantilla del seguidor
+de las 5 bases en el repo privado (`youtube/plantillas/seguidor-5-bases/`). Las tarjetas van en el
+tercio de arriba para no tapar la cara. Las advertencias de HyperFrames sobre "silencio" o "nada se
+mueve" no aplican a una capa que va encima de otro video.
+
 Renderiza en dos pasos: cada tramo a un archivo temporal y luego todo junto (subtítulos, volumen,
 calidad máxima). Así usa poca memoria: el método de un solo filtro con ~100 tramos agotó la memoria
 del contenedor. Los tramos de `keep` se pegan **en el orden en que están**, así que un Reel puede

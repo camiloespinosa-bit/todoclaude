@@ -113,6 +113,8 @@ def main():
     ap.add_argument("--fontsdir")
     ap.add_argument("--no-loudnorm", action="store_true")
     ap.add_argument("--append", help="video que se pega al final (tarjeta de cierre)")
+    ap.add_argument("--overlay", help="video con fondo transparente (.mov ProRes 4444 de HyperFrames) que va encima "
+                    "desde el segundo 0 del video cortado: tarjetas, seguidores de pasos, etc.")
     ap.add_argument("--title", help='título del gancho: "texto con *clave*|etiqueta|hasta_segundos"')
     a = ap.parse_args()
     if os.path.abspath(a.input) == os.path.abspath(a.output):
@@ -143,15 +145,19 @@ def main():
     concat = os.path.join(tmp, "lista.txt")
     open(concat, "w").write("".join(f"file '{f}'\n" for f in lista))
     # Paso 2: se pegan en orden y en una sola pasada final van subtítulos, volumen y calidad máxima.
-    v = "setpts=PTS-STARTPTS"
+    # La capa transparente (--overlay) va debajo de los subtítulos y arriba del video.
+    v = "[0:v]setpts=PTS-STARTPTS"
+    if a.overlay:
+        v += "[base];[1:v]setpts=PTS-STARTPTS,format=yuva420p[capa];[base][capa]overlay=0:0:eof_action=pass"
     if a.captions:
         ass = os.path.splitext(a.output)[0] + ".ass"
         n = build_ass(a.captions, keep, w, h, a.vertical, ass, a.title)
         v += f",ass='{ass}'" + (f":fontsdir='{a.fontsdir}'" if a.fontsdir else "")
         print(f"{n} líneas de subtítulos -> {ass}", file=sys.stderr)
     au = "anull" if a.no_loudnorm else "loudnorm=I=-16:TP=-1.5:LRA=11"
-    cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", concat,
-           "-vf", v, "-af", au + ",aresample=48000",
+    capa = ["-i", a.overlay] if a.overlay else []
+    cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", concat, *capa,
+           "-filter_complex", f"{v}[v];[0:a]{au},aresample=48000[a]", "-map", "[v]", "-map", "[a]",
            "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-pix_fmt", "yuv420p",
            "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-movflags", "+faststart", a.output]
     subprocess.run(cmd, check=True)
