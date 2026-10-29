@@ -124,7 +124,7 @@ Camilo antes de dividir. Un archivo por video: `<original>__parte-01.mp4`, etc.
   amarillo `#FDD835`. Máximo 2 líneas, abajo en horizontal; en vertical, en el tercio inferior
   pero por encima de la zona de botones de la app.
 - Oki: solo los SVG oficiales de `assets/img/oki/`. **Nunca generar ni recrear a Oki con IA.**
-- Voz y llamados: `.claude/youtube/voice.md`. Nada de promesas de resultados.
+- Voz y llamados: `~/.claude/youtube/voice.md` (copia del repo privado `gimnasio-cerebro-privado`). Nada de promesas de resultados.
 - Si existe una carpeta `B-roll kit` (en el repo o junto al video), de ahí salen logo, fotos y
   gráficos. Si no existe, usa solo lo del repo.
 
