@@ -1,0 +1,244 @@
+<title>LOT-R frente a la ITC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: lámina vertical tipo póster académico; franja de veredicto arriba, seis bloques de directrices en orden ITC, cierre crítico. */
+:root{
+  --bg:#f3f5f6; --paper:#ffffff; --ink:#18242b; --muted:#53636b; --line:#d5dde1;
+  --accent:#1f5a6e; --accent-soft:#e2eef2;
+  --ok:#2f7d4f; --ok-bg:#e3f2e8; --mid:#a36a00; --mid-bg:#fbefd6; --no:#b23a3a; --no-bg:#f8e1e1;
+  --f-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f171b; --paper:#162229; --ink:#e6eef1; --muted:#9fb0b7; --line:#2a3a42;
+  --accent:#7cc0d6; --accent-soft:#1c3440;
+  --ok:#6cc792; --ok-bg:#183a27; --mid:#e7b55a; --mid-bg:#3a2d12; --no:#ef8a8a; --no-bg:#3d1d1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171b; --paper:#162229; --ink:#e6eef1; --muted:#9fb0b7; --line:#2a3a42;
+  --accent:#7cc0d6; --accent-soft:#1c3440;
+  --ok:#6cc792; --ok-bg:#183a27; --mid:#e7b55a; --mid-bg:#3a2d12; --no:#ef8a8a; --no-bg:#3d1d1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px}
+.sheet{max-width:1080px;margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.pad{padding:28px clamp(18px,4vw,44px)}
+header.pad{border-bottom:4px solid var(--accent)}
+.eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(26px,4vw,40px)/1.12 var(--f-display);margin:10px 0 10px;text-wrap:balance}
+h2{font:700 22px/1.2 var(--f-display);margin:0 0 4px;text-wrap:balance}
+.lead{color:var(--muted);max-width:70ch;margin:0}
+.cite{font-size:13px;color:var(--muted);margin-top:14px;display:grid;gap:4px}
+.cite b{color:var(--ink);font-weight:600}
+
+/* veredicto */
+.verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.vbox{border-radius:6px;padding:12px 14px;display:flex;align-items:baseline;gap:10px}
+.vbox .n{font:700 34px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.vbox .t{font-weight:600;font-size:14px}
+.v-ok{background:var(--ok-bg);color:var(--ok)} .v-mid{background:var(--mid-bg);color:var(--mid)} .v-no{background:var(--no-bg);color:var(--no)}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;margin-top:12px}
+.bar span:nth-child(1){flex:5;background:var(--ok)} .bar span:nth-child(2){flex:9;background:var(--mid)} .bar span:nth-child(3){flex:6;background:var(--no)}
+.barlab{font:500 12px var(--f-mono);color:var(--muted);margin-top:6px}
+
+/* proceso */
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding:0;list-style:none;counter-reset:s}
+.flow li{flex:1 1 150px;min-width:0;background:var(--accent-soft);border-radius:6px;padding:10px 12px;font-size:13px;position:relative;counter-increment:s}
+.flow li::before{content:counter(s);font:500 11px var(--f-mono);color:var(--accent);display:block;margin-bottom:2px}
+.flow li b{display:block;font-size:13.5px}
+.flow small{color:var(--muted)}
+
+/* bloques */
+section.block{border-top:1px solid var(--line)}
+.bhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.bhead .tally{font:500 12px var(--f-mono);color:var(--muted)}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:88px minmax(0,1fr) minmax(0,1.55fr);gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:6px;border-left-width:5px}
+.row.ok{border-left-color:var(--ok)} .row.mid{border-left-color:var(--mid)} .row.no{border-left-color:var(--no)}
+.code{font:500 15px var(--f-mono);color:var(--accent)}
+.chip{display:inline-block;margin-top:6px;font:600 11px/1 var(--f-body);letter-spacing:.04em;text-transform:uppercase;padding:5px 7px;border-radius:4px}
+.ok .chip{background:var(--ok-bg);color:var(--ok)} .mid .chip{background:var(--mid-bg);color:var(--mid)} .no .chip{background:var(--no-bg);color:var(--no)}
+.dir{font-size:14px;font-weight:500}
+.ev{font-size:13.5px;color:var(--ink)}
+.ev .pg{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px}
+
+/* crítico */
+.critic{background:var(--accent-soft)}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:12px}
+.cols h3{font:600 14px/1.3 var(--f-body);margin:0 0 6px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;font-size:12px}
+.cols p,.cols ul{margin:0;font-size:14px}
+.cols ul{padding-left:18px;display:grid;gap:4px}
+.bottomline{margin-top:16px;font:500 17px/1.45 var(--f-display);max-width:75ch}
+.refs{font-size:12.5px;color:var(--muted);display:grid;gap:6px}
+.refs p{margin:0;padding-left:2em;text-indent:-2em}
+.refs i{color:var(--ink)}
+
+@media (max-width:760px){
+  .row{grid-template-columns:1fr;gap:6px}
+  .cols{grid-template-columns:1fr}
+  .verdict{grid-template-columns:1fr}
+}
+</style>
+
+<div class="sheet">
+<header class="pad">
+  <div class="eyebrow">Psicometría · Guía 2 · Infografía</div>
+  <h1>¿La adaptación colombiana del <span style="white-space:nowrap">LOT-R</span> cumple las directrices de la ITC?</h1>
+  <p class="lead">Paralelo entre el proceso de traducción y adaptación de la escala Life Orientation Test-Revised (optimismo disposicional) en cuidadores de pacientes con cáncer y las 20 directrices de la Comisión Internacional de Tests, segunda edición.</p>
+  <div class="cite">
+    <div><b>Artículo analizado:</b> Valdelamar-Jiménez y Sánchez-Pedraza (2017), <i>Revista Facultad Nacional de Salud Pública, 35</i>(2), 216-224.</div>
+    <div><b>Criterio:</b> Muñiz, Elosua y Hambleton (2013), <i>Psicothema, 25</i>(2), 151-157.</div>
+  </div>
+  <div class="verdict" role="list">
+    <div class="vbox v-ok" role="listitem"><span class="n">5</span><span class="t">Cumple</span></div>
+    <div class="vbox v-mid" role="listitem"><span class="n">9</span><span class="t">Cumple parcialmente</span></div>
+    <div class="vbox v-no" role="listitem"><span class="n">6</span><span class="t">No cumple</span></div>
+  </div>
+  <div class="bar" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="barlab">20 directrices evaluadas · fortalezas en lo legal y lingüístico; vacío en la evidencia empírica</div>
+</header>
+
+<section class="pad block">
+  <h2>Lo que hicieron los autores</h2>
+  <p class="lead">Siguieron el manual de traducción de la EORTC (Grupo de Calidad de Vida). El estudio se declara como la fase inicial de una validación posterior (p. 222).</p>
+  <ol class="flow">
+    <li><b>Permiso y ética</b><small>Autorización de los autores del LOT-R y aval del Comité de Ética del INC (p. 219)</small></li>
+    <li><b>2 traducciones directas</b><small>Un médico y un psicólogo, independientes (p. 219)</small></li>
+    <li><b>Consenso</b><small>Ítems 3, 7 y 9 con discrepancias; se crea versión preliminar (p. 219-220)</small></li>
+    <li><b>2 traducciones inversas</b><small>Traductores nativos de inglés que no conocían la escala (p. 219)</small></li>
+    <li><b>Prueba piloto</b><small>21 cuidadores, entrevista individual, 5 a 7 min (p. 220-221)</small></li>
+    <li><b>Versión final</b><small>Ítems 3, 7 y 9 reescritos; se verifica equivalencia semántica (p. 221-222)</small></li>
+  </ol>
+</section>
+
+<section class="pad block">
+  <div class="bhead"><h2>1. Directrices previas</h2><span class="tally">2 cumple · 3 parcial</span></div>
+  <div class="rows">
+    <div class="row ok"><div><div class="code">DP1</div><span class="chip">Cumple</span></div>
+      <div class="dir">Obtener los permisos de quien tenga la propiedad intelectual del test.</div>
+      <div class="ev">"Previa solicitud de permiso los autores aceptaron la traducción y adaptación al español colombiano de la escala". <span class="pg">p. 219</span></div></div>
+    <div class="row mid"><div><div class="code">DP2</div><span class="chip">Parcial</span></div>
+      <div class="dir">Cumplir las leyes y prácticas profesionales sobre el uso de tests del país.</div>
+      <div class="ev">Reportan aprobación del Comité de Ética del Instituto Nacional de Cancerología y "asentimiento informado" de los participantes <span class="pg">p. 219-220</span>. No mencionan la normativa colombiana (p. ej., Ley 1090 de 2006, art. 50, sobre derechos de los participantes) ni el manejo de datos.</div></div>
+    <div class="row ok"><div><div class="code">DP3</div><span class="chip">Cumple</span></div>
+      <div class="dir">Seleccionar el diseño de adaptación más adecuado.</div>
+      <div class="ev">Eligen y justifican el procedimiento de la EORTC, con traducciones directas e inversas y prueba piloto, para mantener la equivalencia semántica <span class="pg">p. 219</span>.</div></div>
+    <div class="row mid"><div><div class="code">DP4</div><span class="chip">Parcial</span></div>
+      <div class="dir">Evaluar la relevancia del constructo en las poblaciones de interés.</div>
+      <div class="ev">Argumentan con literatura la importancia del optimismo en cuidadores <span class="pg">p. 218-219</span>, pero no evalúan si el constructo se entiende igual en cuidadores colombianos. Además citan que en población colombiana el LOT-R mostró estructura bidimensional con alfa de 0,58 en pesimismo <span class="pg">p. 218</span> y no discuten esa implicación.</div></div>
+    <div class="row mid"><div><div class="code">DP5</div><span class="chip">Parcial</span></div>
+      <div class="dir">Evaluar la influencia de diferencias culturales o lingüísticas relevantes.</div>
+      <div class="ev">El piloto detectó problemas de comprensión con la forma negativa "casi nunca" <span class="pg">p. 221</span> y los autores reconocen que la población reveló sesgos de interpretación <span class="pg">p. 223</span>. No hubo un análisis previo y sistemático de diferencias culturales (escolaridad mediana de 7 años, estratos 1 a 3).</div></div>
+  </div>
+</section>
+
+<section class="pad block">
+  <div class="bhead"><h2>2. Directrices de desarrollo</h2><span class="tally">3 cumple · 2 parcial</span></div>
+  <div class="rows">
+    <div class="row ok"><div><div class="code">DD1</div><span class="chip">Cumple</span></div>
+      <div class="dir">Asegurar con expertos cualificados que se consideren diferencias lingüísticas, psicológicas y culturales.</div>
+      <div class="ev">Traducción directa por dos profesionales (Medicina y Psicología) con fluidez en inglés y experiencia en medición; traducción inversa por dos traductores nativos de inglés <span class="pg">p. 219</span>. Falta un comité externo independiente; el consenso lo hizo el mismo equipo investigador.</div></div>
+    <div class="row ok"><div><div class="code">DD2</div><span class="chip">Cumple</span></div>
+      <div class="dir">Usar diseños y procedimientos racionales apropiados para la población.</div>
+      <div class="ev">Proceso iterativo: dos traducciones independientes, consenso, retrotraducción, piloto y revisión final <span class="pg">p. 219-222</span>. No se apoyan solo en la traducción inversa, riesgo que Muñiz et al. (2013, p. 152) advierten.</div></div>
+    <div class="row ok"><div><div class="code">DD3</div><span class="chip">Cumple</span></div>
+      <div class="dir">Dar evidencias de que instrucciones e ítems tienen significado similar en las poblaciones.</div>
+      <div class="ev">Las tablas 1 y 2 muestran ítem por ítem la versión original, las traducciones y la retrotraducción <span class="pg">p. 220</span>; la instrucción no presentó dificultades <span class="pg">p. 219</span>; se verificó la equivalencia semántica final <span class="pg">p. 222</span>. La evidencia es solo cualitativa.</div></div>
+    <div class="row mid"><div><div class="code">DD4</div><span class="chip">Parcial</span></div>
+      <div class="dir">Dar evidencias de que formato, escala de respuesta, corrección y aplicación son adecuados.</div>
+      <div class="ev">Se conserva la escala de 0 a 4 <span class="pg">p. 222</span>. Siete cuidadores tuvieron dificultad para elegir la opción de respuesta en los ítems 7 y 9 <span class="pg">p. 221</span>. No se evalúan las reglas de corrección (ítems inversos y de relleno) ni la aplicación autoadministrada frente a la entrevistada.</div></div>
+    <div class="row mid"><div><div class="code">DD5</div><span class="chip">Parcial</span></div>
+      <div class="dir">Hacer estudios piloto con análisis de ítems, fiabilidad y validez.</div>
+      <div class="ev">Hubo piloto con 21 cuidadores, acorde a la EORTC <span class="pg">p. 220</span>, pero fue cualitativo: no reportan análisis de ítems, fiabilidad ni validez de la versión colombiana.</div></div>
+  </div>
+</section>
+
+<section class="pad block">
+  <div class="bhead"><h2>3. Directrices de confirmación</h2><span class="tally">4 no cumple</span></div>
+  <div class="rows">
+    <div class="row no"><div><div class="code">DC1</div><span class="chip">No cumple</span></div>
+      <div class="dir">Definir la muestra y usar un tamaño suficiente para los análisis empíricos.</div>
+      <div class="ev">La muestra piloto está bien descrita (tabla 3) <span class="pg">p. 221</span>, pero 21 personas, en su mayoría de Bogotá y de una sola institución, no permiten análisis empíricos.</div></div>
+    <div class="row no"><div><div class="code">DC2</div><span class="chip">No cumple</span></div>
+      <div class="dir">Dar información empírica sobre equivalencia de constructo, método e ítems.</div>
+      <div class="ev">Solo se establece equivalencia semántica por consenso. No hay análisis factorial, invarianza ni funcionamiento diferencial de los ítems.</div></div>
+    <div class="row no"><div><div class="code">DC3</div><span class="chip">No cumple</span></div>
+      <div class="dir">Recoger evidencias de fiabilidad y validez de la versión adaptada.</div>
+      <div class="ev">Solo citan alfas de otras versiones (0,65 a 0,80) <span class="pg">p. 218</span>. La validación queda para "estudios futuros" <span class="pg">p. 222-223</span>.</div></div>
+    <div class="row no"><div><div class="code">DC4</div><span class="chip">No cumple</span></div>
+      <div class="dir">Establecer la comparabilidad de puntuaciones entre poblaciones.</div>
+      <div class="ev">No se aplicó la escala para obtener puntuaciones ni se hicieron diseños de equiparación.</div></div>
+  </div>
+</section>
+
+<section class="pad block">
+  <div class="bhead"><h2>4. Directrices de aplicación</h2><span class="tally">2 parcial</span></div>
+  <div class="rows">
+    <div class="row mid"><div><div class="code">DA1</div><span class="chip">Parcial</span></div>
+      <div class="dir">Preparar materiales e instrucciones que minimicen diferencias culturales y lingüísticas.</div>
+      <div class="ev">La versión final (tabla 4) trae instrucción y escala en español colombiano <span class="pg">p. 222</span>, ajustadas según el piloto. No hay manual de aplicación.</div></div>
+    <div class="row mid"><div><div class="code">DA2</div><span class="chip">Parcial</span></div>
+      <div class="dir">Especificar las condiciones de aplicación para todas las poblaciones.</div>
+      <div class="ev">Describen el piloto: individual, sin el paciente presente, en el servicio, dirigido por una investigadora, de 5 a 7 minutos <span class="pg">p. 220-221</span>. No fijan condiciones estandarizadas para usos futuros.</div></div>
+  </div>
+</section>
+
+<section class="pad block">
+  <div class="bhead"><h2>5. Puntuación e interpretación</h2><span class="tally">2 no cumple</span></div>
+  <div class="rows">
+    <div class="row no"><div><div class="code">DPI1</div><span class="chip">No cumple</span></div>
+      <div class="dir">Interpretar diferencias entre grupos con la información demográfica pertinente.</div>
+      <div class="ev">No se reportan puntuaciones, por lo que no hay interpretación de diferencias entre grupos.</div></div>
+    <div class="row no"><div><div class="code">DPI2</div><span class="chip">No cumple</span></div>
+      <div class="dir">Comparar puntuaciones solo en el nivel de invarianza demostrado.</div>
+      <div class="ev">No hay estudio de invarianza. Afirman que el LOT-R mantiene "propiedades psicométricas equivalentes" en otros idiomas <span class="pg">p. 219</span>, algo que no se ha comprobado para esta versión.</div></div>
+  </div>
+</section>
+
+<section class="pad block">
+  <div class="bhead"><h2>6. Documentación</h2><span class="tally">2 parcial</span></div>
+  <div class="rows">
+    <div class="row mid"><div><div class="code">DOC1</div><span class="chip">Parcial</span></div>
+      <div class="dir">Documentar técnicamente los cambios y la evidencia de equivalencia entre versiones.</div>
+      <div class="ev">Documentan con detalle cada cambio y su razón (tablas 1, 2 y 4) <span class="pg">p. 220-222</span>. Falta la evidencia de equivalencia métrica.</div></div>
+    <div class="row mid"><div><div class="code">DOC2</div><span class="chip">Parcial</span></div>
+      <div class="dir">Dar documentación a los usuarios para un uso correcto del test.</div>
+      <div class="ev">Publican la versión final con su instrucción <span class="pg">p. 222</span>, pero sin indicar qué ítems se invierten ni cuáles son de relleno en esta versión, y sin normas de interpretación.</div></div>
+  </div>
+  <p class="note">En el artículo de Muñiz et al. (2013, p. 155) las directrices de documentación aparecen con los códigos DC1 y DC2, iguales a los de confirmación. Aquí se nombran DOC1 y DOC2 para distinguirlas.</p>
+</section>
+
+<section class="pad block critic">
+  <h2>Análisis crítico: ¿se puede usar esta versión del LOT-R?</h2>
+  <div class="cols">
+    <div><h3>Fortalezas</h3><ul>
+      <li>Permiso de los autores y aval ético.</li>
+      <li>Procedimiento iterativo con traductores independientes, sin confiar solo en la retrotraducción.</li>
+      <li>Participación de la población objetivo, que permitió reconocer y corregir sesgos de interpretación (p. 223).</li>
+      <li>Documentación transparente de cada cambio.</li>
+    </ul></div>
+    <div><h3>Limitaciones</h3><ul>
+      <li>No hay datos de fiabilidad, validez ni equivalencia de la versión colombiana.</li>
+      <li>Muestra pequeña, de una sola institución y casi toda de Bogotá.</li>
+      <li>Los ítems negativos (3, 7 y 9) fueron confusos; el problema puede afectar la estructura factorial, como sugiere el alfa de 0,58 en pesimismo de otra versión aplicada en Colombia (p. 218).</li>
+      <li>No se evalúa la escala con personas de baja escolaridad, pese a una mediana de 7 años.</li>
+    </ul></div>
+    <div><h3>Uso recomendado</h3>
+      <p>Esta versión sirve como punto de partida para investigación. Todavía no es apropiada para tomar decisiones clínicas sobre cuidadores ni para comparar sus puntuaciones con las de otros países, porque las directrices de confirmación (DC1 a DC4) y de interpretación (DPI1, DPI2) siguen pendientes.</p></div>
+  </div>
+  <p class="bottomline">Conclusión: la adaptación logró equivalencia lingüística y cultural, pero no métrica. Muñiz et al. (2013, p. 153) señalan que el objetivo es la máxima equivalencia lingüística, cultural, conceptual y métrica posible, y en este estudio la equivalencia métrica no se evaluó.</p>
+</section>
+
+<section class="pad block">
+  <h2 style="font-size:17px;margin-bottom:10px">Referencias</h2>
+  <div class="refs">
+    <p>Congreso de la República de Colombia. (2006). <i>Ley 1090 de 2006, por la cual se reglamenta el ejercicio de la profesión de Psicología, se dicta el Código Deontológico y Bioético y otras disposiciones</i>.</p>
+    <p>Muñiz, J., Elosua, P. y Hambleton, R. K. (2013). Directrices para la traducción y adaptación de los tests: segunda edición. <i>Psicothema, 25</i>(2), 151-157. https://doi.org/10.7334/psicothema2013.24</p>
+    <p>Valdelamar-Jiménez, J. y Sánchez-Pedraza, R. (2017). Traducción y adaptación transcultural de la escala Life Orientation Test-Revised para medir optimismo disposicional en cuidadores de pacientes con cáncer en Colombia. <i>Revista Facultad Nacional de Salud Pública, 35</i>(2), 216-224. https://doi.org/10.17533/udea.rfnsp.v35n2a06</p>
+  </div>
+</section>
+</div>
