@@ -30,7 +30,7 @@ Formato APA 7.
 
 ## Nota sobre la guía
 
-La Guía 2 atribuye el artículo de la EPCEP a "Muñiz (2018)", pero el PDF de la carpeta es de Peña, P. P., Gonzalez, C. H. y Montenegro, H. L. (2019), *Formación Universitaria, 12*(6), 15-26, https://doi.org/10.4067/S0718-50062019000600015, y no cita a Muñiz. Las "10 fases" deben venir de otro texto de Muñiz que no está en la carpeta.
+La Guía 2 atribuye el artículo de la EPCEP a "Muñiz (2018)", pero el PDF de la carpeta es de Peña, P. P., Gonzalez, C. H. y Montenegro, H. L. (2019), *Formación Universitaria, 12*(6), 15-26, https://doi.org/10.4067/S0718-50062019000600015, y no cita a Muñiz. Las "10 fases" son las del capítulo 8 de Muñiz (2018), que sí está en la carpeta (ver abajo).
 
 ## Fuentes para las fases de construcción (plan de trabajo)
 

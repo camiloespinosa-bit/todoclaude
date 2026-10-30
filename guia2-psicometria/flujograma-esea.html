@@ -1,0 +1,69 @@
+<title>Flujograma ESEA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--ink:#18242b;--muted:#53636b;--line:#c9d3d8;--a:#1f5a6e;--a-soft:#e2eef2;--b:#5b4a8a;--b-soft:#ebe7f5;--c:#2f7d4f;--c-soft:#e3f2e8;--loop:#b5651d;
+  --f:"IBM Plex Sans","Segoe UI",Arial,sans-serif;--m:"IBM Plex Mono",Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:14px/1.4 var(--f)}
+.wrap{width:900px;padding:22px 26px;position:relative}
+h1{font-size:19px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+.stage{display:grid;grid-template-columns:120px 1fr;gap:14px;margin-bottom:10px}
+.lab{border-radius:6px;padding:10px;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;text-align:center}
+.s1 .lab{background:var(--a-soft);color:var(--a)} .s2 .lab{background:var(--b-soft);color:var(--b)} .s3 .lab{background:var(--c-soft);color:var(--c)}
+.steps{display:grid;gap:0}
+.box{display:grid;grid-template-columns:34px 1fr 74px;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:6px;padding:8px 10px;background:#fff;position:relative;margin-right:70px}
+.s1 .box{border-color:var(--a)} .s2 .box{border-color:var(--b)} .s3 .box{border-color:var(--c)}
+.n{font:500 18px var(--m);text-align:center}
+.s1 .n{color:var(--a)} .s2 .n{color:var(--b)} .s3 .n{color:var(--c)}
+.t b{display:block;font-size:14px}
+.t span{font-size:12px;color:var(--muted)}
+.mes{font:500 11px var(--m);color:var(--muted);text-align:right}
+.arrow{height:14px;margin-right:70px;display:flex;justify-content:center}
+.arrow::before{content:"";width:2px;background:#8a989f;height:100%}
+.legend{margin-top:10px;font-size:11.5px;color:var(--muted)}
+svg#loops{position:absolute;inset:0;pointer-events:none;overflow:visible}
+</style>
+<div class="wrap" id="w">
+  <h1>Escala Situacional de Empatía para Adolescentes (ESEA): fases de construcción</h1>
+  <p class="sub">Basado en las diez fases de Muñiz (2018) y Muñiz y Fonseca-Pedrero (2019). Meses estimados.</p>
+
+  <div class="stage s1"><div class="lab">Diseño<br>teórico</div><div class="steps">
+    <div class="box"><div class="n">1</div><div class="t"><b>Marco general</b><span>Justificación, población de 12 a 17 años, uso educativo, aplicación colectiva</span></div><div class="mes">Mes 1</div></div>
+    <div class="arrow"></div>
+    <div class="box"><div class="n">2</div><div class="t"><b>Definición de la variable</b><span>Definición operativa de empatía y 4 dimensiones; relaciones esperadas con otras variables</span></div><div class="mes">Mes 1-2</div></div>
+    <div class="arrow"></div>
+    <div class="box"><div class="n">3</div><div class="t"><b>Especificaciones</b><span>Ficha técnica, tabla 4 dimensiones × 4 contextos, Likert de 5 puntos</span></div><div class="mes">Mes 2</div></div>
+  </div></div>
+  <div class="arrow" style="margin-left:134px"></div>
+
+  <div class="stage s2"><div class="lab">Construcción<br>y pilotaje</div><div class="steps">
+    <div class="box" id="b4"><div class="n">4</div><div class="t"><b>Construcción de ítems</b><span>Banco de 96 ítems; juicio de 7 expertos; V de Aiken</span></div><div class="mes">Mes 3-4</div></div>
+    <div class="arrow"></div>
+    <div class="box"><div class="n">5</div><div class="t"><b>Edición</b><span>Cuadernillo, formulario digital, hoja de respuestas y base de datos</span></div><div class="mes">Mes 4</div></div>
+    <div class="arrow"></div>
+    <div class="box" id="b6"><div class="n">6</div><div class="t"><b>Estudios piloto</b><span>Cualitativo (n = 24) y cuantitativo (n = 500); se eligen 48 ítems</span></div><div class="mes">Mes 5-7</div></div>
+  </div></div>
+  <div class="arrow" style="margin-left:134px"></div>
+
+  <div class="stage s3"><div class="lab">Validación<br>y cierre</div><div class="steps">
+    <div class="box"><div class="n">7</div><div class="t"><b>Selección de otros instrumentos</b><span>BES (versión española) y medida de conducta prosocial</span></div><div class="mes">Mes 7</div></div>
+    <div class="arrow"></div>
+    <div class="box"><div class="n">8</div><div class="t"><b>Aplicación del test</b><span>n = 1200, muestreo por conglomerados, aplicadores entrenados</span></div><div class="mes">Mes 8-9</div></div>
+    <div class="arrow"></div>
+    <div class="box" id="b9"><div class="n">9</div><div class="t"><b>Propiedades psicométricas</b><span>AFE y AFC, omega, invarianza por sexo y edad, validez convergente, baremos</span></div><div class="mes">Mes 10-11</div></div>
+    <div class="arrow"></div>
+    <div class="box"><div class="n">10</div><div class="t"><b>Versión final</b><span>48 ítems, manual, informe a colegios, evaluación con el CET-R</span></div><div class="mes">Mes 12</div></div>
+  </div></div>
+  <div class="legend">Flechas naranjas: regreso a la construcción de ítems cuando el piloto o el análisis psicométrico detectan ítems deficientes.</div>
+  <svg id="loops"></svg>
+</div>
+<script>
+const w=document.getElementById('w').getBoundingClientRect(),svg=document.getElementById('loops');
+function r(id){const b=document.getElementById(id).getBoundingClientRect();return{x:b.right-w.left,y:(b.top+b.bottom)/2-w.top}}
+const a=r('b4'),six=r('b6'),nine=r('b9');
+let s='<defs><marker id="h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#b5651d"/></marker></defs>';
+const path=(from,off)=>`<path d="M${from.x},${from.y} H${from.x+off} V${a.y} H${a.x+4}" fill="none" stroke="#b5651d" stroke-width="2" marker-end="url(#h)"/>`;
+s+=path(six,28)+path(nine,52);
+svg.innerHTML=s;
+</script>
