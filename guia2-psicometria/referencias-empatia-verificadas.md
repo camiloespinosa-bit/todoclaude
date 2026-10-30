@@ -31,3 +31,8 @@ Formato APA 7.
 ## Nota sobre la guía
 
 La Guía 2 atribuye el artículo de la EPCEP a "Muñiz (2018)", pero el PDF de la carpeta es de Peña, P. P., Gonzalez, C. H. y Montenegro, H. L. (2019), *Formación Universitaria, 12*(6), 15-26, https://doi.org/10.4067/S0718-50062019000600015, y no cita a Muñiz. Las "10 fases" deben venir de otro texto de Muñiz que no está en la carpeta.
+
+## Fuentes para las fases de construcción (plan de trabajo)
+
+- Muñiz, J. (2018). *Introducción a la psicometría: teoría clásica y TRI*. Pirámide. Capítulo 8, "Fases para la construcción de un test". Está en la carpeta del curso (PDF escaneado de eLibro).
+- Muñiz, J. y Fonseca-Pedrero, E. (2019). Diez pasos para la construcción de un test. *Psicothema, 31*(1), 7-16. https://doi.org/10.7334/psicothema2018.291 (verificada en psicothema.com y Dialnet)
