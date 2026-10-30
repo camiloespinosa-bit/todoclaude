@@ -84,8 +84,17 @@ corrige `palabras.json` si hace falta.
 **3. Repeticiones y pausas.**
 
 ```bash
-python3 -I scripts/plan_cuts.py $WORK/palabras.json --gap 0.5 --out $WORK/plan.json
+python3 -I scripts/plan_cuts.py $WORK/palabras.json --gap 0.3 --out $WORK/plan.json [--drop-ranges "..."]
+python3 -I scripts/recortar_plan.py $WORK/plan.json $WORK/plan.json          # siempre (ver abajo)
+python3 -I scripts/verificar_pausas.py entrada.mp4 $WORK/plan.json $WORK/plan.json   # siempre
 ```
+
+**Dos pasos obligatorios después de `plan_cuts.py` (lección del video 01, 2026-10-30):**
+- `recortar_plan.py`: Whisper alarga la última palabra antes de una pausa y el tramo conservado se
+  metía en la toma descartada (se oía "las las", "a… A veces", un "3" suelto).
+- `verificar_pausas.py`: mide el volumen real de cada pausa quitada y devuelve las que tienen voz
+  (pico sobre −25 dB). Whisper ubicó mal "gratuita" y el final se oía "ven a una clase grata".
+Después, imprime y lee el texto completo que queda antes de renderizar.
 
 **Camilo marca sus repeticiones con una cuenta regresiva: "3, 2, 1"** (no dice "repito"). El
 script avisa cada cuenta regresiva; la toma mala es la que viene justo antes y la decides tú
@@ -160,6 +169,30 @@ completo: `ffprobe` da duración de video y audio, y `ffmpeg -v error -i salida.
 da errores. (El 2026-10-27 se entregó un Reel mientras todavía se escribía y llegó incompleto.)
 Mira 3 o 4 cuadros sueltos para revisar subtítulos y encuadre. Luego di dónde quedó el archivo (ruta completa) y recuérdale: **"Míralo una vez
 completo antes de publicarlo. Tú eres el director."**
+
+## Lecciones del primer video completo (video 01, 2026-10-29 y 30)
+
+Hay una guía más detallada en el repo privado: `youtube/guia-edicion.md` (gimnasio-cerebro-privado).
+
+- **Lo que a Camilo le fascinó:** animaciones ilustradas (dibujo plano con los colores de la marca)
+  que acompañan lo que dice, sobre la pared libre a su lado, atadas al segundo de cada palabra
+  (`scripts/tiempo_editado.py plan.json palabras.json desde hasta`), con **sonidos sintetizados**
+  suaves bajo la voz (`scripts/sonidos.py`, sin derechos de terceros; `--sonidos`, volumen 0,25 a
+  0,55). Se hacen en HyperFrames con fondo transparente y van con `--capas` (`.mov` con su `start`).
+- **Palabras clave en grande** sobre la pared (`--grandes`), salvo durante título, escenas o seguidor.
+- **Subtítulos horizontales grandes:** 0,10 del alto, 4 palabras por línea. En horizontal, título del
+  gancho arriba a la derecha (`--title-right`) para no tapar la cara.
+- **Verticales por base** (30 a 40 s): título 3,6 s y luego una tarjetita "Base N" arriba con su mini
+  video en bucle (`scripts/tarjeta_vertical.py` + `--capas`). Si se sacan de un horizontal, avisar
+  que se amplía la imagen (1,78 veces) y ajustar `--crop-x` a donde cae la cara.
+- **Sincronía:** si la voz se ve desfasada, hacer primero una prueba A/B corta (misma frase con 0,
+  100, 200 y 300 ms de retraso, al inicio y al final) y que Camilo escoja; corregir en un master con
+  `asetrate` + `adelay` y pasar los tiempos con `scripts/tiempos_sync.py`. `scripts/medir_tramos.py`
+  confirma que el montaje no agrega desfase. Pedir un aplauso al empezar a grabar.
+- **HyperFrames:** no repite videos en bucle (los mini videos van con FFmpeg); en SVG, GSAP lee el
+  `translate` como x/y, así que se anima x desde la posición real.
+- **Antes de un render largo**, probar el comando con un pedazo corto. **Al terminar**, volver a
+  transcribir el final del video para confirmar que no se corta nada.
 
 ## Lo que esta skill no hace
 
