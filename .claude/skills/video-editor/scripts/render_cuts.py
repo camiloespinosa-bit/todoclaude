@@ -15,6 +15,8 @@
 --title          título fijo durante el gancho; --title-right lo pone arriba a la derecha (horizontal).
 --grandes        las palabras *clave* aparecen en grande con un rebote en x,y, salvo en los rangos dados.
 --overlay        capa transparente (.mov ProRes 4444 de HyperFrames) desde --overlay-start.
+--zooms         JSON: Snap Zoom {tipo:snap,a,b,z,cx,cy} y Zoom Through Cut {tipo:corte,t,z}.
+--escenas        JSON [{file,start,dur}]: escenas a pantalla completa; la persona pasa a un recuadro.
 --capas          JSON [{file, x, y, start, end}]: .mp4 en bucle (mini videos), .png fijos y .mov que
                  corren una vez desde 'start' (escenas animadas). Van debajo de --overlay.
 --sonidos        JSON [{file, start, vol}]: efectos mezclados bajo la voz antes de nivelar.
@@ -112,7 +114,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             f.write(f"Dialogue: 0,{ass_time(a)},{ass_time(b)},GC,,0,0,0,,{t}\n")
         if grandes:
             # La palabra clave (las que van en amarillo) aparece en grande sobre la pared, con un pequeño rebote.
-            gx, gy, fuera = grandes
+            gx, gy, gw, fuera = grandes
             clave, prev = [], None
             for x in words:
                 if x["word"].startswith("*") and "_tramo" in x:
@@ -126,9 +128,20 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 if any(a <= tt <= b for a, b in fuera) or tt - ult < 1.5: continue
                 ult = tt
                 txt = txt[0].upper() + txt[1:]
-                anim = f"{{\\pos({gx},{gy})\\fscx40\\fscy40\\t(0,170,\\fscx115\\fscy115)\\t(170,300,\\fscx100\\fscy100)\\fad(0,250)}}"
+                # tamaño ajustado para que la palabra quepa en el ancho libre (gw px); si son dos palabras, van en dos líneas
+                lineas = txt.split(" ") if gw and len(txt) * 0.6 * h * 0.15 > gw else [txt]
+                fs = round(min(h * 0.15, gw / (0.62 * max(len(l) for l in lineas)))) if gw else round(h * 0.15)
+                txt = "\\N".join(lineas)
+                anim = f"{{\\pos({gx},{gy})\\fs{fs}\\fscx40\\fscy40\\t(0,170,\\fscx115\\fscy115)\\t(170,300,\\fscx100\\fscy100)\\fad(0,250)}}"
                 f.write(f"Dialogue: 2,{ass_time(tt)},{ass_time(tt + 1.4)},Grande,,0,0,0,,{anim}{txt}\n")
     return len(lines)
+
+def mascara_pip(pip, carpeta):
+    """PNG gris con esquinas redondeadas para el recuadro de Camilo durante las escenas."""
+    from PIL import Image, ImageDraw
+    m = Image.new("L", (pip["w"], pip["h"]), 0)
+    ImageDraw.Draw(m).rounded_rectangle((0, 0, pip["w"] - 1, pip["h"] - 1), pip.get("r", 26), fill=255)
+    f = os.path.join(carpeta, "mascara_pip.png"); m.save(f); return f
 
 def main():
     ap = argparse.ArgumentParser()
@@ -142,6 +155,9 @@ def main():
                     "desde el segundo 0 del video cortado: tarjetas, seguidores de pasos, etc.")
     ap.add_argument("--overlay-start", type=float, default=0.0, help="segundo del video cortado en que arranca --overlay")
     ap.add_argument("--capas", help="JSON con videos en bucle debajo de --overlay: [{file, x, y, start, end}]")
+    ap.add_argument("--zooms", help='JSON: [{"tipo":"snap","a":s,"b":s,"z":1.25,"cx":980,"cy":380}, {"tipo":"corte","t":s,"z":1.5}]')
+    ap.add_argument("--escenas", help='JSON: [{"file":escena.mp4,"start":s,"dur":s}] a pantalla completa; Camilo pasa a un recuadro '
+                    '(pip: x,y,w,h,r; por defecto arriba a la izquierda 560x315)')
     ap.add_argument("--grandes", help='palabras clave en grande: "x,y;desde-hasta;..." (rangos donde NO aparecen)')
     ap.add_argument("--sonidos", help="JSON con efectos: [{file, start, vol}] que se mezclan bajo la voz")
     ap.add_argument("--fps", help="cuadros por segundo de salida (por defecto los del video de entrada)")
@@ -154,6 +170,12 @@ def main():
     keep = json.load(open(a.plan))["keep"]
     w, h, fps = probe(a.input)
     fps = a.fps or fps
+    # Cada tramo dura un número entero de cuadros, y el audio de ese tramo se recorta o rellena a esa misma
+    # duración. Así, al pegar decenas de tramos, la voz y la imagen no se separan (video 02, 2026-10-31:
+    # sin esto la imagen llegó a ir 0,9 s detrás de la voz al final).
+    num, _, den = str(fps).partition("/")
+    fpsf = float(num) / float(den or 1)
+    keep = [[s, s + round((e - s) * fpsf) / fpsf] for s, e in keep]
     if a.vertical:
         w, h = 1080, 1920
     # Paso 1: cada tramo a su propio archivo temporal, uno por uno (poca memoria aunque sean cientos
@@ -165,15 +187,24 @@ def main():
     lista = []
     for i, (s, e) in enumerate(keep):
         f = os.path.join(tmp, f"{i:04d}.mkv")
-        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", str(s), "-t", str(e - s),
-                        "-i", a.input, "-vf", norm_v, *enc, f], check=True)
+        n = round((e - s) * fpsf)
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", str(s), "-t", f"{e - s + 0.3:.3f}",
+                        "-i", a.input, "-vf", norm_v + ",setpts=PTS-STARTPTS", "-frames:v", str(n),
+                        "-af", f"asetpts=PTS-STARTPTS,apad,atrim=end={n / fpsf:.6f}", *enc, f], check=True)
         lista.append(f)
     if a.append:
         # Tarjeta final (por ejemplo la de HyperFrames), con silencio si no trae audio.
         f = os.path.join(tmp, "zz-final.mkv")
         subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", a.append, "-f", "lavfi",
                         "-i", "anullsrc=r=48000:cl=mono", "-map", "0:v", "-map", "1:a", "-shortest",
-                        "-vf", norm_v, *enc, f], check=True)
+                        "-vf", norm_v + ",setpts=PTS-STARTPTS", "-af", "asetpts=PTS-STARTPTS", *enc, f], check=True)
+        # la tarjeta también: audio exactamente igual de largo que su video
+        nf = int(subprocess.run(["ffprobe", "-v", "error", "-count_frames", "-select_streams", "v", "-show_entries",
+                                 "stream=nb_read_frames", "-of", "csv=p=0", f], capture_output=True, text=True).stdout.strip())
+        g = f.replace(".mkv", "-exacta.mkv")
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", f, "-c:v", "copy", "-af",
+                        f"apad,atrim=end={nf / fpsf:.6f}", "-c:a", "pcm_s16le", f"-frames:v", str(nf), g], check=True)
+        f = g
         lista.append(f)
     concat = os.path.join(tmp, "lista.txt")
     open(concat, "w").write("".join(f"file '{f}'\n" for f in lista))
@@ -184,6 +215,26 @@ def main():
     capas = json.load(open(a.capas)) if a.capas else []
     sonidos = json.load(open(a.sonidos)) if a.sonidos else []
     v = "[0:v]setpts=PTS-STARTPTS"
+    # Zooms sobre la toma: Snap Zoom (golpe de acercamiento en una frase) y Zoom Through Cut (acercamiento con
+    # desenfoque que esconde un corte). zoompan con d=1 da un cuadro por cuadro de entrada.
+    zooms = json.load(open(a.zooms)) if a.zooms else []
+    if zooms:
+        partes, blur = [], []
+        for zz in zooms:
+            if zz["tipo"] == "snap":
+                A, B = zz["a"], zz["b"]
+                partes.append(f"{zz.get('z', 1.25) - 1}*min(1,max(0,(it-{A})/0.12))*min(1,max(0,({B}+0.25-it)/0.25))")
+            else:
+                T0 = zz["t"]
+                partes.append(f"{zz.get('z', 1.5) - 1}*max(0,1-abs(it-{T0})/0.2)")
+                blur.append(f"between(t,{T0 - 0.12},{T0 + 0.12})")
+        cx, cy = zooms[0].get("cx", 960), zooms[0].get("cy", 380)
+        zexp = "1+" + "+".join(partes)
+        v += (f",zoompan=z='{zexp}':x='max(0,min(iw-iw/zoom,{cx}-iw/zoom/2))':y='max(0,min(ih-ih/zoom,{cy}-ih/zoom/2))'"
+              f":d=1:s={w}x{h}:fps={fps}")
+        if blur:
+            v += f",gblur=sigma=14:enable='{'+'.join(blur)}'"
+    escenas = json.load(open(a.escenas)) if a.escenas else []
     for j, c in enumerate(capas):
         if c["file"].endswith(".mov"):    # escena animada con transparencia: una sola vez, desde 'start'
             v += (f"[b{j}];[{j + 2}:v]format=yuva420p,tpad=start_duration={c['start']}:color=0x00000000,setpts=PTS-STARTPTS[m{j}];"
@@ -191,15 +242,30 @@ def main():
         else:
             v += (f"[b{j}];[{j + 2}:v]setpts=PTS-STARTPTS[m{j}];[b{j}][m{j}]overlay={c['x']}:{c['y']}:shortest=1:"
                   f"enable='between(t,{c['start']},{c['end']})'")
+    if escenas:
+        b0 = 2 + len(capas) + len(sonidos)
+        pip = escenas[0].get("pip", {"x": 40, "y": 40, "w": 560, "h": 315, "r": 26})
+        ventanas = "+".join(f"between(t,{e['start']},{e['start'] + e['dur']})" for e in escenas)
+        v += f"[e_in];[e_in]split[e_b][e_p];[e_p]scale={pip['w']}:{pip['h']},format=yuva420p[e_pc];[{b0}:v]format=gray,scale={pip['w']}:{pip['h']}[e_m];[e_pc][e_m]alphamerge[e_pip];[e_b]null"
+        for k, e in enumerate(escenas):
+            v += (f"[e{k}];[{b0 + 1 + k}:v]setpts=PTS-STARTPTS,tpad=start_duration={e['start']}[es{k}];"
+                  f"[e{k}][es{k}]overlay=0:0:eof_action=pass:enable='between(t,{e['start']},{e['start'] + e['dur']})'")
+        v += f"[e_f];[e_f][e_pip]overlay={pip['x']}:{pip['y']}:enable='{ventanas}'"
     if a.overlay:
         pad = f",tpad=start_duration={a.overlay_start}:color=0x00000000" if a.overlay_start else ""
         v += f"[base];[1:v]format=yuva420p{pad},setpts=PTS-STARTPTS[capa];[base][capa]overlay=0:0:eof_action=pass"
+    # El video final dura exactamente lo que el montaje (tramos + tarjeta final): ninguna capa lo puede estirar.
+    dur_total = sum(e - s for s, e in keep)
+    if a.append:
+        dur_total += float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", a.append],
+                                          capture_output=True, text=True).stdout)
     if a.captions:
         ass = os.path.splitext(a.output)[0] + ".ass"
         gr = None
         if a.grandes:
             pos, *fz = a.grandes.split(";")
-            gr = (*[int(v) for v in pos.split(",")], [tuple(float(v) for v in z.split("-")) for z in fz])
+            xy = [int(v) for v in pos.split(",")] + [0]      # x,y[,ancho libre]
+            gr = (xy[0], xy[1], xy[2], [tuple(float(v) for v in z.split("-")) for z in fz])
         n = build_ass(a.captions, keep, w, h, a.vertical, ass, a.title, 9 if a.title_right else 8, gr)
         v += f",ass='{ass}'" + (f":fontsdir='{a.fontsdir}'" if a.fontsdir else "")
         print(f"{n} líneas de subtítulos -> {ass}", file=sys.stderr)
@@ -219,10 +285,17 @@ def main():
                  else ["-i", c["file"]] if c["file"].endswith(".mov") else ["-stream_loop", "-1", "-i", c["file"]])
     for s_ in sonidos:
         capa += ["-i", s_["file"]]
+    if escenas:
+        total = sum(e - s for s, e in keep) + 30
+        capa += ["-loop", "1", "-framerate", "30", "-t", f"{total:.2f}", "-i", mascara_pip(escenas[0].get("pip", {"w": 560, "h": 315, "r": 26}), os.path.dirname(os.path.abspath(a.output)))]
+        for e in escenas:
+            capa += ["-i", e["file"]]
     cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", concat, *capa,
-           "-filter_complex", f"{v}[v];{mezcla}{fuente}{au},aresample=48000[a]", "-map", "[v]", "-map", "[a]",
+           "-filter_complex", f"{v},trim=duration={dur_total:.3f}[v];{mezcla}{fuente}{au},aresample=48000[a]", "-map", "[v]", "-map", "[a]",
            "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-pix_fmt", "yuv420p",
-           "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-movflags", "+faststart", a.output]
+           "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-shortest", "-movflags", "+faststart", a.output]
+    if os.environ.get("VER_COMANDO"):
+        print(" ".join(repr(c) if " " in c or ";" in c else c for c in cmd), file=sys.stderr)
     subprocess.run(cmd, check=True)
     shutil.rmtree(tmp)
     print(f"listo -> {os.path.abspath(a.output)}", file=sys.stderr)

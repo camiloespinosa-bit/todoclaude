@@ -191,6 +191,16 @@ Hay una guía más detallada en el repo privado: `youtube/guia-edicion.md` (gimn
   confirma que el montaje no agrega desfase. Pedir un aplauso al empezar a grabar.
 - **HyperFrames:** no repite videos en bucle (los mini videos van con FFmpeg); en SVG, GSAP lee el
   `translate` como x/y, así que se anima x desde la posición real.
+- **Sincronía del montaje (video 02, 2026-10-31):** cada tramo salía con el video un poco más largo que
+  el audio y, al mezclar sonidos (`--sonidos`), la imagen se fue quedando hasta 0,9 s detrás de la voz.
+  `render_cuts.py` ya lo corrige (cada tramo dura un número entero de cuadros y su audio se ajusta a esa
+  duración). Después de cada render, medir con `scripts/medir_tramos2.py original final plan.json
+  "rangos-a-saltar"`: debe quedar en ±50 ms sin irse separando.
+- **Si la cara ocupa el centro** (`scripts/cara_pos.py`), las escenas van a pantalla completa con la
+  persona en un recuadro (`--escenas`). Título detrás de la cabeza: `scripts/silueta.py` recorta a la
+  persona cuadro a cuadro (MediaPipe `selfie_multiclass_256x256.tflite` con `ai-edge-litert`; MediaPipe
+  completo falla en la nube por falta de libEGL) y se pone encima del título con `--capas`.
+- Zooms: `--zooms` con Snap Zoom en frases fuertes y Zoom Through Cut en cambios de tema; sin recargar.
 - **Antes de un render largo**, probar el comando con un pedazo corto. **Al terminar**, volver a
   transcribir el final del video para confirmar que no se corta nada.
 
