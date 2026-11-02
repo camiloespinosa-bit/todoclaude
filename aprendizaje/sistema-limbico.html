@@ -1,0 +1,590 @@
+<title>Sistema límbico en 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  /* Layout: escena 3D a la izquierda (arriba en celular) y panel de lectura con pestañas a la derecha (abajo en celular).
+     Una sola apariencia oscura, elegida a propósito para que las estructuras brillen. */
+  :root {
+    --fondo: #0D1620;
+    --panel: #132230;
+    --linea: #24384A;
+    --tinta: #E9F0F4;
+    --tinta-suave: #9DB0BE;
+    --acento: #FF8A3D;
+    --fuente-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --fuente: "Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--tinta);
+    font-family: var(--fuente);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .app { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 420px; }
+  .escena { position: relative; min-height: 0; overflow: hidden; }
+  .escena canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  .escena canvas:active { cursor: grabbing; }
+  .etiquetas { position: absolute; inset: 0; pointer-events: none; }
+  .etiqueta {
+    position: absolute; transform: translate(-50%, -130%);
+    font-size: 12.5px; font-weight: 700; white-space: nowrap;
+    padding: 3px 8px; border-radius: 999px;
+    background: rgba(13, 22, 32, 0.82); border: 1px solid var(--c); color: var(--tinta);
+    transition: opacity 200ms ease;
+  }
+  .etiqueta[hidden] { display: none; }
+  .barra {
+    position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); right: 12px; top: calc(12px + env(safe-area-inset-top, 0px));
+    display: flex; gap: 8px; flex-wrap: wrap; pointer-events: none;
+  }
+  .barra > * { pointer-events: auto; }
+  .chip {
+    font: inherit; font-size: 13px; font-weight: 700; color: var(--tinta);
+    background: rgba(19, 34, 48, 0.85); border: 1px solid var(--linea); border-radius: 999px;
+    padding: 6px 12px; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { border-color: var(--acento); color: #FFD2B3; }
+  .chip:focus-visible, .tab:focus-visible, .pieza:focus-visible, .paso button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  .aviso {
+    position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); right: 12px; bottom: 10px;
+    font-size: 12px; color: var(--tinta-suave); pointer-events: none;
+  }
+
+  .panel {
+    background: var(--panel); border-left: 1px solid var(--linea);
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .panel__cabeza { padding: 20px 22px 12px; padding-right: max(22px, env(safe-area-inset-right, 0px)); }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tinta-suave); }
+  h1, h2, h3 { font-family: var(--fuente-titulo); line-height: 1.1; margin: 0; text-wrap: balance; }
+  h1 { font-size: 28px; font-weight: 800; margin-top: 4px; }
+  h2 { font-size: 22px; font-weight: 800; }
+  h3 { font-size: 17px; font-weight: 600; }
+  p { margin: 0; }
+  .tabs { display: flex; gap: 4px; padding: 0 22px; border-bottom: 1px solid var(--linea); overflow-x: auto; }
+  .tab {
+    font: inherit; font-size: 14px; font-weight: 700; color: var(--tinta-suave);
+    background: none; border: none; border-bottom: 3px solid transparent;
+    padding: 10px 8px; cursor: pointer; white-space: nowrap;
+  }
+  .tab[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--acento); }
+  .contenido {
+    flex: 1; overflow-y: auto; min-height: 0;
+    padding: 18px 22px 28px; padding-right: max(22px, env(safe-area-inset-right, 0px));
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .contenido[hidden] { display: none; }
+  .nota { font-size: 14px; color: var(--tinta-suave); border-left: 3px solid var(--linea); padding-left: 12px; }
+
+  .piezas { display: flex; flex-direction: column; gap: 6px; }
+  .pieza {
+    display: grid; grid-template-columns: 14px 1fr; gap: 10px; align-items: start;
+    text-align: left; font: inherit; color: var(--tinta);
+    background: transparent; border: 1px solid transparent; border-radius: 10px;
+    padding: 8px 10px; cursor: pointer;
+  }
+  .pieza:hover { background: rgba(255, 255, 255, 0.04); }
+  .pieza[aria-pressed="true"] { background: rgba(255, 255, 255, 0.06); border-color: var(--c); }
+  .pieza__punto { width: 14px; height: 14px; border-radius: 50%; background: var(--c); margin-top: 4px; box-shadow: 0 0 10px var(--c); }
+  .pieza__nombre { font-weight: 700; }
+  .pieza__corto { font-size: 14px; color: var(--tinta-suave); display: block; }
+  .ficha { border: 1px solid var(--linea); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .ficha[hidden] { display: none; }
+  .ficha__tipo { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); }
+
+  .paso { display: flex; flex-direction: column; gap: 12px; }
+  .paso__numero { font-size: 13px; font-weight: 700; color: var(--acento); }
+  .paso__cuerpo { display: flex; flex-wrap: wrap; gap: 6px; }
+  .reaccion { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: rgba(62, 198, 192, 0.15); color: #9FE7E3; }
+  .paso__botones { display: flex; gap: 8px; flex-wrap: wrap; }
+  .paso button {
+    font: inherit; font-size: 15px; font-weight: 700; color: var(--tinta);
+    background: #1B3042; border: 1px solid var(--linea); border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  }
+  .paso button.principal { background: var(--acento); color: #1A0E05; border-color: var(--acento); }
+  .paso button:disabled { opacity: 0.4; cursor: default; }
+  .puntos { display: flex; gap: 6px; }
+  .puntos i { width: 22px; height: 5px; border-radius: 3px; background: var(--linea); }
+  .puntos i.on { background: var(--acento); }
+
+  .ideas { display: flex; flex-direction: column; gap: 14px; }
+  .idea { display: flex; flex-direction: column; gap: 6px; }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: 52vh auto; height: auto; min-height: 100%; }
+    .escena { height: 52vh; }
+    .panel { border-left: none; border-top: 1px solid var(--linea); }
+    .contenido { overflow: visible; }
+    .panel__cabeza, .tabs, .contenido { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  }
+  @media (prefers-reduced-motion: reduce) { .etiqueta { transition: none; } }
+</style>
+
+<div class="app">
+  <div class="escena" id="escena">
+    <canvas id="lienzo" aria-label="Modelo 3D esquemático del sistema límbico. Arrastra para girarlo y toca una estructura para ver qué hace."></canvas>
+    <div class="etiquetas" id="etiquetas" aria-hidden="true"></div>
+    <div class="barra">
+      <button class="chip" type="button" id="b-corteza" aria-pressed="true">Corteza</button>
+      <button class="chip" type="button" id="b-nombres" aria-pressed="true">Nombres</button>
+      <button class="chip" type="button" id="b-girar" aria-pressed="true">Girar</button>
+    </div>
+    <p class="aviso">Modelo esquemático: formas y posiciones aproximadas. No es una imagen anatómica.</p>
+  </div>
+
+  <aside class="panel">
+    <div class="panel__cabeza">
+      <span class="eyebrow">Emoción, memoria y motivación</span>
+      <h1>El sistema límbico</h1>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" role="tab" type="button" aria-selected="true" aria-controls="t-piezas" id="tab-piezas">Piezas</button>
+      <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="t-ejemplo" id="tab-ejemplo">Ejemplo</button>
+      <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="t-gimnasio" id="tab-gimnasio">Para el Gimnasio</button>
+      <button class="tab" role="tab" type="button" aria-selected="false" aria-controls="t-mito" id="tab-mito">Un mito</button>
+    </div>
+
+    <section class="contenido" role="tabpanel" id="t-piezas" aria-labelledby="tab-piezas">
+      <p>Un conjunto de estructuras en la parte interna del cerebro que participan sobre todo en la emoción, la memoria y la motivación, y en mantener el cuerpo en equilibrio. Toca una pieza aquí o en el modelo.</p>
+      <div class="ficha" id="ficha" hidden aria-live="polite">
+        <span class="ficha__tipo" id="ficha-tipo"></span>
+        <h2 id="ficha-nombre"></h2>
+        <p id="ficha-texto"></p>
+      </div>
+      <div class="piezas" id="lista-piezas"></div>
+      <p class="nota">"Sistema límbico" es una etiqueta histórica. Hoy muchos neurocientíficos, como Joseph LeDoux, señalan que no hay un criterio único para decidir qué estructuras entran. Lo que sí está bien establecido es qué hace cada pieza y cómo se conectan.</p>
+    </section>
+
+    <section class="contenido" role="tabpanel" id="t-ejemplo" aria-labelledby="tab-ejemplo" hidden>
+      <div class="paso" aria-live="polite">
+        <div class="puntos" id="puntos" aria-hidden="true"></div>
+        <span class="paso__numero" id="paso-numero"></span>
+        <h2 id="paso-titulo"></h2>
+        <p id="paso-texto"></p>
+        <div class="paso__cuerpo" id="paso-cuerpo"></div>
+        <div class="paso__botones">
+          <button type="button" id="b-anterior">← Anterior</button>
+          <button type="button" class="principal" id="b-siguiente">Siguiente →</button>
+        </div>
+      </div>
+      <p class="nota">Los tiempos están simplificados: en el cerebro real varias de estas cosas pasan al mismo tiempo y en fracciones de segundo.</p>
+    </section>
+
+    <section class="contenido" role="tabpanel" id="t-gimnasio" aria-labelledby="tab-gimnasio" hidden>
+      <div class="ideas">
+        <div class="idea">
+          <h3>1. Emoción y aprendizaje no están separados</h3>
+          <p>Una emoción moderada ayuda a recordar: un reto con historia se recuerda mejor que un ejercicio suelto. Pero el estrés alto y sostenido perjudica la memoria de trabajo y el funcionamiento del hipocampo. Un niño asustado o frustrado aprende peor. Por eso importan el error sin castigo y que OKI anime.</p>
+        </div>
+        <div class="idea">
+          <h3>2. Frenar la emoción depende de la corteza prefrontal, que madura despacio</h3>
+          <p>Las conexiones que permiten regular la reacción emocional se terminan de desarrollar hasta entrada la adultez; las edades exactas varían según el estudio. Por eso un niño de 6 años se desborda más fácil que uno de 10, y por eso la Inteligencia Emocional y las funciones ejecutivas se entrenan juntas.</p>
+        </div>
+        <div class="idea">
+          <h3>3. Sobre el autismo, con cautela</h3>
+          <p>Hay investigación sobre diferencias en la amígdala y en cómo se procesan las señales sociales y sensoriales en el autismo, pero los resultados son variados y no hay un patrón único para todas las personas autistas. En la práctica, muchas personas autistas viven una carga sensorial y emocional mayor en ciertos entornos, y reducir esa carga suele ayudar a su regulación.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="contenido" role="tabpanel" id="t-mito" aria-labelledby="tab-mito" hidden>
+      <h2>El "cerebro triuno"</h2>
+      <p>Es la idea de que tenemos tres cerebros apilados por la evolución: uno reptil, uno emocional (el límbico) y uno racional encima. La propuso Paul MacLean, el mismo que popularizó el término "sistema límbico".</p>
+      <p>Hoy está descartada en neurociencia. Emoción y razón trabajan entrelazadas todo el tiempo, y el cerebro no evolucionó por capas que se fueron agregando encima. En este modelo se ve: la corteza prefrontal y la amígdala están conectadas en los dos sentidos.</p>
+      <p class="nota">Sigue apareciendo en libros de divulgación y capacitaciones, así que conviene no usarla en los materiales del Gimnasio.</p>
+    </section>
+  </aside>
+</div>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+  import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+  import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Contenido ----------
+  // Ejes del modelo: x = hacia los lados, y = arriba, z = hacia la frente.
+  const PIEZAS = [
+    { id: "amigdala", nombre: "Amígdala", color: "#FF6B4A", tipo: "Límbica",
+      corto: "Detecta lo importante y dispara la emoción",
+      texto: "Detecta lo que es importante, sobre todo lo que puede ser una amenaza, y dispara la respuesta emocional rápida, como el miedo o el sobresalto. También le da peso emocional a los recuerdos: lo que nos emocionó se recuerda mejor. Hay una en cada hemisferio, al frente del hipocampo." },
+    { id: "hipocampo", nombre: "Hipocampo", color: "#F4C542", tipo: "Límbica",
+      corto: "Forma recuerdos nuevos y da el contexto",
+      texto: "Clave para formar recuerdos nuevos de hechos y experiencias, y para orientarse en el espacio. Aporta el contexto: dónde estoy, qué pasó la última vez. Es muy sensible al estrés sostenido. Su forma curva recuerda a un caballito de mar, de ahí el nombre." },
+    { id: "hipotalamo", nombre: "Hipotálamo", color: "#3EC6C0", tipo: "Límbica",
+      corto: "Conecta la emoción con el cuerpo",
+      texto: "Pequeño pero poderoso: controla hormonas, como la respuesta de estrés con cortisol, el ritmo cardíaco, el hambre, la sed, la temperatura y el sueño. Es el puente entre lo que sentimos y lo que le pasa al cuerpo." },
+    { id: "cingulada", nombre: "Corteza cingulada", color: "#A98BFF", tipo: "Límbica",
+      corto: "Nota errores y conflictos, regula la atención",
+      texto: "Una banda en forma de C en la cara interna de cada hemisferio. Ayuda a notar conflictos y errores, a regular la atención y a vivir el aspecto sentido del dolor y de la emoción." },
+    { id: "accumbens", nombre: "Núcleo accumbens", color: "#7CC36B", tipo: "Límbica según algunos autores",
+      corto: "Motivación y recompensa",
+      texto: "Participa en la motivación y la recompensa: el impulso de querer repetir algo que salió bien. Algunos autores lo incluyen en el sistema límbico y otros no." },
+    { id: "talamo", nombre: "Tálamo", color: "#8FA8C8", tipo: "Conexión",
+      corto: "Estación de paso de los sentidos",
+      texto: "Por aquí pasa casi toda la información de los sentidos antes de llegar a la corteza. Una vía rápida va del tálamo directo a la amígdala, y por eso podemos asustarnos antes de saber qué vimos. Suele incluirse por sus conexiones con el resto de las piezas." },
+    { id: "fornix", nombre: "Fórnix y cuerpos mamilares", color: "#E8D9B5", tipo: "Conexión",
+      corto: "El cable que une memoria y cuerpo",
+      texto: "El fórnix es un haz de fibras en forma de arco que lleva información del hipocampo a los cuerpos mamilares, dos pequeñas esferas junto al hipotálamo. Forma parte del circuito que James Papez describió en 1937 al proponer una base cerebral para la emoción." },
+    { id: "prefrontal", nombre: "Corteza prefrontal", color: "#5B9BFF", tipo: "No es límbica: la regula",
+      corto: "Evalúa y frena la reacción emocional",
+      texto: "No forma parte del sistema límbico, pero es su gran regulador. Evalúa la situación, planea y puede frenar la reacción de la amígdala. Es la zona de las funciones ejecutivas, y de las que más tarde terminan de madurar." }
+  ];
+  const porId = Object.fromEntries(PIEZAS.map((p) => [p.id, p]));
+
+  const PASOS = [
+    { titulo: "Un niño ve un perro grande que ladra", texto: "Sigamos qué pasa dentro de su cerebro, paso a paso.", foco: [], rutas: [] },
+    { titulo: "La amígdala da la alarma", texto: "La imagen entra por los ojos y llega al tálamo. Por una vía rápida, el tálamo avisa directo a la amígdala, que marca: ¡peligro posible! Esto pasa incluso antes de que el niño piense \"es un perro\".", foco: ["talamo", "amigdala"], rutas: ["ojo-talamo", "talamo-amigdala"] },
+    { titulo: "El hipotálamo activa el cuerpo", texto: "La amígdala avisa al hipotálamo, y el cuerpo responde.", cuerpo: ["Corazón acelerado", "Adrenalina", "Luego cortisol", "Músculos tensos"], foco: ["amigdala", "hipotalamo"], rutas: ["amigdala-hipotalamo"] },
+    { titulo: "El hipocampo aporta el contexto", texto: "El hipocampo busca en la memoria: este perro es el del vecino, ya lo conozco. Esa información le llega a la amígdala.", foco: ["hipocampo", "amigdala"], rutas: ["hipocampo-amigdala"] },
+    { titulo: "La corteza prefrontal evalúa y frena", texto: "La corteza prefrontal mira la situación completa: está amarrado, no pasa nada. Y le baja el volumen a la amígdala. La calma llega.", foco: ["prefrontal", "amigdala"], rutas: ["prefrontal-amigdala"], calma: true },
+    { titulo: "El recuerdo queda grabado", texto: "Si el susto fue fuerte, la amígdala y el hipocampo juntos hacen que ese momento quede guardado con más fuerza. Por eso recordamos tan bien lo que nos asustó o nos emocionó.", foco: ["amigdala", "hipocampo"], rutas: ["amigdala-hipocampo", "hipocampo-amigdala"] }
+  ];
+
+  // ---------- Escena ----------
+  const contenedor = document.getElementById("escena");
+  const canvas = document.getElementById("lienzo");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("#0D1620");
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 50);
+  camera.position.set(3.3, 1.0, 1.9);
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.enablePan = false;
+  controls.minDistance = 1.6;
+  controls.maxDistance = 6;
+  controls.autoRotate = !quieto;
+  controls.autoRotateSpeed = 0.7;
+  controls.target.set(0, 0.05, 0.05);
+
+  scene.add(new THREE.HemisphereLight("#CFE3FF", "#1A2430", 1.4));
+  const luz = new THREE.DirectionalLight("#FFFFFF", 1.6);
+  luz.position.set(2, 3, 2);
+  scene.add(luz);
+
+  // Corteza: nube de puntos tenue con forma de dos hemisferios (esquemática)
+  let semilla = 11;
+  const rand = () => ((semilla = (semilla * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const corteza = new THREE.Group();
+  scene.add(corteza);
+  {
+    const pos = [], col = [];
+    const base = new THREE.Color("#7FA6C4"), frente = new THREE.Color("#5B9BFF");
+    for (let i = 0; i < 9000; i++) {
+      const lado = i % 2 ? 1 : -1;
+      const u = rand() * 2 - 1, t = rand() * Math.PI * 2, s = Math.sqrt(1 - u * u);
+      let x = s * Math.cos(t), y = u, z = s * Math.sin(t);
+      if (x * lado < -0.75) continue;  // la cara interna no se dibuja: se ve la cisura
+      const pl = 0.035 * Math.sin(9 * x + 4 * y) * Math.cos(8 * z - 3 * y);
+      const r = 1 + pl;
+      let px = x * 0.5 * r + lado * 0.52, py = y * 0.62 * r + 0.12, pz = z * 0.98 * r;
+      if (py < -0.3) py = -0.3 + (py + 0.3) * 0.5;
+      pos.push(px, py, pz);
+      const c = pz > 0.55 && py > -0.2 ? frente : base;
+      col.push(c.r, c.g, c.b);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+    corteza.add(new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.012, vertexColors: true, transparent: true, opacity: 0.4, depthWrite: false })));
+  }
+  // Zona prefrontal: casquete translúcido al frente (seleccionable)
+  const geoPrefrontal = new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.27);
+  geoPrefrontal.rotateX(Math.PI / 2);
+
+  // ---------- Estructuras ----------
+  const mallas = [];          // { mesh, id }
+  const materiales = {};      // id -> [materiales]
+  function material(id) {
+    const p = porId[id];
+    const m = new THREE.MeshStandardMaterial({ color: p.color, emissive: p.color, emissiveIntensity: 0.25, roughness: 0.45, transparent: true, opacity: 0.95 });
+    (materiales[id] = materiales[id] || []).push(m);
+    return m;
+  }
+  function agregar(geo, id, pos) {
+    const mesh = new THREE.Mesh(geo, material(id));
+    if (pos) mesh.position.copy(pos);
+    mesh.userData.id = id;
+    scene.add(mesh);
+    mallas.push(mesh);
+    return mesh;
+  }
+  const v = (x, y, z) => new THREE.Vector3(x, y, z);
+  const elipsoide = (rx, ry, rz) => { const g = new THREE.SphereGeometry(1, 32, 20); g.scale(rx, ry, rz); return g; };
+  const tubo = (puntos, radio) => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(puntos), 64, radio, 12, false);
+  const anclas = {};          // punto donde va la etiqueta de cada pieza
+
+  for (const lado of [-1, 1]) {
+    // Tálamo
+    agregar(elipsoide(0.11, 0.1, 0.18), "talamo", v(0.12 * lado, 0.04, -0.05));
+    // Hipotálamo (uno, en la línea media)
+    if (lado === 1) agregar(elipsoide(0.085, 0.07, 0.11), "hipotalamo", v(0, -0.2, 0.15));
+    // Cuerpos mamilares
+    agregar(new THREE.SphereGeometry(0.038, 20, 14), "fornix", v(0.045 * lado, -0.27, 0.02));
+    // Amígdala
+    const am = agregar(elipsoide(0.075, 0.065, 0.1), "amigdala", v(0.34 * lado, -0.3, 0.3));
+    am.rotation.y = 0.3 * lado;
+    // Hipocampo: curva que va de la amígdala hacia atrás y arriba
+    agregar(tubo([v(0.34 * lado, -0.31, 0.2), v(0.38 * lado, -0.27, 0.0), v(0.36 * lado, -0.19, -0.24), v(0.29 * lado, -0.06, -0.4)], 0.048), "hipocampo");
+    // Fórnix: arco desde la cola del hipocampo, por encima del tálamo, hasta los cuerpos mamilares
+    agregar(tubo([v(0.29 * lado, -0.06, -0.4), v(0.2 * lado, 0.2, -0.3), v(0.07 * lado, 0.27, -0.05), v(0.05 * lado, 0.2, 0.16), v(0.045 * lado, -0.06, 0.12), v(0.045 * lado, -0.25, 0.03)], 0.02), "fornix");
+    // Corteza cingulada: banda en C en la cara interna
+    agregar(tubo([v(0.07 * lado, -0.02, 0.72), v(0.08 * lado, 0.36, 0.55), v(0.08 * lado, 0.52, 0.15), v(0.08 * lado, 0.5, -0.3), v(0.08 * lado, 0.32, -0.68), v(0.07 * lado, 0.08, -0.8)], 0.055), "cingulada");
+    // Núcleo accumbens
+    agregar(new THREE.SphereGeometry(0.05, 20, 14), "accumbens", v(0.1 * lado, -0.1, 0.48));
+    // Corteza prefrontal (casquete frontal de cada hemisferio)
+    const pf = agregar(geoPrefrontal, "prefrontal", v(0.52 * lado, 0.12, 0.05));
+    pf.scale.set(0.5, 0.62, 0.98);
+    pf.material.opacity = 0.16;
+    pf.material.depthWrite = false;
+    pf.material.side = THREE.DoubleSide;
+  }
+  Object.assign(anclas, {
+    amigdala: v(0.34, -0.3, 0.3), hipocampo: v(0.37, -0.2, -0.2), hipotalamo: v(0, -0.2, 0.15), cingulada: v(0.08, 0.53, 0.0),
+    accumbens: v(-0.1, -0.1, 0.48), talamo: v(-0.12, 0.08, -0.05), fornix: v(-0.07, 0.28, -0.05), prefrontal: v(0.5, 0.3, 0.92)
+  });
+
+  // Ojo (solo para el ejemplo) y rutas de los impulsos
+  const ojo = new THREE.Mesh(new THREE.SphereGeometry(0.07, 20, 14), new THREE.MeshStandardMaterial({ color: "#FFFFFF", emissive: "#BFD8FF", emissiveIntensity: 0.5 }));
+  ojo.position.set(0.28, -0.12, 1.25);
+  ojo.visible = false;
+  scene.add(ojo);
+  const RUTAS = {
+    "ojo-talamo": [v(0.28, -0.12, 1.2), v(0.2, -0.12, 0.7), v(0.14, 0.0, 0.2), v(0.12, 0.04, -0.03)],
+    "talamo-amigdala": [v(0.14, 0.02, -0.03), v(0.28, -0.12, 0.12), v(0.34, -0.28, 0.28)],
+    "amigdala-hipotalamo": [v(0.32, -0.3, 0.3), v(0.16, -0.26, 0.24), v(0.02, -0.21, 0.16)],
+    "hipocampo-amigdala": [v(0.36, -0.19, -0.24), v(0.38, -0.27, 0.0), v(0.35, -0.3, 0.26)],
+    "amigdala-hipocampo": [v(0.35, -0.29, 0.26), v(0.39, -0.24, 0.02), v(0.36, -0.18, -0.24)],
+    "prefrontal-amigdala": [v(0.45, 0.3, 0.85), v(0.38, 0.05, 0.6), v(0.35, -0.24, 0.34)]
+  };
+  const curvas = Object.fromEntries(Object.entries(RUTAS).map(([k, p]) => [k, new THREE.CatmullRomCurve3(p)]));
+  const lineasRuta = {};
+  for (const [k, c] of Object.entries(curvas)) {
+    const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(c.getPoints(40)), new THREE.LineBasicMaterial({ color: "#FFE2C8", transparent: true, opacity: 0 }));
+    scene.add(l);
+    lineasRuta[k] = l;
+  }
+  const impulsos = [];
+  for (let k = 0; k < 18; k++) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.022, 12, 8), new THREE.MeshBasicMaterial({ color: "#FFE8C2" }));
+    m.visible = false;
+    scene.add(m);
+    impulsos.push(m);
+  }
+
+  // ---------- Postproceso (resplandor suave) ----------
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.5, 0.35);
+  composer.addPass(bloom);
+  composer.addPass(new OutputPass());
+
+  function ajustar() {
+    const w = contenedor.clientWidth, h = contenedor.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    composer.setSize(w, h);
+    camera.aspect = w / h;
+    // En pantallas angostas la cámara se aleja para que quepa todo el cerebro
+    camera.fov = w / h < 0.9 ? 44 : 40;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(ajustar).observe(contenedor);
+  ajustar();
+
+  // ---------- Etiquetas ----------
+  const capaEtiquetas = document.getElementById("etiquetas");
+  const etiquetas = Object.fromEntries(PIEZAS.map((p) => {
+    const el = document.createElement("span");
+    el.className = "etiqueta";
+    el.style.setProperty("--c", p.color);
+    el.textContent = p.nombre;
+    capaEtiquetas.appendChild(el);
+    return [p.id, el];
+  }));
+  let mostrarNombres = true;
+  const tmp = new THREE.Vector3();
+  function ponerEtiquetas() {
+    const w = contenedor.clientWidth, h = contenedor.clientHeight;
+    for (const p of PIEZAS) {
+      const el = etiquetas[p.id];
+      const visible = mostrarNombres && (estado.pestana === "piezas" ? true : estado.focoActual.includes(p.id));
+      if (!visible || (p.id === "prefrontal" && !mostrarCorteza && estado.pestana === "piezas" && estado.seleccion !== "prefrontal")) { el.hidden = true; continue; }
+      tmp.copy(anclas[p.id]).project(camera);
+      if (tmp.z > 1) { el.hidden = true; continue; }
+      el.hidden = false;
+      el.style.left = `${(tmp.x + 1) / 2 * w}px`;
+      el.style.top = `${(1 - tmp.y) / 2 * h}px`;
+      el.style.opacity = estado.seleccion && estado.seleccion !== p.id && estado.pestana === "piezas" ? 0.45 : 1;
+    }
+  }
+
+  // ---------- Estado e interacción ----------
+  const estado = { pestana: "piezas", seleccion: null, paso: 0, focoActual: [], tPaso: 0 };
+  let mostrarCorteza = true;
+
+  function pintarResaltado() {
+    const foco = estado.pestana === "piezas" ? (estado.seleccion ? [estado.seleccion] : null) : estado.focoActual;
+    for (const p of PIEZAS) {
+      const activo = !foco || foco.includes(p.id);
+      for (const m of materiales[p.id]) {
+        const esPF = p.id === "prefrontal";
+        // La prefrontal casi no se ve salvo cuando está en foco, para no tapar las estructuras internas
+        m.opacity = esPF ? (activo && foco ? 0.3 : mostrarCorteza ? 0.04 : 0.0) : (activo ? 0.95 : 0.18);
+        m.emissiveIntensity = foco && activo ? 0.8 : 0.25;
+      }
+    }
+  }
+
+  // Lista de piezas
+  const lista = document.getElementById("lista-piezas");
+  const botonesPieza = {};
+  PIEZAS.forEach((p) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pieza";
+    b.style.setProperty("--c", p.color);
+    b.setAttribute("aria-pressed", "false");
+    b.innerHTML = `<span class="pieza__punto" aria-hidden="true"></span><span><span class="pieza__nombre">${p.nombre}</span><span class="pieza__corto">${p.corto}</span></span>`;
+    b.addEventListener("click", () => seleccionar(estado.seleccion === p.id ? null : p.id));
+    lista.appendChild(b);
+    botonesPieza[p.id] = b;
+  });
+  const ficha = document.getElementById("ficha");
+  function seleccionar(id) {
+    estado.seleccion = id;
+    for (const [k, b] of Object.entries(botonesPieza)) b.setAttribute("aria-pressed", String(k === id));
+    if (id) {
+      const p = porId[id];
+      ficha.hidden = false;
+      ficha.style.setProperty("--c", p.color);
+      document.getElementById("ficha-tipo").textContent = p.tipo;
+      document.getElementById("ficha-nombre").textContent = p.nombre;
+      document.getElementById("ficha-texto").textContent = p.texto;
+    } else {
+      ficha.hidden = true;
+    }
+    pintarResaltado();
+  }
+
+  // Tocar en el modelo
+  const raycaster = new THREE.Raycaster();
+  let inicioToque = null;
+  canvas.addEventListener("pointerdown", (e) => { inicioToque = { x: e.clientX, y: e.clientY }; });
+  canvas.addEventListener("pointerup", (e) => {
+    if (!inicioToque || Math.hypot(e.clientX - inicioToque.x, e.clientY - inicioToque.y) > 6) return;
+    const r = canvas.getBoundingClientRect();
+    raycaster.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
+    const candidatos = mallas.filter((m) => m.userData.id !== "prefrontal" || mostrarCorteza);
+    const hits = raycaster.intersectObjects(candidatos, false);
+    // Si se toca la corteza prefrontal pero detrás hay una estructura interna, gana la interna
+    const hit = hits.find((h) => h.object.userData.id !== "prefrontal") || hits[0];
+    if (estado.pestana !== "piezas") cambiarPestana("piezas");
+    seleccionar(hit ? hit.object.userData.id : null);
+  });
+
+  // Pestañas
+  const tabs = ["piezas", "ejemplo", "gimnasio", "mito"];
+  function cambiarPestana(nombre) {
+    estado.pestana = nombre;
+    tabs.forEach((t) => {
+      document.getElementById(`tab-${t}`).setAttribute("aria-selected", String(t === nombre));
+      document.getElementById(`t-${t}`).hidden = t !== nombre;
+    });
+    if (nombre === "ejemplo") irAPaso(estado.paso);
+    else { estado.focoActual = []; ojo.visible = false; ocultarRutas(); }
+    pintarResaltado();
+  }
+  tabs.forEach((t) => document.getElementById(`tab-${t}`).addEventListener("click", () => cambiarPestana(t)));
+
+  // Ejemplo paso a paso
+  const puntos = document.getElementById("puntos");
+  puntos.innerHTML = PASOS.map(() => "<i></i>").join("");
+  function ocultarRutas() { Object.values(lineasRuta).forEach((l) => { l.material.opacity = 0; }); impulsos.forEach((m) => { m.visible = false; }); }
+  function irAPaso(n) {
+    estado.paso = Math.max(0, Math.min(PASOS.length - 1, n));
+    const P = PASOS[estado.paso];
+    estado.focoActual = P.foco;
+    estado.tPaso = 0;
+    document.getElementById("paso-numero").textContent = `Paso ${estado.paso + 1} de ${PASOS.length}`;
+    document.getElementById("paso-titulo").textContent = P.titulo;
+    document.getElementById("paso-texto").textContent = P.texto;
+    document.getElementById("paso-cuerpo").innerHTML = (P.cuerpo || []).map((c) => `<span class="reaccion">${c}</span>`).join("");
+    [...puntos.children].forEach((el, i) => el.classList.toggle("on", i <= estado.paso));
+    document.getElementById("b-anterior").disabled = estado.paso === 0;
+    const sig = document.getElementById("b-siguiente");
+    sig.textContent = estado.paso === PASOS.length - 1 ? "Ver de nuevo ↺" : "Siguiente →";
+    ojo.visible = estado.paso <= 1;
+    ocultarRutas();
+    P.rutas.forEach((k) => { lineasRuta[k].material.opacity = 0.35; });
+    pintarResaltado();
+  }
+  document.getElementById("b-anterior").addEventListener("click", () => irAPaso(estado.paso - 1));
+  document.getElementById("b-siguiente").addEventListener("click", () => irAPaso(estado.paso === PASOS.length - 1 ? 0 : estado.paso + 1));
+
+  // Botones de la escena
+  function alternar(id, fn) {
+    const b = document.getElementById(id);
+    b.addEventListener("click", () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on)); fn(on); });
+  }
+  alternar("b-corteza", (on) => { mostrarCorteza = on; corteza.visible = on; pintarResaltado(); });
+  alternar("b-nombres", (on) => { mostrarNombres = on; });
+  alternar("b-girar", (on) => { controls.autoRotate = on && !quieto; });
+  if (quieto) document.getElementById("b-girar").setAttribute("aria-pressed", "false");
+
+  // ---------- Bucle ----------
+  const reloj = new THREE.Clock();
+  const AMIGDALA_ALERTA = new THREE.Color("#FF3B2E"), AMIGDALA_CALMA = new THREE.Color("#FFB08A"), AMIGDALA_BASE = new THREE.Color(porId.amigdala.color);
+  function cuadro() {
+    const dt = Math.min(reloj.getDelta(), 0.05);
+    const t = reloj.elapsedTime;
+    estado.tPaso += dt;
+    // Pulso de las piezas en foco
+    if (estado.pestana === "ejemplo") {
+      const P = PASOS[estado.paso];
+      for (const id of P.foco) for (const m of materiales[id]) if (id !== "prefrontal") m.emissiveIntensity = 0.6 + (quieto ? 0 : 0.35 * Math.sin(t * 5));
+      // La amígdala se alerta en los pasos 2 y 3 y se calma en el 5
+      const color = P.calma ? AMIGDALA_BASE.clone().lerp(AMIGDALA_CALMA, Math.min(1, estado.tPaso / 2)) : (estado.paso >= 1 && estado.paso <= 3 ? AMIGDALA_ALERTA : AMIGDALA_BASE);
+      for (const m of materiales.amigdala) { m.color.copy(color); m.emissive.copy(color); }
+      // Impulsos viajando por las rutas activas
+      let k = 0;
+      for (const ruta of P.rutas) {
+        for (let j = 0; j < 4 && k < impulsos.length; j++, k++) {
+          const u = quieto ? j / 4 : ((t * 0.6 + j / 4) % 1);
+          impulsos[k].position.copy(curvas[ruta].getPointAt(u));
+          impulsos[k].visible = true;
+        }
+      }
+      for (; k < impulsos.length; k++) impulsos[k].visible = false;
+    } else {
+      for (const m of materiales.amigdala) { m.color.copy(AMIGDALA_BASE); m.emissive.copy(AMIGDALA_BASE); }
+    }
+    controls.update();
+    composer.render();
+    ponerEtiquetas();
+    requestAnimationFrame(cuadro);
+  }
+  pintarResaltado();
+  requestAnimationFrame(cuadro);
+</script>
