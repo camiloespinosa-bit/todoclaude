@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Phonics S2 · Vowel Detectives · Gimnasio del Cerebro</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --azul: #145389;
+    --azulOscuro: #2C5F7C;
+    --verde: #7CB342;
+    --naranja: #F57C00;
+    --fondoClaro: #F0F4F8;
+    --amarillo: #FDD835;
+    --tAzul: #EAF4F6;
+    --tVerde: #F1F8E9;
+    --tNaranja: #FFF3E0;
+    --tOscuro: #1D3F54;
+    --borde: #E2E8F0;
+  }
+  body { font-family: 'Poppins', sans-serif; color: var(--tOscuro); background: #fff; }
+  .page {
+    width: 210mm; height: 297mm; padding: 16mm 14mm 14mm;
+    page-break-after: always; break-after: page;
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
+  }
+  .page:last-child { page-break-after: avoid; break-after: auto; }
+  @media print {
+    .noprint { display: none !important; }
+    body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { margin: 0; box-shadow: none; page-break-after: always; }
+    .page:last-child { page-break-after: avoid; }
+  }
+
+  .hdr { position: absolute; top: 0; left: 0; right: 0; height: 9mm; background: var(--azulOscuro); color: #fff;
+         display: flex; align-items: center; justify-content: space-between; padding: 0 14mm; font-size: 10px; }
+  .hdr b { color: var(--amarillo); font-weight: 800; letter-spacing: .04em; }
+  .ftr { position: absolute; bottom: 5mm; left: 14mm; right: 14mm; display: flex; justify-content: space-between;
+         font-size: 9px; color: var(--azulOscuro); opacity: .7; }
+
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--azul); }
+  h1 { font-size: 30px; font-weight: 900; color: var(--azulOscuro); line-height: 1.1; }
+  h2 { font-size: 22px; font-weight: 800; color: var(--azulOscuro); line-height: 1.15; }
+  .sub { font-size: 12px; color: var(--azulOscuro); opacity: .85; margin: 3px 0 10px; }
+  .titlerow { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  .titlerow img { height: 74px; flex: none; }
+
+  .grid { display: grid; flex: 1; margin-bottom: 4mm; }
+  .card { border: 2px dashed #B8C4D0; display: flex; align-items: center; justify-content: center; position: relative; }
+  .letter { font-size: 140px; font-weight: 700; line-height: 1; }
+  .v { color: var(--naranja); }
+  .c { color: var(--azul); }
+  .word { font-size: 50px; font-weight: 700; letter-spacing: 1px; color: var(--azulOscuro); }
+  .pic { font-size: 100px; line-height: 1; }
+  .tiny { position: absolute; bottom: 6px; right: 10px; font-size: 11px; color: var(--azulOscuro); opacity: .6; }
+
+  .cardw { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); border: 1.5px solid var(--borde);
+           border-left: 4px solid var(--azul); padding: 9px 14px; margin-top: 9px; font-size: 12px; line-height: 1.5; }
+  .cardw strong { color: var(--azulOscuro); font-weight: 700; }
+  .cardw.g { border-left-color: var(--verde); }
+  .cardw.o { border-left-color: var(--naranja); }
+  .cardw ul { margin: 4px 0 0 16px; }
+  .note { background: var(--tAzul); border-left: 4px solid var(--azul); border-radius: 0 8px 8px 0; padding: 8px 12px; font-size: 12px; margin-top: 9px; line-height: 1.5; }
+  .inst { background: var(--azulOscuro); color: #fff; border-radius: 12px; padding: 14px 18px; }
+  .inst h3 { color: var(--amarillo); font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+  .inst p, .inst li { font-size: 12px; opacity: .9; line-height: 1.5; }
+  .muted { color: var(--azulOscuro); opacity: .75; }
+
+  table.t { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 4px; }
+  table.t th { background: var(--azulOscuro); color: #fff; font-weight: 600; text-align: left; padding: 6px 8px; }
+  table.t td { border-bottom: 1px solid var(--borde); padding: 6px 8px; vertical-align: top; }
+  table.t tr:nth-child(even) td { background: var(--fondoClaro); }
+  .badge { width: 24px; height: 24px; border-radius: 50%; background: var(--azul); color: #fff; font-weight: 900; font-size: 11px;
+           display: inline-flex; align-items: center; justify-content: center; }
+
+  /* Vowel cards */
+  .vcard { border: 2px dashed #B8C4D0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; position: relative; }
+  .vcard .letter { font-size: 120px; }
+  .vcard .key { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 700; color: var(--azulOscuro); }
+  .vcard .key span.e { font-size: 54px; }
+  .vcard .key img { height: 64px; }
+  .vcard .act { font-size: 11px; color: var(--azulOscuro); opacity: .7; }
+
+  /* Chain */
+  .chain { display: flex; flex-wrap: wrap; gap: 8px 6px; align-items: center; font-size: 32px; font-weight: 700; color: var(--azulOscuro); margin: 6px 0 8px; }
+  .chain .arr { color: var(--verde); font-size: 22px; }
+  .chg { background: var(--tNaranja); color: var(--naranja); border-radius: 6px; padding: 0 2px; }
+
+  /* Vowel houses */
+  .houses { flex: 1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 4mm; }
+  .house { display: flex; flex-direction: column; border: 3px solid var(--azulOscuro); border-radius: 14px; overflow: hidden; background: #fff; }
+  .roof { background: var(--azulOscuro); color: #fff; text-align: center; padding: 8px 0 6px; }
+  .roof .l { font-size: 64px; font-weight: 800; color: var(--amarillo); line-height: 1; }
+  .roof .k { font-size: 26px; line-height: 1.2; }
+  .roof .k img { height: 34px; display: inline-block; vertical-align: middle; }
+  .slot { flex: 1; border-top: 2px dashed #B8C4D0; }
+  .slot:first-of-type { border-top: none; }
+
+  /* Quick check */
+  .check { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; align-content: center; }
+  .check div { font-size: 54px; font-weight: 700; text-align: center; color: var(--tOscuro); border-bottom: 2px solid var(--borde); padding-bottom: 2px; }
+  .check small { font-size: 15px; color: var(--azul); font-weight: 700; margin-right: 12px; vertical-align: middle; }
+  .alien { margin-top: 14px; background: var(--tVerde); border-radius: 16px; padding: 12px 18px; display: flex; align-items: center; gap: 18px; }
+  .alien .w { font-size: 54px; font-weight: 700; color: var(--tOscuro); flex: 1; text-align: center; }
+  table.rec { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; }
+  table.rec th { background: var(--azulOscuro); color: #fff; font-weight: 600; padding: 6px 6px; }
+  table.rec td { border: 1px solid #B8C4D0; padding: 7px 6px; text-align: center; }
+  table.rec td:nth-child(2) { font-weight: 700; text-align: left; color: var(--azulOscuro); }
+  table.rec tr.tot td { background: var(--fondoClaro); font-weight: 700; }
+  table.rec tr.al td { background: var(--tVerde); }
+
+  /* Sentences */
+  .sentence { font-size: 50px; font-weight: 800; text-align: center; margin: 14px 0 4px; color: var(--azulOscuro); }
+  .tricky { background: var(--tNaranja); color: var(--naranja); border-radius: 10px; padding: 0 8px; }
+  .draw { flex: 1; border: 4px solid var(--azulOscuro); border-radius: 18px; margin: 8px 0 4px; position: relative; }
+  .draw span { position: absolute; top: 8px; left: 16px; font-size: 15px; color: var(--azul); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- 1. GUÍA -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Inglés · Phonics · Sesión 2</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Material del facilitador</div>
+      <h1>Vowel Detectives</h1>
+      <p class="sub">Sesión 2 · CVC con las 5 vocales cortas · 6 años · 60 minutos · Imprimir en A4</p>
+    </div>
+    <img src="../../assets/img/oki/oki-sorpresa.svg" style="height:100px;">
+  </div>
+
+  <div class="note" style="margin-top:0;"><strong>Objetivo:</strong> leer palabras CVC con a, e, i, o, u mezcladas, distinguiendo la vocal del medio. <strong>Requisito:</strong> 8 o más de 10 en el Quick Check de la sesión 1. Si sacó menos, mira el recuadro "Si la sesión 1 salió baja".</div>
+
+  <table class="t" style="margin-top:10px;">
+    <tr><th style="width:12%">Pág.</th><th style="width:26%">Material</th><th>Cómo prepararlo</th></tr>
+    <tr><td>2</td><td>Vowel cards (5)</td><td>Recorta. Cada vocal con su palabra clave y su gesto. Se usan en el Warm-up, en Vowel Freeze y como guía durante toda la sesión.</td></tr>
+    <tr><td>3</td><td>Letter cards nuevas (9)</td><td>Recorta y súmalas a las de la sesión 1. Trae h, r, l, j, k, w y una e, o, u extra.</td></tr>
+    <tr><td>4</td><td>Picture cards (8)</td><td>Recorta. Para Vowel Detective (oral).</td></tr>
+    <tr><td>5</td><td>Hoja del facilitador</td><td>Cadena de palabras, listas por actividad y frases de apoyo. No se recorta.</td></tr>
+    <tr><td>6 y 7</td><td>Vowel Houses + Word cards (15)</td><td>Imprime las casas sin recortar. Recorta las 15 palabras.</td></tr>
+    <tr><td>8 y 9</td><td>Quick Check 2</td><td>La 8 la lee el estudiante. En la 9 anotas los resultados.</td></tr>
+    <tr><td>10</td><td>My Sentences</td><td>Dos oraciones para leer y dibujar.</td></tr>
+  </table>
+
+  <div class="inst" style="margin-top:10px;">
+    <h3>Ruta de la sesión</h3>
+    <p><span class="badge" style="background:var(--verde)">1</span> 0 a 5 Vowel Warm-up &nbsp; <span class="badge" style="background:var(--verde)">2</span> 5 a 10 Review &nbsp; <span class="badge" style="background:var(--verde)">3</span> 10 a 20 Vowel Detective &nbsp; <span class="badge" style="background:var(--verde)">4</span> 20 a 32 Word Chain</p>
+    <p style="margin-top:6px;"><span class="badge" style="background:var(--naranja)">5</span> 32 a 37 Vowel Freeze &nbsp; <span class="badge" style="background:var(--naranja)">6</span> 37 a 48 Vowel Houses &nbsp; <span class="badge" style="background:var(--naranja)">7</span> 48 a 54 Quick Check 2 &nbsp; <span class="badge" style="background:var(--naranja)">8</span> 54 a 60 Sentences</p>
+  </div>
+
+  <div class="cardw o">
+    <strong>Si la sesión 1 salió baja</strong>
+    <ul>
+      <li><b>5 a 7:</b> usa solo a, i y o. Salta la página 3 y en Vowel Houses usa 3 casas.</li>
+      <li><b>0 a 4, o no une sonidos:</b> no uses esta sesión todavía. Repite la sesión 1 empezando con oral blending y palabras de 2 sonidos.</li>
+    </ul>
+  </div>
+  <div class="cardw">
+    <strong>Clave de la sesión:</strong> las vocales cortas e / i y o / u son las que más se confunden, sobre todo en hispanohablantes, porque el español no tiene la /ɪ/ ni la /ʌ/. Exagera la boca: e con sonrisa, i con boca pequeña, o redonda, u relajada como "uh".
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Rionegro, Antioquia</span><span>01</span></div>
+</section>
+
+<!-- 2. VOWEL CARDS -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Vowel cards</span></div>
+  <div class="kicker">Warm-up · Vowel Freeze</div>
+  <h2>Vowel Cards</h2>
+  <p class="sub">Recorta. Cada vocal tiene una palabra clave y un gesto. Di la palabra, haz el gesto, di el sonido: "apple, apple, /a/".</p>
+  <div class="grid" style="grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);">
+    <div class="vcard"><span class="letter v">a</span><div class="key"><span class="e">🍎</span>apple</div><div class="act">Gesto: morder una manzana</div></div>
+    <div class="vcard"><span class="letter v">e</span><div class="key"><span class="e">🥚</span>egg</div><div class="act">Gesto: romper un huevo</div></div>
+    <div class="vcard"><span class="letter v">i</span><div class="key"><span class="e">🐛</span>insect</div><div class="act">Gesto: dedos que caminan por el brazo</div></div>
+    <div class="vcard"><span class="letter v">o</span><div class="key"><img src="../../assets/img/oki/oki-base-saludo.svg">octopus</div><div class="act">Gesto: mover los brazos como Oki</div></div>
+    <div class="vcard"><span class="letter v">u</span><div class="key"><span class="e">☂️</span>umbrella</div><div class="act">Gesto: abrir un paraguas</div></div>
+    <div class="vcard" style="border-style:solid;border-color:var(--borde);background:var(--fondoClaro);">
+      <img src="../../assets/img/oki/oki-pensando.svg" style="height:120px;">
+      <div style="font-size:14px;font-weight:700;color:var(--azulOscuro);text-align:center;padding:0 16px;">"O is for octopus,<br>like Oki!"</div>
+    </div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>02</span></div>
+</section>
+
+<!-- 3. NEW LETTERS -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Letter cards nuevas</span></div>
+  <div class="kicker">Word Chain · Vowel Houses</div>
+  <h2>Letter Cards · New Letters</h2>
+  <p class="sub">Súmalas a las 18 de la sesión 1. Repasa sus sonidos en el Warm-up antes de usarlas.</p>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);">
+    <div class="card"><span class="letter c">h</span></div>
+    <div class="card"><span class="letter c">r</span></div>
+    <div class="card"><span class="letter c">l</span></div>
+    <div class="card"><span class="letter c">j</span></div>
+    <div class="card"><span class="letter c">k</span></div>
+    <div class="card"><span class="letter c">w</span></div>
+    <div class="card"><span class="letter v">e</span></div>
+    <div class="card"><span class="letter v">o</span></div>
+    <div class="card"><span class="letter v">u</span></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>03</span></div>
+</section>
+
+<!-- 4. PICTURE CARDS -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Vowel Detective</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Oral · 10 a 20 min</div>
+      <h2>Picture Cards · Vowel Detective</h2>
+      <p class="sub">Di la palabra estirando la vocal: "beeed". El estudiante señala la vowel card que escuchó en el medio.</p>
+    </div>
+    <img src="../../assets/img/oki/oki-pensando.svg">
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,1fr);">
+    <div class="card"><span class="pic">🛏️</span><span class="tiny">bed · e</span></div>
+    <div class="card"><span class="pic">🐶</span><span class="tiny">dog · o</span></div>
+    <div class="card"><span class="pic">☀️</span><span class="tiny">sun · u</span></div>
+    <div class="card"><span class="pic">🐖</span><span class="tiny">pig · i</span></div>
+    <div class="card"><span class="pic">🐈</span><span class="tiny">cat · a</span></div>
+    <div class="card"><span class="pic">🐔</span><span class="tiny">hen · e</span></div>
+    <div class="card"><span class="pic">🚌</span><span class="tiny">bus · u</span></div>
+    <div class="card"><span class="pic">🪵</span><span class="tiny">log · o</span></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>04</span></div>
+</section>
+
+<!-- 5. FACILITATOR SHEET -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Hoja del facilitador</span></div>
+  <div class="kicker">We Do · 20 a 32 min</div>
+  <h2>Word Chain · Vowel Swap</h2>
+  <p class="sub">Cambia una sola letra cada vez (en naranja). Casi todos los cambios son de vocal: es el punto de la sesión.</p>
+  <div class="chain">
+    bag <span class="arr">→</span> <span>b<span class="chg">i</span>g</span> <span class="arr">→</span>
+    <span>b<span class="chg">u</span>g</span> <span class="arr">→</span> <span>bu<span class="chg">d</span></span> <span class="arr">→</span>
+    <span>b<span class="chg">e</span>d</span> <span class="arr">→</span> <span>be<span class="chg">t</span></span> <span class="arr">→</span>
+    <span><span class="chg">n</span>et</span> <span class="arr">→</span> <span>n<span class="chg">o</span>t</span> <span class="arr">→</span>
+    <span><span class="chg">h</span>ot</span> <span class="arr">→</span> <span>h<span class="chg">u</span>t</span>
+  </div>
+  <div class="cardw"><strong>Review (5 a 10 min):</strong> sat, pin, fan, map, sit, nap<br><span class="muted">Palabras de la sesión 1. Si las lee rápido, sigue. Si duda, repasa con arm tapping.</span></div>
+  <div class="cardw"><strong>Vowel Detective (oral):</strong> bed, dog, sun, pig, cat, hen, bus, log<br><span class="muted">"Listen: beeed. What's the middle sound? Show me the card!" Después cambien los papeles.</span></div>
+  <div class="cardw g" style="display:flex;align-items:center;gap:12px;">
+    <div style="flex:1;"><strong>Vowel Freeze (pausa activa):</strong> pon música y bailen. Cuando pares, muestra una vowel card. El estudiante se congela, hace el gesto y dice el sonido.<br><span class="muted">Ronda difícil: muestra la vocal, él dice una palabra que la tenga.</span></div>
+    <img src="../../assets/img/oki/oki-ejercitando.svg" style="height:62px;">
+  </div>
+  <div class="cardw o"><strong>Frases de apoyo</strong>
+    <ul>
+      <li>"Be a vowel detective! What's the middle sound?"</li>
+      <li>"Look at the vowel first. What does it say?"</li>
+      <li>"Tap it, slide it, say it fast!"</li>
+      <li>"Is it /e/ like egg or /i/ like insect? Show me your mouth."</li>
+      <li>"Freeze! What sound is this?"</li>
+    </ul>
+  </div>
+  <div class="note"><strong>Si se traba en la vocal:</strong> tapa las consonantes y que diga solo la vocal. Luego destapa una por una: "e... be... bed". Si confunde e / i, pon las dos vowel cards juntas y exagera la forma de la boca.</div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>05</span></div>
+</section>
+
+<!-- 6. VOWEL HOUSES -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Vowel Houses</span></div>
+  <div class="kicker">You Do · 37 a 48 min</div>
+  <h2>Vowel Houses</h2>
+  <p class="sub">El estudiante lee la palabra en voz alta y la lleva a la casa de su vocal. Primero lee, después ubica.</p>
+  <div class="houses">
+    <div class="house"><div class="roof"><div class="l">a</div><div class="k">🍎</div></div><div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
+    <div class="house"><div class="roof"><div class="l">e</div><div class="k">🥚</div></div><div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
+    <div class="house"><div class="roof"><div class="l">i</div><div class="k">🐛</div></div><div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
+    <div class="house"><div class="roof"><div class="l">o</div><div class="k"><img src="../../assets/img/oki/oki-base-saludo.svg"></div></div><div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
+    <div class="house"><div class="roof"><div class="l">u</div><div class="k">☂️</div></div><div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>06</span></div>
+</section>
+
+<!-- 7. WORD CARDS -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Vowel Houses</span></div>
+  <div class="kicker">You Do · 37 a 48 min</div>
+  <h2>Word Cards · Vowel Houses</h2>
+  <p class="sub">Recorta. Barájalas antes de empezar. Todas las letras van en el mismo color: aquí la vocal la tiene que encontrar él.</p>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(5,1fr);">
+    <div class="card"><span class="word">jam</span></div>
+    <div class="card"><span class="word">hen</span></div>
+    <div class="card"><span class="word">lip</span></div>
+    <div class="card"><span class="word">dog</span></div>
+    <div class="card"><span class="word">cup</span></div>
+    <div class="card"><span class="word">rat</span></div>
+    <div class="card"><span class="word">wet</span></div>
+    <div class="card"><span class="word">kid</span></div>
+    <div class="card"><span class="word">log</span></div>
+    <div class="card"><span class="word">bus</span></div>
+    <div class="card"><span class="word">bag</span></div>
+    <div class="card"><span class="word">red</span></div>
+    <div class="card"><span class="word">hit</span></div>
+    <div class="card"><span class="word">pot</span></div>
+    <div class="card"><span class="word">run</span></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>07</span></div>
+</section>
+
+<!-- 8. QUICK CHECK CHILD -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Quick Check 2 · hoja del niño</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Evaluación · 48 a 54 min</div>
+      <h2>Can you read these words?</h2>
+      <p class="sub">Sin ayuda. Las dos últimas son "alien words": no existen, así que no se pueden adivinar.</p>
+    </div>
+    <img src="../../assets/img/oki/oki-leyendo.svg">
+  </div>
+  <div class="check" style="flex:1;">
+    <div><small>1</small>pet</div><div><small>2</small>gum</div>
+    <div><small>3</small>dot</div><div><small>4</small>ham</div>
+    <div><small>5</small>rib</div><div><small>6</small>web</div>
+    <div><small>7</small>mud</div><div><small>8</small>sad</div>
+    <div><small>9</small>fit</div><div><small>10</small>rod</div>
+  </div>
+  <div class="alien" style="margin-bottom:4mm;">
+    <img src="../../assets/img/oki/oki-sorpresa.svg" style="height:80px;">
+    <div style="font-size:13px;font-weight:700;color:var(--azulOscuro);width:90px;">Alien words!</div>
+    <div class="w"><small style="font-size:15px;color:var(--azul);margin-right:10px;">11</small>vop</div>
+    <div class="w"><small style="font-size:15px;color:var(--azul);margin-right:10px;">12</small>mib</div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>08</span></div>
+</section>
+
+<!-- 9. QUICK CHECK RECORD -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Quick Check 2 · hoja del facilitador</span></div>
+  <div class="kicker">Evaluación</div>
+  <h2>Quick Check 2 · Registro</h2>
+  <p class="sub">Alumno: ____________________ &nbsp;&nbsp; Fecha: ____________________ &nbsp;&nbsp; Sesión #: ______</p>
+  <table class="rec">
+    <tr><th>#</th><th>Palabra</th><th>Vocal</th><th>✓ Lee la palabra</th><th>Error en la vocal</th><th>Qué dijo</th></tr>
+    <tr><td>1</td><td>pet</td><td>e</td><td></td><td></td><td></td></tr>
+    <tr><td>2</td><td>gum</td><td>u</td><td></td><td></td><td></td></tr>
+    <tr><td>3</td><td>dot</td><td>o</td><td></td><td></td><td></td></tr>
+    <tr><td>4</td><td>ham</td><td>a</td><td></td><td></td><td></td></tr>
+    <tr><td>5</td><td>rib</td><td>i</td><td></td><td></td><td></td></tr>
+    <tr><td>6</td><td>web</td><td>e</td><td></td><td></td><td></td></tr>
+    <tr><td>7</td><td>mud</td><td>u</td><td></td><td></td><td></td></tr>
+    <tr><td>8</td><td>sad</td><td>a</td><td></td><td></td><td></td></tr>
+    <tr><td>9</td><td>fit</td><td>i</td><td></td><td></td><td></td></tr>
+    <tr><td>10</td><td>rod</td><td>o</td><td></td><td></td><td></td></tr>
+    <tr class="tot"><td colspan="3">Total palabras reales</td><td>____ / 10</td><td>____ / 10</td><td></td></tr>
+    <tr class="al"><td>11</td><td>vop</td><td>o</td><td></td><td></td><td></td></tr>
+    <tr class="al"><td>12</td><td>mib</td><td>i</td><td></td><td></td><td></td></tr>
+  </table>
+  <div class="inst" style="margin-top:10px;">
+    <h3>Interpretación</h3>
+    <ul style="margin-left:16px;">
+      <li><b>8 a 10 y lee al menos 1 alien word:</b> está decodificando, no memorizando. Siguiente paso: CVCC (hand, milk, jump).</li>
+      <li><b>8 a 10 pero no lee las alien words:</b> puede estar reconociendo palabras de memoria. Repite esta sesión con otras palabras.</li>
+      <li><b>5 a 7:</b> revisa la columna "Error en la vocal". Si los errores se concentran en dos vocales (típico: e / i), dedica la próxima sesión a ese contraste.</li>
+      <li><b>0 a 4:</b> vuelve a la sesión 1 con a, i, o.</li>
+    </ul>
+  </div>
+  <div class="cardw" style="flex:1;margin-bottom:4mm;"><strong>Observaciones</strong> <span class="muted">(vocales que confunde, velocidad, qué lo motivó)</span></div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>09</span></div>
+</section>
+
+<!-- 10. SENTENCES -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>My Sentences</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Cierre · 54 a 60 min</div>
+      <h2>My Sentences</h2>
+      <p class="sub">Nombres con mayúscula: si no reconoce la B o la P, muéstrale que suenan igual que b y p. Al final, pega un sticker en su certificado.</p>
+    </div>
+    <img src="../../assets/img/oki/oki-celebrando.svg">
+  </div>
+  <div class="sentence">Ben got <span class="tricky">a</span> big bug.</div>
+  <div class="draw"><span>Draw it!</span></div>
+  <div class="sentence">Pam can hop <span class="tricky">on</span> <span class="tricky">a</span> log.</div>
+  <div class="draw" style="margin-bottom:4mm;"><span>Draw it!</span></div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Vowel Detectives</span><span>10</span></div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Phonics S1 · Let's Make Words! · Gimnasio del Cerebro</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --azul: #145389;
+    --azulOscuro: #2C5F7C;
+    --verde: #7CB342;
+    --naranja: #F57C00;
+    --fondoClaro: #F0F4F8;
+    --amarillo: #FDD835;
+    --tAzul: #EAF4F6;
+    --tVerde: #F1F8E9;
+    --tNaranja: #FFF3E0;
+    --tOscuro: #1D3F54;
+    --borde: #E2E8F0;
+  }
+  body { font-family: 'Poppins', sans-serif; color: var(--tOscuro); background: #fff; }
+  .page {
+    width: 210mm; height: 297mm; padding: 16mm 14mm 14mm;
+    page-break-after: always; break-after: page;
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
+  }
+  .page:last-child { page-break-after: avoid; break-after: auto; }
+  @media print {
+    .noprint { display: none !important; }
+    body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { margin: 0; box-shadow: none; page-break-after: always; }
+    .page:last-child { page-break-after: avoid; }
+  }
+
+  /* Header and footer band */
+  .hdr { position: absolute; top: 0; left: 0; right: 0; height: 9mm; background: var(--azulOscuro); color: #fff;
+         display: flex; align-items: center; justify-content: space-between; padding: 0 14mm; font-size: 10px; }
+  .hdr b { color: var(--amarillo); font-weight: 800; letter-spacing: .04em; }
+  .ftr { position: absolute; bottom: 5mm; left: 14mm; right: 14mm; display: flex; justify-content: space-between;
+         font-size: 9px; color: var(--azulOscuro); opacity: .7; }
+
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--azul); }
+  h1 { font-size: 30px; font-weight: 900; color: var(--azulOscuro); line-height: 1.1; }
+  h2 { font-size: 22px; font-weight: 800; color: var(--azulOscuro); line-height: 1.15; }
+  .sub { font-size: 12px; color: var(--azulOscuro); opacity: .85; margin: 3px 0 10px; }
+  .titlerow { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  .titlerow img { height: 74px; flex: none; }
+
+  /* Cut-out card grids */
+  .grid { display: grid; flex: 1; margin-bottom: 4mm; }
+  .card { border: 2px dashed #B8C4D0; display: flex; align-items: center; justify-content: center; position: relative; }
+  .letter { font-size: 140px; font-weight: 700; line-height: 1; }
+  .v { color: var(--naranja); }
+  .c { color: var(--azul); }
+  .word { font-size: 56px; font-weight: 700; letter-spacing: 1px; color: var(--azulOscuro); }
+  .pic { font-size: 110px; line-height: 1; }
+  .pic svg { width: 120px; height: 120px; }
+  .tiny { position: absolute; bottom: 6px; right: 10px; font-size: 11px; color: var(--azulOscuro); opacity: .6; }
+  .cut { font-size: 10px; color: var(--azulOscuro); opacity: .7; text-align: center; }
+
+  /* Brand blocks */
+  .cardw { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); border: 1.5px solid var(--borde);
+           border-left: 4px solid var(--azul); padding: 9px 14px; margin-top: 9px; font-size: 12px; line-height: 1.5; }
+  .cardw strong { color: var(--azulOscuro); font-weight: 700; }
+  .cardw.g { border-left-color: var(--verde); }
+  .cardw.o { border-left-color: var(--naranja); }
+  .cardw ul { margin: 4px 0 0 16px; }
+  .note { background: var(--tAzul); border-left: 4px solid var(--azul); border-radius: 0 8px 8px 0; padding: 8px 12px; font-size: 12px; margin-top: 9px; line-height: 1.5; }
+  .inst { background: var(--azulOscuro); color: #fff; border-radius: 12px; padding: 14px 18px; }
+  .inst h3 { color: var(--amarillo); font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+  .inst p, .inst li { font-size: 12px; opacity: .9; line-height: 1.5; }
+  .muted { color: var(--azulOscuro); opacity: .75; }
+
+  table.t { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 4px; }
+  table.t th { background: var(--azulOscuro); color: #fff; font-weight: 600; text-align: left; padding: 6px 8px; }
+  table.t td { border-bottom: 1px solid var(--borde); padding: 6px 8px; vertical-align: top; }
+  table.t tr:nth-child(even) td { background: var(--fondoClaro); }
+  .badge { width: 24px; height: 24px; border-radius: 50%; background: var(--azul); color: #fff; font-weight: 900; font-size: 11px;
+           display: inline-flex; align-items: center; justify-content: center; }
+
+  /* Sound boxes */
+  .mat { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 26px; }
+  .boxes { display: flex; gap: 20px; }
+  .sbox { width: 55mm; height: 66mm; border: 5px solid var(--azulOscuro); border-radius: 18px; background: #fff;
+          display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; }
+  .sdot { width: 30px; height: 30px; border-radius: 50%; background: var(--naranja); }
+
+  /* Chain */
+  .chain { display: flex; flex-wrap: wrap; gap: 8px 6px; align-items: center; font-size: 34px; font-weight: 700; color: var(--azulOscuro); margin: 6px 0 8px; }
+  .chain .arr { color: var(--verde); font-size: 24px; }
+  .chg { background: var(--tNaranja); color: var(--naranja); border-radius: 6px; padding: 0 2px; }
+
+  /* Quick check */
+  .check { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 30px; flex: 1; align-content: center; }
+  .check div { font-size: 60px; font-weight: 700; text-align: center; color: var(--tOscuro); border-bottom: 2px solid var(--borde); padding-bottom: 4px; }
+  .check small { font-size: 15px; color: var(--azul); font-weight: 700; margin-right: 12px; vertical-align: middle; }
+  table.rec { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+  table.rec th { background: var(--azulOscuro); color: #fff; font-weight: 600; padding: 7px 6px; }
+  table.rec td { border: 1px solid #B8C4D0; padding: 9px 6px; text-align: center; }
+  table.rec td:nth-child(2) { font-weight: 700; text-align: left; color: var(--azulOscuro); }
+  table.rec tr.tot td { background: var(--fondoClaro); font-weight: 700; }
+
+  /* Sentence */
+  .sentence { font-size: 64px; font-weight: 800; text-align: center; margin: 22px 0 6px; color: var(--azulOscuro); }
+  .tricky { background: var(--tNaranja); color: var(--naranja); border-radius: 10px; padding: 0 8px; }
+  .draw { flex: 1; border: 4px solid var(--azulOscuro); border-radius: 18px; margin: 14px 0 4mm; position: relative; }
+  .draw span { position: absolute; top: 10px; left: 16px; font-size: 16px; color: var(--azul); font-weight: 600; }
+
+  /* Certificate */
+  .cert { flex: 1; border: 6px solid var(--azul); border-radius: 26px; overflow: hidden; display: flex; flex-direction: column; margin-bottom: 4mm; }
+  .cert .top { background: var(--azulOscuro); color: #fff; text-align: center; padding: 24px 20px 20px; }
+  .cert .top h1 { color: var(--amarillo); font-size: 56px; margin: 6px 0 2px; }
+  .cert .body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 30px; }
+  .cert .name { border-bottom: 3px solid var(--azulOscuro); width: 120mm; height: 46px; margin-top: 14px; }
+  .stickers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px; }
+  .stickers div { width: 23mm; height: 23mm; border: 3px dashed var(--verde); border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- 1. GUÍA -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Inglés · Phonics · Blending CVC</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Material del facilitador</div>
+      <h1>Let's Make Words!</h1>
+      <p class="sub">Sesión 1 · Blending CVC · 6 años · 60 minutos · Imprimir en A4</p>
+    </div>
+    <img src="../../assets/img/oki/oki-base-saludo.svg" style="height:100px;">
+  </div>
+
+  <table class="t">
+    <tr><th style="width:12%">Pág.</th><th style="width:26%">Material</th><th>Cómo prepararlo</th></tr>
+    <tr><td>2 y 3</td><td>Letter cards (18)</td><td>Imprime en cartulina y recorta. Vocales en naranja, consonantes en azul.</td></tr>
+    <tr><td>4</td><td>Picture cards (8)</td><td>Recorta. Para Robot Talk. La palabra pequeña de la esquina es solo para ti.</td></tr>
+    <tr><td>5</td><td>Sound boxes</td><td>Plastifica o mete en funda. Pon una letra encima de cada caja.</td></tr>
+    <tr><td>6</td><td>Hoja del facilitador</td><td>Cadena de palabras, listas por actividad y frases de apoyo. No se recorta.</td></tr>
+    <tr><td>7</td><td>Monster</td><td>Pega en una caja de zapatos o de pañuelos y recorta la boca por la línea punteada.</td></tr>
+    <tr><td>8</td><td>Word cards (12)</td><td>Recorta. Para Feed the Monster.</td></tr>
+    <tr><td>9 y 10</td><td>Quick Check</td><td>La 9 la lee el estudiante. En la 10 anotas los resultados.</td></tr>
+    <tr><td>11</td><td>My First Sentence</td><td>El estudiante lee la oración y dibuja.</td></tr>
+    <tr><td>12</td><td>Certificado</td><td>Entrégalo en el cierre. Los círculos son para stickers de las próximas clases.</td></tr>
+  </table>
+
+  <div class="inst" style="margin-top:12px;">
+    <h3>Ruta de la sesión</h3>
+    <p><span class="badge" style="background:var(--verde)">1</span> 0 a 5 Sound Flash &nbsp; <span class="badge" style="background:var(--verde)">2</span> 5 a 12 Robot Talk &nbsp; <span class="badge" style="background:var(--verde)">3</span> 12 a 20 I Do &nbsp; <span class="badge" style="background:var(--verde)">4</span> 20 a 32 Word Chains</p>
+    <p style="margin-top:6px;"><span class="badge" style="background:var(--naranja)">5</span> 32 a 37 Jump and Blend &nbsp; <span class="badge" style="background:var(--naranja)">6</span> 37 a 48 Feed the Monster &nbsp; <span class="badge" style="background:var(--naranja)">7</span> 48 a 54 Quick Check &nbsp; <span class="badge" style="background:var(--naranja)">8</span> 54 a 60 Cierre</p>
+  </div>
+
+  <div class="cardw">
+    <strong>Recordatorios clave</strong>
+    <ul>
+      <li>Di sonidos limpios, sin agregar "uh": /m/ es "mmm", /b/ es un golpe corto, no "buh".</li>
+      <li>Empieza con palabras que inician en sonidos que se alargan (m, s, f, n) antes que b, d, t, p, c.</li>
+      <li>Si el estudiante se cansa o se frustra, cierra antes con un éxito. No fuerces los 60 minutos.</li>
+    </ul>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Rionegro, Antioquia</span><span>01</span></div>
+</section>
+
+<!-- 2. LETTERS 1 -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Letter cards · 1 de 2</span></div>
+  <div class="kicker">Sound Flash · I Do · Word Chains</div>
+  <h2>Letter Cards</h2>
+  <p class="sub">Recorta por la línea punteada.</p>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);">
+    <div class="card"><span class="letter c">m</span></div>
+    <div class="card"><span class="letter c">s</span></div>
+    <div class="card"><span class="letter c">f</span></div>
+    <div class="card"><span class="letter c">n</span></div>
+    <div class="card"><span class="letter c">t</span></div>
+    <div class="card"><span class="letter c">p</span></div>
+    <div class="card"><span class="letter c">c</span></div>
+    <div class="card"><span class="letter c">b</span></div>
+    <div class="card"><span class="letter c">d</span></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>02</span></div>
+</section>
+
+<!-- 3. LETTERS 2 -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Letter cards · 2 de 2</span></div>
+  <div class="kicker">Sound Flash · I Do · Word Chains</div>
+  <h2>Letter Cards</h2>
+  <p class="sub">Vocales en naranja. Incluye una "a", una "i" y una "t" extra para armar palabras.</p>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);">
+    <div class="card"><span class="letter c">g</span></div>
+    <div class="card"><span class="letter v">a</span></div>
+    <div class="card"><span class="letter v">i</span></div>
+    <div class="card"><span class="letter v">o</span></div>
+    <div class="card"><span class="letter v">e</span></div>
+    <div class="card"><span class="letter v">u</span></div>
+    <div class="card"><span class="letter v">a</span></div>
+    <div class="card"><span class="letter v">i</span></div>
+    <div class="card"><span class="letter c">t</span></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>03</span></div>
+</section>
+
+<!-- 4. PICTURES -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Robot Talk</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Oral blending · sin letras</div>
+      <h2>Picture Cards · Robot Talk</h2>
+      <p class="sub">"I am a robot. /s/ /u/ /n/... What word is it?" el estudiante señala la imagen.</p>
+    </div>
+    <img src="../../assets/img/oki/oki-pensando.svg">
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,1fr);">
+    <div class="card"><span class="pic">☀️</span><span class="tiny">sun</span></div>
+    <div class="card"><span class="pic">🗺️</span><span class="tiny">map</span></div>
+    <div class="card"><span class="pic">🪭</span><span class="tiny">fan</span></div>
+    <div class="card"><span class="pic">
+      <svg viewBox="0 0 120 120" aria-label="mop">
+        <rect x="56" y="6" width="8" height="74" rx="3" fill="#F57C00"/>
+        <rect x="40" y="76" width="40" height="10" rx="3" fill="#2C5F7C"/>
+        <g stroke="#145389" stroke-width="6" stroke-linecap="round">
+          <path d="M44 86 L36 114"/><path d="M52 86 L48 116"/><path d="M60 86 L60 117"/>
+          <path d="M68 86 L72 116"/><path d="M76 86 L84 114"/>
+        </g>
+      </svg></span><span class="tiny">mop</span></div>
+    <div class="card"><span class="pic">
+      <svg viewBox="0 0 120 120" aria-label="sit">
+        <rect x="70" y="20" width="8" height="58" rx="3" fill="#F57C00"/>
+        <rect x="34" y="70" width="46" height="8" rx="3" fill="#F57C00"/>
+        <rect x="36" y="76" width="6" height="38" fill="#F57C00"/><rect x="72" y="76" width="6" height="38" fill="#F57C00"/>
+        <circle cx="54" cy="28" r="12" fill="#FFE0C2" stroke="#2C5F7C" stroke-width="2"/>
+        <path d="M54 40 L56 68" stroke="#7CB342" stroke-width="10" stroke-linecap="round"/>
+        <path d="M56 66 L34 68 L32 100" stroke="#145389" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M54 48 L40 58" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+      </svg></span><span class="tiny">sit</span></div>
+    <div class="card"><span class="pic">🐈</span><span class="tiny">cat</span></div>
+    <div class="card"><span class="pic">🐖</span><span class="tiny">pig</span></div>
+    <div class="card"><span class="pic">🛏️</span><span class="tiny">bed</span></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>04</span></div>
+</section>
+
+<!-- 5. SOUND BOXES -->
+<section class="page" style="background:var(--fondoClaro);">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>I Do · We Do</span></div>
+  <div class="kicker">Modelado y práctica guiada</div>
+  <h2>Sound Boxes</h2>
+  <p class="sub">Pon una letra en cada caja. Toca cada punto y di el sonido. Desliza el dedo por la flecha y di la palabra.</p>
+  <div class="mat">
+    <div class="boxes">
+      <div class="sbox"><div class="sdot"></div></div>
+      <div class="sbox"><div class="sdot"></div></div>
+      <div class="sbox"><div class="sdot"></div></div>
+    </div>
+    <svg viewBox="0 0 720 60" style="width:180mm;height:15mm;">
+      <line x1="10" y1="30" x2="680" y2="30" stroke="#7CB342" stroke-width="10" stroke-linecap="round"/>
+      <polygon points="670,6 714,30 670,54" fill="#7CB342"/>
+    </svg>
+    <div style="font-size:28px;font-weight:800;color:var(--azulOscuro);">tap · tap · tap · <span style="color:var(--verde)">slide!</span></div>
+    <div style="display:flex;align-items:center;gap:14px;max-width:170mm;">
+      <img src="../../assets/img/oki/oki-senalando.svg" style="height:110px;">
+      <div class="note" style="margin:0;">Arm tapping: 1er sonido en el hombro, 2º en el codo, 3º en la muñeca. Luego desliza la mano por todo el brazo diciendo la palabra.</div>
+    </div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>05</span></div>
+</section>
+
+<!-- 6. FACILITATOR SHEET -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Hoja del facilitador</span></div>
+  <div class="kicker">We Do · 20 a 32 min</div>
+  <h2>Word Chains</h2>
+  <p class="sub">Cambia una sola letra cada vez (en naranja). Tú mueves las fichas y el estudiante lee. A la mitad, cambien los papeles.</p>
+  <div class="chain">
+    sat <span class="arr">→</span> <span><span class="chg">m</span>at</span> <span class="arr">→</span>
+    <span>ma<span class="chg">p</span></span> <span class="arr">→</span> <span><span class="chg">c</span>ap</span> <span class="arr">→</span>
+    <span>ca<span class="chg">n</span></span> <span class="arr">→</span> <span><span class="chg">f</span>an</span> <span class="arr">→</span>
+    <span>f<span class="chg">i</span>n</span> <span class="arr">→</span> <span><span class="chg">p</span>in</span> <span class="arr">→</span>
+    <span>pi<span class="chg">t</span></span> <span class="arr">→</span> <span><span class="chg">s</span>it</span>
+  </div>
+  <div class="cardw"><strong>I Do (modelado):</strong> sat, mat, man, map, nap, Sam<br><span class="muted">"Watch me. /s/ /a/ /t/... sssaaat... sat!"</span></div>
+  <div class="cardw"><strong>Robot Talk (oral, sin letras):</strong> sun, map, fan, mop, sit, cat, pig, bed<br><span class="muted">Después el estudiante es el robot y tú adivinas.</span></div>
+  <div class="cardw g" style="display:flex;align-items:center;gap:12px;">
+    <div style="flex:1;"><strong>Jump and Blend (pausa activa):</strong> pig, sun, hop, bed, cup, red, jam, wet<br><span class="muted">Un salto por sonido y un salto grande al decir la palabra: "/p/ /i/ /g/... PIG!"</span></div>
+    <img src="../../assets/img/oki/oki-ejercitando.svg" style="height:62px;">
+  </div>
+  <div class="cardw o"><strong>Frases de apoyo</strong>
+    <ul>
+      <li>"Show me your super fast sounds!"</li>
+      <li>"Tap your arm. Now slide!"</li>
+      <li>"Say it fast. What word is it?"</li>
+      <li>"Good try! Let's tap it again together."</li>
+      <li>"You are a reader now!"</li>
+    </ul>
+  </div>
+  <div class="note"><strong>Si se traba:</strong> vuelve a oral blending, usa palabras de 2 sonidos (at, in, up, am) o alarga el sonido que no logra soltar: "sss-aaa-t".</div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>06</span></div>
+</section>
+
+<!-- 7. MONSTER -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Feed the Monster</span></div>
+  <div class="kicker">You Do · 37 a 48 min</div>
+  <h2>Feed the Monster!</h2>
+  <p class="sub">Pega en una caja y recorta la boca por la línea punteada. "Yum! Yum! I love words!"</p>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+    <svg viewBox="0 0 600 640" style="width:160mm;height:190mm;" aria-label="monster">
+      <path d="M150 120 L120 20 L210 95 Z" fill="#145389"/>
+      <path d="M450 120 L480 20 L390 95 Z" fill="#145389"/>
+      <rect x="60" y="80" width="480" height="540" rx="200" fill="#7CB342" stroke="#1D3F54" stroke-width="8"/>
+      <circle cx="210" cy="230" r="70" fill="#fff" stroke="#1D3F54" stroke-width="6"/>
+      <circle cx="390" cy="230" r="70" fill="#fff" stroke="#1D3F54" stroke-width="6"/>
+      <circle cx="225" cy="245" r="32" fill="#2C5F7C"/><circle cx="375" cy="245" r="32" fill="#2C5F7C"/>
+      <circle cx="235" cy="232" r="10" fill="#fff"/><circle cx="385" cy="232" r="10" fill="#fff"/>
+      <circle cx="140" cy="350" r="28" fill="#F57C00" opacity=".55"/><circle cx="460" cy="350" r="28" fill="#F57C00" opacity=".55"/>
+      <rect x="170" y="370" width="260" height="130" rx="50" fill="#1D3F54"/>
+      <path d="M200 372 L222 410 L244 372 Z M356 372 L378 410 L400 372 Z" fill="#fff"/>
+      <rect x="170" y="370" width="260" height="130" rx="50" fill="none" stroke="#FDD835" stroke-width="4" stroke-dasharray="14 10"/>
+      <text x="300" y="560" text-anchor="middle" font-family="Poppins" font-size="34" font-weight="800" fill="#1D3F54">Yum! Yum!</text>
+    </svg>
+  </div>
+  <p class="cut" style="margin-bottom:4mm;">✂ Recorta dentro de la línea punteada de la boca</p>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>07</span></div>
+</section>
+
+<!-- 8. WORD CARDS -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Feed the Monster</span></div>
+  <div class="kicker">You Do · 37 a 48 min</div>
+  <h2>Word Cards · Feed the Monster</h2>
+  <p class="sub">Si la lee bien, el monstruo se la come. Si no: "Yuck! Try again!"</p>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);">
+    <div class="card"><span class="word">c<span class="v">a</span>t</span></div>
+    <div class="card"><span class="word">m<span class="v">a</span>n</span></div>
+    <div class="card"><span class="word">p<span class="v">i</span>g</span></div>
+    <div class="card"><span class="word">s<span class="v">i</span>t</span></div>
+    <div class="card"><span class="word">f<span class="v">a</span>n</span></div>
+    <div class="card"><span class="word">b<span class="v">a</span>t</span></div>
+    <div class="card"><span class="word">p<span class="v">i</span>n</span></div>
+    <div class="card"><span class="word">d<span class="v">a</span>d</span></div>
+    <div class="card"><span class="word">t<span class="v">i</span>p</span></div>
+    <div class="card"><span class="word">c<span class="v">a</span>n</span></div>
+    <div class="card"><span class="word">n<span class="v">a</span>p</span></div>
+    <div class="card"><span class="word">b<span class="v">i</span>g</span></div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>08</span></div>
+</section>
+
+<!-- 9. QUICK CHECK CHILD -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Quick Check · hoja del niño</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Evaluación · 48 a 54 min</div>
+      <h2>Can you read these words?</h2>
+      <p class="sub">Sin ayuda. Todas las letras van en el mismo color a propósito: aquí ya no hay pistas.</p>
+    </div>
+    <img src="../../assets/img/oki/oki-leyendo.svg">
+  </div>
+  <div class="check">
+    <div><small>1</small>mat</div><div><small>2</small>sun</div>
+    <div><small>3</small>pin</div><div><small>4</small>dog</div>
+    <div><small>5</small>fan</div><div><small>6</small>sit</div>
+    <div><small>7</small>cap</div><div><small>8</small>bed</div>
+    <div><small>9</small>tip</div><div><small>10</small>mop</div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>09</span></div>
+</section>
+
+<!-- 10. QUICK CHECK RECORD -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>Quick Check · hoja del facilitador</span></div>
+  <div class="kicker">Evaluación</div>
+  <h2>Quick Check · Registro</h2>
+  <p class="sub">Alumno: ____________________ &nbsp;&nbsp; Fecha: ____________________ &nbsp;&nbsp; Sesión #: ______</p>
+  <table class="rec">
+    <tr><th>#</th><th>Palabra</th><th>✓ Lee la palabra</th><th>Solo dice sonidos sueltos</th><th>Error (qué dijo)</th></tr>
+    <tr><td>1</td><td>mat</td><td></td><td></td><td></td></tr>
+    <tr><td>2</td><td>sun</td><td></td><td></td><td></td></tr>
+    <tr><td>3</td><td>pin</td><td></td><td></td><td></td></tr>
+    <tr><td>4</td><td>dog</td><td></td><td></td><td></td></tr>
+    <tr><td>5</td><td>fan</td><td></td><td></td><td></td></tr>
+    <tr><td>6</td><td>sit</td><td></td><td></td><td></td></tr>
+    <tr><td>7</td><td>cap</td><td></td><td></td><td></td></tr>
+    <tr><td>8</td><td>bed</td><td></td><td></td><td></td></tr>
+    <tr><td>9</td><td>tip</td><td></td><td></td><td></td></tr>
+    <tr><td>10</td><td>mop</td><td></td><td></td><td></td></tr>
+    <tr class="tot"><td colspan="2">Total</td><td>____ / 10</td><td>____ / 10</td><td></td></tr>
+  </table>
+  <div class="inst" style="margin-top:12px;">
+    <h3>Interpretación</h3>
+    <ul style="margin-left:16px;">
+      <li><b>8 a 10:</b> próxima sesión, CVC con todas las vocales mezcladas.</li>
+      <li><b>5 a 7:</b> repite con a e i, y más word chains.</li>
+      <li><b>0 a 4, o dice sonidos sin unirlos:</b> vuelve a oral blending y a palabras de 2 sonidos (at, in, up, am).</li>
+      <li><b>Nota:</b> sun, dog, bed y mop usan vocales que casi no se practicaron. Si las lee, está generalizando.</li>
+    </ul>
+  </div>
+  <div class="cardw" style="flex:1;margin-bottom:4mm;"><strong>Observaciones</strong> <span class="muted">(atención, sonidos que confunde, qué lo motivó)</span></div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>10</span></div>
+</section>
+
+<!-- 11. SENTENCE -->
+<section class="page">
+  <div class="hdr"><b>GIMNASIO DEL CEREBRO</b><span>My First Sentence</span></div>
+  <div class="titlerow">
+    <div>
+      <div class="kicker">Cierre · 54 a 60 min</div>
+      <h2>My First Sentence</h2>
+      <p class="sub">Las palabras en naranja son tricky words: las dice el facilitador.</p>
+    </div>
+    <img src="../../assets/img/oki/oki-empatia.svg">
+  </div>
+  <div class="sentence">Sam sat <span class="tricky">on</span> <span class="tricky">a</span> mat.</div>
+  <div class="draw"><span>Draw Sam on the mat!</span></div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Let's Make Words!</span><span>11</span></div>
+</section>
+
+<!-- 12. CERTIFICATE -->
+<section class="page">
+  <div class="cert">
+    <div class="top">
+      <div class="kicker" style="color:#fff;opacity:.85;">Gimnasio del Cerebro</div>
+      <h1>I am a reader!</h1>
+      <div style="font-size:18px;">⭐ ⭐ ⭐</div>
+    </div>
+    <div class="body">
+      <img src="../../assets/img/oki/oki-celebrando.svg" style="height:190px;">
+      <div style="font-size:22px;font-weight:600;color:var(--azulOscuro);margin-top:10px;">I can blend sounds to make words.</div>
+      <div class="name"></div>
+      <div class="muted" style="font-size:13px;margin-top:4px;">name</div>
+      <div style="font-size:24px;font-weight:700;color:var(--azulOscuro);margin-top:18px;">c + <span class="v">a</span> + t = cat 🐈</div>
+      <div class="stickers"><div></div><div></div><div></div><div></div><div></div></div>
+      <div class="muted" style="font-size:13px;margin-top:8px;">One sticker for every class!</div>
+    </div>
+  </div>
+  <div class="ftr"><span>Gimnasio del Cerebro · Rionegro, Antioquia</span><span>12</span></div>
+</section>
+
+</body>
+</html>
