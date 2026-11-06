@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Time Travel Stage · S24 Show</title>
+<style>
+/*FONTS*/
+:root {
+  --turq: #57A6B5; --dark: #2C5F7C; --deep: #1D3F54; --blue: #145389;
+  --green: #7CB342; --orange: #F57C00; --yellow: #FDD835; --bg: #F0F4F8;
+  --island: var(--orange);
+  --card: rgba(255, 255, 255, 0.95);
+  --shadow: 0 10px 30px rgba(29, 63, 84, 0.18);
+  --font: 'Poppins', 'Segoe UI', Arial, sans-serif;
+  --fs: clamp(28px, 1.9vw, 40px);
+  --fs-l: clamp(36px, 2.8vw, 58px);
+  --fs-xl: clamp(48px, 4.4vw, 92px);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--deep); font-family: var(--font); font-size: var(--fs); }
+canvas#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#ui { position: fixed; inset: 0; pointer-events: none; }
+.screen { position: absolute; inset: 0; display: none; }
+.screen.on { display: block; animation: fadeIn .45s ease both; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+button { font-family: inherit; pointer-events: auto; cursor: pointer; border: 0; }
+.key { display: inline-flex; align-items: center; justify-content: center; min-width: 1.5em; height: 1.5em; padding: 0 .3em; border-radius: .3em; background: var(--deep); color: #fff; font-weight: 800; font-size: .8em; line-height: 1; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+
+/* ---------- Welcome ---------- */
+#scr-welcome { display: none; }
+#scr-welcome.on { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; }
+.title-card { background: var(--card); border-radius: 32px; padding: 3vh 4vw; text-align: center; box-shadow: var(--shadow); }
+.brand { font-weight: 600; color: var(--turq); letter-spacing: .04em; }
+h1 { margin: .1em 0 0; font-size: var(--fs-xl); font-weight: 800; line-height: 1.05; color: var(--deep); }
+h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var(--green); }
+.instr { background: var(--deep); color: #fff; font-weight: 700; font-size: var(--fs-l); padding: .3em 1em; border-radius: 999px; box-shadow: var(--shadow); text-align: center; }
+.players { display: flex; gap: 4vw; }
+.player { background: var(--card); border-radius: 28px; padding: 3vh 3vw; min-width: 22vw; display: flex; flex-direction: column; align-items: center; gap: 1.5vh; box-shadow: var(--shadow); color: var(--deep); font-size: var(--fs-l); font-weight: 800; border: 6px solid transparent; transition: transform .2s, border-color .2s; }
+.player:hover, .player:focus-visible { transform: translateY(-6px); border-color: var(--turq); outline: none; }
+.avatar { width: 2.4em; height: 2.4em; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 1.1em; }
+.player[data-p="0"] .avatar { background: var(--blue); }
+.player[data-p="1"] .avatar { background: var(--orange); }
+.player .key { font-size: .7em; }
+
+/* ---------- Build ---------- */
+.topbar { position: absolute; top: 3vh; left: 3vw; right: 3vw; display: flex; align-items: center; gap: 2vw; }
+.pill { background: var(--island); color: #fff; font-weight: 800; font-size: var(--fs-l); padding: .2em .9em; border-radius: 999px; box-shadow: var(--shadow); white-space: nowrap; }
+.topbar .instr { font-size: var(--fs-l); white-space: nowrap; }
+.slots { margin-left: auto; display: flex; gap: .4em; }
+.slot { width: 1.8em; height: 1.8em; border-radius: 50%; background: var(--card); border: 5px dashed var(--island); box-shadow: var(--shadow); display: grid; place-items: center; font-weight: 800; color: #fff; }
+.slot.full { background: var(--island); border-style: solid; }
+.grid { position: absolute; left: 3vw; right: 3vw; bottom: 3vh; display: grid; grid-template-columns: repeat(6, 1fr) 1.15fr; grid-template-rows: auto auto; gap: 1.2vw; }
+.card { background: var(--card); border-radius: 22px; padding: .6vh .4vw 1vh; display: flex; flex-direction: column; align-items: center; box-shadow: var(--shadow); border: 6px solid transparent; color: var(--deep); font-weight: 700; font-size: var(--fs); line-height: 1.1; position: relative; transition: transform .15s, border-color .15s, background .15s; }
+.card img { width: 100%; max-width: 160px; aspect-ratio: 1; object-fit: contain; pointer-events: none; }
+.card .ph { width: 100%; max-width: 160px; aspect-ratio: 1; }
+.card.focus { border-color: var(--deep); transform: translateY(-6px) scale(1.04); }
+.card.picked { background: var(--island); color: #fff; }
+.card.picked::after { content: '✓'; position: absolute; top: -14px; right: -14px; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--deep); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.next { grid-column: 7; grid-row: 1 / span 2; border-radius: 22px; background: #c9d3db; color: #fff; font-weight: 800; font-size: var(--fs-l); box-shadow: var(--shadow); border: 6px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3em; }
+.next.ready { background: var(--deep); }
+.next.focus { border-color: var(--yellow); transform: scale(1.04); }
+.next .arrow { font-size: 1.6em; line-height: 1; }
+
+/* ---------- Ready ---------- */
+#scr-ready.on { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4vh; }
+.big-card { background: var(--card); border-radius: 32px; padding: 4vh 5vw; text-align: center; box-shadow: var(--shadow); }
+.big-card h2 { margin: 0; font-size: var(--fs-xl); font-weight: 800; }
+.big-card p { margin: .4em 0 0; font-size: var(--fs-l); font-weight: 600; }
+.teacher { background: rgba(29, 63, 84, .88); color: #fff; border-radius: 24px; padding: 1.6vh 2.4vw; display: flex; flex-wrap: wrap; gap: .6em 1.6em; justify-content: center; font-weight: 600; max-width: 90vw; }
+.teacher span { white-space: nowrap; }
+
+/* ---------- Show ---------- */
+.progress { position: absolute; top: 0; left: 0; right: 0; height: 22px; background: rgba(29, 63, 84, .2); }
+.progress i { display: block; height: 100%; width: 100%; background: var(--island); transform-origin: left; transition: transform .2s linear; }
+.show-top { position: absolute; top: calc(22px + 2.5vh); left: 3vw; right: 3vw; display: flex; align-items: flex-start; gap: 2vw; }
+.step { margin-top: .4em; font-weight: 700; color: var(--deep); background: var(--card); display: inline-block; padding: .1em .7em; border-radius: 999px; box-shadow: var(--shadow); }
+.stars { margin: 0 auto; display: flex; gap: .3em; background: var(--card); padding: .25em .6em; border-radius: 999px; box-shadow: var(--shadow); }
+.stars svg { width: 1.9em; height: 1.9em; fill: #CFD8DC; transition: fill .2s; }
+.stars svg.on { fill: var(--yellow); stroke: #E0A800; stroke-width: 1.2; animation: pop .6s cubic-bezier(.3, 1.8, .5, 1) both; }
+@keyframes pop { 0% { transform: scale(.2) rotate(-40deg); } 100% { transform: scale(1) rotate(0); } }
+.timer { background: var(--deep); color: #fff; font-weight: 800; font-size: var(--fs-xl); line-height: 1; padding: .18em .45em; border-radius: 26px; box-shadow: var(--shadow); font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: center; }
+.timer.low { background: var(--orange); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.06); } }
+.frames { position: absolute; left: 50%; bottom: 3.5vh; transform: translateX(-50%); background: var(--card); border-radius: 28px; padding: 1.6vh 2.6vw; box-shadow: var(--shadow); border-left: 18px solid var(--island); min-width: 56vw; }
+.frames .lab { font-weight: 700; color: var(--dark); }
+.frames .line { font-size: var(--fs-l); font-weight: 800; color: var(--deep); line-height: 1.3; }
+.frames .line b { color: var(--island); filter: brightness(.85); }
+.overlay { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(29, 63, 84, .45); }
+.overlay.on { display: flex; }
+.flying { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); font-size: var(--fs-xl); font-weight: 800; color: #fff; text-shadow: 0 4px 18px rgba(29, 63, 84, .6); display: none; white-space: nowrap; }
+.flying.on { display: block; animation: fadeIn .4s both; }
+.hint { position: absolute; right: 3vw; bottom: 3.5vh; display: none; }
+.hint.on { display: flex; }
+.toast { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); font-size: var(--fs-xl); font-weight: 800; color: var(--yellow); text-shadow: 0 4px 0 #B07F00, 0 8px 24px rgba(0,0,0,.25); opacity: 0; pointer-events: none; white-space: nowrap; }
+.toast.go { animation: toast 1.4s ease both; }
+@keyframes toast { 0% { opacity: 0; transform: translate(-50%, -30%) scale(.6); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 70% { opacity: 1; transform: translate(-50%, -55%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -70%) scale(1); } }
+
+/* ---------- Results ---------- */
+.results { position: absolute; right: 3vw; top: 50%; transform: translateY(-50%); width: min(44vw, 820px); background: var(--card); border-radius: 32px; padding: 3.5vh 2.6vw; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 2.2vh; }
+.results h2 { margin: 0; font-size: var(--fs-l); font-weight: 800; line-height: 1.15; }
+.total { display: flex; align-items: center; gap: .4em; font-size: var(--fs-xl); font-weight: 800; line-height: 1; }
+.total svg { width: 1.1em; height: 1.1em; fill: var(--yellow); stroke: #E0A800; stroke-width: 1.2; }
+.total small { font-size: .5em; color: var(--dark); font-weight: 700; }
+.bar { display: grid; grid-template-columns: 6.2em 1fr 3.2em; align-items: center; gap: .6em; font-weight: 700; }
+.bar .track { height: 1.3em; border-radius: 999px; background: #E3EAF0; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 999px; width: 0; transition: width 1.2s cubic-bezier(.2, .8, .2, 1); }
+.bar .val { text-align: right; font-weight: 800; }
+.btns { display: flex; flex-direction: column; gap: 1.4vh; margin-top: 1vh; }
+.btn { white-space: nowrap; }
+.btn { flex: 1; border-radius: 20px; padding: .45em .6em; font-size: var(--fs); font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; gap: .5em; box-shadow: var(--shadow); transition: transform .15s; }
+.btn:hover, .btn:focus-visible { transform: translateY(-3px); outline: none; }
+.btn.csv { background: var(--blue); }
+.btn.nextp { background: var(--green); }
+.btn .key { background: rgba(255,255,255,.25); box-shadow: none; }
+.saved { font-weight: 700; color: var(--green); min-height: 1.2em; }
+
+/* ---------- No WebGL ---------- */
+#nogl { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: var(--bg); padding: 5vw; text-align: center; }
+#nogl.on { display: flex; }
+#nogl div { background: #fff; border-radius: 32px; padding: 5vh 4vw; box-shadow: var(--shadow); max-width: 1100px; }
+#nogl h2 { font-size: var(--fs-xl); margin: 0 0 .3em; color: var(--orange); }
+#nogl p { font-size: var(--fs-l); margin: .3em 0; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <section id="scr-welcome" class="screen">
+    <div class="title-card">
+      <div class="brand">CCA · Show Bloque 4</div>
+      <h1>The <span class="p">Time</span> <span class="n">Travel</span> <span class="f">Stage</span></h1>
+    </div>
+    <div class="instr">Who is presenting today?</div>
+    <div class="players">
+      <button class="player" data-p="0"><span class="avatar">J</span><span>Jerónimo</span><span class="key">1</span></button>
+      <button class="player" data-p="1"><span class="avatar">L</span><span>Luciana</span><span class="key">2</span></button>
+    </div>
+  </section>
+
+  <section id="scr-build" class="screen">
+    <div class="topbar">
+      <div class="pill" id="b-pill">PAST ISLAND</div>
+      <div class="instr" id="b-instr">Pick 3 things from your past.</div>
+      <div class="slots" id="b-slots"></div>
+    </div>
+    <div class="grid" id="b-grid"></div>
+  </section>
+
+  <section id="scr-ready" class="screen">
+    <div class="big-card">
+      <h2 id="r-title">Ready, Jerónimo?</h2>
+      <p>Press <span class="key">SPACE</span> to start the show!</p>
+    </div>
+    <div class="teacher">
+      <span><span class="key">SPACE</span> next island</span>
+      <span><span class="key">1</span> <span class="key">2</span> <span class="key">3</span> stars</span>
+      <span><span class="key">P</span> pause</span>
+      <span><span class="key">R</span> restart island</span>
+      <span><span class="key">F</span> full screen</span>
+      <span><span class="key">M</span> sound</span>
+    </div>
+  </section>
+
+  <section id="scr-show" class="screen">
+    <div class="progress"><i id="s-bar"></i></div>
+    <div class="show-top">
+      <div>
+        <div class="pill" id="s-pill">PAST ISLAND</div>
+        <div class="step" id="s-step">Island 1 of 3</div>
+      </div>
+      <div class="stars" id="s-stars"></div>
+      <div class="timer" id="s-timer">1:00</div>
+    </div>
+    <div class="frames">
+      <div class="lab">You can say:</div>
+      <div class="line" id="s-f1"></div>
+      <div class="line" id="s-f2"></div>
+    </div>
+    <div class="flying" id="s-flying">Next: PRESENT ISLAND</div>
+    <div class="toast" id="s-toast"></div>
+    <div class="teacher hint" id="s-hint">
+      <span><span class="key">SPACE</span> next</span>
+      <span><span class="key">1</span><span class="key">2</span><span class="key">3</span> stars</span>
+      <span><span class="key">P</span> pause</span>
+      <span><span class="key">R</span> restart</span>
+    </div>
+    <div class="overlay" id="s-pause">
+      <div class="big-card"><h2>Paused</h2><p>Press <span class="key">P</span> to go on.</p></div>
+    </div>
+  </section>
+
+  <section id="scr-results" class="screen">
+    <div class="results">
+      <h2 id="res-title">Great show, Jerónimo!</h2>
+      <div class="total"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg><span id="res-total">0</span><small>/ 9 stars</small></div>
+      <div id="res-bars"></div>
+      <div class="btns">
+        <button class="btn csv" id="btn-csv"><span class="key">D</span>Download CSV</button>
+        <button class="btn nextp" id="btn-next"><span class="key">N</span>Next player</button>
+      </div>
+      <div class="saved" id="res-saved"></div>
+    </div>
+  </section>
+</div>
+
+<div id="nogl">
+  <div>
+    <h2>Sorry! No 3D here.</h2>
+    <p>This browser cannot show 3D (WebGL is off).</p>
+    <p>Please open this file in Chrome or Edge, and turn on "hardware acceleration" in the browser settings.</p>
+  </div>
+</div>
+
+<script>
+/*BUNDLE*/
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "s24-time-travel-stage",
+  "private": true,
+  "version": "1.0.0",
+  "description": "CCA S24 Show Bloque 4: The Time Travel Stage (single-file three.js app)",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "verify": "node test/verify.mjs"
+  },
+  "devDependencies": {
+    "@fontsource/poppins": "5.1.0",
+    "esbuild": "0.24.0",
+    "three": "0.170.0"
+  }
+}
