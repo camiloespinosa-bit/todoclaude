@@ -1,0 +1,382 @@
+<title>The Tower 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap">
+<style>
+/* Layout: full-screen 3D stage with a slim brand bar on top, a control rail on the left and a move log on the right. Single light look, built to project in class. */
+:root {
+  --azul: #145389; --azulOscuro: #2C5F7C; --deep: #1D3F54; --verde: #7CB342; --naranja: #F57C00;
+  --fondo: #F0F4F8; --panel: #FFFFFF; --linea: #D9E1E7; --gris: #6B7C88; --error: #C62828; --tq: #EAF4F6;
+  --font: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+  color-scheme: light;
+}
+html, body { height: 100%; }
+body { margin: 0; background: var(--fondo); color: var(--deep); font-family: var(--font); overflow: hidden; }
+#stage { position: fixed; inset: 0; }
+#stage canvas { display: block; cursor: grab; }
+#stage canvas.dragging { cursor: grabbing; }
+.bar { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: linear-gradient(var(--fondo) 70%, transparent); pointer-events: none; z-index: 2; }
+.brand { font-weight: 900; letter-spacing: .04em; color: var(--azulOscuro); font-size: 14px; }
+.title { font-weight: 800; font-size: clamp(22px, 3vw, 34px); color: var(--azulOscuro); margin: 0; text-wrap: balance; }
+.counter { display: flex; gap: 10px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.counter b { font-size: clamp(26px, 3.4vw, 44px); font-weight: 900; color: var(--azul); }
+.counter span { color: var(--gris); font-size: 15px; font-weight: 600; }
+.rail { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); top: 96px; width: 230px; display: flex; flex-direction: column; gap: 12px; z-index: 3; }
+.box { background: var(--panel); border: 1px solid var(--linea); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.box h2 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--naranja); font-weight: 700; }
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+button { font-family: var(--font); font-weight: 700; font-size: 15px; border-radius: 9px; border: 1.5px solid var(--azulOscuro); background: var(--panel); color: var(--azulOscuro); padding: 9px 10px; cursor: pointer; }
+button:hover { background: var(--tq); }
+button:focus-visible { outline: 3px solid var(--naranja); outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--azulOscuro); color: #fff; }
+button.primary { background: var(--azul); border-color: var(--azul); color: #fff; }
+button.primary:hover { background: var(--azulOscuro); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.rules { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.45; color: var(--deep); }
+.hint { font-size: 12px; color: var(--gris); line-height: 1.4; margin: 0; }
+.log { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); top: 96px; width: 300px; max-height: calc(100% - 200px); z-index: 3; }
+.log ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; max-height: 52vh; }
+.log li { font-size: 15px; line-height: 1.35; padding: 7px 10px; border-radius: 8px; background: var(--fondo); }
+.log li:first-child { background: var(--tq); font-weight: 600; }
+.log li .n { color: var(--gris); font-variant-numeric: tabular-nums; font-weight: 600; margin-right: 6px; }
+.log li.bad { background: #FDECEA; color: var(--error); }
+.msg { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 4; max-width: min(640px, calc(100% - 32px));
+  background: var(--azulOscuro); color: #fff; font-weight: 700; font-size: clamp(16px, 2vw, 22px); padding: 12px 22px; border-radius: 14px; text-align: center; }
+.msg.win { background: var(--verde); }
+.msg.bad { background: var(--error); }
+.keys { font-size: 12px; color: var(--gris); }
+kbd { font-family: var(--font); font-weight: 700; border: 1px solid var(--linea); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; background: var(--panel); color: var(--deep); }
+@media (max-width: 900px) {
+  .rail { position: fixed; top: auto; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); width: auto; right: max(16px, env(safe-area-inset-right, 0px)); flex-direction: row; flex-wrap: wrap; }
+  .rail .box { flex: 1 1 200px; }
+  .rail .box.rulesbox, .log { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div id="stage" aria-label="3D Tower of Hanoi"></div>
+
+<header class="bar">
+  <div>
+    <div class="brand">GIMNASIO DEL CEREBRO · BRAIN WARM-UP</div>
+    <h1 class="title">The Tower</h1>
+  </div>
+  <div class="counter" aria-live="polite"><b id="moves">0</b><span>moves · minimum <span id="min">7</span></span></div>
+</header>
+
+<aside class="rail">
+  <div class="box">
+    <h2>Pieces</h2>
+    <div class="seg" id="sizes">
+      <button type="button" id="n2" data-n="2">2</button>
+      <button type="button" id="n3" data-n="3" aria-pressed="true">3</button>
+      <button type="button" id="n4" data-n="4">4</button>
+      <button type="button" id="n5" data-n="5">5</button>
+    </div>
+    <div class="row">
+      <button type="button" id="undo">Undo</button>
+      <button type="button" id="reset">Restart</button>
+    </div>
+    <button type="button" class="primary" id="solve">Show the solution</button>
+    <p class="hint">Click a tower to pick up its top piece. Click another tower to drop it. Drag the background to turn the view.</p>
+    <div class="keys"><kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> pick and drop · <kbd>Z</kbd> undo · <kbd>R</kbd> restart</div>
+  </div>
+  <div class="box rulesbox">
+    <h2>Rules</h2>
+    <ol class="rules">
+      <li>Move only one piece at a time.</li>
+      <li>Move only the top piece.</li>
+      <li>Never put a big piece on a small piece.</li>
+      <li>Move the tower from A to C.</li>
+    </ol>
+  </div>
+</aside>
+
+<aside class="log box" aria-live="polite">
+  <h2>What happened</h2>
+  <ol id="log"></ol>
+</aside>
+
+<div class="msg" id="msg">Move the tower from A to C.</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  const NAMES = ['', 'tiny', 'small', 'medium', 'big', 'huge'];
+  const COLORS = ['', '#2C5F7C', '#F57C00', '#7CB342', '#145389', '#57A6B5'];
+  const PEG_X = [-5.2, 0, 5.2], LETTERS = ['A', 'B', 'C'];
+  const H = 0.5, LIFT = 4.6;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- scene
+  const stage = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#F0F4F8');
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 120);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c5ce, 0.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.6);
+  sun.position.set(6, 14, 9); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12 });
+  scene.add(sun);
+
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity: 0.12 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -0.36; floor.receiveShadow = true; scene.add(floor);
+
+  const wood = new THREE.MeshStandardMaterial({ color: '#D9E1E7', roughness: 0.8 });
+  const board = new THREE.Mesh(new THREE.BoxGeometry(16.5, 0.35, 5.6), wood);
+  board.position.y = -0.18; board.receiveShadow = true; board.castShadow = true; scene.add(board);
+
+  function textTexture(text, bg, fg, size = 256, font = 900) {
+    const c = document.createElement('canvas'); c.width = c.height = size;
+    const g = c.getContext('2d');
+    g.fillStyle = bg; g.fillRect(0, 0, size, size);
+    g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `${font} ${size * 0.62}px Poppins, sans-serif`;
+    g.fillText(text, size / 2, size / 2 + size * 0.04);
+    const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
+  }
+
+  // pegs + hit areas + letter plates
+  const hitAreas = [], pegMeshes = [], plates = [];
+  const pegMat = new THREE.MeshStandardMaterial({ color: '#2C5F7C', roughness: 0.5 });
+  PEG_X.forEach((x, i) => {
+    const peg = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 3.6, 24), pegMat.clone());
+    peg.position.set(x, 1.8, 0); peg.castShadow = true; scene.add(peg); pegMeshes.push(peg);
+    const hit = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 6, 16), new THREE.MeshBasicMaterial({ visible: false }));
+    hit.position.set(x, 2.6, 0); hit.userData.peg = i; scene.add(hit); hitAreas.push(hit);
+    const plate = new THREE.Mesh(new THREE.PlaneGeometry(1.25, 1.25), new THREE.MeshBasicMaterial({ map: textTexture(LETTERS[i], '#FFFFFF', '#2C5F7C'), transparent: true }));
+    plate.position.set(x, 0.02, 2.15); plate.rotation.x = -Math.PI / 2; scene.add(plate); plates.push(plate);
+  });
+
+  // ---------- state
+  let N = 3, pegs = [[], [], []], meshes = {}, history = [], moveCount = 0;
+  let held = null; // { size, from }
+  let busy = false, solving = false, won = false;
+  const radius = s => 0.55 + s * 0.38;
+  const restY = (stackIndex) => H / 2 + stackIndex * H;
+
+  function makeDisc(s) {
+    const col = new THREE.Color(COLORS[s]);
+    const side = new THREE.MeshStandardMaterial({ color: col, roughness: 0.45, metalness: 0.05 });
+    const top = new THREE.MeshStandardMaterial({ map: textTexture(String(s), COLORS[s], '#FFFFFF', 256, 900), roughness: 0.5 });
+    const geo = new THREE.CylinderGeometry(radius(s), radius(s), H * 0.92, 64, 1, false);
+    const m = new THREE.Mesh(geo, [side, top, side]);
+    m.castShadow = true; m.receiveShadow = true; m.userData.size = s;
+    m.rotation.y = Math.PI / 2;
+    return m;
+  }
+
+  function build(n) {
+    Object.values(meshes).forEach(m => { scene.remove(m); m.geometry.dispose(); });
+    N = n; meshes = {}; pegs = [[], [], []]; history = []; moveCount = 0; held = null; won = false;
+    for (let s = n; s >= 1; s--) {
+      const m = makeDisc(s); meshes[s] = m;
+      m.position.set(PEG_X[0], restY(pegs[0].length), 0);
+      pegs[0].push(s); scene.add(m);
+    }
+    document.querySelectorAll('#sizes button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.n === n)));
+    document.getElementById('min').textContent = 2 ** n - 1;
+    logEl.innerHTML = '';
+    updateCounter(); highlight(); say(`Move the tower from A to C. Minimum: ${2 ** n - 1} moves.`);
+  }
+
+  // ---------- UI helpers
+  const movesEl = document.getElementById('moves'), logEl = document.getElementById('log'), msgEl = document.getElementById('msg');
+  const updateCounter = () => { movesEl.textContent = moveCount; document.getElementById('undo').disabled = !history.length || solving; };
+  function say(t, kind = '') { msgEl.textContent = t; msgEl.className = 'msg' + (kind ? ' ' + kind : ''); }
+  function log(text, cls = '') {
+    const li = document.createElement('li'); if (cls) li.className = cls;
+    li.innerHTML = text; logEl.prepend(li);
+  }
+  function highlight() {
+    pegMeshes.forEach((p, i) => p.material.color.set(held && held.from === i ? '#F57C00' : '#2C5F7C'));
+  }
+
+  // ---------- animation
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  function tween(m, to, ms) {
+    if (reduce) { m.position.copy(to); return Promise.resolve(); }
+    const from = m.position.clone(), t0 = performance.now();
+    return new Promise(res => {
+      (function step(now) {
+        const k = Math.min(1, (now - t0) / ms), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        m.position.lerpVectors(from, to, e);
+        k < 1 ? requestAnimationFrame(step) : res();
+      })(t0);
+    });
+  }
+  const speed = () => solving ? 0.55 : 1;
+  async function lift(s, peg) { await tween(meshes[s], new THREE.Vector3(PEG_X[peg], LIFT, 0), 260 * speed()); }
+  async function travelDrop(s, to) {
+    const m = meshes[s];
+    await tween(m, new THREE.Vector3(PEG_X[to], LIFT, 0), 320 * speed());
+    await tween(m, new THREE.Vector3(PEG_X[to], restY(pegs[to].length - 1), 0), 260 * speed());
+  }
+  async function shake(s) {
+    const m = meshes[s], base = m.position.clone(), side = m.material[0], old = side.color.clone();
+    side.color.set('#C62828');
+    for (const dx of [0.35, -0.35, 0.25, -0.25, 0]) await tween(m, new THREE.Vector3(base.x + dx, base.y, 0), 55);
+    side.color.copy(old);
+  }
+
+  // ---------- moves
+  async function doMove(from, to, record = true) {
+    const s = pegs[from].pop(); pegs[to].push(s);
+    await travelDrop(s, to);
+    if (record) {
+      history.push([from, to]); moveCount++; updateCounter();
+      log(`<span class="n">${moveCount}.</span>You moved the ${NAMES[s]} one to ${LETTERS[to]}.`);
+    }
+  }
+
+  async function clickPeg(i) {
+    if (busy || solving) return;
+    busy = true;
+    try {
+      if (!held) {
+        if (won) build(N);
+        if (!pegs[i].length) { say(`Tower ${LETTERS[i]} is empty. Pick another one.`); return; }
+        const s = pegs[i][pegs[i].length - 1];
+        held = { size: s, from: i }; highlight();
+        await lift(s, i);
+        say(`You have the ${NAMES[s]} one. Where does it go?`);
+        return;
+      }
+      const { size: s, from } = held;
+      if (i === from) {
+        held = null; highlight();
+        await tween(meshes[s], new THREE.Vector3(PEG_X[from], restY(pegs[from].length - 1), 0), 240);
+        say('Choose a tower.');
+        return;
+      }
+      const top = pegs[i][pegs[i].length - 1];
+      if (top !== undefined && top < s) {
+        await shake(s);
+        say(`No! You can't put the ${NAMES[s]} one on the ${NAMES[top]} one.`, 'bad');
+        log(`You can't put the ${NAMES[s]} one on the ${NAMES[top]} one.`, 'bad');
+        return;
+      }
+      held = null; highlight();
+      await doMove(from, i);
+      checkWin();
+    } finally { busy = false; }
+  }
+
+  function checkWin() {
+    if (pegs[2].length !== N) { say('Good. Keep planning.'); return; }
+    won = true;
+    const min = 2 ** N - 1;
+    say(moveCount === min ? `Perfect! ${moveCount} moves: the minimum!` : `You did it in ${moveCount} moves! The minimum is ${min}.`, 'win');
+    log(`<b>You did it in ${moveCount} moves.</b>`);
+  }
+
+  async function undo() {
+    if (busy || solving || !history.length) return;
+    busy = true;
+    try {
+      if (held) { const { size: s, from } = held; held = null; highlight(); await tween(meshes[s], new THREE.Vector3(PEG_X[from], restY(pegs[from].length - 1), 0), 200); }
+      const [from, to] = history.pop(); moveCount--; won = false;
+      const s = pegs[to][pegs[to].length - 1];
+      await lift(s, to); await doMove(to, from, false);
+      updateCounter(); log(`Undo: the ${NAMES[s]} one went back to ${LETTERS[from]}.`); say('Undone. Your turn.');
+    } finally { busy = false; }
+  }
+
+  function solution(n, a, b, c, out) { if (!n) return out; solution(n - 1, a, c, b, out); out.push([a, c]); solution(n - 1, b, a, c, out); return out; }
+
+  async function solve() {
+    if (busy || solving) return;
+    build(N); solving = true; setButtons();
+    log('<b>The solution, step by step:</b>');
+    const steps = solution(N, 0, 1, 2, []);
+    for (let k = 0; k < steps.length && solving; k++) {
+      const [from, to] = steps[k], s = pegs[from][pegs[from].length - 1];
+      say(`Step ${k + 1}: move the ${NAMES[s]} one to ${LETTERS[to]}.`);
+      held = { size: s, from }; highlight();
+      await lift(s, from); held = null; highlight();
+      await doMove(from, to, false);
+      moveCount = k + 1; updateCounter();
+      log(`<span class="n">${k + 1}.</span>Move the ${NAMES[s]} one to ${LETTERS[to]}.`);
+      await sleep(reduce ? 500 : 250);
+    }
+    if (solving) { solving = false; won = true; say(`Done: ${steps.length} moves. Now you try!`, 'win'); }
+    setButtons();
+  }
+  function setButtons() {
+    document.getElementById('solve').textContent = solving ? 'Stop' : 'Show the solution';
+    ['undo', 'reset', 'n2', 'n3', 'n4', 'n5'].forEach(id => document.getElementById(id).disabled = solving);
+    updateCounter();
+  }
+
+  // ---------- input
+  document.getElementById('sizes').addEventListener('click', e => { const b = e.target.closest('button'); if (b && !busy && !solving) build(+b.dataset.n); });
+  document.getElementById('reset').onclick = () => { if (!busy && !solving) build(N); };
+  document.getElementById('undo').onclick = undo;
+  document.getElementById('solve').onclick = () => { if (solving) { solving = false; } else solve(); };
+  addEventListener('keydown', e => {
+    if (e.target.closest('button') && (e.key === 'Enter' || e.key === ' ')) return;
+    const k = e.key.toLowerCase();
+    if (k === 'a' || k === '1') clickPeg(0);
+    else if (k === 'b' || k === '2') clickPeg(1);
+    else if (k === 'c' || k === '3') clickPeg(2);
+    else if (k === 'z') undo();
+    else if (k === 'r' && !busy && !solving) build(N);
+  });
+
+  // camera orbit + click picking
+  let theta = 0, phi = 0.36, dist = 25, drag = null;
+  function placeCamera() {
+    camera.position.set(dist * Math.sin(theta) * Math.cos(phi), 1.4 + dist * Math.sin(phi), dist * Math.cos(theta) * Math.cos(phi));
+    camera.lookAt(0, 1.4, 0);
+  }
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  const cv = renderer.domElement;
+  cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, t: theta, p: phi, moved: false }; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) + Math.abs(dy) > 5) { drag.moved = true; cv.classList.add('dragging'); }
+    if (drag.moved) {
+      theta = Math.max(-1.0, Math.min(1.0, drag.t - dx * 0.006));
+      phi = Math.max(0.12, Math.min(0.9, drag.p + dy * 0.005));
+      placeCamera();
+    }
+  });
+  cv.addEventListener('pointerup', e => {
+    cv.classList.remove('dragging');
+    if (drag && !drag.moved) {
+      const r = cv.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const hit = ray.intersectObjects(hitAreas)[0];
+      if (hit) clickPeg(hit.object.userData.peg);
+    }
+    drag = null;
+  });
+  cv.addEventListener('wheel', e => { e.preventDefault(); dist = Math.max(16, Math.min(34, dist + e.deltaY * 0.01)); placeCamera(); }, { passive: false });
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h); camera.aspect = w / h;
+    camera.fov = w / h < 1 ? 50 : 30; dist = w / h < 1 ? 30 : dist;
+    camera.updateProjectionMatrix(); placeCamera();
+  }
+  addEventListener('resize', resize); resize();
+  renderer.setAnimationLoop(() => renderer.render(scene, camera));
+
+  // Poppins may arrive after the first textures are drawn: rebuild once fonts are ready.
+  build(3);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
+    plates.forEach((p, i) => { p.material.map = textTexture(LETTERS[i], '#FFFFFF', '#2C5F7C'); p.material.needsUpdate = true; });
+    if (!history.length && !busy && !solving) build(N);
+  });
+})();
+</script>

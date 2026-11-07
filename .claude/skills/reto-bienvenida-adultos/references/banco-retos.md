@@ -76,6 +76,8 @@ jarras y los pitillos son la misma trampa: el cerebro repite lo que le funcionó
 Imprimible listo en el repositorio: `Reto_Torre_Hanoi.pdf` (guía, registro, soluciones, póster,
 piezas recortables 1 a 4 con nombres tiny, small, medium, big, bases A B C y hoja de la pareja).
 Alternativa sin imprimir: 4 libros, platos, cajas o tapas de tamaños distintos. Los vasos del kit no sirven (son iguales).
+Versión 3D para proyectar (three.js): `retos/torre-hanoi-3d.html`, publicada en https://claude.ai/artifact/6HkVr6JXD6ayrPtqwNLuQn.
+Úsala para mostrar las reglas, para el Explain it o como misión para casa; el reto en sí se hace con piezas físicas.
 
 **Material:** 4 cuadrados de papel o cartón de unos 20, 15, 10 y 6 cm, numerados del 1 (el más
 pequeño) al 4; 3 lugares marcados con cinta: A, B, C. La torre empieza en A, la pieza grande abajo.
