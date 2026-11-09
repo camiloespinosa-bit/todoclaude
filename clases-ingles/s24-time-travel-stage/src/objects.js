@@ -281,6 +281,61 @@ function rainCloud() {
   return g;
 }
 
+function rocketToy() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.5, 10), C.white), 0, 1.0, 0));
+  g.add(at(mesh(new THREE.ConeGeometry(0.4, 0.7, 10), C.orange), 0, 2.1, 0));
+  const win = at(mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.08, 12), C.turq), 0, 1.25, 0.38);
+  win.rotation.x = Math.PI / 2;
+  g.add(win);
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2;
+    const fin = at(mesh(new THREE.BoxGeometry(0.08, 0.55, 0.4), C.blue), Math.sin(a) * 0.42, 0.45, Math.cos(a) * 0.42);
+    fin.rotation.y = a;
+    g.add(fin);
+  }
+  const flame = at(mesh(new THREE.ConeGeometry(0.25, 0.5, 8), C.yellow, { emissive: '#F57C00', emissiveIntensity: 0.6 }), 0, 0.05, 0);
+  flame.rotation.x = Math.PI;
+  g.add(flame);
+  g.rotation.z = -0.3;
+  return g;
+}
+
+function chefHat() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.5, 12), C.white), 0, 0.25, 0));
+  for (const [x, z] of [[0, 0], [-0.35, 0.1], [0.35, 0.1], [0, -0.3], [0, 0.35]]) {
+    g.add(at(mesh(new THREE.SphereGeometry(0.42, 10, 8), C.white), x, 0.8, z));
+  }
+  g.add(at(mesh(new THREE.CylinderGeometry(0.57, 0.57, 0.1, 12), C.red), 0, 0.1, 0));
+  return g;
+}
+
+function palette() {
+  const g = new THREE.Group();
+  const board = mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.08, 14), '#E8C99A');
+  board.scale.set(1.2, 1, 0.9);
+  g.add(board);
+  const cols = [C.red, C.yellow, C.blue, C.green, C.orange];
+  cols.forEach((c, i) => {
+    const a = (i / cols.length) * Math.PI * 1.4 + 0.3;
+    g.add(at(mesh(new THREE.SphereGeometry(0.15, 8, 6), c), Math.cos(a) * 0.65, 0.08, Math.sin(a) * 0.5));
+  });
+  const brush = rod(new THREE.Vector3(-0.2, 0.1, -0.2), new THREE.Vector3(0.9, 0.5, 0.6), 0.04, C.brown);
+  g.add(brush, at(mesh(new THREE.ConeGeometry(0.07, 0.2, 6), C.blue), 0.95, 0.53, 0.63));
+  g.rotation.x = 0.9;
+  return g;
+}
+
+function microphone() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.SphereGeometry(0.38, 12, 10), '#B0BEC5', { metalness: 0.3, roughness: 0.4 }), 0, 1.5, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.1, 12), C.deep), 0, 1.2, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.16, 0.1, 1.2, 10), C.deep), 0, 0.6, 0));
+  g.rotation.z = -0.35;
+  return g;
+}
+
 export const OBJECTS = [
   { id: 'bike', name: 'Bike', make: bike },
   { id: 'guitar', name: 'Guitar', make: guitar },
@@ -294,6 +349,10 @@ export const OBJECTS = [
   { id: 'skates', name: 'Skates', make: skates },
   { id: 'trophy', name: 'Trophy', make: trophy },
   { id: 'rain', name: 'Rain cloud', make: rainCloud },
+  { id: 'rocket', name: 'Rocket', make: rocketToy },
+  { id: 'chef', name: 'Chef hat', make: chefHat },
+  { id: 'palette', name: 'Paints', make: palette },
+  { id: 'mic', name: 'Microphone', make: microphone },
 ];
 
 // Returns a group centered at the origin whose largest side equals `size`.

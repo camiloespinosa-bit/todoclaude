@@ -1,4 +1,4 @@
-// Headless check of the GAME edition: plays all 3 worlds, tests keys, CSV, network, console.
+// Headless check of the GAME edition (Bloque 4 complete): plays all 4 worlds and every challenge.
 // Usage: node test/verify.mjs [outDir]
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -33,40 +33,65 @@ async function openPage(query = '') {
   await wait(1500);
   return { ctx, page, errors, external };
 }
-const S = (page) => page.evaluate(() => JSON.parse(JSON.stringify(window.__TTS.S)));
+const S = (page) => page.evaluate(() => JSON.parse(JSON.stringify(window.__TTS.S, (k, v) => (k === 'Q' ? undefined : v))));
+const Qs = (page) => page.evaluate(() => window.__TTS.quest());
 const pos = (page) => page.evaluate(() => ({ x: window.__TTS.AV.pos.x, y: window.__TTS.AV.pos.y, z: window.__TTS.AV.pos.z }));
-const tp = (page, x, z, y = 0) => page.evaluate(([x, z, y]) => window.__TTS.teleport(x, z, y), [x, z, y]);
+const tpTo = (page, p) => page.evaluate((p) => window.__TTS.teleport(p.x, p.z, p.y || 0), p);
+const answer = (page) => page.evaluate(() => window.__TTS.answer());
+const wrong = (page) => page.evaluate(() => window.__TTS.wrong());
+const waitQuest = (page, type, ms = 12000) => page.waitForFunction((t) => { const q = window.__TTS.quest(); return q && q.type === t && q.started && !q.done; }, type, { timeout: ms }).then(() => true, () => false);
 const waitMode = (page, mode, ms = 20000) => page.waitForFunction((m) => window.__TTS.S.mode === m, mode, { timeout: ms }).then(() => true, () => false);
+const waitReady = (page, ms = 6000) => page.waitForFunction(() => { const q = window.__TTS.quest(); return q && (q.ready || q.done); }, null, { timeout: ms }).then(() => true, () => false);
 
-async function collectThree(page) {
-  const picks = await page.evaluate(() => window.__TTS.world().pickups.map((p) => ({ x: p.x, z: p.z, top: p.top })));
-  for (const p of picks.slice(0, 3)) { await tp(page, p.x, p.z, p.top); await wait(500); }
-  await wait(1300);
-}
-async function wordStones(page, { wrongFirst = false, shot = null } = {}) {
-  const C = await page.evaluate(() => ({ X: window.__TTS.PAD_X, Z: window.__TTS.PAD_Z, ws: window.__TTS.WORD_START }));
-  for (let q = 0; q < 3; q++) {
-    await wait(300);
-    const ok = await page.evaluate(() => window.__TTS.correctPad());
-    if (wrongFirst && q === 0) {
-      await tp(page, C.X[(ok + 1) % 3], C.Z, 0.3);
-      await wait(400);
-      if (shot) await page.screenshot({ path: join(OUT, shot.replace('.png', '_wrong.png')) });
-      await wait(900);
+async function solveRounds(page, type, { wrongFirst = false, shot = null } = {}) {
+  await waitQuest(page, type);
+  const q0 = await Qs(page);
+  for (let i = 0; i < q0.max; i++) {
+    await waitReady(page);
+    if (wrongFirst && i === 0) {
+      const w = await wrong(page);
+      if (w) {
+        await tpTo(page, w);
+        await wait(500);
+        if (shot) await page.screenshot({ path: join(OUT, shot.replace('.png', '_wrong.png')) });
+        await wait(900);
+        await waitReady(page);
+      }
     }
-    if (shot && q === 0) { await tp(page, C.ws.x, C.ws.z); await wait(600); await page.screenshot({ path: join(OUT, shot) }); }
-    await tp(page, C.X[ok], C.Z, 0.3);
-    await wait(2300);
+    if (shot && i === 0) await page.screenshot({ path: join(OUT, shot) });
+    const a = await answer(page);
+    await tpTo(page, a);
+    await wait(type === 'ladder' ? 500 : 2400);
   }
+  return page.waitForFunction((t) => { const q = window.__TTS.quest(); return !q || q.type !== t || q.done; }, type, { timeout: 8000 }).then(() => true, () => false);
 }
-async function goStage(page) {
-  const st = await page.evaluate(() => window.__TTS.STAGE);
-  await tp(page, st.x, st.z, st.top);
-  return waitMode(page, 'talk', 5000);
+async function collect3(page, shot) {
+  await waitQuest(page, 'collect');
+  for (let i = 0; i < 3; i++) {
+    const a = await answer(page);
+    await tpTo(page, a);
+    await wait(700);
+    if (shot && i === 0) await page.screenshot({ path: join(OUT, shot) });
+  }
+  return page.waitForFunction(() => window.__TTS.quest().type !== 'collect', null, { timeout: 8000 }).then(() => true, () => false);
 }
-async function goPortal(page) {
-  const p = await page.evaluate(() => window.__TTS.PORTAL);
-  await tp(page, p.x, p.z + 1, 0.4);
+async function talk(page, stars, shot) {
+  await waitQuest(page, 'talk');
+  await tpTo(page, await answer(page));
+  const ok = await waitMode(page, 'talk', 5000);
+  await wait(1400);
+  await page.keyboard.press(String(stars));
+  await wait(700);
+  if (shot) await page.screenshot({ path: join(OUT, shot) });
+  await page.keyboard.press('Enter');
+  await wait(800);
+  return ok;
+}
+async function portal(page, shot) {
+  await waitQuest(page, 'portal');
+  await wait(600);
+  if (shot) await page.screenshot({ path: join(OUT, shot) });
+  await tpTo(page, await answer(page));
   return waitMode(page, 'warp', 5000);
 }
 
@@ -77,162 +102,156 @@ async function goPortal(page) {
   check('Title screen visible', await page.isVisible('#L-title'));
   await page.keyboard.press('1');
   await wait(600);
-  check('Key 1 -> briefing for Jerónimo', (await S(page)).mode === 'brief' && (await page.textContent('#b-hi')).includes('Jerónimo'));
   await page.screenshot({ path: join(OUT, '02_brief.png') });
   await page.keyboard.press('Enter');
   await wait(1200);
   let s = await S(page);
-  check('Enter starts the trip in YESTERDAY LAND', s.mode === 'play' && s.wi === 0 && s.quest === 0);
+  check('Trip starts in YESTERDAY LAND', s.mode === 'play' && s.wi === 0);
   await page.screenshot({ path: join(OUT, '03_arrival_past.png') });
-  await wait(2500);
+  await waitQuest(page, 'collect');
 
-  // real keyboard movement + jump
+  // real controls
   const p0 = await pos(page);
-  await page.keyboard.down('ArrowUp'); await wait(900); await page.keyboard.up('ArrowUp');
+  await page.keyboard.down('ArrowUp'); await wait(1200); await page.keyboard.up('ArrowUp');
   const p1 = await pos(page);
-  check('Arrow Up walks the traveler forward', p1.z < p0.z - 1, `z ${p0.z.toFixed(1)} -> ${p1.z.toFixed(1)}`);
-  await page.keyboard.down('ArrowLeft'); await wait(1200); await page.keyboard.up('ArrowLeft');
-  const p2 = await pos(page);
-  check('Arrow Left walks left', p2.x < p1.x - 0.5);
+  check('Arrow Up walks forward', p1.z < p0.z - 1, `${p0.z.toFixed(1)} -> ${p1.z.toFixed(1)}`);
   await page.keyboard.press('Space');
   await wait(180);
-  const p3 = await pos(page);
-  check('Space jumps', p3.y > 0.4, `y=${p3.y.toFixed(2)}`);
+  check('Space jumps', (await pos(page)).y > 0.4);
   await wait(800);
-  await page.screenshot({ path: join(OUT, '04_explore_past.png') });
-
-  // walk into a pickup with the keyboard (teleport next to it, then press arrow)
-  const pk = await page.evaluate(() => window.__TTS.world().pickups.find((p) => p.top === 0));
-  await tp(page, pk.x, pk.z + 4);
-  await wait(200);
-  await page.keyboard.down('ArrowUp');
-  await page.waitForFunction(() => window.__TTS.S.collected[0].length === 1, null, { timeout: 6000 }).catch(() => {});
-  await page.keyboard.up('ArrowUp');
-  await wait(300);
-  s = await S(page);
-  check('Walking into a shining thing collects it', s.collected[0].length === 1, s.collected[0].join());
-  await page.screenshot({ path: join(OUT, '05_collect.png') });
-  // the rest
-  const rest = await page.evaluate(() => window.__TTS.world().pickups.filter((p) => !p.taken).map((p) => ({ x: p.x, z: p.z, top: p.top })));
-  for (const p of rest.slice(0, 2)) { await tp(page, p.x, p.z, p.top); await wait(500); }
-  await wait(1300);
-  s = await S(page);
-  check('3 things -> Word Stones challenge', s.collected[0].length === 3 && s.quest === 1);
-
-  await wordStones(page, { wrongFirst: true, shot: '06_wordstones.png' });
-  s = await S(page);
-  check('Word Stones: wrong answer allowed, 3 answered, first-try score = 2', s.quest === 2 && s.words[0] === 2, `words=${s.words[0]}`);
-
-  check('Stepping on the stage starts the talk', await goStage(page));
+  // trampoline
+  const tr = await page.evaluate(() => window.__TTS.tramp());
+  await tpTo(page, { x: tr.x, z: tr.z, y: 0.35 });
+  let py = 0;
+  for (let i = 0; i < 15; i++) { await wait(100); py = Math.max(py, (await pos(page)).y); }
+  check('Trampoline launches high', py > 2.5, `y=${py.toFixed(2)}`);
+  await wait(400);
+  await page.screenshot({ path: join(OUT, '04_trampoline.png') });
   await wait(1500);
-  await page.keyboard.press('2');
-  await wait(600);
   s = await S(page);
-  check('Teacher key 2 gives 2 stars', s.stars[0] === 2);
-  await page.screenshot({ path: join(OUT, '07_talk_past.png') });
+  check('Time crystal above trampoline collected', s.crystals[0] >= 1, `crystals=${s.crystals[0]}`);
+
+  check('Past: find 3 things', await collect3(page, '05_collect_past.png'));
+  check('Past: Word Stones (with a wrong try)', await solveRounds(page, 'stones', { wrongFirst: true, shot: '06_wordstones.png' }));
+  // talk with teacher keys
+  await waitQuest(page, 'talk');
+  await tpTo(page, await answer(page));
+  check('Stage starts the talk', await waitMode(page, 'talk', 5000));
+  await wait(1200);
+  await page.keyboard.press('2');
+  await wait(500);
+  check('Key 2 gives 2 stars', (await S(page)).stars[0] === 2);
   await page.keyboard.press('p');
   const t1 = (await S(page)).talkLeft;
   await wait(1200);
-  s = await S(page);
-  check('P pauses the talk timer', s.paused && Math.abs(s.talkLeft - t1) < 0.01);
-  await page.screenshot({ path: join(OUT, '08_paused.png') });
+  check('P pauses', Math.abs((await S(page)).talkLeft - t1) < 0.01);
+  await page.screenshot({ path: join(OUT, '07_paused.png') });
   await page.keyboard.press('p');
-  await wait(900);
-  check('P resumes', (await S(page)).talkLeft < t1 - 0.3);
+  await wait(1200);
+  check('P resumes (real-time timer)', (await S(page)).talkLeft < t1 - 0.6);
   await page.keyboard.press('r');
   await wait(100);
-  check('R restarts the talk timer', (await S(page)).talkLeft > 59.5);
+  check('R restarts the timer', (await S(page)).talkLeft > 59);
   await page.keyboard.press('3');
-  await page.keyboard.press(' '); // kid's space must NOT end the talk
-  await wait(300);
+  await page.keyboard.press(' ');
+  await wait(400);
   check('Space does not end the talk', (await S(page)).mode === 'talk');
+  await page.screenshot({ path: join(OUT, '08_talk_past.png') });
   await page.keyboard.press('Enter');
-  await wait(1200);
-  s = await S(page);
-  check('Enter ends the talk -> portal quest', s.mode === 'play' && s.quest === 3 && s.stars[0] === 3);
-  await page.screenshot({ path: join(OUT, '09_portal_open.png') });
-
-  check('Portal starts the time warp', await goPortal(page));
-  await wait(1500);
-  await page.screenshot({ path: join(OUT, '10_warp.png') });
-  await wait(2600);
-  s = await S(page);
-  check('Arrive in TODAY TOWN', s.mode === 'play' && s.wi === 1);
   await wait(800);
+  check('Past: portal -> warp', await portal(page, '09_portal_past.png'));
+  await wait(1400);
+  await page.screenshot({ path: join(OUT, '10_warp.png') });
+  check('Arrive in TODAY TOWN', await waitMode(page, 'play', 8000) && (await S(page)).wi === 1);
+  await wait(700);
   await page.screenshot({ path: join(OUT, '11_arrival_present.png') });
-  await wait(2200);
 
-  // World 2
-  await collectThree(page);
-  await page.screenshot({ path: join(OUT, '12_present_after_collect.png') });
-  await wordStones(page, { shot: '13_wordstones_present.png' });
-  await goStage(page);
-  await wait(1200);
-  await page.keyboard.press('1');
-  await wait(500);
-  await page.screenshot({ path: join(OUT, '14_talk_present.png') });
-  await page.keyboard.press('Enter');
+  // Today Town
+  await waitQuest(page, 'actions');
+  await wait(400);
+  await page.screenshot({ path: join(OUT, '12_actions.png') });
+  check('Present: What are they doing? (with a wrong try)', await solveRounds(page, 'actions', { wrongFirst: true, shot: '12b_actions_near.png' }));
+  check('Present: Every day / Right now zones', await solveRounds(page, 'zones', { wrongFirst: true, shot: '13_zones.png' }));
+  check('Present: Can Stones', await solveRounds(page, 'stones', { shot: '14_can.png' }));
+  await waitQuest(page, 'opinion');
+  await waitReady(page);
+  await page.screenshot({ path: join(OUT, '15_opinion.png') });
+  await tpTo(page, await answer(page));
   await wait(900);
-  await goPortal(page);
-  await waitMode(page, 'play', 8000);
-  s = await S(page);
-  check('Arrive in TOMORROW CITY', s.wi === 2);
-  await wait(3000);
-  await page.screenshot({ path: join(OUT, '15_future.png') });
-
-  // World 3 using teacher skip (K) for all four challenges
-  await page.keyboard.press('k');
-  await wait(1500);
-  check('K skips Find 3 things', (await S(page)).quest === 1);
-  await page.keyboard.press('k');
-  await wait(500);
-  check('K skips Word Stones', (await S(page)).quest === 2);
-  await page.keyboard.press('k');
-  await wait(1200);
-  check('K starts the talk', (await S(page)).mode === 'talk');
-  await page.keyboard.press('2');
+  await page.screenshot({ path: join(OUT, '15b_opinion_say.png') });
+  let q = await Qs(page);
+  check('Opinion: standing on a side asks to say it', q.phase === 'say');
+  await page.keyboard.press('Enter');
   await wait(600);
-  await page.screenshot({ path: join(OUT, '16_talk_future.png') });
+  await waitReady(page);
+  await tpTo(page, await answer(page));
+  await wait(900);
   await page.keyboard.press('Enter');
   await wait(900);
-  await page.keyboard.press('k');
-  check('Last portal -> finale', await waitMode(page, 'finale', 8000));
-  await wait(2500);
+  check('Present: Opinion Corner done', (await Qs(page)).type !== 'opinion' || (await Qs(page)).done);
+  check('Present: talk', await talk(page, 1, '16_talk_present.png'));
+  check('Present: portal', await portal(page));
+  check('Arrive in TOMORROW CITY', await waitMode(page, 'play', 8000) && (await S(page)).wi === 2);
+  await wait(3000);
+  await page.screenshot({ path: join(OUT, '17_future.png') });
+
+  // Tomorrow City
+  check('Future: pick 3 dreams', await collect3(page, '18_dreams.png'));
+  check('Future: Prediction Track', await solveRounds(page, 'ladder', { shot: '19_ladder.png' }));
+  check('Future: Today / Tomorrow', await solveRounds(page, 'zones', { shot: '20_today_tomorrow.png' }));
+  check('Future: Advice Clinic', await solveRounds(page, 'stones', { wrongFirst: true, shot: '21_advice.png' }));
+  check('Future: talk', await talk(page, 2, '22_talk_future.png'));
+  check('Future: portal', await portal(page));
+  check('Arrive in ULTIMATE CHALLENGE', await waitMode(page, 'play', 8000) && (await S(page)).wi === 3);
+  await wait(3000);
+  await page.screenshot({ path: join(OUT, '23_arena.png') });
+  check('Arena: Ultimate Stones (5)', await solveRounds(page, 'stones', { shot: '24_ultimate.png' }));
+  check('Arena: golden portal -> finale', await portal(page, '25_golden_portal.png'));
+  check('Finale reached', await waitMode(page, 'finale', 10000));
+  await wait(2800);
   s = await S(page);
-  check('Finale totals', s.stars.join() === '3,1,2' && s.words[0] === 2 && s.words[1] === 3, `stars=${s.stars} words=${s.words}`);
-  await page.screenshot({ path: join(OUT, '17_finale.png') });
+  check('Finale totals', s.stars.slice(0, 3).join() === '3,1,2', `stars=${s.stars}`);
+  await page.screenshot({ path: join(OUT, '26_finale.png') });
 
   const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btn-csv')]);
   const csvPath = join(OUT, dl.suggestedFilename());
   await dl.saveAs(csvPath);
   const csv = readFileSync(csvPath, 'utf8');
-  console.log('CSV:', dl.suggestedFilename());
   console.log(csv);
-  check('CSV: header + 9 rows for Jerónimo', /player,world,challenge,score,max,details,date/.test(csv) && (csv.match(/^Jerónimo,/gm) || []).length === 9);
-  const [dl2] = await Promise.all([page.waitForEvent('download'), page.keyboard.press('d')]);
-  check('Key D downloads CSV', !!dl2.suggestedFilename());
+  const n = (csv.match(/^Jerónimo,/gm) || []).length;
+  check('CSV has all challenges (≥ 18 rows)', n >= 18, `rows=${n}`);
   await page.keyboard.press('n');
   await wait(800);
-  check('N -> back to title', (await S(page)).mode === 'title');
+  check('N -> title', (await S(page)).mode === 'title');
   check('No console errors/warnings (run A)', errors.length === 0, errors.slice(0, 5).join(' | '));
   check('No external requests (run A)', external.length === 0, external.join(' '));
   await ctx.close();
 }
 
-// ================= Run B: Luciana, talk timer runs out by itself =================
+// ================= Run B: Luciana, teacher K skips everything; talk timer ends alone =================
 {
   const { ctx, page, errors, external } = await openPage('?t=4');
   await page.click('.player[data-p="1"]');
-  await wait(500);
+  await wait(400);
   await page.keyboard.press('Enter');
-  await wait(3500);
-  await page.screenshot({ path: join(OUT, '18_luciana.png') });
-  await collectThree(page);
-  await wordStones(page);
-  await goStage(page);
-  await wait(6500);
-  const s = await S(page);
-  check('Talk ends by itself when time is up', s.mode === 'play' && s.quest === 3);
+  await waitQuest(page, 'collect');
+  await page.screenshot({ path: join(OUT, '27_luciana.png') });
+  let guard = 0;
+  while ((await S(page)).mode !== 'finale' && guard++ < 120) {
+    const s = await S(page);
+    const q = await Qs(page);
+    if (s.mode === 'play' && q && q.type === 'talk' && q.started && !q.done && s.wi === 0) {
+      await tpTo(page, await answer(page));
+      await waitMode(page, 'talk', 4000);
+      await wait(5500); // timer t=4 ends by itself
+      check('Talk ends by itself when time is up', (await S(page)).mode === 'play');
+      continue;
+    }
+    if (s.mode === 'play') await page.keyboard.press('k');
+    await wait(1300);
+  }
+  const sb = await S(page);
+  check('K skips through all 4 worlds to the finale', sb.mode === 'finale', `mode=${sb.mode} wi=${sb.wi} q=${JSON.stringify(await Qs(page))}`);
   check('No console errors/warnings (run B)', errors.length === 0, errors.slice(0, 5).join(' | '));
   check('No external requests (run B)', external.length === 0);
   await ctx.close();

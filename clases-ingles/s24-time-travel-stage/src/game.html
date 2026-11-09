@@ -143,6 +143,43 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 .btn .key { background: rgba(255,255,255,.25); box-shadow: none; }
 .saved { font-weight: 700; color: var(--green); min-height: 1.2em; }
 
+
+/* ---------- v3 HUD ---------- */
+.pack { flex-direction: row; }
+.crys { display: flex; align-items: center; gap: .35em; font-weight: 800; color: #00897B; margin-right: .3em; }
+.gem { display: inline-block; width: .8em; height: .8em; background: linear-gradient(135deg, #A7FFEB, #00BFA5); transform: rotate(45deg); border-radius: 3px; box-shadow: 0 0 10px rgba(0,191,165,.6); vertical-align: middle; }
+.big-gem { width: .6em; height: .6em; margin-right: .2em; }
+.slots { display: flex; gap: .8vw; }
+.task { position: absolute; left: 50%; bottom: 3vh; transform: translateX(-50%); padding: 1.4vh 2.4vw; border-left: 18px solid var(--world-ink, var(--world)); display: none; text-align: center; max-width: 90vw; min-width: 46vw; }
+.task.on { display: block; animation: fadeIn .4s both; }
+.task .lab { font-weight: 700; color: var(--dark); }
+.task .s { font-size: var(--fs-l); font-weight: 800; line-height: 1.2; margin-top: .15em; }
+.task .s u { text-decoration: none; display: inline-block; min-width: 2em; border-bottom: 7px solid var(--world-ink, var(--world)); color: var(--world-ink, var(--world)); }
+.task .opts { display: flex; gap: 1vw; justify-content: center; margin-top: .6em; flex-wrap: wrap; }
+.task .opt { background: #F0F4F8; border-radius: 16px; padding: .15em .6em; font-weight: 700; display: inline-flex; align-items: center; gap: .4em; }
+.task .opt b { background: var(--deep); color: #fff; border-radius: 50%; width: 1.4em; height: 1.4em; display: inline-grid; place-items: center; font-size: .8em; }
+.task .say { display: inline-grid; place-items: center; background: var(--orange); color: #fff; border-radius: 50%; width: 1.6em; height: 1.6em; font-weight: 800; margin-left: .3em; }
+.clues { position: absolute; left: 2.4vw; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 1vh; align-items: flex-start; }
+.clues .lab { background: var(--deep); color: #fff; font-weight: 700; padding: .1em .7em; border-radius: 999px; }
+.clues .chip { background: var(--card); box-shadow: var(--shadow); border-radius: 16px; padding: .15em .7em; font-weight: 800; display: flex; align-items: center; gap: .4em; }
+.clues .chip img { width: 1.8em; height: 1.8em; object-fit: contain; }
+.frames { min-width: 0; max-width: 92vw; }
+.frames .lines { display: grid; grid-template-columns: repeat(2, auto); column-gap: 3vw; }
+.frames .lines .line { font-size: var(--fs-l); font-weight: 800; line-height: 1.3; white-space: nowrap; }
+.frames .lines .line b { color: var(--world); filter: brightness(.85); }
+.totals { flex-wrap: wrap; gap: 2vw; }
+.results { width: min(60vw, 1150px); max-height: 96vh; padding: 2.4vh 2vw; gap: 1.1vh; }
+.results .totals .big { font-size: var(--fs-l); }
+.results .wrow { padding: .2em .5em; }
+.btns { flex-direction: row !important; }
+.btns .btn { flex: 1; }
+.tot { display: flex; align-items: baseline; gap: .3em; }
+.wrow { grid-template-columns: 5.4em 4.6em 1fr; }
+.wrow .chips { display: flex; flex-wrap: wrap; gap: .3em; }
+.wrow .rc { background: #fff; border-radius: 12px; padding: 0 .45em; font-weight: 700; white-space: nowrap; }
+.wrow .rc b { color: var(--green); }
+.small-p { font-size: var(--fs) !important; font-weight: 600; margin-top: 1.2vh !important; }
+
 #nogl { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: var(--bg); padding: 5vw; text-align: center; }
 #nogl.on { display: flex; }
 #nogl div { background: #fff; border-radius: 32px; padding: 5vh 4vw; box-shadow: var(--shadow); max-width: 1100px; }
@@ -170,12 +207,14 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
   <section id="L-brief" class="layer center-col">
     <div class="card brief">
       <h2 id="b-hi">Hi, Jerónimo!</h2>
-      <p>You are a Time Traveler. Visit 3 worlds!</p>
+      <p>You are a Time Traveler. Visit 4 worlds!</p>
       <div class="worlds-row">
         <span style="background:var(--orange)">PAST</span>
         <span style="background:var(--turq)">PRESENT</span>
         <span style="background:var(--green)">FUTURE</span>
+        <span style="background:var(--yellow);color:var(--blue)">ULTIMATE</span>
       </div>
+      <p class="small-p">Find, run, jump and talk! Catch the <span class="gem"></span> time crystals!</p>
       <div class="controls">
         <div class="ctrl"><span class="key">←</span><span class="key">↑</span><span class="key">↓</span><span class="key">→</span> move</div>
         <div class="ctrl"><span class="key">SPACE</span> jump</div>
@@ -185,7 +224,7 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
     <div class="teacher">
       <span><b>Teacher:</b></span>
       <span><span class="key">1</span><span class="key">2</span><span class="key">3</span> stars (on stage)</span>
-      <span><span class="key">ENTER</span> end talk</span>
+      <span><span class="key">ENTER</span> end talk / next opinion</span>
       <span><span class="key">P</span> pause</span>
       <span><span class="key">K</span> skip challenge</span>
       <span><span class="key">H</span> help</span>
@@ -200,11 +239,12 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
       <div class="pill" id="h-world">YESTERDAY LAND</div>
       <div class="card quests" id="h-quests"></div>
     </div>
-    <div class="card pack"><span class="lab">My things</span><div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
+    <div class="card pack"><div class="crys"><span class="gem"></span><span id="h-crys">0/0</span></div><div class="slots" id="h-slots"><div class="slot"></div><div class="slot"></div><div class="slot"></div></div></div>
     <div class="hint" id="h-hint"></div>
-    <div class="card sentence" id="h-sentence">
-      <div class="lab">Word Stones <span class="num" id="h-snum">1 / 3</span> · Step on the right word!</div>
-      <div class="s" id="h-s"></div>
+    <div class="card task" id="h-task">
+      <div class="lab" id="h-tlab"></div>
+      <div class="s" id="h-ts"></div>
+      <div class="opts" id="h-topts"></div>
     </div>
     <div class="feedback" id="h-feedback"></div>
     <div class="card arrival" id="h-arrival"><div class="w" id="h-aw"></div><div class="t" id="h-at"></div></div>
@@ -221,10 +261,10 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
       <div class="stars" id="t-stars"></div>
       <div class="timer" id="t-timer">1:00</div>
     </div>
+    <div class="clues" id="t-clues"></div>
     <div class="card frames">
       <div class="lab">You can say:</div>
-      <div class="line" id="t-f1"></div>
-      <div class="line" id="t-f2"></div>
+      <div class="lines" id="t-frames"></div>
     </div>
     <div class="feedback good" id="t-feedback"></div>
   </section>
@@ -239,8 +279,9 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
     <div class="card results">
       <h2 id="f-title">You are a Time Master, Jerónimo!</h2>
       <div class="totals">
-        <div class="big"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg><span id="f-stars">0</span></div><small>/ 9 talk stars</small>
-        <div class="big" style="color:var(--green)">✓<span id="f-words">0</span></div><small>/ 9 words</small>
+        <div class="tot"><div class="big"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg><span id="f-stars">0</span></div><small>/ 9 talk stars</small></div>
+        <div class="tot"><div class="big" style="color:var(--green)">✓<span id="f-pts">0</span></div><small>challenges</small></div>
+        <div class="tot"><div class="big" style="color:#00BFA5"><span class="gem big-gem"></span><span id="f-crys">0</span></div><small>crystals</small></div>
       </div>
       <div id="f-rows" style="display:flex;flex-direction:column;gap:1vh"></div>
       <div class="btns">
