@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "verify": "node test/verify.mjs"
+    "verify": "node test/verify.mjs",
+    "verify:v1": "node test/verify_v1.mjs"
   },
   "devDependencies": {
     "@fontsource/poppins": "5.1.0",
