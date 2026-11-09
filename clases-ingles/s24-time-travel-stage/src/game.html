@@ -178,6 +178,13 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 .wrow .chips { display: flex; flex-wrap: wrap; gap: .3em; }
 .wrow .rc { background: #fff; border-radius: 12px; padding: 0 .45em; font-weight: 700; white-space: nowrap; }
 .wrow .rc b { color: var(--green); }
+.stars { pointer-events: auto; }
+.stars svg { cursor: pointer; }
+.wrow .st.edit { pointer-events: auto; cursor: pointer; display: inline-flex; gap: .05em; }
+.wrow .st .fs { color: #CFD8DC; font-size: 1.15em; transition: transform .15s; }
+.wrow .st .fs.on { color: #E0A800; }
+.wrow .st .fs:hover { transform: scale(1.3); }
+.edit-tip { font-weight: 600; color: var(--dark); font-size: var(--fs); }
 .small-p { font-size: var(--fs) !important; font-weight: 600; margin-top: 1.2vh !important; }
 
 #nogl { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: var(--bg); padding: 5vw; text-align: center; }
@@ -283,6 +290,7 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
         <div class="tot"><div class="big" style="color:var(--green)">✓<span id="f-pts">0</span></div><small>challenges</small></div>
         <div class="tot"><div class="big" style="color:#00BFA5"><span class="gem big-gem"></span><span id="f-crys">0</span></div><small>crystals</small></div>
       </div>
+      <div class="edit-tip">Teacher: click the stars to change them.</div>
       <div id="f-rows" style="display:flex;flex-direction:column;gap:1vh"></div>
       <div class="btns">
         <button class="btn csv" id="btn-csv"><span class="key">D</span>Download CSV</button>

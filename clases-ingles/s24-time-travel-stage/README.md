@@ -17,7 +17,8 @@ El contenido sale de los materiales de clase y está en `src/content.js` (fácil
 | Quién | Teclas |
 |---|---|
 | Niño | Flechas o WASD = caminar, Espacio = saltar (también funciona un control de videojuego) |
-| Profe, en el escenario | `1` `2` `3` estrellas (`0` borra), `Enter` termina la charla, `R` reinicia el reloj |
+| Profe, en el escenario | `1` `2` `3` estrellas (fila de números o teclado numérico; `0` borra) o clic en las estrellas, `Enter` termina la charla, `R` reinicia el reloj |
+| Profe, resultados | Clic en las estrellas de cada mundo para corregirlas (el CSV se actualiza) |
 | Profe, Opinion Corner | `Enter` pasa a la siguiente opinión (o espera 10 s) |
 | Profe, siempre | `P` pausa, `K` salta el reto actual, `H` ayuda, `F` pantalla completa, `M` música |
 | Resultados | `D` descarga CSV, `N` siguiente jugador |

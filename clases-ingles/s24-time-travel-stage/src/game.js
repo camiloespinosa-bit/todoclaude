@@ -1909,6 +1909,12 @@ function start() {
   scene.add(talkGroup);
   const starsEl = $('t-stars');
   starsEl.innerHTML = STAR_SVG.repeat(3);
+  starsEl.querySelectorAll('svg').forEach((svg, k) => {
+    svg.addEventListener('click', () => {
+      if (S.mode !== 'talk') return;
+      giveStars(S.stars[S.wi] === k + 1 ? k : k + 1);
+    });
+  });
   function renderStars(anim) {
     starsEl.querySelectorAll('svg').forEach((s, k) => {
       s.classList.remove('on');
@@ -2055,6 +2061,19 @@ function start() {
   finale.visible = false;
   scene.add(finale);
   let fireworkT = 0;
+  const talkRows = [];
+  // Teacher can fix the talk stars on the results screen (click a star).
+  $('f-rows').addEventListener('click', (e) => {
+    const star = e.target.closest('.fs');
+    const box = e.target.closest('.st.edit');
+    if (!star || !box || S.mode !== 'finale') return;
+    const w = +box.dataset.w, n = +star.dataset.n;
+    S.stars[w] = S.stars[w] === n ? n - 1 : n;
+    box.querySelectorAll('.fs').forEach((el) => el.classList.toggle('on', +el.dataset.n <= S.stars[w]));
+    if (talkRows[w]) talkRows[w].score = S.stars[w];
+    $('f-stars').textContent = S.stars.reduce((a, b) => a + b, 0);
+    sfx.stars(Math.max(1, S.stars[w]));
+  });
   const pad2 = (n) => String(n).padStart(2, '0');
   const stamp = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 
@@ -2104,14 +2123,18 @@ function start() {
     $('f-saved').textContent = '';
     $('f-rows').innerHTML = WORLDS.map((w, i) => {
       const hasTalk = w.quests.some((q) => q.type === 'talk');
-      const stars = hasTalk ? `<span class="st">${'★'.repeat(S.stars[i])}<span style="color:#CFD8DC">${'★'.repeat(3 - S.stars[i])}</span></span>` : '<span class="st"></span>';
+      const stars = hasTalk ? `<span class="st edit" data-w="${i}">${[1, 2, 3].map((n) => `<span class="fs${n <= S.stars[i] ? ' on' : ''}" data-n="${n}">★</span>`).join('')}</span>` : '<span class="st"></span>';
       const chips = S.results[i].map((r) => `<span class="rc">${esc(r.short)} <b>${r.score}/${r.max}</b></span>`).join('');
       return `<div class="wrow"><span class="nm" style="background:${w.color};${w.key === 'arena' ? 'color:#145389' : ''}">${w.short}</span>${stars}<span class="chips">${chips}</span></div>`;
     }).join('');
     const when = stamp(new Date());
     WORLDS.forEach((w, i) => {
       for (const r of S.results[i]) S.rows.push({ player: name, world: w.short, challenge: r.name, score: r.score, max: r.max, details: r.details, date: when });
-      if (w.quests.some((q) => q.type === 'talk')) S.rows.push({ player: name, world: w.short, challenge: 'Talk stars', score: S.stars[i], max: 3, details: S.clues[i].map((c) => c.label).join('; '), date: when });
+      if (w.quests.some((q) => q.type === 'talk')) {
+        const row = { player: name, world: w.short, challenge: 'Talk stars', score: S.stars[i], max: 3, details: S.clues[i].map((c) => c.label).join('; '), date: when };
+        S.rows.push(row);
+        talkRows[i] = row;
+      }
       S.rows.push({ player: name, world: w.short, challenge: 'Time crystals (bonus)', score: S.crystals[i], max: S.crystalsMax[i], details: '', date: when });
     });
     showLayer('final');
@@ -2212,7 +2235,7 @@ function start() {
         break;
       case 'talk':
         if (e.repeat) return;
-        if (k === '1' || k === '2' || k === '3' || k === '0') giveStars(+k);
+        if (starKey(e) !== null) giveStars(starKey(e));
         else if (k === 'Enter' || k === 'k' || k === 'K') endTalk();
         else if (k === 'r' || k === 'R') {
           S.talkLeft = TALK_SECONDS;
@@ -2227,6 +2250,14 @@ function start() {
         break;
     }
   });
+
+  // Stars: number row or numpad, with or without Num Lock
+  function starKey(e) {
+    const m = /^(?:Digit|Numpad)([0-3])$/.exec(e.code || '');
+    if (m) return +m[1];
+    if (['0', '1', '2', '3'].includes(e.key)) return +e.key;
+    return null;
+  }
 
   function gamepadInput() {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];

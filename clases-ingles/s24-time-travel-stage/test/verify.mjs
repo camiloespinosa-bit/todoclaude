@@ -116,8 +116,9 @@ async function portal(page, shot) {
   const p1 = await pos(page);
   check('Arrow Up walks forward', p1.z < p0.z - 1, `${p0.z.toFixed(1)} -> ${p1.z.toFixed(1)}`);
   await page.keyboard.press('Space');
-  await wait(180);
-  check('Space jumps', (await pos(page)).y > 0.4);
+  let jy = 0;
+  for (let i = 0; i < 10; i++) { await wait(80); jy = Math.max(jy, (await pos(page)).y); }
+  check('Space jumps', jy > 0.4, `max y=${jy.toFixed(2)}`);
   await wait(800);
   // trampoline
   const tr = await page.evaluate(() => window.__TTS.tramp());
@@ -138,6 +139,12 @@ async function portal(page, shot) {
   await tpTo(page, await answer(page));
   check('Stage starts the talk', await waitMode(page, 'talk', 5000));
   await wait(1200);
+  await page.keyboard.press('Numpad1');
+  await wait(400);
+  check('Numpad 1 gives 1 star', (await S(page)).stars[0] === 1);
+  await page.click('#t-stars svg:nth-child(3)');
+  await wait(400);
+  check('Clicking the 3rd star gives 3 stars', (await S(page)).stars[0] === 3);
   await page.keyboard.press('2');
   await wait(500);
   check('Key 2 gives 2 stars', (await S(page)).stars[0] === 2);
@@ -213,6 +220,11 @@ async function portal(page, shot) {
   check('Finale totals', s.stars.slice(0, 3).join() === '3,1,2', `stars=${s.stars}`);
   await page.screenshot({ path: join(OUT, '26_finale.png') });
 
+  await page.click('.wrow .st.edit[data-w="1"] .fs[data-n="3"]');
+  await wait(400);
+  s = await S(page);
+  check('Finale: clicking stars edits them', s.stars[1] === 3 && (await page.textContent('#f-stars')) === '8', `stars=${s.stars}`);
+  await page.screenshot({ path: join(OUT, '26b_finale_edit.png') });
   const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btn-csv')]);
   const csvPath = join(OUT, dl.suggestedFilename());
   await dl.saveAs(csvPath);
@@ -220,6 +232,7 @@ async function portal(page, shot) {
   console.log(csv);
   const n = (csv.match(/^Jerónimo,/gm) || []).length;
   check('CSV has all challenges (≥ 18 rows)', n >= 18, `rows=${n}`);
+  check('CSV has the edited talk stars (Present = 3)', /Jerónimo,Present,Talk stars,3,3/.test(csv));
   await page.keyboard.press('n');
   await wait(800);
   check('N -> title', (await S(page)).mode === 'title');
