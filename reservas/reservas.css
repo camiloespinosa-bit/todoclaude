@@ -115,7 +115,7 @@ body.reservas { background: var(--fondo-claro); }
 }
 .opcion:active, .dia:active, .hora:active { transform: scale(0.97); }
 .opcion:focus-visible, .dia:focus-visible, .hora:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
-.opcion[aria-checked="true"], .dia[aria-checked="true"], .hora[aria-pressed="true"] { border-color: var(--azul); background: var(--tint-azul); }
+.opcion[aria-checked="true"], .dia[aria-checked="true"], .hora[aria-checked="true"], .hora[aria-pressed="true"] { border-color: var(--azul); background: var(--tint-azul); }
 
 .opcion { position: relative; padding: 16px; text-align: left; display: flex; flex-direction: column; gap: 2px; }
 .opcion strong { font-size: 1rem; }
@@ -196,22 +196,14 @@ body.reservas { background: var(--fondo-claro); }
 .campo-fase select:focus { outline: none; border-color: var(--azul); }
 .campo-fase small { font-weight: 400; color: var(--texto-suave); }
 
-/* Varias clases y repetir semanas (paso 3) */
-.elegidas, .repetir { margin-top: 14px; }
-.elegidas__lista { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.elegida {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 6px 6px 12px; border-radius: 999px;
-  background: var(--tint-azul); color: var(--azul-oscuro); font-weight: 600; font-size: 0.88rem;
-}
-.elegida::first-letter { text-transform: uppercase; }
-.elegida button {
-  font: inherit; font-weight: 800; line-height: 1; cursor: pointer;
-  width: 26px; height: 26px; border-radius: 50%; border: 0;
-  background: var(--blanco); color: var(--azul-oscuro);
-}
-.elegida button:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
-.elegidas__ayuda { margin: 8px 0 0; font-size: 0.85rem; color: var(--texto-suave); }
+/* Clases fijas cada semana (paso 3) */
+#modo { margin-bottom: 4px; }
+#modo[hidden] { display: none; }
+.plan__titulo { font-weight: 700; color: var(--azul-oscuro); border-top: 0 !important; }
+.plan__cerrado strong { display: block; color: var(--naranja-profundo); }
+.semana { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.semana .dia { padding: 12px 0; font-weight: 700; }
+.semana .dia[aria-pressed="true"] { border-color: var(--azul); background: var(--tint-azul); }
 .plan { list-style: none; margin: 14px 0 0; padding: 0; font-size: 0.92rem; }
 .plan:empty { display: none; }
 .plan li { padding: 9px 0; border-top: 1px solid var(--borde); }
@@ -223,4 +215,4 @@ body.reservas { background: var(--fondo-claro); }
 .listo__lista, .listo__fallidas ul { list-style: none; padding: 0; margin: 8px 0 14px; }
 .listo__lista li::first-letter, .listo__fallidas li::first-letter { text-transform: uppercase; }
 .listo__fallidas { color: var(--naranja-profundo); }
-.hora[aria-pressed="true"]::before { content: "✓ "; color: var(--azul); }
+.hora[aria-pressed="true"]::before, .semana .dia[aria-pressed="true"]::before { content: "✓ "; color: var(--azul); }

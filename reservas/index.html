@@ -89,27 +89,29 @@
       </section>
 
       <section class="paso">
-        <h2><span class="paso__num">3</span> Elige día y hora</h2>
-        <div class="dias" id="dias" role="radiogroup" aria-label="Día"></div>
-        <div class="horas" id="horas" aria-label="Hora" aria-live="polite"></div>
-        <div class="elegidas" id="elegidas" hidden>
-          <p class="opciones__titulo">Tus clases</p>
-          <ul class="elegidas__lista" id="lista-elegidas"></ul>
-          <p class="elegidas__ayuda">¿Varios días a la semana? Toca otro día y otra hora para agregarla (hasta 5).</p>
+        <h2><span class="paso__num">3</span> ¿Cuándo?</h2>
+        <div class="opciones opciones--dos" role="radiogroup" aria-label="Cuándo" id="modo">
+          <button type="button" class="opcion" role="radio" aria-checked="true" data-modo="fijo">
+            <strong>Clases fijas cada semana</strong>
+            <span>Mismos días y hora, por 4 semanas</span>
+          </button>
+          <button type="button" class="opcion" role="radio" aria-checked="false" data-modo="una">
+            <strong>Una sola clase</strong>
+            <span>Elige la fecha en el calendario</span>
+          </button>
         </div>
-        <div class="repetir" id="repetir" hidden>
-          <p class="opciones__titulo">¿Las repites cada semana?</p>
-          <div class="opciones opciones--dos" role="radiogroup" aria-label="Repetir" id="opciones-repetir">
-            <button type="button" class="opcion" role="radio" aria-checked="true" data-semanas="1">
-              <strong>Solo esta vez</strong>
-              <span>Las fechas que elegiste</span>
-            </button>
-            <button type="button" class="opcion" role="radio" aria-checked="false" data-semanas="4">
-              <strong>Cada semana</strong>
-              <span>Las mismas clases durante 4 semanas</span>
-            </button>
-          </div>
+
+        <div id="bloque-fijo">
+          <p class="opciones__titulo">¿Qué días son sus clases?</p>
+          <div class="semana" id="dias-semana" aria-label="Días de la semana"></div>
+          <p class="opciones__titulo">¿A qué hora?</p>
+          <div class="horas" id="horas-fijas" aria-label="Hora" aria-live="polite"></div>
           <ul class="plan" id="plan" aria-live="polite"></ul>
+        </div>
+
+        <div id="bloque-una" hidden>
+          <div class="dias" id="dias" role="radiogroup" aria-label="Día"></div>
+          <div class="horas" id="horas" role="radiogroup" aria-label="Hora" aria-live="polite"></div>
         </div>
       </section>
 
