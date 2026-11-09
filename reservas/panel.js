@@ -274,6 +274,7 @@ function filaAsistente(s, a) {
   const nombre = crear("strong", "", a.nombre);
   datos.append(nombre);
   if (a.tipo === "bloque") datos.append(crear("span", "etiqueta-sesion etiqueta-sesion--bloque", "Bloque 2 h"));
+  if (enSerie(a)) datos.append(crear("span", "etiqueta-sesion etiqueta-sesion--bloque", `Serie de ${a.serie.length}`));
   const detalle = [a.programa, s.clase === "prueba" ? `${a.personas} ${a.personas === 1 ? "persona" : "personas"}` : null, a.acepta_whatsapp ? null : "No aceptó WhatsApp"]
     .filter(Boolean).join(" · ");
   if (detalle) datos.append(crear("span", "panel-asistente__detalle", detalle));
@@ -331,13 +332,29 @@ function avisoDe(s, a) {
   if (!a.acepta_whatsapp || primeraHora(s, a) !== s) return null;
   const hoy = hoyEnBogota();
   if (s.fecha < hoy || (s.fecha === hoy && s.inicio <= minutosAhoraEnBogota())) return null;
-  const tipo = s.fecha <= sumarDias(hoy, 1) ? "recordatorio" : "confirmacion";
+  const manana = sumarDias(hoy, 1);
+  const tipo = s.fecha <= manana ? "recordatorio" : "confirmacion";
+  // Una serie (varias clases reservadas juntas) se confirma con un solo mensaje, en su
+  // primera clase de pasado mañana en adelante.
+  if (tipo === "confirmacion" && enSerie(a)) {
+    const primera = a.serie.find((c) => c.fecha > manana);
+    if (!primera || primera.fecha !== s.fecha || primera.inicio !== s.inicio) return null;
+  }
   const enviado = tipo === "recordatorio" ? a.whatsapp_recordatorio_en : a.whatsapp_confirmacion_en;
   return { tipo, enviado, hoy: s.fecha === hoy };
 }
 
+const enSerie = (a) => (a.serie?.length ?? 0) > 1;
+
 function textoAviso(s, a, aviso) {
   const nombre = String(a.nombre).trim().split(/\s+/)[0];
+  if (aviso.tipo === "confirmacion" && enSerie(a)) {
+    const hoy = hoyEnBogota();
+    const fechas = a.serie.filter((c) => c.fecha >= hoy).map((c) => `${fechaLarga(c.fecha)} a las ${textoHora(c.inicio)}`);
+    const donde = s.modalidad === "presencial" ? "en nuestra sede de Rionegro" : "por Google Meet (cada invitación de tu calendario tiene su enlace)";
+    const clases = a.tipo === "bloque" ? "tus bloques de 2 horas" : "tus clases";
+    return `Hola ${nombre}, confirmamos ${clases} en El Gimnasio del Cerebro, ${donde}:\n${fechas.map((f) => `- ${f}`).join("\n")}\nSi necesitas cambiar alguna, respóndenos por aquí.`;
+  }
   const clase = NOMBRE_CLASE[a.tipo];
   const hora = textoHora(s.inicio);
   const donde = lugar(s.modalidad, s.enlace_meet);
@@ -378,8 +395,9 @@ async function marcarAviso(a, tipo) {
   const ahora = new Date().toISOString();
   const campo = tipo === "recordatorio" ? "whatsapp_recordatorio_en" : "whatsapp_confirmacion_en";
   const clave = a.bloque_id ?? a.id;
+  const mismo = (x) => (x.bloque_id ?? x.id) === clave || (tipo === "confirmacion" && a.serie_id && x.serie_id === a.serie_id);
   for (const s of sesiones) {
-    for (const x of s.asistentes ?? []) if ((x.bloque_id ?? x.id) === clave) x[campo] = ahora;
+    for (const x of s.asistentes ?? []) if (mismo(x)) x[campo] = ahora;
   }
   pintarDia();
   pintarPendientes();
@@ -388,7 +406,7 @@ async function marcarAviso(a, tipo) {
   } catch (error) {
     if (error.message === "NO_AUTORIZADO") return;
     for (const s of sesiones) {
-      for (const x of s.asistentes ?? []) if ((x.bloque_id ?? x.id) === clave) x[campo] = null;
+      for (const x of s.asistentes ?? []) if (mismo(x)) x[campo] = null;
     }
     pintarDia();
     pintarPendientes();
