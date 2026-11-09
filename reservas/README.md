@@ -16,15 +16,17 @@ estudiantes tienen planes mensuales pagados por anticipado.
   siguiente reserva del grupo. Las reservas viejas con "Programa infantil (0 a 15 años)" no dicen
   la edad: esos grupos quedan cerrados para nuevas reservas (`supabase/migrations/010_grupos_por_fase.sql`).
 - **Bloque de 2 horas:** son dos grupos seguidos; el estudiante queda en los dos.
-- **Varias clases de una vez:** en el paso 3 se pueden elegir hasta 5 clases (varios días y
-  horas) y, con "Cada semana", repetirlas durante 4 semanas. Antes de reservar, la página
-  muestra todas las fechas: las que no se pueden (grupo lleno o de otra fase) se omiten, y si
-  un día está cerrado (por ejemplo, un lunes festivo) ofrece el siguiente día abierto de esa
-  semana, a la misma hora si hay cupo. Cada clase se reserva con las mismas reglas; si alguna
-  se ocupa en ese momento, las demás quedan y la página dice cuál no. Todas comparten un
-  `serie_id`: en el panel aparecen como "Serie de N" y se confirman con un solo WhatsApp que
-  lista todas las fechas. Google Calendar envía una invitación por cada clase
-  (`supabase/migrations/012_reservas_repetidas.sql`).
+- **Clases fijas cada semana:** en el paso 3 la opción principal es elegir los días de la
+  semana (por ejemplo, lunes y jueves) y una hora; solo salen las horas que existen en todos
+  esos días. La página arma las próximas 4 semanas desde la próxima fecha de cada día (si hoy
+  ya pasó esa hora, empieza la otra semana) y las muestra antes de reservar: las que no se
+  pueden (grupo lleno o de otra fase) se omiten, y si una fecha está cerrada (por ejemplo, un
+  lunes festivo) pregunta si quiere reemplazarla por el siguiente día abierto de esa semana,
+  a la misma hora si hay cupo. "Una sola clase" sigue siendo elegir la fecha en el calendario.
+  Cada clase se reserva con las mismas reglas; si alguna se ocupa en ese momento, las demás
+  quedan y la página dice cuál no. Todas comparten un `serie_id`: en el panel aparecen como
+  "Serie de N" y se confirman con un solo WhatsApp que lista todas las fechas. Google Calendar
+  envía una invitación por cada clase (`supabase/migrations/012_reservas_repetidas.sql`).
 - **Clase de prueba:** gratis, 30 minutos, para una familia o grupo de hasta 5 personas.
   Solo cabe en horas sin grupo, y mientras exista, esa hora queda bloqueada para clases.
 - **Horario:** lunes 6–2 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y
