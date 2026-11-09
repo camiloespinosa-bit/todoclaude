@@ -14,10 +14,10 @@ const TIPOS = {
 
 // Franjas de atención por día de la semana (0 = domingo), solo para el modo prototipo:
 // conectada, la página usa el horario guardado en la base de datos. Minutos desde medianoche.
-// Lunes 6–1 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y 1–8 p.m.;
+// Lunes 6–2 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y 1–8 p.m.;
 // viernes 6–12; sábado 8–12 y 1–5.
 const HORARIO = {
-  1: [[360, 780], [1140, 1200]],
+  1: [[360, 840], [1140, 1200]],
   2: [[360, 720], [780, 960], [1140, 1200]],
   3: [[360, 720], [780, 1200]],
   4: [[360, 720], [780, 960], [1140, 1200]],
@@ -197,11 +197,36 @@ const btnReservar = document.getElementById("btn-reservar");
 const campoPersonas = document.querySelector("[data-solo-prueba]");
 
 const campoFase = document.getElementById("fase");
+const cajaElegidas = document.getElementById("elegidas");
+const listaElegidas = document.getElementById("lista-elegidas");
+const cajaRepetir = document.getElementById("repetir");
+const opcionesRepetir = document.getElementById("opciones-repetir");
+const listaPlan = document.getElementById("plan");
 
-const estado = { tipo: null, modalidad: null, programa: null, fecha: null, hora: null };
+const MAX_ELEGIDAS = 5; // clases distintas por semana
+const SEMANAS_REPETIR = 4;
+
+// elegidas: las clases que tocó la persona ({ fecha, hora }).
+// plan: lo que se va a reservar al repetir semanas, con el estado de cada fecha.
+const estado = { tipo: null, modalidad: null, programa: null, fecha: null, elegidas: [], semanas: 1 };
+let plan = [];
+
+const clave = (x) => `${x.fecha} ${x.hora}`;
+const ordenar = (lista) => lista.sort((a, b) => clave(a).localeCompare(clave(b)));
+const textoFecha = (x) => `${formatear(x.fecha, { weekday: "short", day: "numeric", month: "short" }).replace(",", "")} · ${textoHora(x.hora)}`;
 
 function marcar(contenedor, elegido) {
   for (const b of contenedor.querySelectorAll("button")) b.setAttribute("aria-checked", String(b === elegido));
+}
+
+// Lo que se va a reservar: las fechas elegidas, o el plan de varias semanas con los
+// cambios que aceptó la persona en los días cerrados. Sin repetidos.
+function clasesAReservar() {
+  const lista = estado.semanas === 1
+    ? estado.elegidas
+    : plan.flatMap((p) => (p.estado === "ok" ? [p] : p.estado === "cerrado" && p.cambio ? [p.cambio] : []));
+  const vistas = new Set();
+  return ordenar(lista.filter((x) => !vistas.has(clave(x)) && vistas.add(clave(x))).map(({ fecha, hora }) => ({ fecha, hora })));
 }
 
 function actualizarResumen() {
@@ -209,9 +234,21 @@ function actualizarResumen() {
   if (estado.tipo) partes.push(`${TIPOS[estado.tipo].nombre} (${TIPOS[estado.tipo].minutos} min)`);
   if (estado.modalidad) partes.push(estado.modalidad === "virtual" ? "Virtual" : "Presencial");
   if (estado.programa) partes.push(estado.programa);
-  if (estado.fecha) partes.push(formatear(estado.fecha, { weekday: "long", day: "numeric", month: "long" }));
-  if (estado.hora !== null) partes.push(textoHora(estado.hora));
+  const clases = clasesAReservar();
+  if (clases.length === 1) {
+    partes.push(formatear(clases[0].fecha, { weekday: "long", day: "numeric", month: "long" }), textoHora(clases[0].hora));
+  } else if (clases.length > 1) {
+    partes.push(`${clases.length} clases`);
+  }
   seleccion.textContent = partes.length ? partes.join(" · ") : "Elige tipo de clase, modalidad, fase, día y hora.";
+  btnReservar.textContent = clases.length > 1 ? `Reservar ${clases.length} clases` : "Reservar";
+}
+
+// Cambiar tipo, modalidad o fase cambia qué horas sirven: se empieza de nuevo.
+function reiniciarElegidas() {
+  estado.elegidas = [];
+  plan = [];
+  pintarElegidas();
 }
 
 for (const grupo of document.querySelectorAll("[data-grupo]")) {
@@ -221,6 +258,7 @@ for (const grupo of document.querySelectorAll("[data-grupo]")) {
     estado[grupo.dataset.grupo] = boton.dataset.valor;
     marcar(grupo, boton);
     campoPersonas.hidden = estado.tipo !== "prueba";
+    reiniciarElegidas();
     pintarHoras();
     actualizarResumen();
   });
@@ -228,8 +266,17 @@ for (const grupo of document.querySelectorAll("[data-grupo]")) {
 
 campoFase.addEventListener("change", () => {
   estado.programa = campoFase.value || null;
+  reiniciarElegidas();
   pintarHoras();
   actualizarResumen();
+});
+
+opcionesRepetir.addEventListener("click", (e) => {
+  const boton = e.target.closest("button");
+  if (!boton) return;
+  estado.semanas = Number(boton.dataset.semanas);
+  marcar(opcionesRepetir, boton);
+  calcularPlan();
 });
 
 function pintarDias() {
@@ -251,7 +298,6 @@ function pintarDias() {
       estado.fecha = fecha;
       marcar(contDias, btn);
       pintarHoras();
-      actualizarResumen();
     });
     contDias.append(btn);
   }
@@ -260,7 +306,6 @@ function pintarDias() {
 let consulta = 0; // evita pintar una respuesta vieja si cambian de día rápido
 
 async function pintarHoras() {
-  estado.hora = null;
   const mia = ++consulta;
   contHoras.replaceChildren();
   const falta = !estado.tipo || !estado.modalidad || !estado.programa ? "Primero elige el tipo de clase, la modalidad y la fase."
@@ -284,31 +329,178 @@ async function pintarHoras() {
     contHoras.innerHTML = `<p class="horas__vacio">No quedan horas libres ese día para esta opción. Prueba otro día.</p>`;
     return;
   }
+  const fecha = estado.fecha;
   for (const { minutos: m, disponible, detalle } of opciones) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "hora";
-    btn.setAttribute("role", "radio");
-    btn.setAttribute("aria-checked", "false");
+    btn.setAttribute("aria-pressed", String(estado.elegidas.some((x) => x.fecha === fecha && x.hora === m)));
     btn.disabled = !disponible;
     btn.innerHTML = `${textoHora(m)}<small>${detalle}</small>`;
-    btn.addEventListener("click", () => {
-      estado.hora = m;
-      marcar(contHoras, btn);
-      actualizarResumen();
-    });
+    btn.addEventListener("click", () => alternarHora(fecha, m, btn));
     contHoras.append(btn);
   }
 }
 
+// La clase de prueba es una sola; las demás se pueden elegir varias.
+function alternarHora(fecha, hora, btn) {
+  mensaje.textContent = "";
+  const ya = estado.elegidas.findIndex((x) => x.fecha === fecha && x.hora === hora);
+  if (estado.tipo === "prueba") {
+    estado.elegidas = ya >= 0 ? [] : [{ fecha, hora }];
+    for (const b of contHoras.querySelectorAll(".hora")) b.setAttribute("aria-pressed", "false");
+  } else if (ya >= 0) {
+    estado.elegidas.splice(ya, 1);
+  } else if (estado.elegidas.length >= MAX_ELEGIDAS) {
+    mensaje.textContent = `Puedes elegir hasta ${MAX_ELEGIDAS} clases. Quita una para agregar otra.`;
+    return;
+  } else {
+    estado.elegidas.push({ fecha, hora });
+    ordenar(estado.elegidas);
+  }
+  btn.setAttribute("aria-pressed", String(estado.elegidas.some((x) => x.fecha === fecha && x.hora === hora)));
+  pintarElegidas();
+  calcularPlan();
+}
+
+function pintarElegidas() {
+  listaElegidas.replaceChildren();
+  const varias = estado.tipo && estado.tipo !== "prueba";
+  cajaElegidas.hidden = !varias || !estado.elegidas.length;
+  cajaRepetir.hidden = !varias || !estado.elegidas.length;
+  for (const x of estado.elegidas) {
+    const li = document.createElement("li");
+    li.className = "elegida";
+    li.append(textoFecha(x));
+    const quitar = document.createElement("button");
+    quitar.type = "button";
+    quitar.textContent = "×";
+    quitar.setAttribute("aria-label", `Quitar ${textoFecha(x)}`);
+    quitar.addEventListener("click", () => {
+      estado.elegidas = estado.elegidas.filter((y) => clave(y) !== clave(x));
+      pintarElegidas();
+      calcularPlan();
+      if (x.fecha === estado.fecha) pintarHoras();
+    });
+    li.append(quitar);
+    listaElegidas.append(li);
+  }
+}
+
+// ---------- Repetir cada semana ----------
+// Cada clase elegida se repite el mismo día y a la misma hora las 3 semanas siguientes.
+// Si ese día está cerrado (por ejemplo, un lunes festivo), se ofrece el siguiente día
+// abierto de esa semana, a la misma hora si se puede.
+let calculo = 0;
+
+async function calcularPlan() {
+  const mio = ++calculo;
+  plan = [];
+  if (estado.semanas === 1 || !estado.elegidas.length) {
+    pintarPlan();
+    actualizarResumen();
+    return;
+  }
+  listaPlan.innerHTML = `<li class="plan__no">Revisando las próximas semanas…</li>`;
+  const tipo = estado.tipo, modalidad = estado.modalidad, fase = faseDe(estado.programa);
+  const agendas = new Map();
+  const agendaDe = (fecha) => {
+    if (!agendas.has(fecha)) agendas.set(fecha, cargarAgenda(fecha));
+    return agendas.get(fecha);
+  };
+  const nuevo = [];
+  try {
+    for (const x of estado.elegidas) {
+      for (let k = 0; k < SEMANAS_REPETIR; k++) {
+        const fecha = sumarDias(x.fecha, 7 * k);
+        const item = { fecha, hora: x.hora };
+        if (!franjasDe(fecha).length) {
+          item.estado = "cerrado";
+          item.alternativa = await buscarAlternativa(fecha, x.hora, agendaDe, tipo, modalidad, fase);
+          item.cambio = item.alternativa?.opciones.includes(x.hora) ? { fecha: item.alternativa.fecha, hora: x.hora } : null;
+        } else {
+          const opcion = horasDisponibles(fecha, tipo, modalidad, fase, await agendaDe(fecha)).find((o) => o.minutos === x.hora);
+          item.estado = opcion?.disponible ? "ok" : "no";
+          item.motivo = opcion ? opcion.detalle : "Fuera del horario";
+        }
+        nuevo.push(item);
+      }
+    }
+  } catch {
+    if (mio === calculo) listaPlan.innerHTML = `<li class="plan__no">No pudimos revisar las próximas semanas. Revisa tu conexión e intenta de nuevo.</li>`;
+    return;
+  }
+  if (mio !== calculo) return;
+  plan = ordenar(nuevo);
+  pintarPlan();
+  actualizarResumen();
+}
+
+async function buscarAlternativa(fecha, hora, agendaDe, tipo, modalidad, fase) {
+  for (let d = 1; d < 7; d++) {
+    const otra = sumarDias(fecha, d);
+    if (!franjasDe(otra).length) continue;
+    const opciones = horasDisponibles(otra, tipo, modalidad, fase, await agendaDe(otra))
+      .filter((o) => o.disponible).map((o) => o.minutos);
+    return opciones.length ? { fecha: otra, opciones } : null;
+  }
+  return null;
+}
+
+function pintarPlan() {
+  listaPlan.replaceChildren();
+  if (!plan.length) return;
+  for (const p of plan) {
+    const li = document.createElement("li");
+    if (p.estado === "ok") {
+      li.textContent = `✓ ${textoFecha(p)}`;
+    } else if (p.estado === "no") {
+      li.className = "plan__no";
+      li.textContent = `✗ ${textoFecha(p)}: ${p.motivo.toLowerCase()}. No se reserva.`;
+    } else if (!p.alternativa) {
+      li.className = "plan__no";
+      li.textContent = `✗ ${textoFecha(p)}: día cerrado (festivo) y no hay otra hora libre esa semana.`;
+    } else {
+      li.className = "plan__cerrado";
+      li.append(`${textoFecha(p)}: día cerrado (festivo).`);
+      const etiqueta = document.createElement("label");
+      etiqueta.append("En su lugar:");
+      const lista = document.createElement("select");
+      lista.add(new Option("No reservar esa semana", ""));
+      for (const m of p.alternativa.opciones) {
+        lista.add(new Option(textoFecha({ fecha: p.alternativa.fecha, hora: m }), String(m), false, p.cambio?.hora === m));
+      }
+      lista.addEventListener("change", () => {
+        p.cambio = lista.value ? { fecha: p.alternativa.fecha, hora: Number(lista.value) } : null;
+        actualizarTotal();
+        actualizarResumen();
+      });
+      etiqueta.append(lista);
+      li.append(etiqueta);
+    }
+    listaPlan.append(li);
+  }
+  const total = document.createElement("li");
+  total.className = "plan__total";
+  listaPlan.append(total);
+  actualizarTotal();
+}
+
+function actualizarTotal() {
+  const total = listaPlan.querySelector(".plan__total");
+  if (!total) return;
+  const n = clasesAReservar().length;
+  total.textContent = n === 1 ? "Se reservará 1 clase." : `Se reservarán ${n} clases.`;
+}
+
 // Enlace "Agregar a Google Calendar" con la plantilla pública de eventos de Google.
-function enlaceCalendario(datos) {
+function enlaceCalendario(datos, clase) {
   const tipo = TIPOS[estado.tipo];
-  const aTexto = (min) => `${estado.fecha.replaceAll("-", "")}T${String(Math.floor(min / 60)).padStart(2, "0")}${String(min % 60).padStart(2, "0")}00`;
+  const aTexto = (min) => `${clase.fecha.replaceAll("-", "")}T${String(Math.floor(min / 60)).padStart(2, "0")}${String(min % 60).padStart(2, "0")}00`;
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: `${tipo.nombre} — El Gimnasio del Cerebro`,
-    dates: `${aTexto(estado.hora)}/${aTexto(estado.hora + tipo.minutos)}`,
+    dates: `${aTexto(clase.hora)}/${aTexto(clase.hora + tipo.minutos)}`,
     ctz: ZONA,
     details: `${datos.programa}. Modalidad: ${estado.modalidad}.`,
     location: estado.modalidad === "presencial" ? "Rionegro, Antioquia" : "Google Meet",
@@ -327,16 +519,27 @@ const ERRORES = {
   FUERA_DE_HORARIO: "Esa hora está fuera del horario de atención.",
   PERSONAS_INVALIDAS: "Revisa el número de personas (de 1 a 5).",
   AUTORIZACION_REQUERIDA: "Para reservar debes autorizar el tratamiento de tus datos.",
+  DEMASIADAS_CLASES: "Son demasiadas clases de una vez. Quita algunas e intenta de nuevo.",
 };
 const ERRORES_DE_AGENDA = ["HORA_OCUPADA", "OTRA_MODALIDAD", "OTRA_FASE", "SIN_CUPO", "HORA_PASADA", "FUERA_DE_HORARIO"];
 
-async function guardarReserva(datos) {
+// Motivo corto para la lista de clases que no se pudieron reservar.
+const MOTIVOS = {
+  HORA_OCUPADA: "esa hora ya está ocupada",
+  OTRA_MODALIDAD: "hay un grupo de la otra modalidad",
+  OTRA_FASE: "hay un grupo de otra fase",
+  SIN_CUPO: "el grupo está lleno",
+  YA_RESERVADO: "ya tenías esa reserva",
+  HORA_PASADA: "esa hora ya pasó",
+  FUERA_DE_HORARIO: "día cerrado o fuera del horario",
+};
+
+async function guardarReserva(datos, clases) {
   if (!CONECTADO) return { ok: true, calendario: false, prototipo: true };
   return llamar("/functions/v1/reservar", {
     tipo: estado.tipo,
     modalidad: estado.modalidad,
-    fecha: estado.fecha,
-    inicio: estado.hora,
+    items: clases.map((c) => ({ fecha: c.fecha, inicio: c.hora })),
     nombre: datos.nombre,
     telefono: datos.telefono,
     correo: datos.correo,
@@ -348,10 +551,15 @@ async function guardarReserva(datos) {
   });
 }
 
+function llenarLista(ul, textos) {
+  ul.replaceChildren(...textos.map((t) => Object.assign(document.createElement("li"), { textContent: t })));
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   mensaje.textContent = "";
-  if (!estado.tipo || !estado.modalidad || !estado.programa || !estado.fecha || estado.hora === null) {
+  const clases = clasesAReservar();
+  if (!estado.tipo || !estado.modalidad || !estado.programa || !clases.length) {
     mensaje.textContent = "Te falta elegir tipo de clase, modalidad, fase, día u hora.";
     return;
   }
@@ -361,34 +569,59 @@ form.addEventListener("submit", async (e) => {
     return;
   }
   const datos = Object.fromEntries(new FormData(form));
+  const textoBoton = btnReservar.textContent;
   btnReservar.disabled = true;
   btnReservar.textContent = "Reservando…";
   let resultado;
   try {
-    resultado = await guardarReserva(datos);
+    resultado = await guardarReserva(datos, clases);
   } catch (error) {
     mensaje.textContent = ERRORES[error.message] ?? "No pudimos guardar la reserva. Intenta de nuevo o escríbenos por WhatsApp.";
-    if (ERRORES_DE_AGENDA.includes(error.message)) pintarHoras();
-    return;
-  } finally {
+    if (ERRORES_DE_AGENDA.includes(error.message)) {
+      pintarHoras();
+      calcularPlan();
+    }
     btnReservar.disabled = false;
-    btnReservar.textContent = "Reservar";
+    btnReservar.textContent = textoBoton;
+    return;
   }
+  btnReservar.disabled = false;
+  btnReservar.textContent = textoBoton;
 
+  const resultados = (resultado.resultados ?? clases.map((c) => ({ fecha: c.fecha, inicio: c.hora, ok: true })))
+    .map((r) => ({ fecha: r.fecha, hora: Number(r.inicio), ok: r.ok, error: r.error }));
+  const hechas = resultados.filter((r) => r.ok);
+  const fallidas = resultados.filter((r) => !r.ok);
   const virtual = estado.modalidad === "virtual";
-  document.getElementById("listo-titulo").textContent = estado.tipo === "prueba" ? "¡Tu clase de prueba gratis quedó reservada!" : "¡Tu clase quedó reservada!";
-  document.getElementById("listo-detalle").textContent = `${seleccion.textContent.replace(/\.$/, "")}. ${datos.nombre.trim()}, te escribiremos al WhatsApp ${datos.telefono}.`;
+  const una = hechas.length === 1;
+
+  document.getElementById("listo-titulo").textContent = estado.tipo === "prueba" ? "¡Tu clase de prueba gratis quedó reservada!"
+    : una ? "¡Tu clase quedó reservada!" : `¡Quedaron reservadas tus ${hechas.length} clases!`;
+  const resumenTipo = seleccion.textContent.split(" · ").slice(0, 3).join(" · ");
+  document.getElementById("listo-detalle").textContent = una
+    ? `${resumenTipo} · ${formatear(hechas[0].fecha, { weekday: "long", day: "numeric", month: "long" })} · ${textoHora(hechas[0].hora)}. ${datos.nombre.trim()}, te escribiremos al WhatsApp ${datos.telefono}.`
+    : `${resumenTipo}. ${datos.nombre.trim()}, te escribiremos al WhatsApp ${datos.telefono}.`;
+  const lista = document.getElementById("listo-lista");
+  lista.hidden = una;
+  if (!una) llenarLista(lista, hechas.map(textoFecha));
+  const cajaFallidas = document.getElementById("listo-fallidas");
+  cajaFallidas.hidden = !fallidas.length;
+  llenarLista(document.getElementById("listo-fallidas-lista"), fallidas.map((f) => `${textoFecha(f)}: ${MOTIVOS[f.error] ?? "no se pudo reservar"}`));
+
   const nota = document.getElementById("listo-nota");
   const meet = document.getElementById("btn-meet");
   const calendario = document.getElementById("btn-calendario");
   if (resultado.calendario) {
-    nota.textContent = `Te enviamos la invitación de Google Calendar a ${datos.correo}.${virtual ? " Ahí está el enlace de Google Meet." : ""}`;
+    nota.textContent = una
+      ? `Te enviamos la invitación de Google Calendar a ${datos.correo}.${virtual ? " Ahí está el enlace de Google Meet." : ""}`
+      : `Te enviamos una invitación de Google Calendar por cada clase a ${datos.correo}.${virtual ? " Cada una tiene su enlace de Google Meet." : ""}`;
     calendario.hidden = true;
   } else {
-    nota.textContent = resultado.prototipo ? "" : "Tu cupo quedó guardado. La invitación de calendario te llegará en un rato.";
-    calendario.href = enlaceCalendario(datos);
+    nota.textContent = resultado.prototipo ? "" : "Tus cupos quedaron guardados. Las invitaciones de calendario te llegarán en un rato.";
+    calendario.hidden = !una;
+    if (una) calendario.href = enlaceCalendario(datos, hechas[0]);
   }
-  if (resultado.meet) {
+  if (una && resultado.meet) {
     meet.href = resultado.meet;
     meet.hidden = false;
   }
@@ -404,7 +637,8 @@ document.getElementById("btn-otra").addEventListener("click", () => location.rel
     document.querySelector(".aviso-prototipo")?.remove();
     const { fecha: hoy } = hoyEnBogota();
     try {
-      await cargarFranjas(hoy, sumarDias(hoy, DIAS_A_MOSTRAR));
+      // Hasta 4 semanas después del último día que se puede elegir, para repetir clases.
+      await cargarFranjas(hoy, sumarDias(hoy, DIAS_A_MOSTRAR + 7 * SEMANAS_REPETIR));
     } catch {
       mensaje.textContent = "No pudimos cargar el horario. Recarga la página o escríbenos por WhatsApp.";
     }

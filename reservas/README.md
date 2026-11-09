@@ -16,11 +16,20 @@ estudiantes tienen planes mensuales pagados por anticipado.
   siguiente reserva del grupo. Las reservas viejas con "Programa infantil (0 a 15 años)" no dicen
   la edad: esos grupos quedan cerrados para nuevas reservas (`supabase/migrations/010_grupos_por_fase.sql`).
 - **Bloque de 2 horas:** son dos grupos seguidos; el estudiante queda en los dos.
+- **Varias clases de una vez:** en el paso 3 se pueden elegir hasta 5 clases (varios días y
+  horas) y, con "Cada semana", repetirlas durante 4 semanas. Antes de reservar, la página
+  muestra todas las fechas: las que no se pueden (grupo lleno o de otra fase) se omiten, y si
+  un día está cerrado (por ejemplo, un lunes festivo) ofrece el siguiente día abierto de esa
+  semana, a la misma hora si hay cupo. Cada clase se reserva con las mismas reglas; si alguna
+  se ocupa en ese momento, las demás quedan y la página dice cuál no. Todas comparten un
+  `serie_id`: en el panel aparecen como "Serie de N" y se confirman con un solo WhatsApp que
+  lista todas las fechas. Google Calendar envía una invitación por cada clase
+  (`supabase/migrations/012_reservas_repetidas.sql`).
 - **Clase de prueba:** gratis, 30 minutos, para una familia o grupo de hasta 5 personas.
   Solo cabe en horas sin grupo, y mientras exista, esa hora queda bloqueada para clases.
-- **Horario:** lunes 6–1 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y
+- **Horario:** lunes 6–2 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y
   1–8 p.m.; viernes 6–12; sábado 8–12 y 1–5. Domingo cerrado. Se cambia en la tabla `horario`
-  de Supabase (ver `supabase/migrations/006_horario_6am.sql`).
+  de Supabase (ver `supabase/migrations/006_horario_6am.sql` y `011_lunes_hasta_2pm.sql`).
 - **Google Calendar (opción B):** un evento por grupo con todos sus estudiantes invitados y un
   solo enlace de Meet si es virtual. Cada clase de prueba es su propio evento. Los estudiantes
   no ven los correos de los demás.

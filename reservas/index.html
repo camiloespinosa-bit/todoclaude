@@ -91,7 +91,26 @@
       <section class="paso">
         <h2><span class="paso__num">3</span> Elige día y hora</h2>
         <div class="dias" id="dias" role="radiogroup" aria-label="Día"></div>
-        <div class="horas" id="horas" role="radiogroup" aria-label="Hora" aria-live="polite"></div>
+        <div class="horas" id="horas" aria-label="Hora" aria-live="polite"></div>
+        <div class="elegidas" id="elegidas" hidden>
+          <p class="opciones__titulo">Tus clases</p>
+          <ul class="elegidas__lista" id="lista-elegidas"></ul>
+          <p class="elegidas__ayuda">¿Varios días a la semana? Toca otro día y otra hora para agregarla (hasta 5).</p>
+        </div>
+        <div class="repetir" id="repetir" hidden>
+          <p class="opciones__titulo">¿Las repites cada semana?</p>
+          <div class="opciones opciones--dos" role="radiogroup" aria-label="Repetir" id="opciones-repetir">
+            <button type="button" class="opcion" role="radio" aria-checked="true" data-semanas="1">
+              <strong>Solo esta vez</strong>
+              <span>Las fechas que elegiste</span>
+            </button>
+            <button type="button" class="opcion" role="radio" aria-checked="false" data-semanas="4">
+              <strong>Cada semana</strong>
+              <span>Las mismas clases durante 4 semanas</span>
+            </button>
+          </div>
+          <ul class="plan" id="plan" aria-live="polite"></ul>
+        </div>
       </section>
 
       <section class="paso">
@@ -141,6 +160,11 @@
       <img src="../assets/img/oki/oki-celebrando.svg" alt="" width="160" height="160" />
       <h2 id="listo-titulo">¡Tu clase quedó reservada!</h2>
       <p id="listo-detalle"></p>
+      <ul class="listo__lista" id="listo-lista" hidden></ul>
+      <div class="listo__fallidas" id="listo-fallidas" hidden>
+        <p><strong>Estas no se pudieron reservar:</strong></p>
+        <ul id="listo-fallidas-lista"></ul>
+      </div>
       <p id="listo-nota"></p>
       <a class="boton boton--primario" id="btn-meet" target="_blank" rel="noopener" hidden>Abrir enlace de Google Meet</a>
       <a class="boton boton--primario" id="btn-calendario" target="_blank" rel="noopener">Agregar a Google Calendar</a>

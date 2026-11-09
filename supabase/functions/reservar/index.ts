@@ -36,6 +36,8 @@ const SERVICE_KEY: string = (() => {
 const CALENDARIO = Deno.env.get("GOOGLE_CALENDAR_ID") ?? "primary";
 const ZONA = "America/Bogota";
 const SEDE = "Rionegro, Antioquia";
+// Clases que se pueden reservar de una vez (5 días por semana durante 4 semanas).
+const MAX_CLASES = 20;
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -336,29 +338,48 @@ async function reservar(datos: Record<string, unknown>) {
     return responder({ error: "AUTORIZACION_REQUERIDA" }, 409);
   }
 
-  let sesiones: string[];
-  try {
-    const r = await rpc("reservar", {
-      p_tipo: datos.tipo,
-      p_modalidad: datos.modalidad,
-      p_fecha: datos.fecha,
-      p_inicio: datos.inicio,
-      p_nombre: datos.nombre,
-      p_telefono: String(datos.telefono ?? "").replace(/[\s-]/g, ""),
-      p_correo: datos.correo,
-      p_programa: datos.programa,
-      p_personas: datos.personas ?? 1,
-      p_acepta_whatsapp: Boolean(datos.acepta_whatsapp),
-      p_politica: datos.politica_version.slice(0, 20),
-    });
-    sesiones = r.sesiones;
-  } catch (e) {
-    const codigo = codigoDeError(e);
-    return responder({ error: codigo }, codigo === "ERROR" ? 500 : 409);
+  // Una o varias clases (varios días y repetir semanas). Cada una se reserva por separado
+  // con las mismas reglas: las que no se puedan quedan en "resultados" con su motivo.
+  const items: { fecha: unknown; inicio: unknown }[] = Array.isArray(datos.items)
+    ? datos.items
+    : [{ fecha: datos.fecha, inicio: datos.inicio }];
+  if (!items.length || items.length > MAX_CLASES || (datos.tipo === "prueba" && items.length > 1)) {
+    return responder({ error: "DEMASIADAS_CLASES" }, 409);
+  }
+  const serie = items.length > 1 ? crypto.randomUUID() : null;
+
+  const sesiones: string[] = [];
+  const resultados: { fecha: unknown; inicio: unknown; ok: boolean; error?: string }[] = [];
+  for (const item of items) {
+    try {
+      const r = await rpc("reservar", {
+        p_tipo: datos.tipo,
+        p_modalidad: datos.modalidad,
+        p_fecha: item.fecha,
+        p_inicio: item.inicio,
+        p_nombre: datos.nombre,
+        p_telefono: String(datos.telefono ?? "").replace(/[\s-]/g, ""),
+        p_correo: datos.correo,
+        p_programa: datos.programa,
+        p_personas: datos.personas ?? 1,
+        p_acepta_whatsapp: Boolean(datos.acepta_whatsapp),
+        p_politica: datos.politica_version.slice(0, 20),
+        p_serie: serie,
+      });
+      sesiones.push(...r.sesiones);
+      resultados.push({ fecha: item.fecha, inicio: item.inicio, ok: true });
+    } catch (e) {
+      resultados.push({ fecha: item.fecha, inicio: item.inicio, ok: false, error: codigoDeError(e) });
+    }
+  }
+  const primera = resultados.find((r) => r.ok);
+  if (!primera) {
+    const codigo = resultados[0].error ?? "ERROR";
+    return responder({ error: codigo, resultados }, codigo === "ERROR" ? 500 : 409);
   }
 
-  // La reserva ya quedó guardada. Si Google falla, no se pierde: se informa y el docente
-  // la puede reenviar al calendario desde su panel.
+  // Las reservas ya quedaron guardadas. Si Google falla, no se pierden: se informa y el
+  // docente las puede reenviar al calendario desde su panel.
   let meet: string | null = null;
   let calendario = true;
   try {
@@ -367,8 +388,8 @@ async function reservar(datos: Record<string, unknown>) {
     console.error(e);
     calendario = false;
   }
-  await confirmarPorWhatsApp(datos, sesiones, meet);
-  return responder({ ok: true, calendario, meet });
+  await confirmarPorWhatsApp({ ...datos, fecha: primera.fecha, inicio: primera.inicio }, sesiones, meet);
+  return responder({ ok: true, calendario, meet, resultados });
 }
 
 async function panel(req: Request, datos: Record<string, unknown>) {
