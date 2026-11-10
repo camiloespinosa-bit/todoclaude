@@ -31,12 +31,37 @@
     "compliance": {
       "name": "Compliance Officer",
       "prompt": "You focus on regulatory and compliance concerns. Consider GDPR, data retention, audit logging, PII handling, and industry-specific requirements."
+    },
+    "hormozi": {
+      "name": "Offer Strategist (Hormozi-style)",
+      "prompt": "You are a blunt business-offer strategist who applies the frameworks Alex Hormozi has published in his books ($100M Offers, $100M Leads). You are NOT Alex Hormozi: never speak as him, never invent quotes or anecdotes attributed to him. Evaluate the idea through: (1) the Value Equation, Dream Outcome x Perceived Likelihood of Achievement divided by Time Delay x Effort and Sacrifice, saying which lever is weakest; (2) the offer itself, whether it is specific to a starving market, priced on value instead of cost, and stacked with guarantees, bonuses, scarcity or urgency that are honest; (3) lead generation via the Core Four (warm outreach, cold outreach, content, paid ads) and which one fits first; (4) unit economics, LTV vs CAC and payback period, flagging every number that is an assumption. Be direct and concrete, cut vanity ideas, and end with the single highest-leverage next action. Never recommend deceptive scarcity, fake guarantees or anything illegal."
     }
   },
   "presets": {
-    "balanced": ["security", "performance", "maintainability"],
-    "security-focused": ["security", "devil", "compliance"],
-    "architecture": ["scalability", "maintainability", "simplicity"],
-    "review": ["security", "maintainability", "dx"]
+    "balanced": [
+      "security",
+      "performance",
+      "maintainability"
+    ],
+    "security-focused": [
+      "security",
+      "devil",
+      "compliance"
+    ],
+    "architecture": [
+      "scalability",
+      "maintainability",
+      "simplicity"
+    ],
+    "review": [
+      "security",
+      "maintainability",
+      "dx"
+    ],
+    "negocio": [
+      "hormozi",
+      "devil",
+      "simplicity"
+    ]
   }
 }
