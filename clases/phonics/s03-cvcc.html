@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Phonics · Sesión 3 · Palabras de 4 sonidos (CVCC)</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#145389;--azulOscuro:#2C5F7C;--deep:#1D3F54;--verde:#7CB342;--naranja:#F57C00;--fondo:#F0F4F8;--tqL:#EAF4F6;--vdL:#F1F8E9;--naL:#FFF3E0;--ink:#1E2A33;--muted:#6B7C88;--line:#D9E1E7}
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:Letter;margin:0}
+body{font-family:'Poppins',sans-serif;color:var(--ink);background:#ccc;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:8.5in;height:11in;background:#fff;margin:0 auto 8mm;position:relative;overflow:hidden;page-break-after:always;padding:15mm 16mm 12mm 21mm;display:flex;flex-direction:column;gap:3.6mm;font-size:9.4pt;line-height:1.45}
+.page:last-child{page-break-after:avoid}
+@media print{body{background:#fff}.page{margin:0;box-shadow:none}}
+.stripe{position:absolute;left:0;top:0;bottom:0;width:6mm;background:linear-gradient(to bottom,var(--azul) 0 60%,var(--verde) 60% 80%,var(--naranja) 80% 100%)}
+.top{display:flex;align-items:center;justify-content:space-between;border-bottom:.7mm solid var(--azul);padding-bottom:2.2mm}
+.brand{display:flex;align-items:center;gap:3mm;font-weight:900;font-size:11pt;color:var(--azulOscuro);letter-spacing:.02em}
+.brand img{height:12mm}
+.top .sec{font-size:8pt;color:var(--muted)}
+.foot{margin-top:auto;display:flex;justify-content:space-between;font-size:7pt;color:var(--muted)}
+h1{font-size:21pt;font-weight:800;color:var(--azulOscuro);line-height:1.15;margin-top:1mm}
+.kicker{font-size:8pt;font-weight:700;color:var(--naranja);letter-spacing:.1em;text-transform:uppercase;margin-top:-1.5mm}
+.note{font-size:8pt;color:var(--muted)}
+.call{border-left:1.2mm solid var(--azul);background:var(--tqL);border-radius:0 2.5mm 2.5mm 0;padding:3mm 4mm;font-size:9.4pt}
+.call.or{border-color:var(--naranja);background:var(--naL)}
+.call.vd{border-color:var(--verde);background:var(--vdL)}
+.call b{color:var(--deep)}
+.call ul{padding-left:4.5mm;margin-top:1mm}
+h2{font-size:12pt;font-weight:700;color:var(--azulOscuro);display:flex;align-items:center;gap:2.5mm}
+h2::before{content:"";width:1.6mm;height:5mm;border-radius:1mm;background:var(--azul)}
+.tbl{border:1px solid var(--line);border-radius:2.5mm;overflow:hidden;flex:none}
+.tbl table{width:100%;border-collapse:collapse;font-size:8.6pt}
+.tbl th{background:var(--azulOscuro);color:#fff;text-align:left;font-weight:600;padding:2mm 3mm}
+.tbl td{padding:1.8mm 3mm;vertical-align:top;border-top:1px solid var(--line)}
+.tbl tr:nth-child(even) td{background:var(--fondo)}
+.tbl td.m{font-weight:700;color:var(--azulOscuro);white-space:nowrap;width:15mm}
+.tbl td.n{font-weight:700;color:var(--azulOscuro);width:30mm}
+.tbl td.c{text-align:center}
+.say{font-style:italic;color:#34495a}
+.cb{display:inline-block;width:3.6mm;height:3.6mm;border:1.4px solid var(--azulOscuro);border-radius:.8mm;vertical-align:-.6mm;margin:0 1mm}
+.ln{display:inline-block;border-bottom:1px solid #8a9aa6;min-width:18mm}
+.lines{background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 7.6mm,#b9c5ce 7.6mm,#b9c5ce 7.9mm)}
+.cutnote{font-size:7.6pt;color:var(--muted)}
+.cutgrid{display:grid;border:1px dashed #c3ccd3}
+.cut{border:1px dashed #c3ccd3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4mm;gap:2mm}
+.tag{font-size:8pt;font-weight:700;color:var(--naranja);letter-spacing:.1em;text-transform:uppercase}
+.secret{align-self:flex-start;background:var(--naranja);color:#fff;font-size:7.5pt;font-weight:800;letter-spacing:.1em;padding:1mm 3mm;border-radius:1.5mm}
+.mission{border:.9mm solid var(--azul);border-radius:5mm;padding:6mm 7mm;position:relative}
+.mission h3{font-size:19pt;font-weight:800;color:var(--azulOscuro);margin:1mm 0 3mm}
+.mission p{margin-bottom:2mm}
+.mission ul{padding-left:5mm;margin-top:1mm}
+.mission img{position:absolute;right:6mm;top:5mm;height:30mm}
+.sig{font-size:7.5pt;color:var(--muted);margin-top:2mm}
+.titlerow{display:flex;justify-content:space-between;align-items:flex-end;gap:4mm}
+.titlerow img{height:30mm;flex:none}
+
+/* Session-specific */
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:2mm 8mm;font-size:15pt;font-weight:700;color:var(--azulOscuro)}
+.pairs div{display:flex;align-items:center;gap:3mm}
+.pairs .ar{color:var(--verde);font-size:12pt}
+.pairs .add{background:var(--naL);color:var(--naranja);border-radius:1.5mm;padding:0 1mm}
+.boxes{display:flex;gap:5mm;justify-content:center}
+.sbox{width:38mm;height:52mm;border:1.2mm solid var(--azulOscuro);border-radius:5mm;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4mm}
+.sbox.end{border-color:var(--naranja);border-style:dashed}
+.sdot{width:7mm;height:7mm;border-radius:50%;background:var(--naranja)}
+.big{font-size:40pt;font-weight:800;color:var(--deep);text-align:center;line-height:1.1}
+.word{font-size:34pt;font-weight:800;color:var(--azulOscuro)}
+.bingo{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);border:.9mm solid var(--azul);border-radius:4mm;overflow:hidden;flex:1}
+.bingo div{border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:30pt;font-weight:800;color:var(--azulOscuro)}
+.bhead{display:flex;justify-content:space-between;align-items:center;background:var(--azulOscuro);color:#fff;border-radius:3mm;padding:2mm 4mm;font-weight:700}
+.bhead span:last-child{color:#FDD835}
+.check{display:grid;grid-template-columns:1fr 1fr;gap:3mm 12mm}
+.check div{font-size:36pt;font-weight:800;color:var(--deep);border-bottom:1px solid var(--line);padding:0 0 1mm 2mm}
+.check small{font-size:10pt;color:var(--azul);font-weight:700;margin-right:4mm;vertical-align:middle}
+.alien{background:var(--vdL);border-radius:3mm;padding:3mm 5mm;display:flex;align-items:center;gap:6mm}
+.alien .w{font-size:36pt;font-weight:800;color:var(--deep);flex:1;text-align:center}
+.draw{flex:1;border:.9mm solid var(--azulOscuro);border-radius:4mm;position:relative}
+.draw span{position:absolute;top:2mm;left:4mm;font-size:9pt;color:var(--azul);font-weight:600}
+.sentence{font-size:30pt;font-weight:800;color:var(--azulOscuro);text-align:center}
+.tricky{background:var(--naL);color:var(--naranja);border-radius:2mm;padding:0 2mm}
+.taps{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;text-align:center;font-size:8.6pt}
+.taps div{background:var(--fondo);border-radius:2.5mm;padding:2mm}
+.taps b{display:block;font-size:11pt;color:var(--azulOscuro)}
+</style></head><body>
+
+<!-- 1. GUÍA DEL FACILITADOR -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Guía del facilitador</div></div>
+  <h1>Sesión 3 · Palabras de 4 sonidos (CVCC)</h1>
+  <div class="kicker">Guía del facilitador · 60 minutos · En inglés</div>
+  <div class="call"><b>Objetivo:</b> leer palabras de 4 sonidos que terminan en dos consonantes (-st, -nd, -mp, -lk, -ft, -lp, -nt), diciendo los dos sonidos del final sin dejar caer el último.</div>
+  <div class="call or"><b>Cuidar el ánimo:</b> es el primer salto en dificultad. Si se frustra, vuelve a una palabra de 3 sonidos que ya domina y súmale solo el último sonido ("ten... tent!"). Celebra cada palabra larga: <span class="say">"That's a big word! Four sounds!"</span></div>
+  <h2>Plan minuto a minuto</h2>
+  <div class="tbl"><table>
+    <tr><th>Min</th><th>Momento</th><th>Qué hacer</th></tr>
+    <tr><td class="m">0 a 5</td><td class="n">Vowel Freeze</td><td>Repaso de vocales con las vowel cards y los gestos de la sesión 2. Pon música, para y muestra una vocal. <span class="say">"Freeze! What sound is this?"</span></td></tr>
+    <tr><td class="m">5 a 10</td><td class="n">Review</td><td>Lee 6 palabras CVC de la sesión 2: hen, bug, pot, lip, jam, wet. Si duda en alguna vocal, repasa con su vowel card.</td></tr>
+    <tr><td class="m">10 a 18</td><td class="n">Count the Sounds</td><td>Oral, sin letras. Di la palabra y que empuje una ficha a cada caja del tablero (pág. 5) por cada sonido. Primero el par corto y luego el largo: net / nest, ban / band, cap / camp. Después: jump, milk, lamp. <span class="say">"Nest. How many sounds? n-e-s-t. Four!"</span></td></tr>
+    <tr><td class="m">18 a 28</td><td class="n">Add a Sound</td><td>Con letter cards en el tablero. Arma la palabra de 3, que la lea, agrega la cuarta letra en la caja naranja y que lea de nuevo. Pares en la pág. 4. Arm tapping de 4 toques (pág. 2). <span class="say">"Ten. Now I add t... ten-t. Tent!"</span></td></tr>
+    <tr><td class="m">28 a 33</td><td class="n">Jump and Blend</td><td>Pausa activa. Un salto por sonido y un salto grande al decir la palabra. Empieza con <span class="say">"/j/ /u/ /m/ /p/... JUMP!"</span> Sigue con hand, nest, lamp, milk.</td></tr>
+    <tr><td class="m">33 a 45</td><td class="n">Oki's Bingo</td><td>Baraja las 12 call cards (pág. 6). El estudiante saca una, la lee en voz alta y los dos la buscan en su tablero (pág. 7). Gana quien complete una línea. Si la lee mal, la carta vuelve al mazo. <span class="say">"Read it to me. Do you have it?"</span></td></tr>
+    <tr><td class="m">45 a 51</td><td class="n">Quick Check 3</td><td>10 palabras nuevas y 2 alien words (pág. 8), sin ayuda. Anota en la pág. 4.</td></tr>
+    <tr><td class="m">51 a 57</td><td class="n">My Sentences</td><td>Lee y dibuja las dos oraciones (pág. 9). "a" y "in" ya las conoce.</td></tr>
+    <tr><td class="m">57 a 60</td><td class="n">Cierre</td><td>Sticker en su certificado. Entrega la misión para casa (pág. 10) a la familia y explícale los 3 juegos en un minuto.</td></tr>
+  </table></div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 2. GUÍA (CONT.) -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Guía del facilitador</div></div>
+  <div class="titlerow">
+    <div>
+      <h1>Antes de empezar</h1>
+      <div class="kicker">Sesión 3 · Requisitos, errores típicos y ajustes</div>
+    </div>
+    <img src="../../assets/img/oki/oki-pensando.svg" alt="Oki">
+  </div>
+  <div class="call"><b>Requisito:</b> 8 o más de 10 en el Quick Check 2 y al menos una alien word leída. Si no lo logró, repite la sesión 2 con otras palabras: esta sesión supone que ya lee CVC con las 5 vocales.</div>
+  <h2>Lo que entrena hoy</h2>
+  <div class="tbl"><table>
+    <tr><td class="n">Conciencia fonémica</td><td>Contar 4 sonidos en una palabra y notar que "nest" tiene uno más que "net".</td></tr>
+    <tr><td class="n">Decodificación</td><td>Unir 4 sonidos de izquierda a derecha, sin saltarse el último.</td></tr>
+    <tr><td class="n">Memoria de trabajo</td><td>Sostener 4 sonidos mientras los une. Es más carga que con 3: por eso se toca el brazo.</td></tr>
+  </table></div>
+  <h2>Arm tapping con 4 sonidos</h2>
+  <div class="taps">
+    <div><b>1 · hombro</b>/j/</div><div><b>2 · codo</b>/u/</div><div><b>3 · muñeca</b>/m/</div><div><b>4 · dedos</b>/p/</div>
+  </div>
+  <div class="note">Después desliza la mano del hombro a los dedos diciendo la palabra completa: "jump!".</div>
+  <h2>Error típico en hispanohablantes</h2>
+  <div class="call"><b>Se come el último sonido:</b> dice "bes" por best o "han" por hand. En español casi ninguna palabra termina en dos consonantes, así que el oído no lo espera. Cuando pase, tapa la última letra, que lea las tres primeras, destápala y que agregue solo ese sonido: <span class="say">"bes... bes-t. Best!"</span> No le digas "está mal": dile <span class="say">"Listen to the end. One more sound!"</span></div>
+  <div class="call vd"><b>Si le cuesta:</b>
+    <ul>
+      <li>Quédate solo con -st y -nd, que son los finales más comunes, y deja -mp, -lk y -ft para la próxima.</li>
+      <li>Haz más rondas de Add a Sound antes del bingo y reduce el bingo a 6 palabras.</li>
+      <li>Si dice los sonidos sueltos pero no los une, alarga los sonidos continuos: "nnneeesss-t".</li>
+    </ul>
+  </div>
+  <div class="call vd"><b>Si arrasa:</b>
+    <ul>
+      <li>En el bingo, que lea la carta sin tocarse el brazo.</li>
+      <li>Reto: una cadena de palabras largas cambiando una sola letra: band → bend → bent → best.</li>
+      <li>Avísale lo que viene: palabras que empiezan con dos consonantes (stop, frog).</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 3. MATERIALES Y REGISTRO -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Materiales y registro</div></div>
+  <h1>Materiales y registro</h1>
+  <div class="kicker">Sesión 3 · Estudiante: <span class="ln" style="min-width:45mm"></span> · Fecha: <span class="ln" style="min-width:30mm"></span></div>
+  <div class="tbl"><table>
+    <tr><th style="width:9mm"></th><th>Material</th></tr>
+    <tr><td><span class="cb"></span></td><td>Vowel cards de la sesión 2 (con gestos)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Letter cards de las sesiones 1 y 2 (necesitas s, t, n, d, m, p, l, k, f a mano)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Tablero de 4 cajas (en este PDF, pág. 5) y 4 fichas o tapitas</td></tr>
+    <tr><td><span class="cb"></span></td><td>Call cards del bingo, 12 (en este PDF, pág. 6, recortadas)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Tableros de bingo, 2 (en este PDF, pág. 7) y 18 marcadores (tapitas, fríjoles o fichas)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Quick Check 3 (en este PDF, pág. 8) y oraciones (pág. 9), lápiz y colores</td></tr>
+    <tr><td><span class="cb"></span></td><td>Música para Vowel Freeze, certificado con stickers y misión para casa (pág. 10)</td></tr>
+  </table></div>
+  <h2>Registro rápido</h2>
+  <div class="tbl"><table>
+    <tr><th style="width:52mm">Objetivo</th><th>Cómo le fue</th></tr>
+    <tr><td class="n">Ánimo al llegar / al salir</td><td>Llegó: 🙂 <span class="cb"></span> 😐 <span class="cb"></span> 🙁 <span class="cb"></span> &nbsp;&nbsp; Salió: 🙂 <span class="cb"></span> 😐 <span class="cb"></span> 🙁 <span class="cb"></span></td></tr>
+    <tr><td class="n">Cuenta 4 sonidos oralmente</td><td>Lo logra: <span class="cb"></span> solo &nbsp; <span class="cb"></span> con ayuda &nbsp; <span class="cb"></span> todavía no</td></tr>
+    <tr><td class="n">Agrega el 4º sonido (Add a Sound)</td><td>Pares leídos bien: <span class="ln" style="min-width:12mm"></span> / 6</td></tr>
+    <tr><td class="n">Lee las call cards del bingo</td><td>Cartas leídas al primer intento: <span class="ln" style="min-width:12mm"></span> / 12</td></tr>
+    <tr><td class="n">Se come el último sonido</td><td><span class="cb"></span> casi nunca &nbsp; <span class="cb"></span> a veces &nbsp; <span class="cb"></span> casi siempre &nbsp; ¿con qué final? <span class="ln" style="min-width:20mm"></span></td></tr>
+    <tr><td class="n">Quick Check 3</td><td>Reales: <span class="ln" style="min-width:12mm"></span> / 10 &nbsp;&nbsp; Alien words: <span class="ln" style="min-width:12mm"></span> / 2</td></tr>
+  </table></div>
+  <div><b>Notas</b> (ánimo, qué funcionó, qué costó):</div>
+  <div class="lines" style="flex:1"></div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 4. SOLO FACILITADOR -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Solo para el facilitador</div></div>
+  <div class="secret">SOLO PARA EL FACILITADOR</div>
+  <h2>Add a Sound · 6 pares</h2>
+  <div class="note">Arma la palabra de 3 letras, que la lea, pon la cuarta letra en la caja naranja y que lea otra vez.</div>
+  <div class="pairs">
+    <div>ten <span class="ar">→</span> ten<span class="add">t</span></div>
+    <div>ban <span class="ar">→</span> ban<span class="add">d</span></div>
+    <div>men <span class="ar">→</span> men<span class="add">d</span></div>
+    <div>hum <span class="ar">→</span> hum<span class="add">p</span></div>
+    <div>pan <span class="ar">→</span> pan<span class="add">t</span></div>
+    <div>bus <span class="ar">→</span> bus<span class="add">t</span></div>
+  </div>
+  <h2>Quick Check 3 · Registro</h2>
+  <div class="tbl"><table>
+    <tr><th style="width:8mm">#</th><th>Palabra</th><th>Final</th><th>✓ Lee la palabra</th><th>Se come el último sonido</th><th>Qué dijo</th></tr>
+    <tr><td>1</td><td class="n">vest</td><td>-st</td><td></td><td></td><td></td></tr>
+    <tr><td>2</td><td class="n">bend</td><td>-nd</td><td></td><td></td><td></td></tr>
+    <tr><td>3</td><td class="n">lump</td><td>-mp</td><td></td><td></td><td></td></tr>
+    <tr><td>4</td><td class="n">mist</td><td>-st</td><td></td><td></td><td></td></tr>
+    <tr><td>5</td><td class="n">lift</td><td>-ft</td><td></td><td></td><td></td></tr>
+    <tr><td>6</td><td class="n">belt</td><td>-lt</td><td></td><td></td><td></td></tr>
+    <tr><td>7</td><td class="n">desk</td><td>-sk</td><td></td><td></td><td></td></tr>
+    <tr><td>8</td><td class="n">golf</td><td>-lf</td><td></td><td></td><td></td></tr>
+    <tr><td>9</td><td class="n">hunt</td><td>-nt</td><td></td><td></td><td></td></tr>
+    <tr><td>10</td><td class="n">raft</td><td>-ft</td><td></td><td></td><td></td></tr>
+    <tr><td colspan="3"><b>Total palabras reales</b></td><td><b>___ / 10</b></td><td><b>___ / 10</b></td><td></td></tr>
+    <tr><td>11</td><td class="n">vimp</td><td>-mp</td><td></td><td></td><td></td></tr>
+    <tr><td>12</td><td class="n">dast</td><td>-st</td><td></td><td></td><td></td></tr>
+  </table></div>
+  <div class="call"><b>Cómo leer el resultado:</b>
+    <ul>
+      <li><b>8 a 10 y al menos 1 alien word:</b> pasa a la sesión 4, palabras que empiezan con dos consonantes (CCVC: stop, frog, clap).</li>
+      <li><b>8 a 10 sin alien words:</b> puede estar reconociendo de memoria. Repite con otras palabras CVCC.</li>
+      <li><b>5 a 7:</b> mira la columna "Se come el último sonido". Si es eso, la próxima sesión es más Add a Sound. Si el error está en la vocal, repasa vocales primero.</li>
+      <li><b>0 a 4:</b> vuelve a CVC (sesión 2). El salto a 4 sonidos fue muy pronto, y está bien.</li>
+    </ul>
+  </div>
+  <div class="note">Las palabras del Quick Check no aparecen en ninguna otra actividad de la sesión, a propósito: así mide lectura y no memoria.</div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 5. TABLERO 4 CAJAS -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Recortables y tableros</div></div>
+  <h1>Four Sound Boxes</h1>
+  <div class="kicker">Count the Sounds · Add a Sound</div>
+  <div class="note">No se recorta. Mejor plastificado o en funda. Una ficha o una letra por caja. La caja punteada naranja es el sonido nuevo de hoy.</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8mm">
+    <div class="boxes">
+      <div class="sbox"><div class="sdot"></div></div>
+      <div class="sbox"><div class="sdot"></div></div>
+      <div class="sbox"><div class="sdot"></div></div>
+      <div class="sbox end"><div class="sdot"></div></div>
+    </div>
+    <svg viewBox="0 0 720 60" style="width:170mm;height:13mm;align-self:center">
+      <line x1="10" y1="30" x2="680" y2="30" stroke="#7CB342" stroke-width="10" stroke-linecap="round"/>
+      <polygon points="670,6 714,30 670,54" fill="#7CB342"/>
+    </svg>
+    <div class="big" style="font-size:30pt">tap · tap · tap · <span style="color:var(--naranja)">tap</span> · <span style="color:var(--verde)">slide!</span></div>
+    <div style="display:flex;align-items:center;gap:5mm;justify-content:center">
+      <img src="../../assets/img/oki/oki-senalando.svg" style="height:32mm" alt="Oki">
+      <div class="call" style="max-width:110mm">Toca cada punto y di su sonido. Desliza el dedo por la flecha y di la palabra completa. <span class="say">"Don't forget the last box!"</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 6. CALL CARDS -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Recortables y tableros</div></div>
+  <div class="cutnote">Call cards de Oki's Bingo. El estudiante saca una carta y la lee en voz alta. Recortar por la línea punteada.</div>
+  <div class="cutgrid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);flex:1">
+    <div class="cut"><div class="word">nest</div></div>
+    <div class="cut"><div class="word">hand</div></div>
+    <div class="cut"><div class="word">jump</div></div>
+    <div class="cut"><div class="word">lamp</div></div>
+    <div class="cut"><div class="word">milk</div></div>
+    <div class="cut"><div class="word">tent</div></div>
+    <div class="cut"><div class="word">sand</div></div>
+    <div class="cut"><div class="word">best</div></div>
+    <div class="cut"><div class="word">camp</div></div>
+    <div class="cut"><div class="word">pond</div></div>
+    <div class="cut"><div class="word">gift</div></div>
+    <div class="cut"><div class="word">help</div></div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 7. BINGO BOARDS -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Hoja del estudiante</div></div>
+  <div class="cutnote">Corta la hoja por la mitad: un tablero para el estudiante y otro para el facilitador. Cada tablero tiene 9 de las 12 palabras, así que nadie gana con todas las cartas.</div>
+  <div class="bhead"><span>Oki's Bingo · Player 1</span><span>BINGO!</span></div>
+  <div class="bingo">
+    <div>nest</div><div>jump</div><div>milk</div>
+    <div>sand</div><div>camp</div><div>gift</div>
+    <div>hand</div><div>best</div><div>help</div>
+  </div>
+  <div style="border-top:1px dashed #c3ccd3;margin:1mm 0"></div>
+  <div class="bhead"><span>Oki's Bingo · Player 2</span><span>BINGO!</span></div>
+  <div class="bingo">
+    <div>lamp</div><div>tent</div><div>pond</div>
+    <div>jump</div><div>gift</div><div>nest</div>
+    <div>help</div><div>sand</div><div>milk</div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 8. QUICK CHECK -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Hoja del estudiante</div></div>
+  <div class="titlerow">
+    <div>
+      <h1>Can you read these words?</h1>
+      <div class="kicker">Quick Check 3 · Sin ayuda</div>
+    </div>
+    <img src="../../assets/img/oki/oki-leyendo.svg" alt="Oki">
+  </div>
+  <div class="check" style="flex:1;align-content:center">
+    <div><small>1</small>vest</div><div><small>2</small>bend</div>
+    <div><small>3</small>lump</div><div><small>4</small>mist</div>
+    <div><small>5</small>lift</div><div><small>6</small>belt</div>
+    <div><small>7</small>desk</div><div><small>8</small>golf</div>
+    <div><small>9</small>hunt</div><div><small>10</small>raft</div>
+  </div>
+  <div class="alien">
+    <div style="font-size:11pt;font-weight:800;color:var(--azulOscuro);width:30mm">Alien words!</div>
+    <div class="w"><small style="font-size:10pt;color:var(--azul);margin-right:4mm">11</small>vimp</div>
+    <div class="w"><small style="font-size:10pt;color:var(--azul);margin-right:4mm">12</small>dast</div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 9. SENTENCES -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Hoja del estudiante</div></div>
+  <div class="titlerow">
+    <div>
+      <h1>My Sentences</h1>
+      <div class="kicker">Lee la oración y dibújala</div>
+    </div>
+    <img src="../../assets/img/oki/oki-celebrando.svg" alt="Oki">
+  </div>
+  <div class="sentence">Pam <span>and</span> Ben camp <span class="tricky">in</span> <span class="tricky">a</span> tent.</div>
+  <div class="draw"><span>Draw it!</span></div>
+  <div class="sentence">Dad can jump <span class="tricky">in</span> <span class="tricky">a</span> pond.</div>
+  <div class="draw"><span>Draw it!</span></div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 10. MISIÓN PARA CASA -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Misión para casa</div></div>
+  <div class="note">Para entregar a la familia al final de la sesión.</div>
+  <div class="mission">
+    <img src="../../assets/img/oki/oki-senalando.svg" alt="Oki">
+    <div class="tag">Misión para casa · Semana 3</div>
+    <h3>¡Palabras de 4 sonidos!</h3>
+    <p style="max-width:120mm">Esta semana tu hijo/a aprendió a leer palabras en inglés que terminan con dos consonantes, como <b>jump</b>, <b>hand</b> y <b>nest</b>. Lo más difícil es no comerse el último sonido. Con estos juegos lo practica en casa sin que parezca tarea.</p>
+    <p style="max-width:120mm"><b>Juego 1: Habla como robot.</b> En la comida, di una palabra en pedacitos y que adivine cuál es: "/h/ /a/ /n/ /d/... hand!". Luego él o ella es el robot y tú adivinas.</p>
+    <p style="max-width:120mm"><b>Juego 2: Salta la palabra.</b> Un salto por cada sonido y un salto grande al decirla completa: "/j/ /u/ /m/ /p/... JUMP!". Prueben con jump, hand, nest, milk y lamp.</p>
+    <p><b>Juego 3: Lee y busca.</b> Escriban estas palabras en papelitos y péguenlas donde va cada cosa: <b>lamp</b> en una lámpara, <b>milk</b> en la leche, <b>hand</b> en la mano de un muñeco. Que las lea cada vez que pase.</p>
+    <div class="call" style="font-weight:600;font-size:12pt;margin:2mm 0 3mm">Palabras de la semana: jump · hand · nest · milk · lamp · tent</div>
+    <ul>
+      <li>Unos minutos varios días funcionan mejor que mucho tiempo un solo día.</li>
+      <li>Si dice "han" en vez de "hand", no le digas que está mal. Dile: "Escucha el final, falta un sonido", y repítanla juntos.</li>
+      <li>No hace falta que tú sepas inglés: con los sonidos de las letras basta. Si dudas de uno, escríbenos.</li>
+    </ul>
+    <div class="sig">______________________ · Facilitador · Gimnasio del Cerebro · 301 491 6120</div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 3</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+</body></html>
