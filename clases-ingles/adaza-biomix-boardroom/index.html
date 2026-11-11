@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biomix Boardroom</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+/* Game metadata (not visible): debate 1 a 1 guiado por el profesor | Business Fluency Lab | Adaza, B1, Biomix | refuerzo de preposiciones */
+:root{
+  --bg:#F2F7F9; --surface:#FFFFFF; --surface-2:#E8F1F4; --ink:#12303F; --muted:#4E6B79; --line:#CFDFE5;
+  --brand:#2C5F7C; --on-brand:#FFFFFF; --focus:#F57C00;
+  --hdr-a:#1D3F54; --hdr-b:#2C5F7C; --hdr-soft:#BCD9E1;
+  --l1:#7CB342; --l2:#57A6B5; --l3:#F57C00;
+  --k-base:#4E8A1F; --k-cause:#1B6F80; --k-contrast:#B85A00; --k-alt:#6B4BA3; --k-add:#2C5F7C; --k-corp:#1D3F54; --k-time:#A3306B;
+  --kb-base:#EAF4DC; --kb-cause:#DDF0F3; --kb-contrast:#FDEBD6; --kb-alt:#EDE6F7; --kb-add:#DCE9F0; --kb-corp:#E1E6EA; --kb-time:#F8E1EC;
+  --gold:#FDD835; --on-gold:#3B2F00;
+  --good:#2F7D32; --good-bg:#E3F2E1; --bad:#B3261E; --bad-bg:#FBE9E7;
+  --font:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+    --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+    --k-base:#B5DD8A; --k-cause:#9AD3DE; --k-contrast:#FFB866; --k-alt:#CDB9EE; --k-add:#9EC4DE; --k-corp:#C9D6DE; --k-time:#F2A7CB;
+    --kb-base:#1F3320; --kb-cause:#17414B; --kb-contrast:#3D2A12; --kb-alt:#2E2447; --kb-add:#1A3A4C; --kb-corp:#223645; --kb-time:#40202F;
+    --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+  --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+  --k-base:#B5DD8A; --k-cause:#9AD3DE; --k-contrast:#FFB866; --k-alt:#CDB9EE; --k-add:#9EC4DE; --k-corp:#C9D6DE; --k-time:#F2A7CB;
+  --kb-base:#1F3320; --kb-cause:#17414B; --kb-contrast:#3D2A12; --kb-alt:#2E2447; --kb-add:#1A3A4C; --kb-corp:#223645; --kb-time:#40202F;
+  --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:16px 40px}
+button{font-family:inherit; font-size:inherit; color:inherit; cursor:pointer}
+button:disabled{cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+h1,h2,h3,h4,p{margin:0}
+h1,h2,h3{text-wrap:balance; line-height:1.15}
+.wrap{max-width:1040px; margin:0 auto}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono)}
+.primary{background:var(--brand); color:var(--on-brand); border:none; border-radius:10px; padding:12px 22px; font-weight:700; font-size:1.05rem}
+.primary:disabled{opacity:.4}
+.gold{background:var(--gold); color:var(--on-gold); border:none; border-radius:12px; padding:14px 26px; font-weight:800; font-size:1.1rem}
+.gold:disabled{opacity:.45}
+.ghost{background:transparent; border:1px solid var(--line); border-radius:10px; padding:9px 15px; color:var(--ink); font-size:.95rem}
+.ghost:hover:not(:disabled){border-color:var(--brand)}
+.ghost:disabled{opacity:.4}
+
+.hero{background:linear-gradient(135deg,var(--hdr-a),var(--hdr-b)); color:#fff; border-radius:18px; padding:clamp(22px,4vw,40px)}
+.kick{font-family:var(--mono); font-size:.76rem; text-transform:uppercase; letter-spacing:.12em; color:var(--hdr-soft)}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem); font-weight:800; letter-spacing:-.02em; margin:8px 0 6px}
+.hero p{color:var(--hdr-soft); max-width:60ch; font-size:1.05rem}
+.grid2{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:14px}
+.box{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px 22px; min-width:0}
+.box h2{font-size:1.15rem; margin-bottom:10px}
+.names{display:grid; gap:10px}
+.names label,.lbl{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); display:block}
+.names input{width:100%; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:10px; padding:10px 14px; font-family:var(--font); font-size:1.05rem}
+.seg{display:flex; gap:8px; flex-wrap:wrap; margin-top:4px}
+.seg button{border:2px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 14px; font-weight:600; font-size:.92rem; text-align:left}
+.seg button.on{border-color:var(--brand); background:var(--surface-2)}
+.seg small{display:block; font-weight:400; color:var(--muted); font-size:.78rem}
+.how{margin:0; padding:0; list-style:none; display:grid; gap:11px}
+.how li{display:grid; grid-template-columns:34px 1fr; gap:12px; align-items:start}
+.how .n{width:34px; height:34px; border-radius:50%; background:var(--brand); color:var(--on-brand); display:flex; align-items:center; justify-content:center; font-weight:700}
+.how b{display:block}
+.how span{color:var(--muted); font-size:.92rem}
+.tnote{color:var(--muted); font-size:.85rem; margin-top:12px}
+.focuslist{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+
+/* game */
+.topbar{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px}
+.topbar h2{font-size:1.3rem; font-weight:800}
+.scorerow{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:10px; margin-bottom:12px}
+.pc{background:var(--surface); border:2px solid var(--gold); border-radius:14px; padding:10px 14px; display:grid; grid-template-columns:1fr auto; gap:0 10px; align-items:center}
+.pc .nm{font-weight:700; font-size:1.05rem}
+.pc .pt{font-family:var(--mono); font-weight:700; font-size:1.6rem; grid-row:span 2}
+.pc .fl{font-size:.82rem; color:var(--muted)}
+.goal{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 14px; display:grid; gap:6px; align-content:center}
+.goal .gh{display:flex; justify-content:space-between; gap:10px; font-size:.9rem}
+.goal .gh b{font-family:var(--mono)}
+.gbar{height:12px; border-radius:99px; background:var(--surface-2); overflow:hidden}
+.gbar i{display:block; height:100%; background:linear-gradient(90deg,var(--l1),var(--gold)); border-radius:99px; transition:width .4s ease}
+.stage{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:clamp(16px,3vw,26px)}
+.step{font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.big{font-size:clamp(1.3rem,3vw,1.9rem); font-weight:800; margin:4px 0 12px}
+.lvls{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.lv{border:2px solid var(--line); border-top:8px solid var(--line); border-radius:14px; padding:16px; background:var(--surface); text-align:left; display:grid; gap:4px}
+.lv:hover{border-color:var(--brand)}
+.lv.l1{border-top-color:var(--l1)} .lv.l2{border-top-color:var(--l2)} .lv.l3{border-top-color:var(--l3)}
+.lv b{font-size:1.3rem}
+.lv span{color:var(--muted); font-size:.9rem}
+.lv em{font-style:normal; font-family:var(--mono); font-size:.72rem; color:var(--muted)}
+.card{border:1px solid var(--line); border-left:10px solid var(--line); border-radius:14px; padding:16px 18px; background:var(--bg)}
+.card.l1{border-left-color:var(--l1)} .card.l2{border-left-color:var(--l2)} .card.l3{border-left-color:var(--l3)}
+.card h3{font-size:1.35rem; font-weight:800}
+.card .lvtag,.lvtag{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.card .sit{font-size:1.2rem; margin:8px 0 12px}
+.sides{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+.side{border:2px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface); text-align:left; font-size:1.05rem; font-weight:600}
+.side small{display:block; font-family:var(--mono); font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:400}
+.side.on{border-color:var(--gold); background:color-mix(in srgb, var(--gold) 22%, var(--surface))}
+.side:disabled{opacity:1}
+.reqs{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px}
+.rq{border-radius:12px; padding:12px 14px; border:2px solid transparent}
+.rq .ct{font-family:var(--mono); font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; font-weight:600}
+.rq .cn{font-size:1.4rem; font-weight:800; line-height:1.2; margin:2px 0}
+.rq .ms{font-size:.88rem}
+.k-base{background:var(--kb-base); color:var(--k-base)} .k-cause{background:var(--kb-cause); color:var(--k-cause)} .k-contrast{background:var(--kb-contrast); color:var(--k-contrast)}
+.k-alt{background:var(--kb-alt); color:var(--k-alt)} .k-add{background:var(--kb-add); color:var(--k-add)} .k-corp{background:var(--kb-corp); color:var(--k-corp)} .k-time{background:var(--kb-time); color:var(--k-time)}
+.rq .cn,.rq .ms{color:var(--ink)}
+.timer{display:flex; align-items:center; gap:16px; margin-top:14px; flex-wrap:wrap}
+.time{font-family:var(--mono); font-weight:700; font-size:2.6rem; min-width:3ch; font-variant-numeric:tabular-nums}
+.time.low{color:var(--bad)}
+.ctrl{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; align-items:center}
+.jrow{border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-top:10px; display:grid; gap:8px; background:var(--bg)}
+.jrow .jh{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center}
+.jrow .jn{font-weight:800; font-size:1.15rem}
+.jrow .mod{font-size:.9rem; color:var(--muted)}
+.jrow .mod b{color:var(--ink)}
+.yn{display:flex; gap:8px; flex-wrap:wrap}
+.yn button{border:2px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 16px; font-weight:700}
+.yn .y.on{background:var(--good-bg); border-color:var(--good); color:var(--good)}
+.yn .n.on{background:var(--bad-bg); border-color:var(--bad); color:var(--bad)}
+.errs{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+.errs .lbl{margin-right:4px}
+.errs button{border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:5px 12px; font-size:.85rem}
+.errs button.on{border-color:var(--bad); background:var(--bad-bg); color:var(--bad); font-weight:600}
+.tw{border:2px dashed var(--l3); border-radius:14px; padding:14px 18px; background:var(--kb-contrast)}
+.tw b{font-size:1.1rem}
+.email{border:1px solid var(--line); border-radius:14px; background:var(--bg); overflow:hidden}
+.email .eh{background:var(--surface-2); padding:8px 14px; font-family:var(--mono); font-size:.78rem; color:var(--muted); display:grid; gap:2px}
+.email .eb{padding:16px 18px; font-size:1.3rem; font-weight:600}
+.email .eb mark{background:color-mix(in srgb, var(--bad) 18%, transparent); color:inherit; border-radius:4px; padding:0 3px}
+.answer{margin-top:12px; border-left:6px solid var(--good); background:var(--good-bg); border-radius:10px; padding:12px 14px}
+.answer b{color:var(--good)}
+.answer p{margin-top:4px}
+.note{color:var(--muted); font-size:.9rem; margin-top:8px}
+
+/* results */
+.rhead{background:linear-gradient(135deg,var(--hdr-a),var(--hdr-b)); color:#fff; border-radius:18px; padding:clamp(20px,4vw,32px)}
+.rhead h2{font-size:clamp(1.7rem,4vw,2.4rem); font-weight:800}
+.rhead p{color:var(--hdr-soft); margin-top:4px}
+.rgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:14px}
+.rc h3{font-size:1.1rem; margin-bottom:6px}
+.rc .sub{color:var(--muted); font-size:.88rem; margin-bottom:8px}
+.rrow{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 14px; align-items:center; padding:8px 0; border-top:1px solid var(--line)}
+.rrow:first-of-type{border-top:none}
+.rrow .nm{font-weight:600}
+.rrow .sc{font-family:var(--mono); font-weight:600}
+.rrow .was{grid-column:1/-1; font-size:.8rem; color:var(--muted)}
+.bar{height:8px; border-radius:99px; background:var(--surface-2); overflow:hidden; grid-column:1/-1}
+.bar i{display:block; height:100%; background:var(--brand); border-radius:99px}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.rchip{border-radius:999px; padding:4px 12px; font-size:.88rem; font-weight:500; border:1px solid var(--line)}
+.rchip.bad{border:1px solid var(--bad); background:var(--bad-bg); color:var(--bad)}
+.rchip.ok{border:1px solid var(--good); background:var(--good-bg); color:var(--good)}
+.rchip.neu{border:1px solid var(--brand); background:var(--surface-2); color:var(--ink)}
+.flash{font-size:.9rem; color:var(--good); min-height:1.3em; margin-top:8px}
+.area{width:100%; min-height:130px; margin-top:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:10px; padding:10px; font-family:var(--mono); font-size:.82rem}
+
+@media (max-width:700px){
+  .grid2,.lvls,.sides,.reqs,.scorerow{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section id="sStart">
+    <div class="hero">
+      <div class="kick">Preposition Arena &middot; One-to-one edition</div>
+      <h1>Biomix Boardroom</h1>
+      <p>Real decisions from a premix company. Pick a side, defend it with two connectors, fix the email, and win the board's approval.</p>
+    </div>
+    <div class="grid2">
+      <div class="box">
+        <h2>Who is in the room?</h2>
+        <div class="names">
+          <div><label for="nS">Student</label><input id="nS" type="text" value="Adaza" maxlength="20" autocomplete="off"></div>
+          <div><label for="nT">Teacher (the board)</label><input id="nT" type="text" value="Teacher" maxlength="20" autocomplete="off"></div>
+          <div>
+            <span class="lbl">Cards</span>
+            <div class="seg" id="modeSeg">
+              <button class="on" data-act="mode" data-m="focus">Review list first<small>Her missed prepositions from Preposition Lab</small></button>
+              <button data-act="mode" data-m="all">All connectors<small>Mixed practice</small></button>
+            </div>
+          </div>
+          <div>
+            <span class="lbl">Board approval goal</span>
+            <div class="seg" id="goalSeg">
+              <button data-act="goal" data-g="15">15 pts<small>Short class</small></button>
+              <button class="on" data-act="goal" data-g="25">25 pts<small>Full class</small></button>
+              <button data-act="goal" data-g="40">40 pts<small>Challenge</small></button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px"><button class="gold" data-act="start">Open the boardroom</button></div>
+      </div>
+      <div class="box">
+        <h2>How a turn works</h2>
+        <ol class="how">
+          <li><span class="n">1</span><div><b>Choose a level, get a Biomix case</b><span>Base 1 point, Compound 2, Corporate 3 for each connector.</span></div></li>
+          <li><span class="n">2</span><div><b>Pick a side and think (40 s)</b><span>Choose the side you can defend best. Plan one sentence for each connector.</span></div></li>
+          <li><span class="n">3</span><div><b>Speak to the board (60 s)</b><span>Use both connectors. Right form and right meaning.</span></div></li>
+          <li><span class="n">4</span><div><b>Teacher judges</b><span>If it is not right yet, the teacher marks the type of mistake.</span></div></li>
+          <li><span class="n">5</span><div><b>Fix the email: +2</b><span>A Biomix email has one mistake. Say the correct sentence.</span></div></li>
+          <li><span class="n">6</span><div><b>Twist (optional): +1</b><span>A surprise question from the board.</span></div></li>
+        </ol>
+        <p class="tnote">Review list from Preposition Lab (34/56, 61%):</p>
+        <div class="focuslist" id="focusList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sGame" hidden>
+    <div class="topbar">
+      <h2>Biomix Boardroom</h2>
+      <div style="display:flex; gap:10px; align-items:center"><span class="mono muted" id="turnNo"></span><button class="ghost" data-act="finish">Finish game</button></div>
+    </div>
+    <div class="scorerow" id="scoreRow"></div>
+    <div class="stage" id="stage"></div>
+  </section>
+
+  <section id="sRes" hidden>
+    <div class="rhead"><h2 id="rTitle"></h2><p id="rSub"></p></div>
+    <div class="rgrid">
+      <div class="box rc"><h3>By level</h3><p class="sub">Speaking today vs. Preposition Lab (written). Different tasks, so use it as a guide, not an exact comparison.</p><div id="rLevels"></div></div>
+      <div class="box rc"><h3>By type of connector</h3><p class="sub">Right uses out of tries.</p><div id="rCats"></div></div>
+    </div>
+    <div class="rgrid">
+      <div class="box rc"><h3>Fix the email</h3><p class="sub">Correcting a written mistake out loud.</p><div id="rFix"></div></div>
+      <div class="box rc"><h3>Type of mistake</h3><p class="sub">What went wrong when it was not right yet.</p><div id="rErr"></div></div>
+    </div>
+    <div class="rgrid">
+      <div class="box rc"><h3>To review</h3><p class="sub">Missed at least once today.</p><div class="chips" id="rMiss"></div></div>
+      <div class="box rc"><h3>Used right</h3><p class="sub">Right at least once today.</p><div class="chips" id="rGood"></div></div>
+    </div>
+    <div class="rgrid">
+      <div class="box rc"><h3>Voice note homework</h3><p class="sub">1 minute about a real situation at work. Use at least 3 of these:</p><div class="chips" id="rHw"></div></div>
+    </div>
+    <div class="ctrl">
+      <button class="primary" data-act="copymsg">Copy message for Adaza</button>
+      <button class="ghost" data-act="copyrep">Copy report</button>
+      <button class="ghost" data-act="csv">Download CSV</button>
+      <button class="ghost" data-act="copycsv">Copy CSV</button>
+      <button class="ghost" data-act="again">Play again</button>
+    </div>
+    <div class="flash" id="flash" role="status"></div>
+    <textarea class="area" id="csvText" readonly hidden aria-label="CSV report"></textarea>
+  </section>
+</div>
+<script>
+(function () {
+  var $ = function (s) { return document.getElementById(s); };
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  /* ---------- content ---------- */
+  var LV = { 1: { n: "Base", pts: 1, d: "Fixed prepositions: verb or adjective + preposition" },
+             2: { n: "Compound", pts: 2, d: "Connectors with meaning: cause, contrast, alternative, addition, time" },
+             3: { n: "Corporate", pts: 3, d: "Formal expressions for meetings, emails and audits" } };
+  /* Preposition Lab results (written practice, from the teacher's screenshots) */
+  var BASELINE = { 1: [4, 10], 2: [16, 26], 3: [14, 20], fix: [6, 10] };
+  var CATN = { base: "Fixed preposition", cause: "Cause", contrast: "Contrast", alt: "Alternative", add: "Addition", time: "Time", corp: "Corporate" };
+  var CATORDER = ["base", "cause", "contrast", "alt", "add", "time", "corp"];
+  var ERRN = { prep: "Wrong preposition", word: "Missing or extra word", meaning: "Meaning does not fit", form: "Wrong verb form (-ing)" };
+  var ERRORDER = ["prep", "word", "meaning", "form"];
+
+  /* connector: [category, meaning, model sentence, on Adaza's review list] */
+  var CONN = {
+    "in charge of": ["base", "You manage it. It is your job.", "Laura is in charge of the quality lab.", 1],
+    "depend on": ["base", "The result changes with something.", "The price depends on the dollar.", 1],
+    "worried about": ["base", "You feel concern about a problem.", "We are worried about the late shipment.", 1],
+    "look forward to + -ing": ["base", "You are happy about something in the future.", "I look forward to meeting the new client.", 1],
+    "arrive in / at": ["base", "In + city or country. At + a place or building.", "They arrived in Medellín and then at the plant.", 1],
+    "rely on": ["base", "You trust that it will help you.", "We rely on two vitamin suppliers.", 0],
+    "responsible for": ["base", "It is your duty.", "Who is responsible for the labels?", 0],
+    "interested in": ["base", "You want to know more or to buy.", "The feed mill is interested in our new premix.", 0],
+    "focus on": ["base", "You give your attention to one thing.", "Let's focus on safety this month.", 0],
+    "participate in": ["base", "You take part.", "All operators participated in the training.", 0],
+    "apologize to / for": ["base", "To a person, for a thing.", "We apologized to the client for the wrong label.", 0],
+
+    "due to": ["cause", "The reason, often a problem.", "The delay is due to a problem at the port.", 0],
+    "because of": ["cause", "The reason. The most common one.", "Because of the rain, the truck was late.", 0],
+    "thanks to": ["cause", "The reason, and it is good.", "Thanks to the lab team, we found the problem early.", 0],
+    "in spite of / despite": ["contrast", "Even with a problem. 'In spite of', but 'despite' with no 'of'.", "Despite the delay, we delivered on time.", 1],
+    "regardless of": ["contrast", "It does not matter what.", "We test every batch regardless of the size.", 1],
+    "instead of": ["alt", "This, not that.", "We use email instead of WhatsApp for orders.", 1],
+    "rather than": ["alt", "This, not that. Often a choice.", "We chose a new mixer rather than a night shift.", 0],
+    "in addition to": ["add", "Plus: this and also that.", "In addition to the price, we check quality.", 1],
+    "on top of": ["add", "One more thing, often an extra cost or task.", "On top of the transport fee, there is a tax.", 1],
+    "as well as": ["add", "Also. In the middle of a sentence.", "We send the premix as well as the lab report.", 0],
+    "along with": ["add", "Together with.", "Along with the invoice, I sent the certificate.", 0],
+    "ahead of / prior to": ["time", "Before. 'Prior to' is more formal.", "We cleaned the plant prior to the audit.", 1],
+
+    "according to": ["corp", "This is what a person or document says.", "According to the lab report, the batch is fine.", 1],
+    "in accordance with": ["corp", "Following a rule or policy.", "We work in accordance with the safety policy.", 1],
+    "by means of": ["corp", "Using this method or tool.", "We reduced waste by means of a new scale.", 1],
+    "at the expense of": ["corp", "One thing wins, another loses.", "Speed should not come at the expense of quality.", 1],
+    "in the event of": ["corp", "If this happens.", "In the event of a failure, call the supervisor.", 1],
+    "in exchange for": ["corp", "I give this, you give that.", "A lower price in exchange for a one-year contract.", 1],
+    "in lieu of": ["alt", "Instead of. Very formal, used in contracts.", "We offered free samples in lieu of a discount.", 1],
+    "subject to": ["corp", "Only if a condition is met.", "The order is subject to credit approval.", 0],
+    "in terms of": ["corp", "Looking at one aspect.", "In terms of cost, option B is better.", 0],
+    "on behalf of": ["corp", "You speak for someone else.", "I am writing on behalf of the sales team.", 0],
+    "in light of": ["corp", "Because of new information.", "In light of the audit results, we changed the process.", 0]
+  };
+
+  /* Cases inspired by a premix / animal-nutrition company. Edit freely to match Adaza's real job. */
+  var CARDS = {
+    1: [
+      { t: "The Late Vitamins", s: "Imported vitamins are two weeks late. A big client needs premix on Friday.", a: "Tell the client today", b: "Try to solve it first", r: ["worried about", "depend on"] },
+      { t: "The Lab Result", s: "A quality test shows a small problem in one batch.", a: "Stop the batch", b: "Test it again first", r: ["in charge of", "responsible for"] },
+      { t: "The Visitors", s: "Managers from the international group visit the plant next week.", a: "Prepare a formal presentation", b: "Show them the plant floor", r: ["look forward to + -ing", "arrive in / at"] },
+      { t: "The New Client", s: "A new feed mill wants a sample this week.", a: "Send it now", b: "Wait for a full formula review", r: ["interested in", "rely on"] },
+      { t: "The Safety Training", s: "Operators need training on new safety rules.", a: "One full day", b: "Short sessions every week", r: ["focus on", "participate in"] },
+      { t: "The Wrong Label", s: "A client received bags with the wrong label.", a: "Call the client today", b: "Send a written report first", r: ["apologize to / for", "in charge of"] },
+      { t: "The Busy Month", s: "December has many orders and many people on vacation.", a: "Cancel some vacations", b: "Hire temporary staff", r: ["depend on", "worried about"] }
+    ],
+    2: [
+      { t: "The Dollar", s: "The dollar went up, so imported raw materials cost more.", a: "Raise prices", b: "Keep prices and earn less", r: ["due to", "in spite of / despite"] },
+      { t: "The Two Suppliers", s: "One supplier is cheap but slow. The other is fast but expensive.", a: "The cheap supplier", b: "The fast supplier", r: ["instead of", "regardless of"] },
+      { t: "More Orders", s: "Orders grew 20%. The plant can add a night shift or buy a new mixer.", a: "Night shift", b: "New mixer", r: ["in addition to", "on top of"] },
+      { t: "The Rush Order", s: "A client wants the order three days early.", a: "Accept", b: "Negotiate a new date", r: ["ahead of / prior to", "because of"] },
+      { t: "Orders by WhatsApp", s: "Clients send orders by WhatsApp and email. Mistakes happen.", a: "A new online order system", b: "Keep WhatsApp, add a checklist", r: ["rather than", "thanks to"] },
+      { t: "The Extra Audit", s: "A client asks for an extra quality audit next month.", a: "Accept it", b: "Share the last audit instead", r: ["regardless of", "as well as"] },
+      { t: "The Truck Problem", s: "Transport is late again. The client is angry.", a: "Change transport company", b: "Keep them and set penalties", r: ["along with", "in spite of / despite"] }
+    ],
+    3: [
+      { t: "The Emergency Plan", s: "The company needs a plan for a possible problem with a product in the market.", a: "A detailed written plan", b: "A fast-response team", r: ["in the event of", "in accordance with"] },
+      { t: "The Exclusive Formula", s: "A large client wants a special formula only for them.", a: "Accept", b: "Refuse", r: ["in exchange for", "subject to"] },
+      { t: "The Cost Target", s: "Headquarters asks for 10% lower costs this year.", a: "Automate processes", b: "Negotiate with suppliers", r: ["by means of", "at the expense of"] },
+      { t: "The New Label Rule", s: "Imagine a new rule changes how premix labels must look.", a: "Change all labels now", b: "Change them little by little", r: ["according to", "in accordance with"] },
+      { t: "Samples or Discount", s: "A client asks for a 10% discount. Sales prefers to give free samples.", a: "Give free samples", b: "Give the discount", r: ["in lieu of", "in terms of"] },
+      { t: "The Late Payment", s: "A big client pays 60 days late again.", a: "Stop new orders", b: "Offer a payment plan", r: ["on behalf of", "in light of"] },
+      { t: "Faster Production", s: "The plant can produce faster, but tests take less time.", a: "Produce faster", b: "Keep full tests", r: ["at the expense of", "according to"] }
+    ]
+  };
+
+  /* Fix the email: wrong sentence, mistake shown, right sentence, connector, error type */
+  var FIXES = [
+    { w: "Despite of the delay, we delivered the premix on Friday.", m: "Despite of", r: "Despite the delay, we delivered the premix on Friday.", why: "Despite has no 'of'. Or say: In spite of the delay.", p: "in spite of / despite", e: "word" },
+    { w: "I look forward to meet you at the plant.", m: "to meet", r: "I look forward to meeting you at the plant.", why: "'To' here is a preposition, so the verb takes -ing.", p: "look forward to + -ing", e: "form" },
+    { w: "Laura is in charge for the quality lab.", m: "in charge for", r: "Laura is in charge of the quality lab.", why: "In charge OF. Responsible FOR.", p: "in charge of", e: "prep" },
+    { w: "The final price depends of the dollar.", m: "depends of", r: "The final price depends on the dollar.", why: "In Spanish 'depende de', in English 'depends on'.", p: "depend on", e: "prep" },
+    { w: "We are worried for the late shipment.", m: "worried for", r: "We are worried about the late shipment.", why: "Worried ABOUT a problem.", p: "worried about", e: "prep" },
+    { w: "We need the order ahead to Friday.", m: "ahead to", r: "We need the order ahead of Friday.", why: "Ahead OF. Prior TO.", p: "ahead of / prior to", e: "prep" },
+    { w: "Prior of the audit, we cleaned the plant.", m: "Prior of", r: "Prior to the audit, we cleaned the plant.", why: "Prior TO. Ahead OF.", p: "ahead of / prior to", e: "prep" },
+    { w: "We reduced waste by means to a new scale.", m: "by means to", r: "We reduced waste by means of a new scale.", why: "By means OF.", p: "by means of", e: "prep" },
+    { w: "According with the lab report, the batch is fine.", m: "According with", r: "According to the lab report, the batch is fine.", why: "According TO. In accordance WITH.", p: "according to", e: "prep" },
+    { w: "We work in accordance to the safety policy.", m: "in accordance to", r: "We work in accordance with the safety policy.", why: "In accordance WITH. According TO.", p: "in accordance with", e: "prep" },
+    { w: "Speed should not come at the expense from quality.", m: "at the expense from", r: "Speed should not come at the expense of quality.", why: "At the expense OF.", p: "at the expense of", e: "prep" },
+    { w: "In the event a failure, call the supervisor.", m: "In the event a", r: "In the event of a failure, call the supervisor.", why: "In the event OF + noun.", p: "in the event of", e: "word" },
+    { w: "The visitors arrived to the plant at 8 a.m.", m: "arrived to", r: "The visitors arrived at the plant at 8 a.m.", why: "Never 'arrive to'. AT a place, IN a city.", p: "arrive in / at", e: "prep" },
+    { w: "The managers arrived at Medellín on Monday.", m: "arrived at Medellín", r: "The managers arrived in Medellín on Monday.", why: "IN + city or country.", p: "arrive in / at", e: "prep" },
+    { w: "In addition of the price, we check quality.", m: "In addition of", r: "In addition to the price, we check quality.", why: "In addition TO.", p: "in addition to", e: "prep" },
+    { w: "We offer a lower price in exchange of a one-year contract.", m: "in exchange of", r: "We offer a lower price in exchange for a one-year contract.", why: "In exchange FOR.", p: "in exchange for", e: "prep" },
+    { w: "Please send orders by email instead WhatsApp.", m: "instead WhatsApp", r: "Please send orders by email instead of WhatsApp.", why: "Instead OF.", p: "instead of", e: "word" },
+    { w: "We sent free samples in lieu a discount.", m: "in lieu a", r: "We sent free samples in lieu of a discount.", why: "In lieu OF.", p: "in lieu of", e: "word" },
+    { w: "On top the transport fee, there is a tax.", m: "On top the", r: "On top of the transport fee, there is a tax.", why: "On top OF.", p: "on top of", e: "word" },
+    { w: "We test every batch regardless the size.", m: "regardless the", r: "We test every batch regardless of the size.", why: "Regardless OF.", p: "regardless of", e: "word" },
+    { w: "The delay is due of a problem at the port.", m: "due of", r: "The delay is due to a problem at the port.", why: "Due TO.", p: "due to", e: "prep" },
+    { w: "Thanks for the lab team, we found the problem early.", m: "Thanks for", r: "Thanks to the lab team, we found the problem early.", why: "As a reason, use 'thanks TO'. 'Thanks for' is to say thank you.", p: "thanks to", e: "prep" },
+    { w: "We changed transport companies instead of the delays.", m: "instead of", r: "We changed transport companies because of the delays.", why: "The delays are the reason, so it is CAUSE, not alternative.", p: "instead of", e: "meaning" },
+    { w: "In addition to the delay, we delivered on time.", m: "In addition to", r: "Despite the delay, we delivered on time.", why: "There is a problem and a good result: CONTRAST, not addition.", p: "in addition to", e: "meaning" }
+  ];
+
+  var TWISTS = [
+    { k: "SWITCH", t: "Switch sides. Argue the other position and use one of your connectors again." },
+    { k: "SORT IT", t: "The teacher says 4 connectors. Say the type of each one: cause, contrast, alternative, addition or time." },
+    { k: "CONTRAST", t: "New fact: the dollar goes up 10% tomorrow. Answer with despite or in spite of." },
+    { k: "THIS, NOT THAT", t: "Say one sentence with instead of and one with in addition to. Which one means 'this, not that'?" },
+    { k: "TIME", t: "The client wants the order before Friday. Answer with ahead of or prior to." },
+    { k: "EMAIL", t: "Say the first and the last line of an email to the client. Use according to and look forward to + -ing." },
+    { k: "BOSS", t: "Your boss asks: 'Why?'. Answer in one sentence with due to or because of." },
+    { k: "ARRIVALS", t: "Tell the board about a visit: the visitors arrive in a city and at the plant. Use both." },
+    { k: "PLAN B", t: "Something goes wrong with your plan. Explain what to do with in the event of." }
+  ];
+
+  /* ---------- state ---------- */
+  var MODE = "focus", GOAL = 25;
+  var S = null, TIMER = null;
+
+  function catOf(p) { return CONN[p][0]; }
+  function kcls(c) { return "k-" + c; }
+  function show(id) { ["sStart", "sGame", "sRes"].forEach(function (s) { $(s).hidden = (s !== id); }); window.scrollTo(0, 0); }
+  function stName() { return S ? S.name : (($("nS").value || "").trim() || "Student"); }
+
+  function focusCount(c) { return c.r.filter(function (p) { return CONN[p][3]; }).length; }
+  function buildDeck(l) {
+    var idx = CARDS[l].map(function (c, i) { return i; });
+    idx = shuffle(idx);
+    if (MODE === "focus") idx.sort(function (x, y) { return focusCount(CARDS[l][x]) - focusCount(CARDS[l][y]); }); /* pop() takes from the end: most focus items first */
+    return idx;
+  }
+  function startGame() {
+    var name = ($("nS").value || "").trim() || "Student";
+    var teacher = ($("nT").value || "").trim() || "Teacher";
+    S = { name: name, teacher: teacher, pts: 0, step: "pick", lvl: 0, card: null, side: null,
+          judge: [null, null], err: [null, null], fix: null, tw: null, events: [], turn: 1, deck: {}, fixDeck: shuffle(FIXES.map(function (f, i) { return i; })),
+          t: { left: 0, total: 0 }, approved: false };
+    [1, 2, 3].forEach(function (l) { S.deck[l] = buildDeck(l); });
+    show("sGame"); render();
+  }
+  function draw(l) {
+    if (!S.deck[l].length) S.deck[l] = buildDeck(l);
+    return CARDS[l][S.deck[l].pop()];
+  }
+  function drawFix() {
+    /* prefer a sentence about a connector she just missed, then one on the card, then any */
+    var missed = S.card.r.filter(function (p, i) { return S.judge[i] === false; });
+    var pools = [missed, S.card.r];
+    for (var k = 0; k < pools.length; k++) {
+      var cand = S.fixDeck.filter(function (i) { return pools[k].indexOf(FIXES[i].p) >= 0; });
+      if (cand.length) { var c = pick(cand); S.fixDeck.splice(S.fixDeck.indexOf(c), 1); return FIXES[c]; }
+    }
+    if (!S.fixDeck.length) S.fixDeck = shuffle(FIXES.map(function (f, i) { return i; }));
+    return FIXES[S.fixDeck.pop()];
+  }
+
+  /* ---------- timer ---------- */
+  function stopTimer() { if (TIMER) { clearInterval(TIMER); TIMER = null; } }
+  function startTimer(sec) {
+    stopTimer(); S.t = { left: sec, total: sec };
+    paintTime();
+    TIMER = setInterval(function () {
+      S.t.left--; paintTime();
+      if (S.t.left <= 0) stopTimer();
+    }, 1000);
+  }
+  function paintTime() { var e = $("time"); if (e) { e.textContent = Math.max(0, S.t.left); e.className = "time" + (S.t.left <= 10 ? " low" : ""); } }
+
+  /* ---------- rendering ---------- */
+  function usesOnly() { return S.events.filter(function (e) { return e.round === "speak"; }); }
+  function sc(list) { var ok = 0; list.forEach(function (e) { if (e.ok) ok++; }); return { ok: ok, n: list.length }; }
+  function scoreRow() {
+    var s = sc(usesOnly()), pct = Math.min(100, Math.round(S.pts / GOAL * 100));
+    $("scoreRow").innerHTML = "<div class='pc'><span class='nm'>" + esc(S.name) + "</span><span class='pt'>" + S.pts + "</span><span class='fl'>Connectors right: " + s.ok + " / " + s.n + "</span></div>" +
+      "<div class='goal'><div class='gh'><span>Board approval</span><b>" + S.pts + " / " + GOAL + "</b></div><div class='gbar'><i style='width:" + pct + "%'></i></div><span class='fl muted' style='font-size:.82rem'>" +
+      (S.pts >= GOAL ? "Approved! The board says yes. Keep playing or finish." : "Win " + (GOAL - S.pts) + " more points to get the board's approval.") + "</span></div>";
+    $("turnNo").textContent = "Turn " + S.turn;
+  }
+  function cardHtml(withSide, mini) {
+    var c = S.card, h = "<div class='card l" + S.lvl + "'><div class='lvtag'>" + LV[S.lvl].n + " &middot; " + LV[S.lvl].pts + " pt each</div><h3>" + esc(c.t) + "</h3>";
+    h += "<div class='sit'>" + esc(c.s) + "</div><div class='sides'>";
+    ["a", "b"].forEach(function (k) {
+      var on = S.side === k;
+      h += "<button class='side" + (on ? " on" : "") + "' data-act='side' data-k='" + k + "'" + (withSide ? "" : " disabled") + "><small>Side " + k.toUpperCase() + (on ? " &middot; your side" : "") + "</small>" + esc(c[k]) + "</button>";
+    });
+    h += "</div><div class='reqs'>";
+    c.r.forEach(function (name) {
+      var cn = CONN[name];
+      h += "<div class='rq " + kcls(cn[0]) + "'><div class='ct'>" + CATN[cn[0]] + (cn[3] ? " &middot; review list" : "") + "</div><div class='cn'>" + esc(name) + "</div>" + (mini ? "" : "<div class='ms'>" + esc(cn[1]) + "</div>") + "</div>";
+    });
+    return h + "</div></div>";
+  }
+  function timerHtml(label) {
+    return "<div class='timer'><div class='time' id='time'>" + Math.max(0, S.t.left) + "</div><div class='muted'>" + label + "</div></div>";
+  }
+  function ynHtml(act, val, extra) {
+    return "<div class='yn'><button class='y" + (val === true ? " on" : "") + "' data-act='" + act + "' data-v='1'" + extra + ">Right</button><button class='n" + (val === false ? " on" : "") + "' data-act='" + act + "' data-v='0'" + extra + ">Not yet</button></div>";
+  }
+
+  function render() {
+    scoreRow();
+    var h = "", last = S.step;
+    if (S.step === "pick") {
+      h = "<div class='step'>Turn " + S.turn + "</div><div class='big'>" + esc(S.name) + ", choose your level</div><div class='lvls'>";
+      [1, 2, 3].forEach(function (l) {
+        var b = BASELINE[l];
+        h += "<button class='lv l" + l + "' data-act='level' data-l='" + l + "'><b>" + LV[l].n + "</b><span>" + LV[l].pts + " point" + (LV[l].pts > 1 ? "s" : "") + " per connector</span><span>" + LV[l].d + "</span><em>Preposition Lab: " + b[0] + "/" + b[1] + "</em></button>";
+      });
+      h += "</div>";
+    } else if (S.step === "card") {
+      h = "<div class='step'>1. Pick your side</div>" + cardHtml(true) +
+        "<div class='ctrl'><button class='gold' data-act='prep'" + (S.side ? "" : " disabled") + ">Start thinking (40 s)</button><button class='ghost' data-act='redraw'>Another case</button><span class='note'>" + (S.side ? "Think: which sentence will use each connector?" : "Choose side A or B first.") + "</span></div>";
+    } else if (S.step === "prep") {
+      h = "<div class='step'>2. Think</div>" + cardHtml(false) + timerHtml("seconds to think. Plan one sentence for each connector.") +
+        "<div class='ctrl'><button class='gold' data-act='speak'>Start speaking (60 s)</button></div>";
+    } else if (S.step === "speak") {
+      h = "<div class='step'>3. Speak: defend your side to the board</div>" + cardHtml(false, true) + timerHtml("seconds. Use both connectors. Right form, right meaning.") +
+        "<div class='ctrl'><button class='primary' data-act='done'>I am done</button></div>";
+    } else if (S.step === "judge") {
+      h = "<div class='step'>4. " + esc(S.teacher) + " judges</div><div class='big'>Did " + esc(S.name) + " use each connector correctly?</div><p class='muted'>Right form (no missing or extra word) and the meaning fits the sentence.</p>";
+      S.card.r.forEach(function (name, i) {
+        var cn = CONN[name], j = S.judge[i];
+        h += "<div class='jrow'><div class='jh'><span class='jn'>" + esc(name) + " <span class='rchip " + kcls(cn[0]) + "' style='font-size:.75rem'>" + CATN[cn[0]] + "</span></span>" + ynHtml("j", j, " data-i='" + i + "'") + "</div>" +
+          "<div class='mod'><b>Means:</b> " + esc(cn[1]) + " <b>Model:</b> " + esc(cn[2]) + "</div>";
+        if (j === false) {
+          h += "<div class='errs'><span class='lbl'>Mistake</span>";
+          ERRORDER.forEach(function (k) { h += "<button class='" + (S.err[i] === k ? "on" : "") + "' data-act='err' data-i='" + i + "' data-e='" + k + "'>" + ERRN[k] + "</button>"; });
+          h += "</div>";
+        }
+        h += "</div>";
+      });
+      h += "<div class='ctrl'><button class='gold' data-act='confirm'" + (S.judge[0] !== null && S.judge[1] !== null ? "" : " disabled") + ">Confirm</button><span class='note'>Marking the type of mistake is optional, but it makes the report more useful.</span></div>";
+    } else if (S.step === "fix") {
+      h = "<div class='step'>5. Fix the email &middot; +2</div><div class='big'>This email has one mistake. Say the correct sentence.</div>";
+      if (!S.fix) {
+        h += "<div class='ctrl'><button class='gold' data-act='fixdraw'>Open the email</button><button class='ghost' data-act='skipfix'>Skip</button></div>";
+      } else {
+        var f = S.fix, wh = esc(f.w).replace(esc(f.m), "<mark>" + esc(f.m) + "</mark>");
+        h += "<div class='email'><div class='eh'><span>From: Sales team</span><span>To: Client</span><span>Subject: Your order</span></div><div class='eb'>" + (S.fix.hint ? wh : esc(f.w)) + "</div></div>";
+        if (!f.shown) {
+          h += "<div class='ctrl'><button class='primary' data-act='fixshow'>Show the answer</button>" + (f.hint ? "" : "<button class='ghost' data-act='fixhint'>Show where the mistake is</button>") + "</div>";
+        } else {
+          h += "<div class='answer'><b>Correct:</b> " + esc(f.r) + "<p class='muted'>" + esc(f.why) + "</p></div>" +
+            "<div class='jrow'><div class='jh'><span class='jn'>Did " + esc(S.name) + " fix it?</span>" + ynHtml("fixj", f.ok, "") + "</div></div>" +
+            "<div class='ctrl'><button class='gold' data-act='tonext'" + (f.ok === null ? " disabled" : "") + ">Continue</button></div>";
+        }
+      }
+    } else if (S.step === "twist") {
+      h = "<div class='step'>6. Twist</div><div class='big'>Twist round? +1 point</div>";
+      if (!S.tw) h += "<div class='ctrl'><button class='gold' data-act='twist'>Draw a twist</button><button class='ghost' data-act='skiptw'>Skip, next turn</button></div>";
+      else {
+        h += "<div class='tw'><div class='lvtag'>" + esc(S.tw.k) + "</div><b>" + esc(S.tw.t) + "</b></div>";
+        if (S.tw.running) h += timerHtml("seconds") + "<div class='ctrl'><button class='primary' data-act='twdone'>I am done</button></div>";
+        else h += "<div class='jrow'><div class='jh'><span class='jn'>Twist answered well?</span>" + ynHtml("twj", S.tw.ok, "") + "</div></div>" +
+          "<div class='ctrl'><button class='gold' data-act='endturn'" + (S.tw.ok === null ? " disabled" : "") + ">Next turn</button></div>";
+      }
+    }
+    $("stage").innerHTML = h;
+    if (last === "prep" || last === "speak" || (last === "twist" && S.tw && S.tw.running)) paintTime();
+  }
+
+  /* ---------- flow ---------- */
+  function commitSpeak() {
+    var c = S.card;
+    c.r.forEach(function (name, i) {
+      var ok = S.judge[i];
+      if (ok) S.pts += S.lvl;
+      S.events.push({ round: "speak", lvl: S.lvl, card: c.t, side: c[S.side], p: name, cat: catOf(name), ok: ok, err: ok ? "" : (S.err[i] || "") });
+    });
+  }
+  function commitFix() {
+    var f = S.fix;
+    if (f.ok) S.pts += 2;
+    S.events.push({ round: "fix", lvl: S.lvl, card: S.card.t, side: "", p: f.p, cat: catOf(f.p), ok: f.ok, err: f.ok ? "" : f.e });
+  }
+  function commitTwist() {
+    if (S.tw.ok) S.pts += 1;
+    S.events.push({ round: "twist", lvl: S.lvl, card: S.card.t, side: "", p: "Twist: " + S.tw.k, cat: "twist", ok: S.tw.ok, err: "" });
+  }
+  function nextTurn() {
+    stopTimer();
+    S.turn++; S.step = "pick"; S.card = null; S.tw = null; S.fix = null;
+  }
+
+  /* ---------- results ---------- */
+  function row(nm, v, pct, was) { return "<div class='rrow'><span class='nm'>" + nm + "</span><span class='sc'>" + esc(v) + "</span><div class='bar'><i style='width:" + pct + "%'></i></div>" + (was ? "<span class='was'>" + esc(was) + "</span>" : "") + "</div>"; }
+  function pctOf(s) { return s.n ? Math.round(s.ok / s.n * 100) : 0; }
+  function unique(a) { var o = [], s = {}; a.forEach(function (x) { if (!s[x]) { s[x] = 1; o.push(x); } }); return o; }
+  function missedToday() { return unique(S.events.filter(function (e) { return e.round !== "twist" && !e.ok; }).map(function (e) { return e.p; })); }
+  function goodToday() { return unique(S.events.filter(function (e) { return e.round !== "twist" && e.ok; }).map(function (e) { return e.p; })); }
+  function homework() {
+    var miss = missedToday(), hw = miss.slice(0, 5);
+    if (hw.length < 3) {
+      var rest = Object.keys(CONN).filter(function (p) { return CONN[p][3] && hw.indexOf(p) < 0 && goodToday().indexOf(p) < 0; });
+      hw = hw.concat(shuffle(rest).slice(0, 3 - hw.length));
+    }
+    return hw;
+  }
+
+  function renderResults() {
+    var use = usesOnly(), s = sc(use), all = sc(S.events.filter(function (e) { return e.round !== "twist"; }));
+    $("rTitle").textContent = S.name + ": " + S.pts + " points" + (S.pts >= GOAL ? " · Approved" : "");
+    $("rSub").textContent = "Connectors spoken right " + s.ok + " / " + s.n + (s.n ? " (" + pctOf(s) + "%)" : "") + " · Goal " + GOAL + " · " + (S.turn - (S.step === "pick" ? 1 : 0)) + " turn(s) · Biomix Boardroom";
+    $("rLevels").innerHTML = [1, 2, 3].map(function (l) {
+      var t = sc(use.filter(function (e) { return e.lvl === l; })), b = BASELINE[l];
+      var was = "Preposition Lab: " + b[0] + "/" + b[1] + " (" + Math.round(b[0] / b[1] * 100) + "%)";
+      return t.n ? row(LV[l].n, t.ok + " / " + t.n + " (" + pctOf(t) + "%)", pctOf(t), was) : row(LV[l].n, "not played", 0, was);
+    }).join("");
+    $("rCats").innerHTML = CATORDER.map(function (k) {
+      var t = sc(use.filter(function (e) { return e.cat === k; }));
+      return t.n ? row(CATN[k], t.ok + " / " + t.n, pctOf(t)) : row(CATN[k], "not played", 0);
+    }).join("");
+    var fx = sc(S.events.filter(function (e) { return e.round === "fix"; })), fb = BASELINE.fix;
+    var fwas = "Preposition Lab, Fix it: " + fb[0] + "/" + fb[1] + " (" + Math.round(fb[0] / fb[1] * 100) + "%)";
+    $("rFix").innerHTML = fx.n ? row("Emails fixed", fx.ok + " / " + fx.n + " (" + pctOf(fx) + "%)", pctOf(fx), fwas) : row("Emails fixed", "not played", 0, fwas);
+    var wrong = S.events.filter(function (e) { return e.round !== "twist" && !e.ok; });
+    $("rErr").innerHTML = wrong.length ? ERRORDER.concat([""]).map(function (k) {
+      var n = wrong.filter(function (e) { return e.err === k; }).length;
+      return n ? row(k ? ERRN[k] : "Not marked", n + " / " + wrong.length, Math.round(n / wrong.length * 100)) : "";
+    }).join("") : "<p class='muted'>No mistakes today.</p>";
+    var miss = missedToday(), good = goodToday();
+    $("rMiss").innerHTML = miss.length ? miss.map(function (m) { return "<span class='rchip bad'>" + esc(m) + "</span>"; }).join("") : "<span class='muted'>Nothing missed</span>";
+    $("rGood").innerHTML = good.length ? good.map(function (m) { return "<span class='rchip ok'>" + esc(m) + "</span>"; }).join("") : "<span class='muted'>None yet</span>";
+    $("rHw").innerHTML = homework().map(function (m) { return "<span class='rchip neu'>" + esc(m) + "</span>"; }).join("");
+    $("csvText").hidden = true; $("flash").textContent = "";
+    void all;
+  }
+  function csvCell(v) { v = String(v); return /[",\n]/.test(v) ? "\"" + v.replace(/"/g, "\"\"") + "\"" : v; }
+  function buildCsv() {
+    var rows = [["student", "turn_round", "level", "case", "side", "connector", "type", "result", "mistake"]];
+    S.events.forEach(function (e) { rows.push([S.name, e.round, LV[e.lvl].n, e.card, e.side, e.p, e.cat === "twist" ? "twist" : CATN[e.cat], e.ok ? "right" : "not yet", e.err ? ERRN[e.err] : ""]); });
+    return rows.map(function (r) { return r.map(csvCell).join(","); }).join("\n");
+  }
+  function buildReport() {
+    var use = usesOnly(), s = sc(use), fx = sc(S.events.filter(function (e) { return e.round === "fix"; }));
+    var L = ["Biomix Boardroom · " + S.name, S.pts + " points (goal " + GOAL + ")", "Spoken connectors right: " + s.ok + "/" + s.n + (s.n ? " (" + pctOf(s) + "%)" : ""), "Emails fixed: " + fx.ok + "/" + fx.n];
+    L.push("By level: " + [1, 2, 3].map(function (l) { var t = sc(use.filter(function (e) { return e.lvl === l; })); return LV[l].n + " " + (t.n ? t.ok + "/" + t.n : "-") + " (Lab " + BASELINE[l][0] + "/" + BASELINE[l][1] + ")"; }).join(" | "));
+    var bycat = CATORDER.map(function (k) { var x = sc(use.filter(function (e) { return e.cat === k; })); return x.n ? CATN[k] + " " + x.ok + "/" + x.n : null; }).filter(Boolean);
+    if (bycat.length) L.push("By type: " + bycat.join(" | "));
+    var wrong = S.events.filter(function (e) { return e.round !== "twist" && !e.ok && e.err; });
+    var ec = ERRORDER.map(function (k) { var n = wrong.filter(function (e) { return e.err === k; }).length; return n ? ERRN[k] + " " + n : null; }).filter(Boolean);
+    if (ec.length) L.push("Mistakes: " + ec.join(" | "));
+    var miss = missedToday();
+    L.push("To review: " + (miss.length ? miss.join(", ") : "nothing"));
+    return L.join("\n");
+  }
+  function buildMessage() {
+    var use = usesOnly(), s = sc(use), good = goodToday(), miss = missedToday();
+    var L = ["Hi " + S.name + "! Great work in the Biomix Boardroom today.", "", "You got " + S.pts + " points" + (S.pts >= GOAL ? " and the board's approval!" : ".") + " Connectors used right: " + s.ok + " of " + s.n + "."];
+    if (good.length) L.push("", "Strong today: " + good.slice(0, 6).join(", ") + ".");
+    if (miss.length) L.push("", "Let's keep practicing: " + miss.slice(0, 6).join(", ") + ".");
+    L.push("", "Voice note homework (1 minute): talk about a real situation at work and use at least 3 of these: " + homework().join(", ") + ".", "", "See you next class!");
+    return L.join("\n");
+  }
+  function flash(m) { $("flash").textContent = m; }
+  function copy(text, okMsg) {
+    var fallback = function () {
+      var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); flash(okMsg); } catch (e) { flash("Could not copy."); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { flash(okMsg); }, fallback); else fallback();
+  }
+  function downloadCsv() {
+    var csv = buildCsv(); $("csvText").value = csv;
+    try {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+      a.download = "biomix-boardroom-" + S.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      flash("If the file did not download, use Copy CSV.");
+    } catch (e) { $("csvText").hidden = false; flash("Use Copy CSV."); }
+  }
+
+  /* ---------- start screen ---------- */
+  $("focusList").innerHTML = Object.keys(CONN).filter(function (p) { return CONN[p][3]; }).map(function (p) { return "<span class='rchip bad'>" + esc(p) + "</span>"; }).join("");
+  function segOn(id, attr, val) { Array.prototype.forEach.call($(id).querySelectorAll("button"), function (b) { b.classList.toggle("on", b.getAttribute(attr) === String(val)); }); }
+
+  /* ---------- events ---------- */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("[data-act]");
+    if (!a) return;
+    var act = a.dataset.act;
+    if (act === "mode") { MODE = a.dataset.m; segOn("modeSeg", "data-m", MODE); return; }
+    if (act === "goal") { GOAL = +a.dataset.g; segOn("goalSeg", "data-g", GOAL); return; }
+    if (act === "start") { startGame(); return; }
+    if (act === "again") { stopTimer(); show("sStart"); return; }
+    if (!S) return;
+    if (act === "copymsg") { copy(buildMessage(), "Message copied. Paste it in WhatsApp."); return; }
+    if (act === "copyrep") { copy(buildReport(), "Report copied."); return; }
+    if (act === "copycsv") { var c = buildCsv(); $("csvText").value = c; copy(c, "CSV copied."); return; }
+    if (act === "csv") { downloadCsv(); return; }
+    if (act === "finish") { stopTimer(); renderResults(); show("sRes"); return; }
+    if (act === "level") { S.lvl = +a.dataset.l; S.card = draw(S.lvl); S.side = null; S.judge = [null, null]; S.err = [null, null]; S.fix = null; S.tw = null; S.step = "card"; }
+    else if (act === "redraw") { S.card = draw(S.lvl); S.side = null; }
+    else if (act === "side") { S.side = a.dataset.k; }
+    else if (act === "prep") { S.step = "prep"; render(); startTimer(40); return; }
+    else if (act === "speak") { S.step = "speak"; render(); startTimer(60); return; }
+    else if (act === "done") { stopTimer(); S.step = "judge"; }
+    else if (act === "j") { var i = +a.dataset.i; S.judge[i] = a.dataset.v === "1"; if (S.judge[i]) S.err[i] = null; }
+    else if (act === "err") { var k = +a.dataset.i; S.err[k] = S.err[k] === a.dataset.e ? null : a.dataset.e; }
+    else if (act === "confirm") { commitSpeak(); S.step = "fix"; S.fix = null; }
+    else if (act === "fixdraw") { var f = drawFix(); S.fix = { w: f.w, m: f.m, r: f.r, why: f.why, p: f.p, e: f.e, shown: false, hint: false, ok: null }; }
+    else if (act === "fixhint") { S.fix.hint = true; }
+    else if (act === "fixshow") { S.fix.shown = true; S.fix.hint = true; }
+    else if (act === "fixj") { S.fix.ok = a.dataset.v === "1"; }
+    else if (act === "skipfix") { S.step = "twist"; S.tw = null; }
+    else if (act === "tonext") { commitFix(); S.step = "twist"; S.tw = null; }
+    else if (act === "twist") { var t = pick(TWISTS); S.tw = { k: t.k, t: t.t, ok: null, running: true }; render(); startTimer(30); return; }
+    else if (act === "skiptw") { nextTurn(); }
+    else if (act === "twdone") { stopTimer(); S.tw.running = false; }
+    else if (act === "twj") { S.tw.ok = a.dataset.v === "1"; }
+    else if (act === "endturn") { commitTwist(); nextTurn(); }
+    render();
+  });
+
+  window.__bd = { S: function () { return S; }, CARDS: CARDS, CONN: CONN, FIXES: FIXES };
+})();
+</script>
+</body>
+</html>
