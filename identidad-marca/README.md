@@ -10,6 +10,7 @@ Paquete generado a partir del skill `cca-marca` y de los 8 SVG oficiales de Oki 
 | Plantillas LinkedIn (2) | 1200 × 627 | `pdf/04-linkedin.pdf` |
 | Membrete y portada de propuesta | A4 | `pdf/05-papeleria-a4.pdf` |
 | Tarjeta de presentación (frente y reverso) | 3.5 × 2 in | `pdf/06-tarjeta-presentacion.pdf` |
+| Banner horizontal para imprimir (`banner.py`) | 190 × 40 cm | `pdf/07-banner-190x40.pdf` |
 
 - `html/`: versión completa con Oki incrustado (fuente de los PDF).
 - `html-express/`: versión importada a Adobe Express. El importador no descarga imágenes externas,
@@ -20,6 +21,7 @@ Regenerar:
 
 ```bash
 python3 identidad-marca/build.py            # html/
+python3 identidad-marca/banner.py           # html/07-banner-190x40.html
 EXPRESS=1 python3 identidad-marca/build.py  # html-express/
 NODE_PATH=/opt/node-tools/node_modules node identidad-marca/render.js  # pdf/
 ```
