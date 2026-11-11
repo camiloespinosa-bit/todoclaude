@@ -654,7 +654,7 @@ h1,h2,h3{text-wrap:balance; line-height:1.15}
       var a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
       a.download = "biomix-boardroom-" + S.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      flash("If the file did not download, use Copy CSV.");
+      $("csvText").hidden = false; flash("If the file did not download, use Copy CSV or copy the text below.");
     } catch (e) { $("csvText").hidden = false; flash("Use Copy CSV."); }
   }
 
