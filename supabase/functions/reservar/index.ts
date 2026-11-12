@@ -97,14 +97,19 @@ function fechaHora(fecha: string, minutos: number) {
 // dos personas reserven al mismo tiempo, la lista de invitados queda completa.
 function armarEvento(s: Sesion) {
   const minutos = s.clase === "grupo" ? 60 : 30;
-  const personas = s.asistentes.reduce((n, a) => n + a.personas, 0);
-  const modalidad = s.modalidad === "virtual" ? "virtual" : "presencial";
+  // Título corto, igual para todos los invitados. El cupo del grupo se ve en el panel, no en
+  // el calendario de los estudiantes.
   const titulo = s.clase === "grupo"
-    ? `Grupo ${modalidad} (${personas}/5) — Gimnasio del Cerebro`
-    : `Clase de prueba ${modalidad} — ${s.asistentes[0]?.nombre ?? ""}`;
-  const descripcion = s.clase === "grupo"
-    ? "Clase en grupo de El Gimnasio del Cerebro."
-    : `Clase de prueba gratuita de El Gimnasio del Cerebro (30 minutos). Personas: ${personas}.`;
+    ? `Clase ${s.modalidad} · Gimnasio del Cerebro`
+    : "Clase de prueba · Gimnasio del Cerebro";
+  const descripcion = [
+    "El cerebro se entrena como un músculo.",
+    s.clase === "grupo" ? "Tu clase en El Gimnasio del Cerebro." : "Tu clase de prueba gratuita en El Gimnasio del Cerebro (30 minutos).",
+    s.modalidad === "presencial" ? `Sede: ${SEDE}.` : "Clase virtual: entra con el enlace de Google Meet de este evento.",
+    "",
+    "¿Necesitas cambiarla? Escríbenos por WhatsApp: https://wa.me/573014916120",
+    "https://gimnasiodelcerebro.co",
+  ].join("\n");
   return {
     summary: titulo,
     description: descripcion,
