@@ -84,8 +84,43 @@ HTML_EXTERIOR = HTML.split("<section", 1)[0].replace(
 </section>
 </body></html>"""
 
+# Version con lista de servicios, reconstruida desde un boceto hecho con IA: se conserva la
+# composicion (servicios, Oki, contacto) pero con el SVG oficial de Oki y un QR real.
+SERVICIOS = ["Estimulación temprana", "Mejora de la memoria", "Agilidad mental", "Concentración",
+             "Resolución de problemas", "Cursos de inglés"]
+_lista = "".join(
+    f'<div style="display:flex;align-items:center;gap:12mm;margin-bottom:{15 if i < len(SERVICIOS) - 1 else 0}mm;">'
+    f'<div style="width:22mm;height:22mm;border-radius:50%;background:{[AMARILLO, VERDE, NARANJA][i % 3]};flex:none;"></div>'
+    f'<p style="font-weight:700;font-size:76pt;line-height:1;color:#fff;white-space:nowrap;">{s}</p></div>'
+    for i, s in enumerate(SERVICIOS))
+
+HTML_SERVICIOS = HTML.split("<section", 1)[0].replace(
+    "Banner Gimnasio del Cerebro 190x40", "Banner servicios Gimnasio del Cerebro 190x40") + f"""<section class="slide" style="background:{AZUL_OSC};">
+ <div style="position:absolute;left:1020mm;top:-200mm;width:1300mm;height:800mm;border-radius:50%;background:{AZUL};"></div>
+ <div style="position:absolute;left:0;right:0;bottom:0;height:16mm;display:flex;">
+  <div style="flex:6;background:{AZUL};"></div><div style="flex:2;background:{VERDE};"></div><div style="flex:2;background:{NARANJA};"></div>
+ </div>
+ <div style="position:absolute;left:80mm;top:0;bottom:16mm;display:flex;flex-direction:column;justify-content:center;">{_lista}</div>
+ <img src="{oki('base-saludo')}" style="position:absolute;left:660mm;top:40mm;width:320mm;height:319mm;">
+ <div style="position:absolute;left:1040mm;top:110mm;width:220mm;">
+  <img src="{qr_data_uri(WA_URL)}" style="width:220mm;height:220mm;border-radius:6mm;">
+  <p style="font-weight:600;font-size:28pt;color:#fff;text-align:center;margin-top:5mm;">Escanea y escríbenos</p>
+ </div>
+ <div style="position:absolute;left:1310mm;top:50mm;width:560mm;">
+  <p style="font-weight:900;font-size:200pt;line-height:.95;color:{AMARILLO};">GIMNASIO</p>
+  <p style="font-weight:900;font-size:128pt;line-height:1;color:#fff;margin-top:2mm;">DEL CEREBRO</p>
+  <p style="font-weight:600;font-size:46pt;color:#fff;margin-top:10mm;">Entrenamiento cognitivo para niños y adultos</p>
+  <p style="display:inline-block;font-weight:800;font-size:40pt;letter-spacing:.05em;color:{AZUL_OSC};background:{AMARILLO};padding:3mm 10mm;border-radius:3mm;margin-top:10mm;">EVALUACIÓN GRATUITA</p>
+  <p style="font-weight:600;font-size:40pt;color:#fff;margin-top:9mm;">Escríbenos al WhatsApp</p>
+  <p style="font-weight:900;font-size:104pt;line-height:1.05;color:#fff;">301 491 6120</p>
+  <p style="font-weight:400;font-size:38pt;color:#fff;opacity:.82;margin-top:3mm;">gimnasiodelcerebro.co</p>
+ </div>
+</section>
+</body></html>"""
+
 if __name__ == "__main__":
     OUT.mkdir(exist_ok=True)
     (OUT / "07-banner-190x40.html").write_text(HTML, encoding="utf-8")
     (OUT / "08-banner-exterior-190x40.html").write_text(HTML_EXTERIOR, encoding="utf-8")
-    print("07-banner-190x40, 08-banner-exterior-190x40")
+    (OUT / "09-banner-servicios-190x40.html").write_text(HTML_SERVICIOS, encoding="utf-8")
+    print("07-banner-190x40, 08-banner-exterior-190x40, 09-banner-servicios-190x40")
