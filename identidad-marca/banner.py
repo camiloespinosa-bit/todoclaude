@@ -10,7 +10,7 @@ from urllib.parse import quote
 
 import segno
 
-from build import AMARILLO, AZUL, AZUL_OSC, NARANJA, OUT, TYPEKIT, VERDE, oki
+from build import AMARILLO, AZUL, AZUL_OSC, EXPRESS, NARANJA, OUT, TYPEKIT, VERDE, oki
 
 GRIS_TEXTO = "#6B7C88"
 
@@ -54,6 +54,11 @@ WA_URL = "https://wa.me/573014916120?text=" + quote("Hola, vi el aviso del local
 
 
 def qr_data_uri(url):
+    if EXPRESS:
+        # Adobe Express no dibuja SVG incrustados: ahi va un PNG grande (24 px por modulo).
+        png = io.BytesIO()
+        segno.make(url, error="m").save(png, kind="png", scale=24, border=4, dark=AZUL_OSC, light="#FFFFFF")
+        return "data:image/png;base64," + base64.b64encode(png.getvalue()).decode()
     svg = io.BytesIO()
     segno.make(url, error="m").save(svg, kind="svg", scale=10, border=4, dark=AZUL_OSC, light="#FFFFFF",
                                      xmldecl=False, svgns=True)
@@ -102,19 +107,17 @@ HTML_SERVICIOS = HTML.split("<section", 1)[0].replace(
  </div>
  <div style="position:absolute;left:80mm;top:0;bottom:16mm;display:flex;flex-direction:column;justify-content:center;">{_lista}</div>
  <img src="{oki('base-saludo')}" style="position:absolute;left:660mm;top:40mm;width:320mm;height:319mm;">
- <div style="position:absolute;left:1040mm;top:110mm;width:220mm;">
-  <img src="{qr_data_uri(WA_URL)}" style="width:220mm;height:220mm;border-radius:6mm;">
-  <p style="font-weight:600;font-size:28pt;color:#fff;text-align:center;margin-top:5mm;">Escanea y escríbenos</p>
- </div>
- <div style="position:absolute;left:1310mm;top:50mm;width:560mm;">
-  <p style="font-weight:900;font-size:200pt;line-height:.95;color:{AMARILLO};">GIMNASIO</p>
-  <p style="font-weight:900;font-size:128pt;line-height:1;color:#fff;margin-top:2mm;">DEL CEREBRO</p>
-  <p style="font-weight:600;font-size:46pt;color:#fff;margin-top:10mm;">Entrenamiento cognitivo para niños y adultos</p>
-  <div style="display:inline-block;background:{AMARILLO};padding:3mm 10mm;border-radius:3mm;margin-top:10mm;"><p style="font-weight:800;font-size:40pt;letter-spacing:.05em;color:{AZUL_OSC};">CLASE GRATUITA</p></div>
-  <p style="font-weight:600;font-size:40pt;color:#fff;margin-top:9mm;">Escríbenos al WhatsApp</p>
-  <p style="font-weight:900;font-size:104pt;line-height:1.05;color:#fff;">301 491 6120</p>
-  <p style="font-weight:400;font-size:38pt;color:#fff;opacity:.82;margin-top:3mm;">gimnasiodelcerebro.co</p>
- </div>
+ <img src="{qr_data_uri(WA_URL)}" style="position:absolute;left:1040mm;top:100mm;width:220mm;height:220mm;border-radius:6mm;">
+ <p style="position:absolute;left:1040mm;top:326mm;width:220mm;text-align:center;font-weight:600;font-size:28pt;line-height:1.2;color:#fff;">Escanea y escríbenos</p>
+ <!-- Cada texto con posicion fija: Express desarma las columnas de bloques apilados -->
+ <p style="position:absolute;left:1310mm;top:48mm;font-weight:900;font-size:200pt;line-height:.95;color:{AMARILLO};">GIMNASIO</p>
+ <p style="position:absolute;left:1310mm;top:120mm;font-weight:900;font-size:128pt;line-height:1;color:#fff;">DEL CEREBRO</p>
+ <p style="position:absolute;left:1310mm;top:176mm;font-weight:600;font-size:46pt;line-height:1.2;color:#fff;">Entrenamiento cognitivo para niños y adultos</p>
+ <div style="position:absolute;left:1310mm;top:205mm;width:150mm;height:24mm;background:{AMARILLO};border-radius:3mm;"></div>
+ <p style="position:absolute;left:1310mm;top:209mm;width:150mm;text-align:center;font-weight:800;font-size:40pt;line-height:1;letter-spacing:.05em;color:{AZUL_OSC};">CLASE GRATUITA</p>
+ <p style="position:absolute;left:1310mm;top:243mm;font-weight:600;font-size:40pt;line-height:1.2;color:#fff;">Escríbenos al WhatsApp</p>
+ <p style="position:absolute;left:1310mm;top:262mm;font-weight:900;font-size:104pt;line-height:1.05;color:#fff;">301 491 6120</p>
+ <p style="position:absolute;left:1310mm;top:305mm;font-weight:400;font-size:38pt;line-height:1.2;color:#fff;opacity:.82;">gimnasiodelcerebro.co</p>
 </section>
 </body></html>"""
 

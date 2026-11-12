@@ -73,7 +73,7 @@ def placeholder(m):
     size = f"{max(14, int(width) // 14)}px" if unit == "px" else f"{int(width) // 6}pt"
     return (f'<div style="{style}border:3px dashed {TURQUESA};border-radius:16px;display:flex;align-items:center;'
             f'justify-content:center;text-align:center;font-weight:700;font-size:{size};color:{TURQUESA};">'
-            f'Oki<br>oki-{pose}.svg</div>')
+            f'Oki: oki-{pose}.svg</div>')
 
 
 def doc(title, w, h, css, slides):
