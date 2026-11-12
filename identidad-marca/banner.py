@@ -72,7 +72,7 @@ HTML_EXTERIOR = HTML.split("<section", 1)[0].replace(
   <p style="font-weight:700;font-size:76pt;color:{AMARILLO};margin-top:14mm;">Entrenamiento cognitivo para niños y adultos</p>
  </div>
  <div style="position:absolute;left:1290mm;top:96mm;width:330mm;">
-  <p style="font-weight:700;font-size:44pt;color:{AMARILLO};letter-spacing:.06em;text-transform:uppercase;">Evaluación gratuita</p>
+  <p style="font-weight:700;font-size:44pt;color:{AMARILLO};letter-spacing:.06em;text-transform:uppercase;">Clase gratuita</p>
   <p style="font-weight:600;font-size:56pt;color:#fff;margin-top:10mm;">Escríbenos al WhatsApp</p>
   <p style="font-weight:900;font-size:120pt;line-height:1.05;color:#fff;margin-top:4mm;">301 491 6120</p>
   <p style="font-weight:400;font-size:44pt;color:#fff;opacity:.82;margin-top:12mm;">gimnasiodelcerebro.co</p>
@@ -110,7 +110,7 @@ HTML_SERVICIOS = HTML.split("<section", 1)[0].replace(
   <p style="font-weight:900;font-size:200pt;line-height:.95;color:{AMARILLO};">GIMNASIO</p>
   <p style="font-weight:900;font-size:128pt;line-height:1;color:#fff;margin-top:2mm;">DEL CEREBRO</p>
   <p style="font-weight:600;font-size:46pt;color:#fff;margin-top:10mm;">Entrenamiento cognitivo para niños y adultos</p>
-  <div style="display:inline-block;background:{AMARILLO};padding:3mm 10mm;border-radius:3mm;margin-top:10mm;"><p style="font-weight:800;font-size:40pt;letter-spacing:.05em;color:{AZUL_OSC};">EVALUACIÓN GRATUITA</p></div>
+  <div style="display:inline-block;background:{AMARILLO};padding:3mm 10mm;border-radius:3mm;margin-top:10mm;"><p style="font-weight:800;font-size:40pt;letter-spacing:.05em;color:{AZUL_OSC};">CLASE GRATUITA</p></div>
   <p style="font-weight:600;font-size:40pt;color:#fff;margin-top:9mm;">Escríbenos al WhatsApp</p>
   <p style="font-weight:900;font-size:104pt;line-height:1.05;color:#fff;">301 491 6120</p>
   <p style="font-weight:400;font-size:38pt;color:#fff;opacity:.82;margin-top:3mm;">gimnasiodelcerebro.co</p>
