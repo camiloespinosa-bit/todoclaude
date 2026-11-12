@@ -97,13 +97,13 @@ function fechaHora(fecha: string, minutos: number) {
 // dos personas reserven al mismo tiempo, la lista de invitados queda completa.
 function armarEvento(s: Sesion) {
   const minutos = s.clase === "grupo" ? 60 : 30;
-  // Título corto y con Oki (🐙), igual para todos los invitados. El cupo del grupo se ve en
-  // el panel, no en el calendario de los estudiantes.
+  // Título corto, igual para todos los invitados. El cupo del grupo se ve en el panel, no en
+  // el calendario de los estudiantes.
   const titulo = s.clase === "grupo"
-    ? `🐙 Clase ${s.modalidad} · Gimnasio del Cerebro`
-    : "🐙 Clase de prueba · Gimnasio del Cerebro";
+    ? `Clase ${s.modalidad} · Gimnasio del Cerebro`
+    : "Clase de prueba · Gimnasio del Cerebro";
   const descripcion = [
-    "El cerebro se entrena como un músculo. 🐙",
+    "El cerebro se entrena como un músculo.",
     s.clase === "grupo" ? "Tu clase en El Gimnasio del Cerebro." : "Tu clase de prueba gratuita en El Gimnasio del Cerebro (30 minutos).",
     s.modalidad === "presencial" ? `Sede: ${SEDE}.` : "Clase virtual: entra con el enlace de Google Meet de este evento.",
     "",
