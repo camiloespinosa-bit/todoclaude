@@ -69,9 +69,10 @@ img{{display:block;}}
 
 def placeholder(m):
     pose, style = m.group(1), m.group(2)
-    size = max(14, int(re.search(r"width:(\d+)px", style).group(1)) // 14)
+    width, unit = re.search(r"width:(\d+)(px|mm)", style).groups()
+    size = f"{max(14, int(width) // 14)}px" if unit == "px" else f"{int(width) // 6}pt"
     return (f'<div style="{style}border:3px dashed {TURQUESA};border-radius:16px;display:flex;align-items:center;'
-            f'justify-content:center;text-align:center;font-weight:700;font-size:{size}px;color:{TURQUESA};">'
+            f'justify-content:center;text-align:center;font-weight:700;font-size:{size};color:{TURQUESA};">'
             f'Oki<br>oki-{pose}.svg</div>')
 
 

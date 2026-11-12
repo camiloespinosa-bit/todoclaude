@@ -110,7 +110,7 @@ HTML_SERVICIOS = HTML.split("<section", 1)[0].replace(
   <p style="font-weight:900;font-size:200pt;line-height:.95;color:{AMARILLO};">GIMNASIO</p>
   <p style="font-weight:900;font-size:128pt;line-height:1;color:#fff;margin-top:2mm;">DEL CEREBRO</p>
   <p style="font-weight:600;font-size:46pt;color:#fff;margin-top:10mm;">Entrenamiento cognitivo para niños y adultos</p>
-  <p style="display:inline-block;font-weight:800;font-size:40pt;letter-spacing:.05em;color:{AZUL_OSC};background:{AMARILLO};padding:3mm 10mm;border-radius:3mm;margin-top:10mm;">EVALUACIÓN GRATUITA</p>
+  <div style="display:inline-block;background:{AMARILLO};padding:3mm 10mm;border-radius:3mm;margin-top:10mm;"><p style="font-weight:800;font-size:40pt;letter-spacing:.05em;color:{AZUL_OSC};">EVALUACIÓN GRATUITA</p></div>
   <p style="font-weight:600;font-size:40pt;color:#fff;margin-top:9mm;">Escríbenos al WhatsApp</p>
   <p style="font-weight:900;font-size:104pt;line-height:1.05;color:#fff;">301 491 6120</p>
   <p style="font-weight:400;font-size:38pt;color:#fff;opacity:.82;margin-top:3mm;">gimnasiodelcerebro.co</p>
