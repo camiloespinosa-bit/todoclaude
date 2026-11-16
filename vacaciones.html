@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vacaciones con Oki | Gimnasio del Cerebro</title>
+  <meta name="description" content="Vacaciones recreativas para niños de 4 a 14 años en Rionegro: 10 horas por semana de retos con movimiento, juego y estrategia. Máximo 10 niños por grupo. Desde el 30 de noviembre." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Gimnasio del Cerebro" />
+  <meta property="og:title" content="Vacaciones con Oki: Misiones del Cerebro" />
+  <meta property="og:description" content="Vacaciones recreativas para niños de 4 a 14 años en Rionegro. 10 horas por semana, máximo 10 niños por grupo. Desde el 30 de noviembre." />
+  <meta property="og:url" content="https://gimnasiodelcerebro.co/vacaciones.html" />
+  <meta property="og:image" content="https://gimnasiodelcerebro.co/assets/img/og/og-cca.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta property="og:locale" content="es_CO" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .precio-grande { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; color: var(--naranja); line-height: 1; margin: 8px 0 4px; }
+    .grupo h3 { margin-bottom: 2px; }
+    .grupo .edad { font-weight: 600; color: var(--azul); margin-bottom: 10px; }
+    .grupo .horario { font-size: 0.95rem; background: var(--fondo-claro); border-radius: var(--radio-sm); padding: 8px 12px; margin: 12px 0 16px; color: var(--texto); }
+    .semana .fecha { font-weight: 700; color: var(--naranja); margin-bottom: 6px; }
+    .lista-check { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+    .lista-check li { padding-left: 30px; position: relative; color: var(--texto-suave); }
+    .lista-check li::before { content: "✓"; position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--tint-verde); color: var(--verde-profundo); font-weight: 800; font-size: 0.8rem; display: grid; place-items: center; }
+    .faq details { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio-sm); padding: 14px 18px; margin-bottom: 10px; }
+    .faq summary { font-weight: 700; cursor: pointer; color: var(--azul-oscuro); }
+    .faq details p { margin: 10px 0 0; }
+    .grupo .boton { width: 100%; justify-content: center; text-align: center; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="encabezado">
+    <div class="contenedor encabezado__barra">
+      <a class="marca" href="index.html">
+        <span class="marca__insignia" aria-hidden="true">GC</span>
+        <span>
+          Gimnasio del Cerebro
+          <small>Rionegro, Antioquia</small>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <ul class="nav__enlaces" data-nav-enlaces>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="fases.html">Fases del Programa</a></li>
+          <li><a href="vacaciones.html" aria-current="page">Vacaciones</a></li>
+          <li><a href="nosotros.html">Sobre Nosotros</a></li>
+          <li><a href="blog/index.html">Blog</a></li>
+        </ul>
+        <a class="boton boton--primario nav__cta" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki" target="_blank" rel="noopener">Reservar cupo</a>
+        <button class="nav__toggle" data-nav-toggle aria-label="Abrir menú" aria-expanded="false">
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="contenedor hero__grid">
+        <div>
+          <span class="etiqueta">Vacaciones recreativas · Desde el 30 de noviembre</span>
+          <h1>Vacaciones con Oki: Misiones del Cerebro</h1>
+          <p class="hero__sub">Una semana de retos con movimiento, juego y estrategia para niños de 4 a 14 años. Dos horas al día, de lunes a viernes, en grupos de máximo 10 niños. Se divierten, se mueven y piensan, lejos de las pantallas.</p>
+          <div class="hero__acciones">
+            <a class="boton boton--primario" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki" target="_blank" rel="noopener">Reservar cupo por WhatsApp</a>
+            <a class="boton boton--fantasma" href="#grupos">Ver grupos y horarios</a>
+          </div>
+          <div class="hero__mini">
+            <div><strong>10</strong> horas por semana</div>
+            <div><strong>10</strong> niños máximo por grupo</div>
+            <div><strong>3</strong> misiones distintas</div>
+          </div>
+        </div>
+        <div class="hero__ilustracion">
+          <img src="assets/img/oki/oki-celebrando.svg" alt="Oki, la mascota del Gimnasio del Cerebro, celebrando" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ QUÉ ES ============ -->
+    <section class="seccion">
+      <div class="contenedor" style="max-width:860px;">
+        <div class="encabezado-seccion">
+          <span class="etiqueta">Cómo es una semana</span>
+          <h2>Cada día, una misión nueva</h2>
+          <p>Las vacaciones siguen la misma forma de trabajar del Gimnasio del Cerebro: retos con movimiento, una historia que les da sentido y juegos donde hay que planear, recordar y esperar el turno.</p>
+        </div>
+        <div class="rejilla rejilla--3">
+          <article class="tarjeta tarjeta--acento-azul">
+            <h3>Se mueven</h3>
+            <p>Circuitos, juegos de reacción y retos de equilibrio. Nada de pasar dos horas sentados.</p>
+          </article>
+          <article class="tarjeta tarjeta--acento-naranja">
+            <h3>Piensan</h3>
+            <p>Acertijos, juegos de memoria y de estrategia adaptados a la edad de cada grupo.</p>
+          </article>
+          <article class="tarjeta tarjeta--acento-verde">
+            <h3>Conviven</h3>
+            <p>Misiones en equipo donde toca escuchar, ponerse de acuerdo y celebrar juntos.</p>
+          </article>
+        </div>
+        <p style="text-align:center; margin-top:28px; font-size:0.9rem;">Somos honestos: una semana de vacaciones es para disfrutar y practicar, no promete cambios medibles en la atención o la memoria. Eso se logra con entrenamiento constante, como el de nuestros <a href="fases.html">programas regulares</a>.</p>
+      </div>
+    </section>
+
+    <!-- ============ GRUPOS ============ -->
+    <section class="seccion seccion--tint-azul" id="grupos">
+      <div class="contenedor">
+        <div class="encabezado-seccion">
+          <span class="etiqueta">Grupos y horarios</span>
+          <h2>Un grupo para cada edad</h2>
+          <p>Lunes a viernes, 2 horas al día: 10 horas en total por semana. Máximo 10 niños por grupo.</p>
+        </div>
+        <div class="rejilla rejilla--3">
+          <article class="tarjeta tarjeta--acento-naranja grupo">
+            <h3>Chiquis</h3>
+            <p class="edad">4 a 6 años</p>
+            <p>Juego sensorial, cuentos con movimiento y retos sencillos de memoria y turnos.</p>
+            <p class="horario"><strong>8:00 a 10:00 a.m.</strong></p>
+            <a class="boton boton--primario" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki%20para%20el%20grupo%20Chiquis%20(4%20a%206%20a%C3%B1os)" target="_blank" rel="noopener">Reservar Chiquis</a>
+          </article>
+          <article class="tarjeta tarjeta--acento-azul grupo">
+            <h3>Aventureros</h3>
+            <p class="edad">7 a 10 años</p>
+            <p>Circuitos, acertijos en equipo y juegos de estrategia con reglas que cambian.</p>
+            <p class="horario"><strong>10:30 a.m. a 12:30 p.m.</strong></p>
+            <a class="boton boton--primario" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki%20para%20el%20grupo%20Aventureros%20(7%20a%2010%20a%C3%B1os)" target="_blank" rel="noopener">Reservar Aventureros</a>
+          </article>
+          <article class="tarjeta tarjeta--acento-verde grupo">
+            <h3>Estrategas</h3>
+            <p class="edad">11 a 14 años</p>
+            <p>Retos de lógica, juegos de mesa de estrategia, debate y misiones de escape.</p>
+            <p class="horario"><strong>2:00 a 4:00 p.m.</strong></p>
+            <a class="boton boton--primario" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki%20para%20el%20grupo%20Estrategas%20(11%20a%2014%20a%C3%B1os)" target="_blank" rel="noopener">Reservar Estrategas</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SEMANAS ============ -->
+    <section class="seccion">
+      <div class="contenedor">
+        <div class="encabezado-seccion">
+          <span class="etiqueta">Calendario</span>
+          <h2>Tres semanas, tres misiones</h2>
+          <p>Cada semana tiene una historia distinta, así que tu hijo puede venir a una, a dos o a las tres sin repetir.</p>
+        </div>
+        <div class="rejilla rejilla--3">
+          <article class="tarjeta semana">
+            <p class="fecha">30 de noviembre al 4 de diciembre</p>
+            <h3>Exploradores del mundo perdido</h3>
+            <p>Mapas, pistas escondidas y retos para encontrar el camino de regreso.</p>
+          </article>
+          <article class="tarjeta semana">
+            <p class="fecha">7 al 12 de diciembre</p>
+            <h3>Inventores en apuros</h3>
+            <p>Construir, probar, fallar y volver a intentar hasta que el invento funcione.</p>
+            <p style="font-size:0.85rem;">El martes 8 es festivo: esa sesión se hace el sábado 12.</p>
+          </article>
+          <article class="tarjeta semana">
+            <p class="fecha">14 al 18 de diciembre</p>
+            <h3>Detectives de Oki</h3>
+            <p>Un misterio que se resuelve observando, recordando detalles y trabajando en equipo.</p>
+          </article>
+        </div>
+        <p style="text-align:center; margin-top:24px;">¿Viajan en diciembre? <a href="https://wa.me/573014916120?text=Hola%2C%20quiero%20saber%20si%20habr%C3%A1%20Vacaciones%20con%20Oki%20en%20enero" target="_blank" rel="noopener">Escríbenos</a> y te avisamos si abrimos semanas en enero.</p>
+      </div>
+    </section>
+
+    <!-- ============ PRECIO ============ -->
+    <section class="seccion seccion--tint-naranja">
+      <div class="contenedor" style="max-width:760px;">
+        <div class="rejilla rejilla--2" style="align-items:start;">
+          <div>
+            <span class="etiqueta">Inversión</span>
+            <p class="precio-grande">$200.000</p>
+            <p style="font-weight:600; color:var(--texto);">por niño, por semana (10 horas)</p>
+            <p>Al terminar, cada familia recibe un descuento para continuar en nuestros programas regulares.</p>
+            <a class="boton boton--primario" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki" target="_blank" rel="noopener">Reservar cupo</a>
+          </div>
+          <div>
+            <h3 style="color:var(--azul-oscuro);">Incluye</h3>
+            <ul class="lista-check">
+              <li>10 horas de actividades guiadas por semana</li>
+              <li>Grupos de máximo 10 niños de edades cercanas</li>
+              <li>Sede del Gimnasio del Cerebro en Rionegro</li>
+              <li>Descuento para seguir en nuestros programas</li>
+            </ul>
+            <h3 style="color:var(--azul-oscuro); margin-top:24px;">Qué traer</h3>
+            <ul class="lista-check">
+              <li>Ropa cómoda para moverse</li>
+              <li>Botella de agua</li>
+              <li>Una merienda pequeña, si la necesita</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="seccion">
+      <div class="contenedor faq" style="max-width:760px;">
+        <div class="encabezado-seccion">
+          <span class="etiqueta">Preguntas frecuentes</span>
+          <h2>Lo que suelen preguntar las familias</h2>
+        </div>
+        <details>
+          <summary>¿Cómo reservo el cupo?</summary>
+          <p>Escríbenos por WhatsApp con el nombre y la edad del niño y la semana que te interesa. Te confirmamos disponibilidad y la forma de pago. Los cupos son limitados porque cada grupo tiene máximo 10 niños.</p>
+        </details>
+        <details>
+          <summary>¿Puede venir más de una semana?</summary>
+          <p>Sí. Cada semana tiene una misión distinta, así que puede venir a una, a dos o a las tres.</p>
+        </details>
+        <details>
+          <summary>¿Necesita saber algo antes?</summary>
+          <p>No. Las actividades se ajustan a la edad del grupo y no hay que tener conocimientos previos.</p>
+        </details>
+        <details>
+          <summary>¿Hay refrigerio?</summary>
+          <p>Como cada sesión dura 2 horas, no incluimos refrigerio. Puede traer agua y una merienda pequeña.</p>
+        </details>
+        <details>
+          <summary>¿Publican fotos de los niños?</summary>
+          <p>Solo con la autorización escrita de los padres. Sin esa autorización, no publicamos ninguna foto ni video del niño.</p>
+        </details>
+        <details>
+          <summary>Mi hijo tiene una condición especial, ¿puede participar?</summary>
+          <p>Escríbenos antes de reservar y conversamos sobre las necesidades de tu hijo, para ver juntos si el grupo es el adecuado para él.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ CTA FINAL ============ -->
+    <section class="seccion cta-final">
+      <div class="contenedor">
+        <img class="oki-flotante oki-flotante--sm" src="assets/img/oki/oki-senalando.svg" alt="Oki señalando hacia el botón de WhatsApp" style="margin-bottom:8px;" />
+        <h2 style="color:var(--azul-oscuro)">Los cupos son de 10 niños por grupo</h2>
+        <p style="max-width:52ch; margin:0 auto 28px;">Escríbenos y te contamos qué semanas y grupos todavía tienen cupo.</p>
+        <a class="boton boton--whatsapp" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki" target="_blank" rel="noopener">Reservar por WhatsApp</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <div class="pie__rejilla">
+        <div>
+          <h4>Gimnasio del Cerebro</h4>
+          <p style="color:rgba(255,255,255,0.75); max-width:36ch;">Domicilio legal: Medellín · Sede de atención: Rionegro, Antioquia, Colombia. Entrenamos las funciones ejecutivas del cerebro con neurociencia aplicada.</p>
+        </div>
+        <div>
+          <h4>Navegación</h4>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="fases.html">Fases del Programa</a></li>
+            <li><a href="vacaciones.html">Vacaciones</a></li>
+            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="blog/index.html">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contacto</h4>
+          <ul>
+            <li><a href="https://wa.me/573014916120" target="_blank" rel="noopener">WhatsApp: 301 491 6120</a></li>
+            <li>Rionegro, Antioquia, Colombia</li>
+          </ul>
+        </div>
+      </div>
+      <div class="pie__inferior">
+        <span>© <span data-anio>2026</span> Gimnasio del Cerebro</span>
+        <span>Hecho con base en evidencia, no en promesas.</span>
+      </div>
+    </div>
+  </footer>
+
+  <a class="whatsapp-flotante" href="https://wa.me/573014916120?text=Hola%2C%20quiero%20reservar%20cupo%20en%20Vacaciones%20con%20Oki" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.1.1-.3.2-.5.1-.2-.1-1-.4-2-1.2-.7-.7-1.2-1.5-1.4-1.7-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.3.1.2 1.6 2.4 3.9 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.4.1.4-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3Z"/></svg>
+    <span>WhatsApp</span>
+  </a>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
