@@ -102,6 +102,9 @@ neuropsicología para observar la planificación; hoy no medimos nada, solo prac
 
 ## 4. Stroop saltado · Inhibición
 
+Tarjetas imprimibles ya hechas (12, rojo, azul, verde y amarillo, fondo oscuro, sin pares repetidos en la ronda 2):
+`clases/luisa/Materiales_Luisa_Rookie_S9.pdf`, páginas 2 a 7. Si el tapete tiene otros colores, regenerarlas.
+
 **Material:** tapete de 4 colores; 12 tarjetas con palabras de color en inglés escritas con tinta de
 OTRO color (por ejemplo RED escrito en azul). Verificar qué colores tiene el tapete y usar solo esos.
 

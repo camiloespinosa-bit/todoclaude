@@ -8,3 +8,4 @@ mental no se repite dos clases seguidas.
 | 2026-10-24 | Luisa y Ana C. | Rookie | Jarras de Luchins | Flexibilidad | | Primera clase juntas |
 | 2026-10-31 | Luisa y Ana C. | Rookie | Pitillos tramposos | Insight | Pasado simple | Les encantó |
 | 2026-11-07 | Luisa y Ana C. | Rookie | Torre de Hanoi | Planificación | Pasado simple | Planeado: confirmar |
+| 2026-11-21 | Luisa (individual; Ana C. se retiró) | Rookie | Stroop saltado (The Color Trap) | Inhibición | Pasado simple | Planeado: tarjetas en `clases/luisa/Materiales_Luisa_Rookie_S9.pdf` |
