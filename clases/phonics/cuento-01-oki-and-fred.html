@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Phonics · Cuento 1 · Oki and Fred</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#145389;--azulOscuro:#2C5F7C;--deep:#1D3F54;--verde:#7CB342;--naranja:#F57C00;--fondo:#F0F4F8;--tqL:#EAF4F6;--vdL:#F1F8E9;--naL:#FFF3E0;--ink:#1E2A33;--muted:#6B7C88;--line:#D9E1E7}
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:Letter;margin:0}
+body{font-family:'Poppins',sans-serif;color:var(--ink);background:#ccc;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:8.5in;height:11in;background:#fff;margin:0 auto 8mm;position:relative;overflow:hidden;page-break-after:always;padding:15mm 16mm 12mm 21mm;display:flex;flex-direction:column;gap:3.6mm;font-size:9.4pt;line-height:1.45}
+.page:last-child{page-break-after:avoid}
+@media print{body{background:#fff}.page{margin:0;box-shadow:none}}
+.stripe{position:absolute;left:0;top:0;bottom:0;width:6mm;background:linear-gradient(to bottom,var(--azul) 0 60%,var(--verde) 60% 80%,var(--naranja) 80% 100%)}
+.top{display:flex;align-items:center;justify-content:space-between;border-bottom:.7mm solid var(--azul);padding-bottom:2.2mm}
+.brand{display:flex;align-items:center;gap:3mm;font-weight:900;font-size:11pt;color:var(--azulOscuro);letter-spacing:.02em}
+.brand img{height:12mm}
+.top .sec{font-size:8pt;color:var(--muted)}
+.foot{margin-top:auto;display:flex;justify-content:space-between;font-size:7pt;color:var(--muted)}
+h1{font-size:21pt;font-weight:800;color:var(--azulOscuro);line-height:1.15;margin-top:1mm}
+.kicker{font-size:8pt;font-weight:700;color:var(--naranja);letter-spacing:.1em;text-transform:uppercase;margin-top:-1.5mm}
+.note{font-size:8pt;color:var(--muted)}
+.call{border-left:1.2mm solid var(--azul);background:var(--tqL);border-radius:0 2.5mm 2.5mm 0;padding:3mm 4mm;font-size:9.4pt}
+.call.or{border-color:var(--naranja);background:var(--naL)}
+.call.vd{border-color:var(--verde);background:var(--vdL)}
+.call b{color:var(--deep)}
+.call ul{padding-left:4.5mm;margin-top:1mm}
+h2{font-size:12pt;font-weight:700;color:var(--azulOscuro);display:flex;align-items:center;gap:2.5mm}
+h2::before{content:"";width:1.6mm;height:5mm;border-radius:1mm;background:var(--azul)}
+.tbl{border:1px solid var(--line);border-radius:2.5mm;overflow:hidden;flex:none}
+.tbl table{width:100%;border-collapse:collapse;font-size:8.6pt}
+.tbl th{background:var(--azulOscuro);color:#fff;text-align:left;font-weight:600;padding:2mm 3mm}
+.tbl td{padding:1.8mm 3mm;vertical-align:top;border-top:1px solid var(--line)}
+.tbl tr:nth-child(even) td{background:var(--fondo)}
+.tbl td.m{font-weight:700;color:var(--azulOscuro);white-space:nowrap;width:15mm}
+.tbl td.n{font-weight:700;color:var(--azulOscuro);width:30mm}
+.tbl td.c{text-align:center}
+.say{font-style:italic;color:#34495a}
+.cb{display:inline-block;width:3.6mm;height:3.6mm;border:1.4px solid var(--azulOscuro);border-radius:.8mm;vertical-align:-.6mm;margin:0 1mm}
+.ln{display:inline-block;border-bottom:1px solid #8a9aa6;min-width:18mm}
+.lines{background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 7.6mm,#b9c5ce 7.6mm,#b9c5ce 7.9mm)}
+.cutnote{font-size:7.6pt;color:var(--muted)}
+.cutgrid{display:grid;border:1px dashed #c3ccd3}
+.cut{border:1px dashed #c3ccd3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4mm;gap:2mm}
+.tag{font-size:8pt;font-weight:700;color:var(--naranja);letter-spacing:.1em;text-transform:uppercase}
+.secret{align-self:flex-start;background:var(--naranja);color:#fff;font-size:7.5pt;font-weight:800;letter-spacing:.1em;padding:1mm 3mm;border-radius:1.5mm}
+.mission{border:.9mm solid var(--azul);border-radius:5mm;padding:6mm 7mm;position:relative}
+.mission h3{font-size:19pt;font-weight:800;color:var(--azulOscuro);margin:1mm 0 3mm}
+.mission p{margin-bottom:2mm}
+.mission ul{padding-left:5mm;margin-top:1mm}
+.mission img{position:absolute;right:6mm;top:5mm;height:30mm}
+.sig{font-size:7.5pt;color:var(--muted);margin-top:2mm}
+.titlerow{display:flex;justify-content:space-between;align-items:flex-end;gap:4mm}
+.titlerow img{height:30mm;flex:none}
+
+/* Session-specific */
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:2mm 8mm;font-size:15pt;font-weight:700;color:var(--azulOscuro)}
+.pairs div{display:flex;align-items:center;gap:3mm}
+.pairs .ar{color:var(--verde);font-size:12pt}
+.pairs .add{background:var(--naL);color:var(--naranja);border-radius:1.5mm;padding:0 1mm}
+.boxes{display:flex;gap:5mm;justify-content:center}
+.sbox{width:38mm;height:52mm;border:1.2mm solid var(--azulOscuro);border-radius:5mm;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4mm}
+.sbox.end{border-color:var(--naranja);border-style:dashed}
+.sdot{width:7mm;height:7mm;border-radius:50%;background:var(--naranja)}
+.big{font-size:40pt;font-weight:800;color:var(--deep);text-align:center;line-height:1.1}
+.word{font-size:34pt;font-weight:800;color:var(--azulOscuro)}
+.bingo{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);border:.9mm solid var(--azul);border-radius:4mm;overflow:hidden;flex:1}
+.bingo div{border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:30pt;font-weight:800;color:var(--azulOscuro)}
+.bhead{display:flex;justify-content:space-between;align-items:center;background:var(--azulOscuro);color:#fff;border-radius:3mm;padding:2mm 4mm;font-weight:700}
+.bhead span:last-child{color:#FDD835}
+.check{display:grid;grid-template-columns:1fr 1fr;gap:3mm 12mm}
+.check div{font-size:36pt;font-weight:800;color:var(--deep);border-bottom:1px solid var(--line);padding:0 0 1mm 2mm}
+.check small{font-size:10pt;color:var(--azul);font-weight:700;margin-right:4mm;vertical-align:middle}
+.alien{background:var(--vdL);border-radius:3mm;padding:3mm 5mm;display:flex;align-items:center;gap:6mm}
+.alien .w{font-size:36pt;font-weight:800;color:var(--deep);flex:1;text-align:center}
+.draw{flex:1;border:.9mm solid var(--azulOscuro);border-radius:4mm;position:relative}
+.draw span{position:absolute;top:2mm;left:4mm;font-size:9pt;color:var(--azul);font-weight:600}
+.sentence{font-size:30pt;font-weight:800;color:var(--azulOscuro);text-align:center}
+.tricky{background:var(--naL);color:var(--naranja);border-radius:2mm;padding:0 2mm}
+.taps{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;text-align:center;font-size:8.6pt}
+.taps div{background:var(--fondo);border-radius:2.5mm;padding:2mm}
+.taps b{display:block;font-size:11pt;color:var(--azulOscuro)}
+/* Story */
+.scene{flex:1;display:flex;align-items:center;justify-content:center;gap:8mm;background:var(--tqL);border-radius:6mm;position:relative;overflow:hidden}
+.scene img{height:85mm}
+.scene .e{font-size:110pt;line-height:1}
+.scene .water{position:absolute;left:0;right:0;bottom:0;height:22mm;background:#57A6B5;opacity:.35}
+.scene.land{background:var(--vdL)}
+.text{font-size:30pt;font-weight:700;color:var(--deep);line-height:1.45;text-align:center;padding:2mm 4mm}
+.oki{background:var(--naL);color:var(--naranja);border-radius:2mm;padding:0 .4mm}
+.pnum{align-self:center;width:9mm;height:9mm;border-radius:50%;background:var(--azul);color:#fff;font-weight:900;font-size:10pt;display:flex;align-items:center;justify-content:center}
+.cover{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6mm;text-align:center}
+.cover h1{font-size:54pt;font-weight:900;color:var(--azulOscuro);margin:0}
+.wl{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}
+.wl div{border-radius:2.5mm;padding:2.5mm 3mm}
+.wl b{display:block;font-size:10pt;color:var(--deep);margin-bottom:1mm}
+.wl span{font-size:13pt;font-weight:700;color:var(--azulOscuro)}
+.q{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:3mm 2mm}
+.q .t{font-size:28pt;font-weight:700;color:var(--deep)}
+.q .yn{display:flex;gap:6mm;font-size:26pt;font-weight:800}
+.q .yn span{width:16mm;height:16mm;border:1mm solid var(--azulOscuro);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--azulOscuro)}
+</style></head><body>
+
+<!-- 0. GUÍA -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Guía del facilitador</div></div>
+  <h1>Cuento 1 · Oki and Fred</h1>
+  <div class="kicker">Lectura decodificable · después de la sesión 4 · 15 a 20 minutos</div>
+  <div class="call"><b>Objetivo:</b> leer un cuento completo usando solo lo aprendido en las sesiones 1 a 4: palabras de 3 sonidos (CVC), con dos consonantes al final (CVCC) y con dos al inicio (CCVC).</div>
+  <div class="call or"><b>Cuidar el ánimo:</b> es su primer cuento entero. Lo importante es que termine sintiendo "yo leí un libro". Si una página le cuesta mucho, léela tú primero y que él la repita señalando.</div>
+  <h2>Palabras del cuento</h2>
+  <div class="wl">
+    <div style="background:var(--tqL)"><b>3 sonidos (CVC)</b><span>can · sat · on · log · hop · in · hug · and</span></div>
+    <div style="background:var(--vdL)"><b>Final doble (CVCC)</b><span>jump · help · fast · lift · felt · end</span></div>
+    <div style="background:var(--naL)"><b>Inicio doble (CCVC)</b><span>swim · swam · Fred · frog · slid · plop · glad · clap · spin</span></div>
+  </div>
+  <div class="call"><b>Única tricky word: <span class="oki">Oki</span>.</b> No se puede leer con los sonidos que conoce: díselo tú antes de empezar y señala que en el cuento va resaltada. Las mayúsculas del inicio de cada oración (O, F, S, P, H, C, E) suenan igual que su minúscula: si duda, muéstrale la pareja.</div>
+  <h2>Cómo leerlo</h2>
+  <div class="tbl"><table>
+    <tr><th>Paso</th><th>Qué hacer</th></tr>
+    <tr><td class="n">1 · Antes</td><td>Lean juntos la lista de palabras de arriba en voz alta. Mira la portada y pregunta: <span class="say">"Who is this? Oki! And this is Fred, a frog."</span></td></tr>
+    <tr><td class="n">2 · Primera lectura</td><td>Él lee cada página. Tú no lees por él: si se traba, di <span class="say">"Tap it!"</span> y deja que toque el brazo. Solo si después de dos intentos no sale, dile la palabra.</td></tr>
+    <tr><td class="n">3 · Hablar</td><td>Después de la página 3 pregunta: <span class="say">"Uh-oh! What can Oki do?"</span> Deja que adivine antes de pasar.</td></tr>
+    <tr><td class="n">4 · Después</td><td>Hoja "Did you read it?" (última página): lee cada pregunta y marca ✓ o ✗.</td></tr>
+    <tr><td class="n">5 · Otra vez</td><td>Que lo vuelva a leer otro día, en casa. La segunda lectura sale más fluida y eso le encanta.</td></tr>
+  </table></div>
+  <div class="note">El cuento no usa "the", "is", "to", ni plurales con -s, porque todavía no se han enseñado. Si mañana enseñas alguna, este cuento sigue sirviendo.</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 1. COVER -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Cuento 1</div></div>
+  <div class="cover">
+    <div class="tag">A story to read by myself</div>
+    <h1><span class="oki">Oki</span> and Fred</h1>
+    <div class="scene" style="flex:none;width:150mm;height:110mm">
+      <img src="../../assets/img/oki/oki-celebrando.svg" alt="Oki" style="height:80mm">
+      <span class="e">🐸</span>
+      <div class="water"></div>
+    </div>
+    <div style="font-size:14pt;color:var(--azulOscuro);margin-top:6mm">Reader: <span class="ln" style="min-width:80mm"></span></div>
+  </div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 2 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="scene"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki"><div class="water"></div></div>
+  <div class="text"><span class="oki">Oki</span> can swim.<br>Swim, <span class="oki">Oki</span>, swim!</div>
+  <div class="pnum">1</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 3 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="scene land"><span class="e">🐸</span><span class="e" style="font-size:80pt">🪵</span><div class="water" style="height:14mm"></div></div>
+  <div class="text">Fred, a frog, sat on a log.<br>Fred can hop. Fred can jump.</div>
+  <div class="pnum">2</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 4 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="scene"><span class="e" style="font-size:80pt">🪵</span><span class="e">🐸</span><span class="e" style="font-size:80pt">💦</span><div class="water" style="height:40mm"></div></div>
+  <div class="text">Fred slid in. Plop!<br>Help! Help!</div>
+  <div class="pnum">3</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 5 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="scene"><img src="../../assets/img/oki/oki-sorpresa.svg" alt="Oki"><div class="water"></div></div>
+  <div class="text"><span class="oki">Oki</span> can help!<br><span class="oki">Oki</span> swam fast.</div>
+  <div class="pnum">4</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 6 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="scene"><img src="../../assets/img/oki/oki-ejercitando.svg" alt="Oki"><span class="e" style="font-size:70pt">🐸</span><div class="water"></div></div>
+  <div class="text"><span class="oki">Oki</span> can lift Fred.<br>Lift, <span class="oki">Oki</span>, lift!</div>
+  <div class="pnum">5</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 7 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="scene land"><img src="../../assets/img/oki/oki-empatia.svg" alt="Oki"><span class="e" style="font-size:80pt">🐸</span></div>
+  <div class="text"><span class="oki">Oki</span> and Fred hug.<br>Fred felt glad.</div>
+  <div class="pnum">6</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 8 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="scene land"><span class="e">🐸</span><img src="../../assets/img/oki/oki-celebrando.svg" alt="Oki"></div>
+  <div class="text">Fred can jump. <span class="oki">Oki</span> can spin.<br>Clap, clap, clap!</div>
+  <div class="pnum">7</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 9 -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Oki and Fred</div></div>
+  <div class="cover">
+    <img src="../../assets/img/oki/oki-leyendo.svg" alt="Oki" style="height:70mm">
+    <h1>End.</h1>
+    <div style="font-size:14pt;color:var(--azulOscuro)">Lo leí yo solo / sola el día <span class="ln" style="min-width:45mm"></span></div>
+  </div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 10. AFTER READING -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Hoja del estudiante</div></div>
+  <div class="titlerow">
+    <div>
+      <h1>Did you read it?</h1>
+      <div class="kicker">Lee cada pregunta y marca ✓ o ✗</div>
+    </div>
+    <img src="../../assets/img/oki/oki-pensando.svg" alt="Oki">
+  </div>
+  <div class="q"><span class="t">Can <span class="oki">Oki</span> swim?</span><span class="yn"><span>✓</span><span>✗</span></span></div>
+  <div class="q"><span class="t">Did Fred sit on a log?</span><span class="yn"><span>✓</span><span>✗</span></span></div>
+  <div class="q"><span class="t">Did Fred get wet?</span><span class="yn"><span>✓</span><span>✗</span></span></div>
+  <div class="q"><span class="t">Did <span class="oki">Oki</span> run?</span><span class="yn"><span>✓</span><span>✗</span></span></div>
+  <div class="q"><span class="t">Did Fred and <span class="oki">Oki</span> hug?</span><span class="yn"><span>✓</span><span>✗</span></span></div>
+  <div class="draw" style="margin-top:2mm"><span>Draw Oki and Fred!</span></div>
+  <div class="note">Respuestas: ✓ ✓ ✓ ✗ ✓. "Did Oki run?" es ✗ a propósito: obliga a leer la pregunta y no a marcar ✓ en todo.</div>
+  <div class="foot"><span>Phonics · Cuento 1</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+</body></html>

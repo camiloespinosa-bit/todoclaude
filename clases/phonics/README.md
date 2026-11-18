@@ -24,3 +24,11 @@ Regenerar los PDF:
 ```bash
 node clases/phonics/render.js
 ```
+
+## Cuentos decodificables
+
+Cuentos que solo usan lo enseñado hasta ese punto. La única tricky word va resaltada.
+
+| Cuento | Después de | Fuente | PDF |
+|---|---|---|---|
+| Oki and Fred | Sesión 4 | `cuento-01-oki-and-fred.html` | `pdf/cuento-01-oki-and-fred.pdf` |
