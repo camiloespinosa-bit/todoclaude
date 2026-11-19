@@ -490,7 +490,7 @@ async function horasParaMover(fecha, tipo, modalidad, fase) {
   const ahora = fecha === hoyEnBogota() ? minutosAhoraEnBogota() : -1;
   const opciones = [];
   for (const { inicio, fin } of franjas) {
-    for (let m = inicio; m + minutos <= fin; m += paso) {
+    for (let m = Math.ceil(inicio / paso) * paso; m + minutos <= fin; m += paso) {
       if (m <= ahora) continue;
       if (tipo === "prueba") {
         const libre = !grupos.has(m - (m % 60)) && !pruebas.has(m);

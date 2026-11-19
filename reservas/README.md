@@ -29,9 +29,10 @@ estudiantes tienen planes mensuales pagados por anticipado.
   envía una invitación por cada clase (`supabase/migrations/012_reservas_repetidas.sql`).
 - **Clase de prueba:** gratis, 30 minutos, para una familia o grupo de hasta 5 personas.
   Solo cabe en horas sin grupo, y mientras exista, esa hora queda bloqueada para clases.
-- **Horario:** lunes 6–2 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y
-  1–8 p.m.; viernes 6–12; sábado 8–12 y 1–5. Domingo cerrado. Se cambia en la tabla `horario`
-  de Supabase (ver `supabase/migrations/006_horario_6am.sql` y `011_lunes_hasta_2pm.sql`).
+- **Horario:** lunes 6–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y
+  1–8 p.m.; viernes 6–3:30 y 4:30–8 p.m.; sábado 8–12 y 1–5. Las clases y bloques empiezan en
+  punto; la clase de prueba, en punto o a la media (el viernes a las 4:30 solo cabe una de prueba). Domingo cerrado. Se cambia en la tabla `horario`
+  de Supabase (ver `supabase/migrations/006_horario_6am.sql` y `011_lunes_hasta_2pm.sql` y `014_lunes_y_viernes.sql`).
 - **Google Calendar (opción B):** un evento por grupo con todos sus estudiantes invitados y un
   solo enlace de Meet si es virtual. Cada clase de prueba es su propio evento. Los estudiantes
   no ven los correos de los demás.
