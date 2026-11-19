@@ -14,14 +14,14 @@ const TIPOS = {
 
 // Franjas de atención por día de la semana (0 = domingo), solo para el modo prototipo:
 // conectada, la página usa el horario guardado en la base de datos. Minutos desde medianoche.
-// Lunes 6–2 y 7–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y 1–8 p.m.;
-// viernes 6–12; sábado 8–12 y 1–5.
+// Lunes 6–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y 1–8 p.m.;
+// viernes 6–3:30 y 4:30–8 p.m.; sábado 8–12 y 1–5.
 const HORARIO = {
-  1: [[360, 840], [1140, 1200]],
+  1: [[360, 1200]],
   2: [[360, 720], [780, 960], [1140, 1200]],
   3: [[360, 720], [780, 1200]],
   4: [[360, 720], [780, 960], [1140, 1200]],
-  5: [[360, 720]],
+  5: [[360, 930], [990, 1200]],
   6: [[480, 720], [780, 1020]],
 };
 
@@ -101,7 +101,9 @@ function horasDisponibles(fecha, tipo, modalidad, fase, { grupos, pruebas }) {
 
   for (const [inicio, fin] of franjas) {
     const paso = tipo === "prueba" ? 30 : 60;
-    for (let m = inicio; m + minutosClase <= fin; m += paso) {
+    // Las clases empiezan en punto y la de prueba en punto o a la media, aunque la franja
+    // empiece a las y media (por ejemplo, el viernes desde las 4:30 p.m.).
+    for (let m = Math.ceil(inicio / paso) * paso; m + minutosClase <= fin; m += paso) {
       if (fecha === ahora.fecha && m <= ahora.minutos) continue;
 
       if (tipo === "prueba") {
@@ -377,7 +379,7 @@ function horasDelHorario(dia) {
   const minutos = TIPOS[estado.tipo].minutos;
   return franjasDe(fecha).flatMap(([inicio, fin]) => {
     const horas = [];
-    for (let m = inicio; m + minutos <= fin; m += paso) horas.push(m);
+    for (let m = Math.ceil(inicio / paso) * paso; m + minutos <= fin; m += paso) horas.push(m);
     return horas;
   });
 }
