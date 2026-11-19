@@ -1,7 +1,7 @@
 // Función del servidor (Supabase Edge Function).
 // - Sin "accion": recibe la reserva desde la página, la guarda con las reglas de la base de
 //   datos y la sincroniza con Google Calendar.
-// - Con "accion" (agenda, cancelar, sincronizar, cerrados, cerrar, abrir, aviso): las usa el panel del docente.
+// - Con "accion" (agenda, cancelar, mover, sincronizar, cerrados, cerrar, abrir, aviso): las usa el panel del docente.
 // - Con accion "recordatorios": la llama cada 15 minutos la tarea programada de Supabase
 //   (pg_cron) para enviar los recordatorios de WhatsApp.
 // - Con accion "limpiar_calendario": la llama una vez al día la tarea programada de Supabase
@@ -397,6 +397,56 @@ async function reservar(datos: Record<string, unknown>) {
   return responder({ ok: true, calendario, meet, resultados });
 }
 
+function sumarDias(fecha: string, dias: number) {
+  const d = new Date(`${fecha}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + dias);
+  return d.toISOString().slice(0, 10);
+}
+
+function diasEntre(desde: string, hasta: string) {
+  return Math.round((Date.parse(`${hasta}T12:00:00Z`) - Date.parse(`${desde}T12:00:00Z`)) / 86400000);
+}
+
+// Mueve la reserva de un estudiante a otra fecha y hora. Con "siguientes", también mueve
+// las siguientes clases de su serie que son el mismo día de la semana y a la misma hora,
+// los mismos días hacia adelante o atrás (por ejemplo, de martes 3 p.m. a jueves 4 p.m.).
+// Cada una se mueve por separado: si una no se puede, las demás sí se mueven.
+async function mover(datos: Record<string, unknown>) {
+  type Clase = { id: string; fecha: string; inicio: number };
+  const fecha = String(datos.fecha);
+  const inicio = Number(datos.inicio);
+  let clases: Clase[] = [{ id: String(datos.reserva), fecha, inicio }];
+  if (datos.siguientes) {
+    const serie: Clase[] = await rpc("serie_siguientes", { p_reserva: datos.reserva });
+    const esta = serie.find((c) => c.id === datos.reserva);
+    if (esta) {
+      const dias = diasEntre(esta.fecha, fecha);
+      clases = serie.map((c) => ({ id: c.id, fecha: sumarDias(c.fecha, dias), inicio }));
+    }
+  }
+
+  const sesiones = new Set<string>();
+  const resultados: { desde?: { fecha: string; inicio: number }; fecha: string; inicio: number; ok: boolean; error?: string }[] = [];
+  for (const c of clases) {
+    try {
+      const r = await rpc("mover_reserva", { p_reserva: c.id, p_fecha: c.fecha, p_inicio: c.inicio });
+      for (const id of r.sesiones ?? []) sesiones.add(id);
+      resultados.push({ desde: r.desde, fecha: c.fecha, inicio: c.inicio, ok: true });
+    } catch (e) {
+      resultados.push({ fecha: c.fecha, inicio: c.inicio, ok: false, error: codigoDeError(e) });
+    }
+  }
+  if (!resultados.some((r) => r.ok)) return responder({ error: resultados[0].error ?? "ERROR", resultados }, 409);
+
+  try {
+    await sincronizarVarias([...sesiones]);
+    return responder({ ok: true, calendario: true, resultados });
+  } catch (e) {
+    console.error(e);
+    return responder({ ok: true, calendario: false, resultados });
+  }
+}
+
 async function panel(req: Request, datos: Record<string, unknown>) {
   if (!(await esDocente(req))) return responder({ error: "NO_AUTORIZADO" }, 401);
 
@@ -442,6 +492,7 @@ async function panel(req: Request, datos: Record<string, unknown>) {
         return responder({ ok: true, calendario: false });
       }
     }
+    if (datos.accion === "mover") return mover(datos);
     if (datos.accion === "sincronizar") {
       const meet = await sincronizarVarias([String(datos.sesion)]);
       return responder({ ok: true, calendario: true, meet });

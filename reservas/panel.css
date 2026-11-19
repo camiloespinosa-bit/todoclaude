@@ -92,3 +92,22 @@
 .panel-aviso { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
 .panel-aviso__hecho { font-weight: 700; font-size: 0.85rem; color: var(--verde-profundo); }
 .panel-aviso__otra { font-size: 0.85rem; font-weight: 600; color: var(--azul); }
+
+/* ---------- Mover la reserva de un estudiante ---------- */
+.panel-mover-btn {
+  font: inherit; font-weight: 700; font-size: 0.85rem;
+  background: transparent; color: var(--azul); border: 2px solid var(--tint-azul); border-radius: 999px;
+  padding: 5px 14px; cursor: pointer;
+}
+.panel-mover-btn:hover { background: var(--tint-azul); }
+.panel-mover-btn:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+.panel-mover { flex-basis: 100%; margin-top: 4px; padding: 14px; border-radius: var(--radio-sm); background: var(--fondo-claro); }
+.panel-mover__titulo { margin: 0 0 10px; font-weight: 700; color: var(--azul-oscuro); }
+.panel-mover__campos { display: flex; flex-wrap: wrap; gap: 10px; }
+.panel-mover__campos label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 0.85rem; flex: 1 1 140px; }
+.panel-mover input, .panel-mover select { font: inherit; padding: 8px 10px; border: 2px solid var(--borde); border-radius: var(--radio-sm); background: var(--blanco); }
+.panel-mover__alcance { margin-top: 10px; font-size: 0.9rem; }
+.panel-mover__alcance p { margin: 0 0 4px; font-weight: 700; }
+.panel-mover__alcance label { display: block; margin: 2px 0; }
+.panel-mover__botones { display: flex; gap: 8px; margin-top: 12px; }
+.panel-avisar-movida { margin-top: 8px; }

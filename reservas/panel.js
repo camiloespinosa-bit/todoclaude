@@ -295,7 +295,14 @@ function filaAsistente(s, a) {
       : `¿Cancelar la reserva de ${a.nombre}? Google le avisará por correo.`;
     if (confirm(aviso)) ejecutar(cancelar, { accion: "cancelar", reserva: a.id }, "Reserva cancelada.");
   });
-  contacto.append(wa, correo, cancelar);
+  const mover = crear("button", "panel-mover-btn", "Mover");
+  mover.type = "button";
+  mover.addEventListener("click", () => {
+    const abierto = fila.querySelector(".panel-mover");
+    if (abierto) abierto.remove();
+    else fila.append(formMover(s, a));
+  });
+  contacto.append(wa, correo, mover, cancelar);
   fila.append(contacto);
   const aviso = botonAviso(s, a);
   if (aviso) fila.append(aviso);
@@ -446,6 +453,189 @@ function pintarPendientes() {
   }
 }
 
+// ---------- Mover la reserva de un estudiante ----------
+// Muestra las horas libres del día elegido con las mismas reglas de la página de reservas
+// (horasDisponibles en reservas.js); el servidor las vuelve a revisar al mover.
+
+async function llamarPublico(funcion, cuerpo) {
+  const r = await fetch(`${CONFIG.supabaseUrl}/rest/v1/rpc/${funcion}`, {
+    method: "POST",
+    headers: { apikey: CONFIG.supabaseAnonKey, "Content-Type": "application/json" },
+    body: JSON.stringify(cuerpo),
+  });
+  if (!r.ok) throw new Error(`HTTP_${r.status}`);
+  return r.json();
+}
+
+function faseDe(programa) {
+  const fases = [
+    ["Fase 0 a 2 años", "f0_2"], ["Fase 3 a 5 años", "f3_5"], ["Fase 6 a 10 años", "f6_10"],
+    ["Fase 11 a 15 años", "f11_15"], ["Fase Experta", "experta"], ["Adulto Vital", "vital"],
+    ["Programa infantil", "infantil"],
+  ];
+  return fases.find(([inicio]) => String(programa ?? "").startsWith(inicio))?.[1] ?? null;
+}
+
+const MINUTOS_TIPO = { prueba: 30, clase: 60, bloque: 120 };
+
+async function horasParaMover(fecha, tipo, modalidad, fase) {
+  const [franjas, ocupadas] = await Promise.all([
+    llamarPublico("dias_abiertos", { p_desde: fecha, p_hasta: fecha }),
+    llamarPublico("agenda_publica", { p_fecha: fecha }),
+  ]);
+  const grupos = new Map(ocupadas.filter((f) => f.clase === "grupo").map((f) => [f.inicio, f]));
+  const pruebas = new Set(ocupadas.filter((f) => f.clase === "prueba").map((f) => f.inicio));
+  const minutos = MINUTOS_TIPO[tipo];
+  const paso = tipo === "prueba" ? 30 : 60;
+  const ahora = fecha === hoyEnBogota() ? minutosAhoraEnBogota() : -1;
+  const opciones = [];
+  for (const { inicio, fin } of franjas) {
+    for (let m = inicio; m + minutos <= fin; m += paso) {
+      if (m <= ahora) continue;
+      if (tipo === "prueba") {
+        const libre = !grupos.has(m - (m % 60)) && !pruebas.has(m);
+        opciones.push({ minutos: m, disponible: libre, detalle: libre ? "libre" : "ocupada" });
+        continue;
+      }
+      let detalle = null;
+      let hayGrupo = false;
+      for (let h = m; h < m + minutos; h += 60) {
+        if (pruebas.has(h) || pruebas.has(h + 30)) { detalle = "clase de prueba"; break; }
+        const g = grupos.get(h);
+        if (!g) continue;
+        hayGrupo = true;
+        if (g.modalidad !== modalidad) { detalle = `grupo ${g.modalidad}`; break; }
+        if (g.fase !== fase) { detalle = "grupo de otra fase"; break; }
+        if (g.ocupados >= 5) { detalle = "lleno"; break; }
+      }
+      opciones.push({ minutos: m, disponible: !detalle, detalle: detalle ?? (hayGrupo ? "se une al grupo" : "grupo nuevo") });
+    }
+  }
+  return opciones;
+}
+
+function formMover(s, a) {
+  const desdeSesion = primeraHora(s, a);
+  const caja = crear("div", "panel-mover");
+  caja.append(crear("p", "panel-mover__titulo", `Mover ${a.tipo === "bloque" ? "el bloque" : "la clase"} de ${a.nombre} (${fechaLarga(desdeSesion.fecha)}, ${textoHora(desdeSesion.inicio)}) a:`));
+
+  const campos = crear("div", "panel-mover__campos");
+  const etFecha = crear("label", "", "Fecha");
+  const fecha = document.createElement("input");
+  fecha.type = "date";
+  fecha.min = hoyEnBogota();
+  etFecha.append(fecha);
+  const etHora = crear("label", "", "Hora");
+  const hora = document.createElement("select");
+  hora.disabled = true;
+  hora.add(new Option("Elige la fecha", ""));
+  etHora.append(hora);
+  campos.append(etFecha, etHora);
+  caja.append(campos);
+
+  // Clases siguientes de la serie que son el mismo día de la semana y a la misma hora.
+  const diaSemana = (f) => new Date(`${f}T12:00:00Z`).getUTCDay();
+  const siguientes = (a.serie ?? []).filter((c) => c.fecha > desdeSesion.fecha
+    && diaSemana(c.fecha) === diaSemana(desdeSesion.fecha) && c.inicio === desdeSesion.inicio).length;
+  let alcance = null;
+  if (siguientes) {
+    alcance = crear("div", "panel-mover__alcance");
+    alcance.append(crear("p", "", "Tiene clases fijas. ¿Qué quieres mover?"));
+    for (const [valor, texto] of [["una", "Solo esta clase"], ["siguientes", siguientes === 1 ? "Esta y la siguiente del mismo día y hora" : `Esta y las ${siguientes} siguientes del mismo día y hora`]]) {
+      const et = crear("label", "");
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `alcance-${a.id}`;
+      radio.value = valor;
+      radio.checked = valor === "una";
+      et.append(radio, ` ${texto}`);
+      alcance.append(et);
+    }
+    caja.append(alcance);
+  }
+
+  const mensaje = crear("p", "panel-mensaje");
+  const botones = crear("div", "panel-mover__botones");
+  const confirmar = crear("button", "boton boton--primario boton--chico", "Mover");
+  confirmar.type = "button";
+  const cerrar = crear("button", "boton boton--fantasma boton--chico", "Cerrar");
+  cerrar.type = "button";
+  cerrar.addEventListener("click", () => caja.remove());
+  botones.append(confirmar, cerrar);
+  caja.append(botones, mensaje);
+
+  let consultaHoras = 0; // si cambian la fecha rápido, solo cuenta la última respuesta
+  fecha.addEventListener("change", async () => {
+    const mia = ++consultaHoras;
+    hora.replaceChildren(new Option("Buscando horas…", ""));
+    hora.disabled = true;
+    if (!fecha.value) return;
+    try {
+      const opciones = await horasParaMover(fecha.value, a.tipo, s.modalidad, faseDe(a.programa));
+      if (mia !== consultaHoras) return;
+      hora.replaceChildren(new Option(opciones.some((o) => o.disponible) ? "Elige la hora" : "No hay horas libres ese día", ""));
+      for (const o of opciones) {
+        const op = new Option(`${textoHora(o.minutos)} · ${o.detalle}`, String(o.minutos));
+        op.disabled = !o.disponible;
+        hora.add(op);
+      }
+      hora.disabled = false;
+    } catch {
+      if (mia === consultaHoras) hora.replaceChildren(new Option("No pudimos cargar las horas", ""));
+    }
+  });
+
+  confirmar.addEventListener("click", async () => {
+    if (!fecha.value || !hora.value) {
+      mensaje.textContent = "Elige la fecha y la hora.";
+      return;
+    }
+    const todas = alcance?.querySelector("input:checked")?.value === "siguientes";
+    const destino = `${fechaLarga(fecha.value)}, ${textoHora(Number(hora.value))}`;
+    const pregunta = todas
+      ? `¿Mover ${siguientes + 1} clases de ${a.nombre} al mismo día de la semana y hora que el ${destino}? Google le avisará por correo.`
+      : `¿Mover la clase de ${a.nombre} al ${destino}? Google le avisará por correo.`;
+    if (!confirm(pregunta)) return;
+    confirmar.disabled = true;
+    mensaje.textContent = "Moviendo…";
+    try {
+      const r = await llamarPanel({ accion: "mover", reserva: a.id, fecha: fecha.value, inicio: Number(hora.value), siguientes: todas });
+      await refrescar();
+      mostrarMovida(s, a, r);
+    } catch (error) {
+      if (error.message === "NO_AUTORIZADO") return;
+      mensaje.textContent = MENSAJES_ERROR[error.message] ?? "No se pudo mover. Intenta de nuevo.";
+      confirmar.disabled = false;
+    }
+  });
+  return caja;
+}
+
+// Después de mover: qué pasó y un botón para avisarle al estudiante por WhatsApp.
+function mostrarMovida(s, a, r) {
+  const hechas = (r.resultados ?? []).filter((x) => x.ok);
+  const fallidas = (r.resultados ?? []).filter((x) => !x.ok);
+  let texto = hechas.length === 1 ? "Clase movida." : `${hechas.length} clases movidas.`;
+  if (fallidas.length) {
+    texto += ` No se pudieron mover: ${fallidas.map((f) => `${fechaLarga(f.fecha)} ${textoHora(f.inicio)} (${(MENSAJES_ERROR[f.error] ?? "no se pudo").replace(/\.$/, "").toLowerCase()})`).join("; ")}.`;
+  }
+  if (r.calendario === false) texto += ' Google Calendar no respondió: revisa los Logs o usa "Reenviar al calendario".';
+  mensajePanel.textContent = texto;
+  if (!a.acepta_whatsapp || !hechas.length) return;
+
+  const nombre = String(a.nombre).trim().split(/\s+/)[0];
+  const donde = s.modalidad === "presencial" ? "en nuestra sede de Rionegro" : "por Google Meet (el enlace está en la invitación de tu calendario)";
+  const cambios = hechas.map((x) => `${fechaLarga(x.desde.fecha)} a las ${textoHora(x.desde.inicio)} → ${fechaLarga(x.fecha)} a las ${textoHora(x.inicio)}`);
+  const mensaje = cambios.length === 1
+    ? `Hola ${nombre}, tu clase en El Gimnasio del Cerebro del ${cambios[0].replace(" → ", " quedó movida para el ")}, ${donde}. Si tienes alguna duda, respóndenos por aquí.`
+    : `Hola ${nombre}, movimos tus clases en El Gimnasio del Cerebro, ${donde}:\n${cambios.map((c) => `- ${c}`).join("\n")}\nSi tienes alguna duda, respóndenos por aquí.`;
+  const avisar = crear("a", "boton boton--whatsapp boton--chico panel-avisar-movida", `Avisar a ${nombre} por WhatsApp`);
+  avisar.href = enlaceWhatsApp(a.telefono, mensaje);
+  avisar.target = "_blank";
+  avisar.rel = "noopener";
+  mensajePanel.append(" ", avisar);
+}
+
 const MENSAJES_ERROR = {
   RESERVA_YA_CANCELADA: "Esa reserva ya estaba cancelada.",
   RESERVA_NO_EXISTE: "No encontramos esa reserva.",
@@ -454,6 +644,14 @@ const MENSAJES_ERROR = {
   FECHA_PASADA: "No se pueden cerrar días que ya pasaron.",
   SIN_DIAS_DE_ATENCION: "En esas fechas no hay días de atención (por ejemplo, solo domingos).",
   DIA_NO_CERRADO: "Ese día ya estaba abierto.",
+  MISMO_HORARIO: "Ya está en ese día y hora.",
+  OTRA_FASE: "Esa hora ya tiene un grupo de otra fase.",
+  OTRA_MODALIDAD: "Esa hora ya tiene un grupo de la otra modalidad.",
+  SIN_CUPO: "Ese grupo está lleno.",
+  HORA_OCUPADA: "Esa hora está ocupada por una clase de prueba.",
+  FUERA_DE_HORARIO: "Ese día está cerrado o la hora está fuera del horario.",
+  HORA_PASADA: "Esa hora ya pasó.",
+  YA_RESERVADO: "Ya tiene otra reserva en esa hora.",
 };
 
 async function ejecutar(boton, cuerpo, exito) {

@@ -130,6 +130,7 @@ Dirección: **gimnasiodelcerebro.co/reservas/panel.html** (no aparece en buscado
 - Muestra 14 días; cada día lleva el número de personas con reserva. Con "Ir a la fecha" se salta a cualquier día.
 - Por cada clase: hora, tipo de grupo, cupo, enlace de Meet y la lista de asistentes con WhatsApp, correo y programa.
 - **Cancelar** una reserva: Google le avisa al estudiante y actualiza el evento. Si el grupo queda vacío, el evento se borra. Si la reserva es un bloque de 2 horas, se cancelan las dos horas. La hora queda libre otra vez en la página de reservas.
+- **Mover** la reserva de un estudiante a otro día u hora: el panel muestra las horas libres de ese día con las mismas reglas de la página (cupo, fase, modalidad, días cerrados). Si tiene clases fijas, pregunta si mover solo esa clase o también las siguientes del mismo día y hora (se corren los mismos días; por ejemplo, de martes a jueves). Si la nueva hora no se puede, no cambia nada. Google le avisa por correo y el panel ofrece un botón para avisarle por WhatsApp con el cambio (`supabase/migrations/013_mover_reserva.sql`).
 - **Reenviar al calendario:** aparece si una reserva no alcanzó a llegar a Google Calendar (por ejemplo, si Google falló en ese momento).
 
 ### Activarlo (una sola vez)
