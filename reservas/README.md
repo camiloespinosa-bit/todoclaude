@@ -151,6 +151,8 @@ Dirección: **gimnasiodelcerebro.co/reservas/panel.html** (no aparece en buscado
 
 En la sección **Cerrar días** del panel: fecha inicial, fecha final opcional (máximo 2 meses) y motivo. Los domingos se saltan. Si hay reservas en esas fechas, el panel pregunta antes de cancelarlas (Google les avisa a los estudiantes). La lista **Próximos días cerrados** permite abrir cualquier día otra vez. Los días cerrados se ven en gris en la página de reservas y en el panel aparecen marcados como "Cerrado".
 
+Con **Solo unas horas** se bloquea una parte de un día (por ejemplo, el miércoles de 8 a 12 por un desplazamiento): esas horas desaparecen de la página de reservas y el resto del día sigue abierto. Si ya hay reservas que se cruzan con esas horas, el panel pregunta antes de cancelarlas (un bloque de 2 horas se cancela completo). El día aparece en el panel con la marca "Bloqueo" y se puede desbloquear desde ese día o desde la lista (`supabase/migrations/015_bloquear_horas.sql`).
+
 Requiere `supabase/migrations/004_dias_cerrados_panel.sql`. Orden para aplicarlo: 1) ejecutar 004 en el SQL Editor, 2) desplegar la función `reservar` nueva, 3) publicar la página (merge).
 
 Seguridad: el panel solo muestra datos si el usuario inició sesión **y** está en la tabla `docentes`. El servidor lo revisa en cada acción; los datos de los estudiantes nunca se leen directamente desde el navegador.

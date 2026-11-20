@@ -111,3 +111,9 @@
 .panel-mover__alcance label { display: block; margin: 2px 0; }
 .panel-mover__botones { display: flex; gap: 8px; margin-top: 12px; }
 .panel-avisar-movida { margin-top: 8px; }
+
+/* ---------- Bloquear solo unas horas ---------- */
+.panel-alcance { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.panel-alcance label { flex-direction: row; align-items: center; gap: 6px; font-weight: 600; }
+.panel-cerrar select { font: inherit; font-weight: 400; padding: 11px 12px; border: 2px solid var(--borde); border-radius: var(--radio-sm); background: var(--blanco); }
+.dia--bloqueo .dia-cerrado { color: var(--naranja-profundo); }

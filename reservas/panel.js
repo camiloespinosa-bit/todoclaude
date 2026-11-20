@@ -122,6 +122,7 @@ let desde = hoyEnBogota();
 let fechaElegida = desde;
 let sesiones = [];
 let cerrados = new Map(); // fecha -> motivo, en los días que muestra la agenda
+let bloqueos = []; // horas bloqueadas en los días que muestra la agenda
 const contPendientes = document.getElementById("avisos-pendientes");
 
 function mostrarEntrar(mensaje = "") {
@@ -171,6 +172,7 @@ async function cargarAgenda() {
     const r = await llamarPanel({ accion: "agenda", desde, hasta: sumarDias(desde, DIAS_A_MOSTRAR - 1) });
     sesiones = r.sesiones ?? [];
     cerrados = new Map((r.cerrados ?? []).map((c) => [c.fecha, c.motivo]));
+    bloqueos = r.bloqueos ?? [];
     mensajePanel.textContent = "";
     pintarDias();
     pintarDia();
@@ -203,6 +205,9 @@ function pintarDias() {
     if (cerrados.has(fecha)) {
       btn.classList.add("dia--cerrado");
       btn.append(crear("span", "dia-cerrado", "Cerrado"));
+    } else if (bloqueos.some((b) => b.fecha === fecha)) {
+      btn.classList.add("dia--bloqueo");
+      btn.append(crear("span", "dia-cerrado", "Bloqueo"));
     }
     btn.setAttribute("aria-label", `${formatear(fecha, { weekday: "long", day: "numeric", month: "long" })}: ${cerrados.has(fecha) ? "cerrado" : `${total} personas`}`);
     btn.addEventListener("click", () => {
@@ -228,6 +233,7 @@ function pintarDia() {
     : "";
   contSesiones.replaceChildren();
   if (cerrados.has(fechaElegida)) contSesiones.append(avisoCerrado(fechaElegida));
+  for (const b of bloqueos.filter((x) => x.fecha === fechaElegida)) contSesiones.append(avisoBloqueo(b));
   if (!delDia.length) {
     if (!cerrados.has(fechaElegida)) contSesiones.append(crear("p", "horas__vacio", "No hay reservas este día."));
     return;
@@ -639,11 +645,12 @@ function mostrarMovida(s, a, r) {
 const MENSAJES_ERROR = {
   RESERVA_YA_CANCELADA: "Esa reserva ya estaba cancelada.",
   RESERVA_NO_EXISTE: "No encontramos esa reserva.",
-  RANGO_INVALIDO: "Revisa las fechas: la final no puede ser antes de la inicial, y el rango es de máximo 2 meses.",
+  RANGO_INVALIDO: "Revisa las fechas u horas: la final no puede ser antes de la inicial, y el rango de días es de máximo 2 meses.",
   MOTIVO_INVALIDO: "Escribe un motivo (entre 2 y 100 letras).",
   FECHA_PASADA: "No se pueden cerrar días que ya pasaron.",
   SIN_DIAS_DE_ATENCION: "En esas fechas no hay días de atención (por ejemplo, solo domingos).",
   DIA_NO_CERRADO: "Ese día ya estaba abierto.",
+  BLOQUEO_NO_EXISTE: "Esas horas ya estaban desbloqueadas.",
   MISMO_HORARIO: "Ya está en ese día y hora.",
   OTRA_FASE: "Esa hora ya tiene un grupo de otra fase.",
   OTRA_MODALIDAD: "Esa hora ya tiene un grupo de la otra modalidad.",
@@ -685,27 +692,44 @@ function avisoCerrado(fecha) {
   return aviso;
 }
 
+const textoRango = (b) => `${textoHora(b.inicio)} a ${textoHora(b.fin)}`;
+
+function avisoBloqueo(b) {
+  const aviso = crear("div", "panel-aviso-cerrado");
+  aviso.append(crear("strong", "", `Bloqueado de ${textoRango(b)}: `), crear("span", "", b.motivo));
+  const abrir = crear("button", "boton boton--fantasma boton--chico", "Desbloquear");
+  abrir.type = "button";
+  abrir.addEventListener("click", () => ejecutar(abrir, { accion: "abrir", bloqueo: b.id }, "Horas desbloqueadas."));
+  aviso.append(abrir);
+  return aviso;
+}
+
 async function cargarCerrados() {
   const hoy = hoyEnBogota();
   try {
     const r = await llamarPanel({ accion: "cerrados", desde: hoy, hasta: sumarDias(hoy, 400) });
     listaCerrados.replaceChildren();
-    if (!r.cerrados?.length) {
-      listaCerrados.append(crear("li", "horas__vacio", "No hay días cerrados."));
+    // Días completos y horas bloqueadas, en orden de fecha.
+    const lista = [...(r.cerrados ?? []), ...(r.bloqueos ?? [])]
+      .sort((x, y) => x.fecha.localeCompare(y.fecha) || (x.inicio ?? -1) - (y.inicio ?? -1));
+    if (!lista.length) {
+      listaCerrados.append(crear("li", "horas__vacio", "No hay días ni horas cerrados."));
       return;
     }
-    for (const c of r.cerrados) {
+    for (const c of lista) {
       const fila = crear("li", "panel-cerrado");
       const texto = crear("div", "");
-      texto.append(crear("strong", "", formatear(c.fecha, { weekday: "short", day: "numeric", month: "short", year: "numeric" })), crear("span", "", ` · ${c.motivo}`));
+      const cuando = formatear(c.fecha, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+      texto.append(crear("strong", "", cuando), crear("span", "", c.id ? `, ${textoRango(c)} · ${c.motivo}` : ` · ${c.motivo}`));
       const abrir = crear("button", "panel-cancelar", "Abrir");
       abrir.type = "button";
-      abrir.addEventListener("click", () => ejecutar(abrir, { accion: "abrir", fecha: c.fecha }, "Día abierto otra vez."));
+      abrir.addEventListener("click", () => ejecutar(abrir, c.id ? { accion: "abrir", bloqueo: c.id } : { accion: "abrir", fecha: c.fecha },
+        c.id ? "Horas desbloqueadas." : "Día abierto otra vez."));
       fila.append(texto, abrir);
       listaCerrados.append(fila);
     }
   } catch (error) {
-    if (error.message !== "NO_AUTORIZADO") listaCerrados.replaceChildren(crear("li", "horas__vacio", "No pudimos cargar los días cerrados."));
+    if (error.message !== "NO_AUTORIZADO") listaCerrados.replaceChildren(crear("li", "horas__vacio", "No pudimos cargar los cierres."));
   }
 }
 
@@ -713,28 +737,60 @@ async function refrescar() {
   await Promise.all([cargarAgenda(), cargarCerrados()]);
 }
 
+// "Todo el día" (uno o varios días) o "Solo unas horas" (de un día).
+const opcionesHora = [];
+for (let m = 300; m <= 1260; m += 30) opcionesHora.push(m);
+for (const [nombre, elegida] of [["inicio", 480], ["fin", 720]]) {
+  const lista = formCerrar.elements[nombre];
+  for (const m of opcionesHora) lista.add(new Option(textoHora(m), String(m), m === elegida, m === elegida));
+}
+
+const soloHoras = () => formCerrar.elements.alcance.value === "horas";
+
+function pintarAlcance() {
+  const horas = soloHoras();
+  for (const el of formCerrar.querySelectorAll("[data-solo-horas]")) el.hidden = !horas;
+  for (const el of formCerrar.querySelectorAll("[data-solo-dias]")) el.hidden = horas;
+  formCerrar.querySelector("[data-texto-desde]").textContent = horas ? "Día" : "Desde";
+  formCerrar.querySelector('button[type="submit"]').textContent = horas ? "Bloquear horas" : "Cerrar";
+}
+for (const radio of formCerrar.elements.alcance) radio.addEventListener("change", pintarAlcance);
+
 formCerrar.addEventListener("submit", async (e) => {
   e.preventDefault();
   const datos = Object.fromEntries(new FormData(formCerrar));
-  const cuerpo = { accion: "cerrar", desde: datos.desde, hasta: datos.hasta || datos.desde, motivo: datos.motivo.trim() };
-  const boton = formCerrar.querySelector("button");
+  const horas = soloHoras();
+  const inicio = Number(datos.inicio), fin = Number(datos.fin);
+  if (horas && fin <= inicio) {
+    mensajeCerrar.textContent = "La hora final tiene que ser después de la inicial.";
+    return;
+  }
+  const cuerpo = horas
+    ? { accion: "cerrar", desde: datos.desde, inicio, fin, motivo: datos.motivo.trim() }
+    : { accion: "cerrar", desde: datos.desde, hasta: datos.hasta || datos.desde, motivo: datos.motivo.trim() };
+  const boton = formCerrar.querySelector('button[type="submit"]');
   boton.disabled = true;
   mensajeCerrar.textContent = "Un momento…";
   try {
     let r = await llamarPanel(cuerpo);
     if (!r.cerrado && r.reservas_activas) {
       const n = r.reservas_activas;
-      const seguir = confirm(`En esas fechas hay ${n} ${n === 1 ? "reserva" : "reservas"}. ¿Cerrar los días y cancelar${n === 1 ? "la" : "las"}? Google les avisará por correo.`);
+      const donde = horas ? "esas horas" : "esas fechas";
+      const accion = horas ? "¿Bloquear las horas" : "¿Cerrar los días";
+      const seguir = confirm(`En ${donde} hay ${n} ${n === 1 ? "reserva" : "reservas"}. ${accion} y cancelar${n === 1 ? "la" : "las"}? Google les avisará por correo.`);
       if (!seguir) {
-        mensajeCerrar.textContent = "No se cerró ningún día.";
+        mensajeCerrar.textContent = horas ? "No se bloqueó nada." : "No se cerró ningún día.";
         return;
       }
       r = await llamarPanel({ ...cuerpo, cancelar: true });
     }
-    let texto = `${r.dias === 1 ? "Se cerró 1 día" : `Se cerraron ${r.dias} días`}.`;
+    let texto = horas
+      ? `Se bloqueó el ${fechaLarga(datos.desde)} de ${textoRango({ inicio, fin })}.`.replace("..", ".")
+      : `${r.dias === 1 ? "Se cerró 1 día" : `Se cerraron ${r.dias} días`}.`;
     if (r.canceladas) texto += ` ${r.canceladas === 1 ? "Se canceló 1 reserva" : `Se cancelaron ${r.canceladas} reservas`}.`;
     if (r.calendario === false) texto += ' Pero Google Calendar no respondió: revisa los Logs de la función.';
     formCerrar.reset();
+    pintarAlcance();
     await refrescar();
     mensajeCerrar.textContent = texto;
   } catch (error) {

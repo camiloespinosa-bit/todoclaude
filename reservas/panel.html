@@ -55,22 +55,32 @@
       <div id="sesiones"></div>
 
       <section class="paso panel-cerrar">
-        <h2>Cerrar días</h2>
-        <p class="panel-ayuda">Vacaciones, imprevistos o festivos: esos días no se pueden reservar.</p>
+        <h2>Cerrar días u horas</h2>
+        <p class="panel-ayuda">Vacaciones, festivos, desplazamientos o citas: ese tiempo no se puede reservar.</p>
         <form id="form-cerrar" class="campos">
-          <label>Desde
+          <div class="campos__ancho panel-alcance" role="radiogroup" aria-label="Qué cerrar">
+            <label><input type="radio" name="alcance" value="dia" checked /> Todo el día</label>
+            <label><input type="radio" name="alcance" value="horas" /> Solo unas horas</label>
+          </div>
+          <label><span data-texto-desde>Desde</span>
             <input type="date" name="desde" required />
           </label>
-          <label>Hasta (opcional)
+          <label data-solo-dias>Hasta (opcional)
             <input type="date" name="hasta" />
           </label>
+          <label data-solo-horas hidden>De
+            <select name="inicio"></select>
+          </label>
+          <label data-solo-horas hidden>A
+            <select name="fin"></select>
+          </label>
           <label class="campos__ancho">Motivo
-            <input name="motivo" required minlength="2" maxlength="100" placeholder="Vacaciones, festivo, imprevisto…" />
+            <input name="motivo" required minlength="2" maxlength="100" placeholder="Vacaciones, desplazamiento, cita…" />
           </label>
           <button class="boton boton--primario" type="submit">Cerrar</button>
           <p class="panel-mensaje campos__ancho" id="mensaje-cerrar" role="status" aria-live="polite"></p>
         </form>
-        <h3>Próximos días cerrados</h3>
+        <h3>Próximos cierres</h3>
         <ul class="panel-cerrados" id="lista-cerrados"></ul>
       </section>
     </section>
