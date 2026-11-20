@@ -1,4 +1,4 @@
-# PRD v1: App de la canasta familiar (nombre por definir)
+# PRD: App de la canasta familiar (nombre por definir)
 
 **Versión:** 1.1 (borrador)
 **Fecha:** 20 de noviembre de 2026
