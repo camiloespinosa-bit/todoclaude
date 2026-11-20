@@ -1,6 +1,6 @@
 # PRD v1: App de la canasta familiar (nombre por definir)
 
-**Versión:** 1.0 (borrador)
+**Versión:** 1.1 (borrador)
 **Fecha:** 20 de noviembre de 2026
 **Ciudad piloto:** Rionegro, Antioquia
 
@@ -43,7 +43,7 @@ Narrativa de marca **[CONFIRMADO]:** ayudar a resolver una necesidad básica (al
 |---|---|
 | Ciudad | Rionegro, Antioquia **[CONFIRMADO]** |
 | Tiendas | Solo cadenas de supermercado **[CONFIRMADO]** |
-| Cadenas iniciales | "El Euro" y "Supermu" (nombres por confirmar, ver preguntas abiertas) |
+| Cadenas iniciales | Euro Supermercados y Supermu (antes La Vaquita) **[CONFIRMADO]** |
 | Tiendas de barrio y plazas | Fuera de alcance **[CONFIRMADO]** |
 | Plataforma | Web app instalable en el celular (PWA) **[CONFIRMADO / RECOMENDACIÓN]** |
 
@@ -54,8 +54,8 @@ Narrativa de marca **[CONFIRMADO]:** ayudar a resolver una necesidad básica (al
 1. **Escanear la tirilla de compra.** La usuaria toma foto de la factura; la IA lee productos, cantidades, precios, supermercado y fecha.
    - Valor individual: ve su gasto organizado por categoría (granos, aseo, lácteos, carnes, etc.).
    - Valor colectivo: cada tirilla aporta decenas de precios reales y verificables a la base de datos.
-2. **Presupuesto del mercado.** Define cuánto quiere gastar al mes y la app le muestra cuánto lleva y cuánto le queda.
-3. **Resumen mensual.** "Este mes gastaste $500.000; $120.000 en carnes, 30% más que el mes pasado". Responde directamente la pregunta "¿en qué se me fue la plata?".
+2. **Presupuesto familiar compartido [CONFIRMADO].** La familia define cuánto quiere gastar al mes en el mercado. Varias personas del hogar (por ejemplo, mamá, papá, hijos mayores) se unen al mismo presupuesto con una invitación, y cada tirilla que cualquiera suba se descuenta del total común. Todos ven cuánto llevan y cuánto les queda.
+3. **Resumen mensual del hogar.** "Este mes el hogar gastó $500.000; $120.000 en carnes, 30% más que el mes pasado", con el detalle de quién hizo cada compra. Responde directamente la pregunta "¿en qué se nos fue la plata?".
 4. **Foto de góndola con descuento.** La usuaria fotografía un producto o una oferta en góndola y la publica para la comunidad.
 5. **Consulta de precios.** Buscar un producto y ver el último precio reportado en cada cadena de Rionegro, con fecha y nivel de confianza.
 6. **Notificaciones push de ofertas.** "El arroz que compras bajó en tal supermercado". En iPhone, las notificaciones de web apps funcionan cuando la app se agrega a la pantalla de inicio (soportado desde iOS 16.4; verificar comportamiento actual antes de construir).
@@ -110,7 +110,7 @@ Esto es crítico porque la confianza es la base del producto **[CONFIRMADO]**. N
 
 | Plazo | Meta | Definición |
 |---|---|---|
-| 3 meses | 100 usuarias activas **[CONFIRMADO]** | Activa = subió al menos 1 tirilla en los últimos 30 días **[RECOMENDACIÓN]** |
+| 3 meses | 100 usuarias activas **[CONFIRMADO]** | Activa = subió al menos 1 tirilla en los últimos 30 días **[RECOMENDACIÓN]**. Medir también hogares activos, porque un hogar puede tener varias usuarias |
 | 6 meses | Uso recurrente **[CONFIRMADO]** | Al menos 40% de las usuarias del mes 3 siguen activas en el mes 6 (cifra **[POR VALIDAR]**) |
 | Continuo | Cobertura de precios | Número de productos con precio de menos de 7 días en cada cadena piloto |
 | Continuo | Valor percibido | Usuarias que dicen que la app les ayudó a gastar menos o a entender su gasto (encuesta) |
@@ -152,8 +152,9 @@ El fundador no conoce apps parecidas. Yo no tengo información verificada sobre 
 
 ## 14. Preguntas abiertas
 
-1. ¿"El Euro" es Euro Supermercados? ¿"Supermu" cuál es exactamente?
-2. ¿Qué otras cadenas hay en Rionegro donde compra el público objetivo?
-3. ¿La app es para la familia completa (varias personas comparten un presupuesto) o individual?
-4. ¿Cuánto tiempo semanal puede dedicarle el fundador al proyecto?
-5. ¿Nombre de la app?
+1. ¿Qué otras cadenas hay en Rionegro donde compra el público objetivo?
+2. ¿Cuánto tiempo semanal puede dedicarle el fundador al proyecto?
+3. ¿Nombre de la app?
+4. En un hogar compartido, ¿todos los miembros ven todas las compras, o hay un administrador que decide qué ve cada uno?
+
+Resueltas en v1.1: las cadenas piloto son Euro Supermercados y Supermu (antes La Vaquita); el presupuesto es familiar y compartido.
