@@ -22,7 +22,11 @@ estudiantes tienen planes mensuales pagados por anticipado.
   ya pasó esa hora, empieza la otra semana) y las muestra antes de reservar: las que no se
   pueden (grupo lleno o de otra fase) se omiten, y si una fecha está cerrada (por ejemplo, un
   lunes festivo) pregunta si quiere reemplazarla por el siguiente día abierto de esa semana,
-  a la misma hora si hay cupo. "Una sola clase" sigue siendo elegir la fecha en el calendario.
+  a la misma hora si hay cupo. Hasta 5 días por semana (20 clases, lo que acepta el servidor).
+- **Fechas sueltas:** para horarios que cambian de semana a semana. En el calendario se tocan
+  varios días y horas (por ejemplo, lunes 7 a.m., jueves 9 a.m. y el martes siguiente 1 p.m.),
+  quedan en la lista "Tus clases" y se reservan todas con un solo formulario (hasta 20). No
+  deja elegir dos clases que se crucen el mismo día. La clase de prueba es siempre una sola.
   Cada clase se reserva con las mismas reglas; si alguna se ocupa en ese momento, las demás
   quedan y la página dice cuál no. Todas comparten un `serie_id`: en el panel aparecen como
   "Serie de N" y se confirman con un solo WhatsApp que lista todas las fechas. Google Calendar

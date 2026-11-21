@@ -216,3 +216,20 @@ body.reservas { background: var(--fondo-claro); }
 .listo__lista li::first-letter, .listo__fallidas li::first-letter { text-transform: uppercase; }
 .listo__fallidas { color: var(--naranja-profundo); }
 .hora[aria-pressed="true"]::before, .semana .dia[aria-pressed="true"]::before { content: "✓ "; color: var(--azul); }
+
+/* Fechas sueltas (paso 3) */
+.elegidas { margin-top: 14px; }
+.elegidas__lista { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.elegida {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 6px 6px 12px; border-radius: 999px;
+  background: var(--tint-azul); color: var(--azul-oscuro); font-weight: 600; font-size: 0.88rem;
+}
+.elegida span::first-letter { text-transform: uppercase; }
+.elegida button {
+  font: inherit; font-weight: 800; line-height: 1; cursor: pointer;
+  width: 26px; height: 26px; border-radius: 50%; border: 0;
+  background: var(--blanco); color: var(--azul-oscuro);
+}
+.elegida button:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+.elegidas__ayuda { margin: 8px 0 0; font-size: 0.85rem; color: var(--texto-suave); }
