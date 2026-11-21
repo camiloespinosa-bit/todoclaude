@@ -1,0 +1,514 @@
+<title>El ciclo de la etiqueta</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: cuaderno de estudio del facilitador. Barra de secciones arriba, una vista a la vez; el ciclo es la pieza central y todo lo demás cuelga de él. */
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#16303f; --muted:#587080; --line:#d4dfe5;
+  --accent:#1f5f84; --accent-soft:#dfecf3;
+  --heat:#c8611a; --heat-soft:#fbeadc;
+  --ok:#2f7a45; --ok-soft:#e1f1e5; --bad:#b23b30; --bad-soft:#f8e2df; --warn:#93600f; --warn-soft:#f7ecd6;
+  --f-display:"Sora","Segoe UI",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1b22; --surface:#16262f; --ink:#e2edf2; --muted:#9bb2bf; --line:#2a3f4b;
+  --accent:#6cb4dd; --accent-soft:#183544; --heat:#f0a062; --heat-soft:#3d2614;
+  --ok:#72cf8e; --ok-soft:#183324; --bad:#f08b80; --bad-soft:#3d1f1c; --warn:#e6b25e; --warn-soft:#3a2c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1b22; --surface:#16262f; --ink:#e2edf2; --muted:#9bb2bf; --line:#2a3f4b;
+  --accent:#6cb4dd; --accent-soft:#183544; --heat:#f0a062; --heat-soft:#3d2614;
+  --ok:#72cf8e; --ok-soft:#183324; --bad:#f08b80; --bad-soft:#3d1f1c; --warn:#e6b25e; --warn-soft:#3a2c14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.8rem,4.5vw,2.6rem);font-weight:700}
+h2{font-size:1.5rem;font-weight:600;margin-bottom:6px}
+h3{font-size:1.1rem;font-weight:600;margin:24px 0 8px}
+p{margin:0 0 12px;max-width:68ch}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+header.top{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+header.top p{color:var(--muted);margin:0}
+nav.sec{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:24px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 .85rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.chip .dot.done{background:var(--ok)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lead{font-size:1.08rem;color:var(--muted);margin-bottom:18px}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.rule.key{border-left:4px solid var(--accent)}
+.rule.err{border-left:4px solid var(--bad)}
+.rule.tip{border-left:4px solid var(--warn)}
+.rule.say{border-left:4px solid var(--ok)}
+.rule h4{margin:0 0 6px;font:600 .95rem var(--f-display)}
+.rule p:last-child,.rule ul:last-child{margin-bottom:0}
+ul,ol{margin:0 0 12px;padding-left:1.2em;max-width:68ch}
+li{margin-bottom:4px}
+.ref{font-size:.92rem;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;margin-bottom:16px}
+.ref a{color:var(--accent)}
+.verify{display:inline-block;font:500 .7rem var(--f-mono);color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:1px 6px;margin-left:4px;vertical-align:middle;letter-spacing:.04em}
+.tbl{overflow-x:auto;margin:10px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font:600 .8rem var(--f-display);color:var(--muted);background:var(--accent-soft)}
+tr:last-child td{border-bottom:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.grid2>*{min-width:0}
+.card-link{display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--ink)}
+.card-link:hover{border-color:var(--accent)}
+.card-link b{font-family:var(--f-display);font-weight:600;display:block;margin-bottom:2px}
+.card-link small{color:var(--muted);font-size:.9rem}
+
+/* ciclo */
+.cycle{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0 8px;counter-reset:st}
+.node{position:relative;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 44px;cursor:pointer;min-width:0}
+.node::before{counter-increment:st;content:counter(st);position:absolute;left:12px;top:12px;width:22px;height:22px;border-radius:50%;background:var(--heat-soft);color:var(--heat);font:600 .8rem var(--f-mono);display:grid;place-items:center}
+.node b{font-family:var(--f-display);font-weight:600;font-size:.98rem;display:block}
+.node small{color:var(--muted);font-size:.86rem}
+.node:hover{border-color:var(--heat)}
+.node[aria-pressed="true"]{border-color:var(--heat);background:var(--heat-soft)}
+.node.break::before{content:"↺";background:var(--ok-soft);color:var(--ok)}
+.node.break[aria-pressed="true"]{border-color:var(--ok);background:var(--ok-soft)}
+.loopnote{font:500 .8rem var(--f-mono);color:var(--heat);margin:4px 0 0}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:12px}
+.detail .src{font-size:.88rem;color:var(--muted)}
+.detail .go{display:inline-block;margin-top:6px;color:var(--accent);font-weight:600;text-decoration:none}
+
+/* simulador */
+.sim{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.meter{margin:4px 0 18px}
+.meter-top{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;color:var(--muted);flex-wrap:wrap}
+.meter-top strong{font-family:var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.track{height:12px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:6px}
+.fill{height:100%;width:60%;background:var(--heat);border-radius:6px;transition:width .4s,background .4s}
+.fill.low{background:var(--ok)}
+@media (prefers-reduced-motion: reduce){.fill,.bar div{transition:none}}
+.scene{font-size:1.05rem;margin-bottom:12px}
+.step-n{font:500 .75rem var(--f-mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{text-align:left;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer}
+.choice:hover:not(:disabled){border-color:var(--accent)}
+.choice:disabled{cursor:default;opacity:.55}
+.choice.picked{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
+.feedback{margin-top:12px;border-radius:10px;padding:12px 14px;font-size:.97rem}
+.feedback.up{background:var(--heat-soft)}
+.feedback.down{background:var(--ok-soft)}
+.feedback .tag{font:600 .72rem var(--f-mono);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:4px}
+.btn{font:600 .9rem var(--f-body);background:var(--accent);color:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:hover{filter:brightness(1.08)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.summary li{margin-bottom:8px}
+
+/* checklist */
+.check{margin:20px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.check h4{margin:0 0 8px;font:600 .95rem var(--f-display)}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer}
+.check input{margin-top:6px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:10px;overflow:hidden}
+.bar div{height:100%;background:var(--ok);width:0;transition:width .3s}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin:16px 0}
+.quiz-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.score{font-family:var(--f-mono);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.q{border-top:1px solid var(--line);padding:12px 0}
+.q:first-of-type{border-top:0}
+.q-text{font-weight:500;margin-bottom:8px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{font:400 .9rem var(--f-body);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{margin-top:8px;font-size:.93rem;padding:8px 10px;border-radius:8px}
+.why.ok{background:var(--ok-soft)}
+.why.no{background:var(--bad-soft)}
+.quiz-list{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+.qbtn{font:500 .85rem var(--f-body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.qbtn[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+
+/* registro */
+.ev{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
+.ev>div{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.ev h4{font:600 .95rem var(--f-display);margin-bottom:8px}
+.ev .pro h4{color:var(--heat)} .ev .con h4{color:var(--ok)}
+.ev ul{list-style:none;padding:0;margin:0 0 8px}
+.ev li{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:6px 0;font-size:.95rem}
+.ev li button{background:none;border:0;color:var(--muted);cursor:pointer;font:inherit}
+.addrow{display:flex;gap:6px}
+.addrow input{flex:1;min-width:0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.labelin{width:100%;font:600 1.05rem var(--f-display);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.verdict{margin-top:12px;font-weight:500}
+.foot{margin-top:40px;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Gimnasio del Cerebro · Estudio del facilitador</span>
+    <h1>El ciclo de la etiqueta</h1>
+    <p>Por qué un adulto que sí habla inglés se convence de que no puede, y dónde se rompe ese ciclo. Siete fuentes, un caso y práctica.</p>
+  </header>
+
+  <nav class="sec" aria-label="Secciones"><div class="chips" id="chips"></div></nav>
+
+  <main id="panels">
+
+  <section class="panel" id="p-inicio" data-name="El ciclo">
+    <h2>El ciclo completo</h2>
+    <p class="lead">Toca cada paso para ver qué pasa, qué fuente lo explica y cómo se ve en clase. El paso verde es donde tu método entra a romperlo.</p>
+    <div class="cycle" id="cycle"></div>
+    <p class="loopnote">El paso 6 vuelve al 1: menos práctica, menos logros, la etiqueta se refuerza.</p>
+    <div class="detail" id="cycle-detail" aria-live="polite"></div>
+
+    <h3>Rutas de estudio</h3>
+    <div class="grid2" id="home-links"></div>
+  </section>
+
+  <section class="panel" id="p-sebastian" data-name="Caso Sebastián">
+    <span class="eyebrow">Simulador</span>
+    <h2>Una reunión con el jefe</h2>
+    <p class="lead">Sebastián vive en Bélgica, habla inglés en clase sin problema y se bloquea en las reuniones con sus jefes. Elige qué hace en cada momento y mira cómo cambia la fuerza de su etiqueta.</p>
+    <div class="sim" id="sim"></div>
+  </section>
+
+  <section class="panel" id="p-registro" data-name="Registro de evidencia">
+    <span class="eyebrow">Herramienta</span>
+    <h2>Poner a prueba una etiqueta</h2>
+    <p class="lead">Es el antídoto práctico contra el sesgo de confirmación. Escribe la etiqueta tal como la dice el estudiante y anota la evidencia de las dos columnas. Viene con el ejemplo de la estudiante de la clase demostrativa.</p>
+    <label for="lbl" class="eyebrow">La etiqueta, con sus palabras</label>
+    <input id="lbl" class="labelin" type="text">
+    <div class="ev">
+      <div class="pro"><h4>Evidencia que la confirma</h4><ul id="list-pro"></ul>
+        <div class="addrow"><input id="in-pro" type="text" placeholder="Ej.: no me salió la palabra 'meeting'"><button class="btn ghost" data-add="pro">Agregar</button></div></div>
+      <div class="con"><h4>Evidencia que la contradice</h4><ul id="list-con"></ul>
+        <div class="addrow"><input id="in-con" type="text" placeholder="Ej.: hablé 12 minutos seguidos"><button class="btn ghost" data-add="con">Agregar</button></div></div>
+    </div>
+    <p class="verdict" id="verdict"></p>
+    <div class="row"><button class="btn ghost" id="ev-reset">Volver al ejemplo</button><button class="btn ghost" id="ev-clear">Empezar en blanco</button></div>
+    <div class="rule tip"><h4>Cómo usarlo en clase</h4><p>Pregunta "¿qué evidencia tenemos a favor y en contra?" y deja que el estudiante llene las dos columnas. Tú aportas los datos medidos (minutos hablados, palabras usadas). El objetivo no es convencerlo de que es bueno, sino que vea la colección completa. Lo que escribes aquí queda solo en este navegador.</p></div>
+  </section>
+
+  <!-- fichas se generan con JS -->
+
+  <section class="panel" id="p-laboratorio" data-name="Laboratorio">
+    <span class="eyebrow">Práctica</span>
+    <h2>Laboratorio</h2>
+    <p class="lead">Frases reales de estudiantes y situaciones de clase. Cada respuesta te dice si acertaste y por qué. Puedes reiniciar cuantas veces quieras.</p>
+    <div class="quiz-list" id="quiz-list"></div>
+    <div id="quiz-area"></div>
+  </section>
+
+  <section class="panel" id="p-limites" data-name="Límites">
+    <h2>Lo que puedes afirmar y lo que no</h2>
+    <p class="lead">Dominar un tema también es saber dónde termina la evidencia. Esto te protege frente a estudiantes, colegas y clientes.</p>
+    <div class="rule key"><h4>Enseñanza informada por la psicología, no terapia</h4><p>Mientras no tengas título y tarjeta profesional, preséntalo así. En Colombia el ejercicio de la psicología lo regula la Ley 1090 de 2006 <span class="verify">POR VERIFICAR DETALLES</span>. Si un estudiante muestra un malestar que va más allá del idioma, remítelo a un profesional.</p></div>
+    <div class="rule err"><h4>Correlación no es causa</h4><p>MacIntyre y Gardner (1994) muestran que ansiedad y bajo rendimiento van juntos. No dicen por sí solos que la ansiedad lo cause.</p></div>
+    <div class="rule err"><h4>Un modelo no es una prueba</h4><p>La pirámide de la WTC (1998) es un modelo heurístico. Ordena factores, pero el artículo no la prueba completa con datos.</p></div>
+    <div class="rule err"><h4>Extrapolar no es demostrar</h4><p>Beck (1963) estudió depresión. Clark y Wells (1995) modelan un trastorno clínico. Nickerson (1998) no habla de idiomas. Usarlos en el aula es razonable como marco, pero es tu aplicación, no un hallazgo de ellos.</p></div>
+    <div class="rule err"><h4>El "efecto de etiquetado" del video</h4><p>Como término de psicología es difuso: mezcla la teoría del etiquetado de la sociología con estudios de expectativas que tienen críticas sobre el tamaño del efecto. Para hablar de etiquetas, apóyate mejor en Beck (las distorsiones) y en Nickerson (el sesgo de confirmación).</p></div>
+    <div class="rule tip"><h4>Las marcas "por verificar"</h4><p>Las referencias están confirmadas en catálogos y repositorios. Los resúmenes vienen de descripciones del contenido, no de leer cada texto completo. Lo marcado conviene revisarlo en el original antes de citarlo en público.</p></div>
+  </section>
+
+  </main>
+
+  <p class="foot">Fuentes: Horwitz, Horwitz y Cope (1986); MacIntyre y Gardner (1994); MacIntyre, Clément, Dörnyei y Noels (1998); Bandura (1977); Beck (1963); Nickerson (1998); Clark y Wells (1995). El progreso y el registro se guardan solo en este navegador.</p>
+</div>
+
+<script>
+(function(){
+  var store={get:function(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+  function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  var V='<span class="verify">POR VERIFICAR</span>';
+
+  /* ---------- fichas ---------- */
+  var FICHAS=[
+   {id:'horwitz',name:'1. Ansiedad en LE',sub:'Horwitz, Horwitz y Cope (1986)',
+    title:'La ansiedad en lengua extranjera existe como algo propio',
+    ref:'Horwitz, E. K., Horwitz, M. B., &amp; Cope, J. (1986). Foreign language classroom anxiety. <i>The Modern Language Journal, 70</i>(2), 125–132. <a href="https://www.ling.ohio-state.edu/research/groups/lacqueys/readings/horowitz.pdf" target="_blank" rel="noopener">Texto</a>',
+    q:'¿Por qué personas capaces en otras áreas se bloquean justo al usar otro idioma?',
+    idea:'Es una ansiedad específica de la situación, parecida al miedo escénico. Aparece porque hablar en otro idioma amenaza la imagen que el adulto tiene de sí mismo como alguien competente: en su lengua se expresa con precisión y en la nueva se siente reducido.',
+    table:[['Aprensión comunicativa','Miedo a comunicarse con otros.'],['Miedo a la evaluación negativa','Temor a cómo lo juzgan. La pieza que más conecta con Sebastián.'],['Ansiedad ante exámenes','Miedo a fallar cuando hay evaluación.'],['FLCAS','33 ítems, escala 1 a 5. Tu programa usa la versión corta de 8 ítems.']],
+    limits:['Las tres dimensiones son el marco del artículo. Estudios posteriores no siempre reproducen esa estructura factorial. '+V,'Describe y mide. No propone tratamiento.'],
+    clase:'Aplica la versión corta al ingreso y al cierre de nivel. El perfil te dice si el bloqueo viene más de la comunicación, del juicio de otros o de la evaluación.',
+    say:'"Lo que sientes tiene nombre y está estudiado desde 1986. Le pasa sobre todo a adultos muy competentes en su idioma: no es falta de capacidad, es la distancia entre quien eres en español y quien todavía puedes ser en inglés."',
+    checks:['Puedo explicar por qué es una ansiedad "específica de la situación".','Nombro los tres componentes sin mirar.','Sé qué componente pesa más en Sebastián.','Sé qué me dice un puntaje alto en el FLCAS y qué no.']},
+   {id:'gardner',name:'2. Entrada y salida',sub:'MacIntyre y Gardner (1994)',
+    title:'La ansiedad bloquea la entrada, el procesamiento y la salida',
+    ref:'MacIntyre, P. D., &amp; Gardner, R. C. (1994). The subtle effects of language anxiety on cognitive processing in the second language. <i>Language Learning, 44</i>(2), 283–305.',
+    q:'¿Cómo interfiere la ansiedad, concretamente, con el uso del idioma?',
+    idea:'El uso del idioma pasa por tres etapas: entrada (atender lo que se oye o lee), procesamiento (organizar y guardar) y salida (producir). La ansiedad medida en cada etapa se relaciona con el rendimiento en tareas de esa misma etapa. Sus efectos son generalizados y sutiles: pequeñas pérdidas que se suman.',
+    table:[['Entrada','No entiende al jefe aunque conoce las palabras.'],['Procesamiento','Entiende, pero no logra organizar la respuesta.'],['Salida','Sabe qué decir, pero no le sale.']],
+    limits:['Son correlaciones: muestran que ansiedad y bajo rendimiento van juntos, no prueban que una cause la otra.','Muestra de estudiantes universitarios en Canadá. '+V],
+    clase:'Ubica dónde se rompe la cadena. Entrada: escucha en contexto real. Procesamiento: tiempo de pausa y frases puente ("Let me think about that..."). Salida: ensayos de bajo riesgo antes de la situación real.',
+    say:'"Cuando estás nervioso, tu cerebro gasta energía vigilándote y le quedan menos recursos para escuchar, pensar y hablar. No olvidaste el inglés: lo estás usando con menos recursos."',
+    checks:['Nombro las tres etapas con un síntoma de cada una.','Sé por qué este estudio no prueba causalidad.','Puedo ubicar en qué etapa está el bloqueo de un estudiante.']},
+   {id:'wtc',name:'3. Decidir hablar',sub:'MacIntyre, Clément, Dörnyei y Noels (1998)',
+    title:'Saber inglés no es lo mismo que decidir hablarlo',
+    ref:'MacIntyre, P. D., Clément, R., Dörnyei, Z., &amp; Noels, K. A. (1998). Conceptualizing willingness to communicate in a L2: A situational model of L2 confidence and affiliation. <i>The Modern Language Journal, 82</i>(4), 545–562. <a href="https://sites.psych.ualberta.ca/IClab/wordpress/wp-content/uploads/2016/08/Cl--mentMacIntyreDoernyeiNoels1998.pdf" target="_blank" rel="noopener">Texto</a>',
+    q:'¿Por qué alguien con buen nivel elige quedarse callado?',
+    idea:'La disposición a comunicarse (WTC) es la decisión, en un momento concreto, de hablar con una persona concreta en el segundo idioma. Se representa como una pirámide de seis capas: en la base, factores estables (personalidad, contexto social); en el medio, motivación y actitudes; arriba, el deseo de hablar con esa persona y la confianza del momento. En la punta, el acto de hablar.',
+    table:[['WTC situacional','Cambia según el momento y el interlocutor; no es un rasgo fijo.'],['Confianza del momento','Combina la competencia que uno cree tener y la ansiedad que siente ahí.'],['Interlocutor','Con el profesor sí, con el jefe extranjero no.']],
+    limits:['Es un modelo heurístico: ordena factores que la investigación ya relacionaba, pero no se prueba completo en el artículo.','El orden exacto de las capas conviene leerlo en la figura original. '+V],
+    clase:'Escalera de interlocutores: profesor, compañero, desconocido en simulación, alguien del trabajo en una situación de bajo riesgo y, al final, la reunión.',
+    say:'"Tu inglés no desaparece en la reunión: baja tu confianza en ese momento con esa persona. Esa confianza se gana hablando en situaciones un poco más difíciles cada vez."',
+    checks:['Sé explicar por qué la WTC es situacional.','Sé qué capa cambia cuando Sebastián pasa de la clase a la reunión.','Distingo un modelo heurístico de un modelo probado.']},
+   {id:'bandura',name:'4. Autoeficacia',sub:'Bandura (1977)',
+    title:'La confianza se construye con evidencia propia',
+    ref:'Bandura, A. (1977). Self-efficacy: Toward a unifying theory of behavioral change. <i>Psychological Review, 84</i>(2), 191–215. https://doi.org/10.1037/0033-295X.84.2.191',
+    q:'¿De dónde sale la creencia de "yo puedo" y cómo se cambia?',
+    idea:'La autoeficacia es la creencia en la propia capacidad para hacer lo que una situación exige. Influye en si la persona empieza, cuánto esfuerzo pone y cuánto persiste. Tiene cuatro fuentes, y las experiencias más directas y confiables son las que más la cambian.',
+    table:[['1. Logros de ejecución','Haberlo hecho uno mismo. La fuente más fuerte.'],['2. Experiencia vicaria','Ver a alguien parecido lograrlo.'],['3. Persuasión verbal','Que alguien te diga que puedes. La más débil de las tres primeras.'],['4. Estados fisiológicos','Cómo interpretas tus nervios y tu activación.']],
+    limits:['Nació del trabajo con fobias. Aplicarla al idioma es una extensión muy usada, pero extensión.','Es específica de cada tarea: alta para leer, baja para hablar en reuniones.'],
+    clase:'Medir y mostrar es la fuente 1, y por eso funciona mejor que decir "tú puedes" (fuente 3). Casos de otros adultos que avanzaron son la fuente 2. Leer los nervios como activación y no como peligro es la fuente 4.',
+    say:'"Que yo te diga que puedes ayuda poco. Lo que cambia tu confianza son las pruebas de lo que ya hiciste, y por eso vamos a medir cada avance."',
+    checks:['Ordeno las cuatro fuentes de más fuerte a más débil.','Tengo un ejemplo de clase para cada fuente.','Distingo expectativa de eficacia ("¿puedo?") y de resultado ("¿servirá?").']},
+   {id:'beck',name:'5. Distorsiones',sub:'Beck (1963)',
+    title:'Cómo la mente interpreta mal la evidencia',
+    ref:'Beck, A. T. (1963). Thinking and depression: I. Idiosyncratic content and cognitive distortions. <i>Archives of General Psychiatry, 9</i>(4), 324–333. https://doi.org/10.1001/archpsyc.1963.01720160014002',
+    q:'¿Por qué una persona llega a conclusiones negativas sobre sí misma que los hechos no sostienen?',
+    idea:'Primer trabajo de Beck sobre lo que sería la terapia cognitiva. En pacientes con depresión encontró temas de baja autovaloración y formas sistemáticas de procesar la información que distorsionan la realidad, sostenidas por creencias de fondo (esquemas).',
+    table:[['Abstracción selectiva','Fijarse en un detalle e ignorar el resto. "No tengo vocabulario" después de 12 minutos hablando.'],['Inferencia arbitraria','Concluir sin evidencia. "El jefe me miró raro, no me entendió."'],['Sobregeneralización','De un error a una regla. "Pronuncié mal, soy malo para el inglés."'],['Magnificación y minimización','Agrandar los errores y achicar los logros.']],
+    limits:['Trata sobre depresión, no sobre idiomas. En el aula es una extrapolación útil como lenguaje, no evidencia de eficacia.','Qué distorsiones exactas trae el listado de 1963 varía según la fuente secundaria. '+V,'Es herramienta pedagógica, no terapia.'],
+    clase:'Enseña dos o tres distorsiones con ejemplos del aula. Ante "no tengo vocabulario", pregunta: "¿qué evidencia hay a favor y en contra?" y revisen el registro.',
+    say:'"Cuando estamos nerviosos, la mente hace trampa: se queda con el único error y borra lo que salió bien. Vamos a pillarla en el acto."',
+    checks:['Distingo abstracción selectiva de inferencia arbitraria.','Sé por qué no puedo decir que Beck probó algo sobre el inglés.','Tengo claro el límite entre esta herramienta y la terapia.']},
+   {id:'nickerson',name:'6. Sesgo de confirmación',sub:'Nickerson (1998)',
+    title:'La mente colecciona pruebas de lo que ya cree',
+    ref:'Nickerson, R. S. (1998). Confirmation bias: A ubiquitous phenomenon in many guises. <i>Review of General Psychology, 2</i>(2), 175–220. <a href="https://pages.ucsd.edu/~cmckenzie/nickersonConfirmationBias.pdf" target="_blank" rel="noopener">Texto</a>',
+    q:'¿Por qué buscamos e interpretamos la información de forma que confirme lo que ya creemos?',
+    idea:'Revisión amplia que define el sesgo como buscar o interpretar evidencia a favor de las creencias o hipótesis que ya se tienen. Muestra sus muchas formas, ejemplos en medicina, justicia y ciencia, posibles explicaciones y si el sesgo tiene alguna utilidad.',
+    table:[['Buscar solo lo que confirma','Recordar las veces que "no me salió" y no las que sí.'],['Leer lo ambiguo a favor','Un silencio del jefe se lee como "no me entendió".'],['Ver lo que se espera ver','Entrar a la reunión buscando el error.'],['No intencional','La persona no lo hace a propósito.']],
+    limits:['Es una revisión, no un experimento propio.','No habla de idiomas ni de ansiedad: la conexión con las etiquetas es tuya, y es razonable.'],
+    clase:'El registro de evidencia obliga a mirar los casos que no confirman la etiqueta. Esta ficha y la de Bandura justifican tu método de medir y mostrar.',
+    say:'"Si crees que eres malo para el inglés, tu mente va a coleccionar pruebas de eso e ignorar las otras. Por eso nosotros llevamos la colección completa."',
+    checks:['Defino el sesgo de confirmación en una frase.','Tengo dos ejemplos en estudiantes de inglés.','Distingo una revisión de un estudio experimental.']},
+   {id:'clark',name:'7. Ansiedad social',sub:'Clark y Wells (1995)',
+    title:'Por qué el miedo no se corrige solo con exponerse',
+    ref:'Clark, D. M., &amp; Wells, A. (1995). A cognitive model of social phobia. En R. G. Heimberg, M. R. Liebowitz, D. A. Hope y F. R. Schneier (Eds.), <i>Social phobia: Diagnosis, assessment, and treatment</i>. Guilford Press. Revisión de apoyo: <a href="https://pubmed.ncbi.nlm.nih.gov/12238248/" target="_blank" rel="noopener">Self-focused attention in social phobia and social anxiety</a> '+V,
+    q:'Si la persona se expone una y otra vez, ¿por qué el miedo no desaparece?',
+    idea:'El miedo social se mantiene por creencias negativas sobre uno mismo y sobre cómo lo ven los demás, y por cuatro procesos que impiden que la experiencia real las corrija. El modelo tiene bastante apoyo empírico y es la base de una terapia cognitiva recomendada como primera línea por NICE para el trastorno de ansiedad social.',
+    table:[['Atención centrada en uno mismo','Se vigila por dentro y no ve que el jefe asiente y entiende.'],['Conductas de seguridad','Hablar poco, guion memorizado, no preguntar. Protegen y a la vez mantienen el miedo.'],['Procesamiento anticipatorio','Darle vueltas antes del evento.'],['Procesamiento posterior','Repasar después y quedarse con el error.']],
+    limits:['Modela un trastorno clínico. Sebastián probablemente tiene ansiedad situacional: úsalo para explicar el mecanismo, nunca para diagnosticar.','La terapia basada en el modelo la aplican profesionales de salud mental.'],
+    clase:'Antes: 2 o 3 ideas clave, no un guion. Durante: atención afuera, en el jefe y el contenido. Después: anotar señales de que lo entendieron, en vez de rumiar.',
+    say:'"En la reunión estás tan ocupado vigilándote que no ves que tu jefe sí te entiende. El ejercicio es mirar hacia afuera y después anotar las pruebas."',
+    checks:['Nombro los cuatro procesos con un ejemplo de Sebastián.','Sé por qué una conducta de seguridad mantiene el miedo.','Conecto la atención hacia adentro con el sesgo de confirmación.']}
+  ];
+  var main=document.getElementById('panels'), lab=document.getElementById('p-laboratorio');
+  FICHAS.forEach(function(f){
+    var s=el('section','panel');s.id='p-'+f.id;s.dataset.name=f.name;
+    var h='<span class="eyebrow">'+f.sub+'</span><h2>'+f.title+'</h2><p class="lead">'+f.q+'</p>';
+    h+='<div class="ref">'+f.ref+'</div>';
+    h+='<div class="rule key"><h4>Idea central</h4><p>'+f.idea+'</p></div>';
+    h+='<h3>Conceptos clave</h3><div class="tbl"><table><tr><th>Concepto</th><th>Cómo se ve</th></tr>'+f.table.map(function(r){return '<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td></tr>';}).join('')+'</table></div>';
+    h+='<div class="rule err"><h4>Límites</h4><ul>'+f.limits.map(function(l){return '<li>'+l+'</li>';}).join('')+'</ul></div>';
+    h+='<div class="rule tip"><h4>En clase</h4><p>'+f.clase+'</p></div>';
+    h+='<div class="rule say"><h4>Para explicárselo a un estudiante</h4><p>'+f.say+'</p></div>';
+    h+='<div class="check" data-key="'+f.id+'"><h4>Lo domino cuando...</h4>'+f.checks.map(function(c,i){return '<label><input type="checkbox" id="c-'+f.id+'-'+i+'"> '+c+'</label>';}).join('')+'<div class="bar"><div></div></div></div>';
+    s.innerHTML=h;main.insertBefore(s,lab);
+  });
+
+  /* ---------- navegación ---------- */
+  var panels=[].slice.call(document.querySelectorAll('.panel'));
+  var chips=document.getElementById('chips'), home=document.getElementById('home-links');
+  var homeDesc={sebastian:'Simulador: elige y mira cómo crece o se debilita la etiqueta',registro:'Herramienta para clase: evidencia a favor y en contra',laboratorio:'Ejercicios con respuesta inmediata',limites:'Qué puedes afirmar con estas fuentes'};
+  FICHAS.forEach(function(f){homeDesc[f.id]=f.sub;});
+  panels.forEach(function(p){
+    var id=p.id.replace('p-','');
+    var a=el('a','chip');a.href='#'+id;a.dataset.id=id;
+    a.innerHTML=(p.querySelector('.check')?'<span class="dot" data-dot="'+id+'"></span>':'')+p.dataset.name;
+    chips.appendChild(a);
+    if(homeDesc[id]){var c=el('a','card-link','<b>'+p.dataset.name+'</b><small>'+homeDesc[id]+'</small>');c.href='#'+id;home.appendChild(c);}
+  });
+  function show(){
+    var id=(location.hash||'#inicio').slice(1);
+    if(!document.getElementById('p-'+id))id='inicio';
+    panels.forEach(function(p){p.hidden=p.id!=='p-'+id;});
+    [].forEach.call(chips.children,function(c){if(c.dataset.id===id)c.setAttribute('aria-current','page');else c.removeAttribute('aria-current');});
+  }
+  window.addEventListener('hashchange',function(){show();window.scrollTo(0,0);});
+  show();
+
+  /* ---------- ciclo ---------- */
+  var CYCLE=[
+    {t:'La etiqueta',s:'"No tengo vocabulario"',d:'El estudiante resume su experiencia en una frase sobre sí mismo. Suele nacer de una distorsión: tomar un detalle (la palabra que no salió) como prueba de todo (abstracción selectiva) o convertir un error en regla (sobregeneralización).',src:'Beck (1963)',go:'beck',cls:'Escucha la frase exacta y anótala. Es tu punto de partida.'},
+    {t:'La mente busca pruebas',s:'Sesgo de confirmación',d:'Con la etiqueta activa, la atención se va a lo que la confirma: los errores, las pausas, la cara seria. Lo que la contradice pasa sin registrarse. No es intencional.',src:'Nickerson (1998)',go:'nickerson',cls:'Pregunta qué recuerda de la última conversación. Casi siempre recuerda solo lo que salió mal.'},
+    {t:'Atención hacia adentro',s:'Se vigila mientras habla',d:'En la situación social, la persona se observa por dentro ("¿lo estoy diciendo bien?") y deja de ver las señales de afuera, como que el otro asiente y entiende.',src:'Clark y Wells (1995)',go:'clark',cls:'En la reunión de Sebastián: está pendiente de su pronunciación, no de la cara del jefe.'},
+    {t:'Ansiedad y menos recursos',s:'Miedo a ser evaluado',d:'Aparece la ansiedad propia del idioma, sobre todo el miedo a la evaluación negativa, y consume recursos en la entrada, el procesamiento y la salida.',src:'Horwitz y colegas (1986) · MacIntyre y Gardner (1994)',go:'gardner',cls:'Por eso "en clase me sale y en la reunión no".'},
+    {t:'Decide no hablar',s:'Baja la disposición',d:'Con la confianza del momento baja, elige callar, responder corto o usar frases memorizadas. Son conductas de seguridad: alivian ahora y mantienen el miedo.',src:'MacIntyre y colegas (1998) · Clark y Wells (1995)',go:'wtc',cls:'"Yes, ok" y pasar la palabra es la conducta típica.'},
+    {t:'Rumiación y menos práctica',s:'La etiqueta se refuerza',d:'Después repasa el error, no los aciertos. Habla menos, practica menos, progresa más lento. Todo eso vuelve al paso 1 como "prueba" de la etiqueta.',src:'Clark y Wells (1995) · Nickerson (1998)',go:'clark',cls:'Aquí se cierra el círculo vicioso que tú describes a tus estudiantes.'},
+    {t:'Punto de quiebre',s:'Evidencia propia, medida',d:'Lo que rompe el ciclo es que el estudiante vea sus propios logros, medidos: minutos hablados, palabras usadas, señales de que lo entendieron. Los logros propios son la fuente más fuerte de autoeficacia, y el registro obliga a mirar lo que el sesgo esconde.',src:'Bandura (1977) · Nickerson (1998)',go:'bandura',cls:'Esto es lo que ya haces cuando mides y muestras. Ahora sabes por qué funciona.',brk:true}
+  ];
+  var cyc=document.getElementById('cycle'), det=document.getElementById('cycle-detail');
+  CYCLE.forEach(function(c,i){
+    var b=el('button','node'+(c.brk?' break':''),'<b>'+c.t+'</b><small>'+c.s+'</small>');
+    b.type='button';b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',function(){pick(i);});cyc.appendChild(b);
+  });
+  function pick(i){
+    [].forEach.call(cyc.children,function(n,j){n.setAttribute('aria-pressed',j===i?'true':'false');});
+    var c=CYCLE[i];
+    det.innerHTML='<span class="eyebrow">'+(c.brk?'Dónde se rompe':'Paso '+(i+1))+'</span><h3 style="margin-top:4px">'+c.t+'</h3><p>'+c.d+'</p><p><b>En clase:</b> '+c.cls+'</p><p class="src">Fuente: '+c.src+'</p><a class="go" href="#'+c.go+'">Ir a la ficha →</a>';
+  }
+  pick(0);
+
+  /* ---------- simulador ---------- */
+  var STEPS=[
+    {scene:'La noche antes de la reunión semanal con sus jefes.',opts:[
+      {t:'Repasa mentalmente todo lo que puede salir mal.',d:12,tag:'Procesamiento anticipatorio',m:'Darle vueltas antes del evento prepara la mente para buscar el error. Llega a la reunión con la etiqueta ya activa.',src:'Clark y Wells'},
+      {t:'Escribe un guion palabra por palabra para no equivocarse.',d:6,tag:'Conducta de seguridad',m:'Parece preparación, pero si todo sale bien él lo atribuirá al guion y no a su inglés. Además, cualquier pregunta fuera del guion lo desarma.',src:'Clark y Wells'},
+      {t:'Prepara 2 o 3 ideas clave y una frase para ganar tiempo.',d:-10,tag:'Preparación útil',m:'Lleva estructura sin depender de un libreto. La frase puente ("Let me think about that...") le da tiempo de procesamiento.',src:'MacIntyre y Gardner'}]},
+    {scene:'Empieza la reunión. Su jefe habla rápido.',opts:[
+      {t:'Se concentra en "¿estaré entendiendo bien? ¿y si me preguntan?".',d:12,tag:'Atención hacia adentro',m:'La atención se va a vigilarse y quedan menos recursos para escuchar. Entiende menos y lo toma como prueba de que su inglés no alcanza.',src:'Clark y Wells · MacIntyre y Gardner'},
+      {t:'Pone la atención en las palabras clave del jefe y en su cara.',d:-10,tag:'Atención hacia afuera',m:'Al mirar afuera, capta más información y ve señales reales: el jefe asiente, sigue, no está evaluando su pronunciación.',src:'Clark y Wells'}]},
+    {scene:'El jefe le pregunta su opinión sobre el proyecto.',opts:[
+      {t:'Responde "Yes, I agree" y cede la palabra rápido.',d:10,tag:'Baja disposición a comunicarse',m:'Alivio inmediato, pero pierde la oportunidad de comprobar que podía. Esa evitación mantiene la creencia de que no puede.',src:'MacIntyre y colegas · Clark y Wells'},
+      {t:'Dice "Let me think about that..." y explica sus dos ideas.',d:-15,tag:'Logro de ejecución',m:'Habló con contenido propio frente a la persona que más teme. Es la fuente más fuerte de autoeficacia, si después lo registra.',src:'Bandura'}]},
+    {scene:'Pronuncia mal una palabra técnica. El jefe sigue hablando sin problema.',opts:[
+      {t:'Piensa: "soy malo para el inglés, se notó".',d:14,tag:'Sobregeneralización',m:'De un error a una regla sobre sí mismo. Y como busca confirmación, no registra que el jefe siguió como si nada.',src:'Beck · Nickerson'},
+      {t:'Nota que el jefe entendió y siguió la conversación.',d:-10,tag:'Evidencia que contradice',m:'Registrar la señal de afuera es justo lo que el sesgo de confirmación impide. Aquí la está capturando.',src:'Nickerson · Clark y Wells'}]},
+    {scene:'Termina la reunión. Esa tarde, en casa.',opts:[
+      {t:'Repasa una y otra vez la palabra mal pronunciada.',d:14,tag:'Rumiación posterior',m:'El repaso selecciona el error y borra los aciertos. La reunión queda guardada como "otro fracaso" y alimenta la etiqueta para la próxima.',src:'Clark y Wells · Nickerson'},
+      {t:'Anota en su registro tres señales de que lo entendieron.',d:-15,tag:'Registro de evidencia',m:'Convierte la reunión en evidencia propia. Es medir y mostrar aplicado fuera de clase, y lo que le da fuerza a la autoeficacia.',src:'Bandura · Nickerson'}]}
+  ];
+  var START=60, sim=document.getElementById('sim'), state;
+  function lvl(v){return v>=70?'Muy fuerte':v>=45?'Fuerte':v>=25?'Debilitándose':'Débil';}
+  function renderSim(){
+    var v=state.v, i=state.i;
+    var h='<div class="meter"><div class="meter-top"><span>Fuerza de la etiqueta "no puedo hablar inglés con mis jefes"</span><strong>'+v+' / 100 · '+lvl(v)+'</strong></div><div class="track"><div class="fill'+(v<45?' low':'')+'" style="width:'+v+'%"></div></div></div>';
+    if(i<STEPS.length){
+      var st=STEPS[i];
+      h+='<div class="step-n">Momento '+(i+1)+' de '+STEPS.length+'</div><p class="scene">'+st.scene+'</p><div class="choices">';
+      st.opts.forEach(function(o,k){var picked=state.cur===k;h+='<button class="choice'+(picked?' picked':'')+'" data-k="'+k+'"'+(state.cur!=null?' disabled':'')+'>'+o.t+'</button>';});
+      h+='</div>';
+      if(state.cur!=null){var o=st.opts[state.cur];
+        h+='<div class="feedback '+(o.d>0?'up':'down')+'"><span class="tag">'+o.tag+' · '+(o.d>0?'+':'')+o.d+'</span>'+o.m+'<br><small>Fuente: '+o.src+'</small></div><div class="row"><button class="btn" id="sim-next">'+(i===STEPS.length-1?'Ver el resumen':'Siguiente momento')+'</button></div>';}
+    } else {
+      h+='<h3 style="margin-top:0">Resumen de la reunión</h3><p>La etiqueta empezó en '+START+' y terminó en <b>'+v+'</b>. '+(v<START?'Sebastián salió con más evidencia propia de la que tenía al llegar.':'El ciclo se reforzó: la próxima reunión empezará con la etiqueta más fuerte.')+'</p><ul class="summary">'+state.log.map(function(l){return '<li><b>'+l.tag+'</b> ('+(l.d>0?'+':'')+l.d+'): '+l.t+'</li>';}).join('')+'</ul>';
+      h+='<div class="rule tip"><h4>Para tu sesión con él</h4><p>Recorre la reunión con Sebastián momento por momento, con estas mismas preguntas. Que sea él quien diga qué hizo en cada uno. Los cinco momentos son los cinco puntos donde puede practicar una alternativa.</p></div><div class="row"><button class="btn" id="sim-again">Repetir la reunión</button></div>';
+    }
+    sim.innerHTML=h;
+  }
+  sim.addEventListener('click',function(e){
+    var c=e.target.closest('.choice');
+    if(c&&state.cur==null){state.cur=+c.dataset.k;var o=STEPS[state.i].opts[state.cur];state.v=Math.max(0,Math.min(100,state.v+o.d));state.log.push(o);renderSim();return;}
+    if(e.target.id==='sim-next'){state.i++;state.cur=null;renderSim();}
+    if(e.target.id==='sim-again'){reset();}
+  });
+  function reset(){state={v:START,i:0,cur:null,log:[]};renderSim();}
+  reset();
+
+  /* ---------- registro de evidencia ---------- */
+  var EX={label:'No tengo vocabulario',pro:['No me salió la palabra para "presupuesto"','Hice varias pausas largas'],con:['Hablé 12 minutos seguidos en inglés','Entendí todas las preguntas del profesor','Expliqué mi trabajo con mis propias palabras']};
+  var ev=store.get('ciclo-registro')||JSON.parse(JSON.stringify(EX));
+  var lbl=document.getElementById('lbl');
+  function saveEv(){store.set('ciclo-registro',ev);}
+  function renderEv(){
+    lbl.value=ev.label;
+    ['pro','con'].forEach(function(k){
+      var ul=document.getElementById('list-'+k);ul.innerHTML='';
+      ev[k].forEach(function(t,i){var li=el('li',null,'<span>'+esc(t)+'</span>');var b=el('button',null,'Quitar');b.type='button';b.setAttribute('aria-label','Quitar: '+t);b.onclick=function(){ev[k].splice(i,1);saveEv();renderEv();};li.appendChild(b);ul.appendChild(li);});
+    });
+    var p=ev.pro.length,c=ev.con.length,vd=document.getElementById('verdict');
+    if(!p&&!c)vd.textContent='Agrega evidencia en las dos columnas.';
+    else if(c>p)vd.textContent='Hay '+c+' pruebas en contra y '+p+' a favor. La etiqueta no se sostiene tal como está dicha. ¿Cómo la diría de forma más exacta? Por ejemplo: "todavía me faltan palabras para algunos temas".';
+    else if(c===p)vd.textContent='Empate: '+p+' y '+c+'. Busca más datos medidos antes de concluir.';
+    else vd.textContent='Hay más evidencia a favor ('+p+') que en contra ('+c+'). Revisa si la columna verde está incompleta: el sesgo de confirmación hace justo eso.';
+  }
+  lbl.addEventListener('input',function(){ev.label=lbl.value;saveEv();});
+  document.querySelectorAll('[data-add]').forEach(function(b){
+    var k=b.dataset.add,inp=document.getElementById('in-'+k);
+    function add(){var t=inp.value.trim();if(!t)return;ev[k].push(t);inp.value='';saveEv();renderEv();inp.focus();}
+    b.addEventListener('click',add);inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();add();}});
+  });
+  document.getElementById('ev-reset').onclick=function(){ev=JSON.parse(JSON.stringify(EX));saveEv();renderEv();};
+  document.getElementById('ev-clear').onclick=function(){ev={label:'',pro:[],con:[]};saveEv();renderEv();lbl.focus();};
+  renderEv();
+
+  /* ---------- checklists ---------- */
+  var checks=store.get('ciclo-checks')||{};
+  document.querySelectorAll('.check').forEach(function(box){
+    var key=box.dataset.key, inputs=box.querySelectorAll('input'), bar=box.querySelector('.bar div');
+    function up(){var n=0;inputs.forEach(function(i){if(i.checked)n++;});bar.style.width=(n/inputs.length*100)+'%';var d=document.querySelector('[data-dot="'+key+'"]');if(d)d.classList.toggle('done',n===inputs.length);}
+    inputs.forEach(function(i){if(checks[i.id])i.checked=true;i.addEventListener('change',function(){checks[i.id]=i.checked;store.set('ciclo-checks',checks);up();});});
+    up();
+  });
+
+  /* ---------- laboratorio ---------- */
+  var QUIZZES=[
+   {id:'dist',title:'¿Qué distorsión es?',intro:'Frases típicas de estudiantes. Usa las pruebas: ¿un detalle por el todo? ¿conclusión sin evidencia? ¿un error convertido en regla? ¿agranda lo malo o achica lo bueno?',
+    opts:['Abstracción selectiva','Inferencia arbitraria','Sobregeneralización','Magnificación / minimización'],
+    items:[
+     ['"No tengo vocabulario" (después de hablar 12 minutos).','Abstracción selectiva','Toma la palabra que no salió y deja por fuera los 12 minutos.'],
+     ['"El jefe frunció el ceño: seguro no me entendió nada."','Inferencia arbitraria','Saca una conclusión sin evidencia; el ceño puede deberse a mil cosas.'],
+     ['"Me equivoqué en el pasado simple, nunca voy a aprender inglés."','Sobregeneralización','De un error puntual a una regla sobre todo su futuro.'],
+     ['"Sí, entendí la película, pero era fácil, eso no cuenta."','Magnificación / minimización','Achica un logro real para que no contradiga la etiqueta.'],
+     ['"La clase fue un desastre" (tuvo una pausa larga en una hora).','Abstracción selectiva','Resume una hora completa por un solo momento.'],
+     ['"Pronuncié mal \'th\', soy malísimo para pronunciar."','Sobregeneralización','Un sonido difícil se convierte en una conclusión general.'],
+     ['"Ese error fue terrible, todos lo notaron."','Magnificación / minimización','Agranda el impacto de un error pequeño.']]},
+   {id:'band',title:'Fuentes de autoeficacia',intro:'¿Qué fuente de Bandura está trabajando cada acción del profesor?',
+    opts:['Logro de ejecución','Experiencia vicaria','Persuasión verbal','Estado fisiológico'],
+    items:[
+     ['Le muestras la grabación donde habló 8 minutos sin parar.','Logro de ejecución','Es evidencia de algo que él mismo hizo. La fuente más fuerte.'],
+     ['Le cuentas el caso de otra adulta de 50 años que pasó de Rookie a Gladiator.','Experiencia vicaria','Ve a alguien parecido a él lograrlo.'],
+     ['Le dices "tú puedes, confía en ti".','Persuasión verbal','Ayuda, pero es la fuente más débil de las tres primeras.'],
+     ['Le enseñas a leer el corazón acelerado como activación y no como peligro.','Estado fisiológico','Cambia la interpretación de su activación corporal.'],
+     ['Comparan su conteo de palabras del primer mes con el de hoy.','Logro de ejecución','Su propio progreso medido.']]},
+   {id:'cw',title:'Los procesos de Clark y Wells',intro:'¿Cuál de los cuatro procesos que mantienen el miedo aparece en cada conducta?',
+    opts:['Atención hacia adentro','Conducta de seguridad','Anticipatorio','Posterior (rumiación)'],
+    items:[
+     ['Durante la reunión piensa todo el tiempo en cómo suena su acento.','Atención hacia adentro','Se vigila por dentro y deja de ver las señales de afuera.'],
+     ['Solo habla si lleva las frases escritas en el celular.','Conducta de seguridad','Le da alivio pero le impide comprobar que podía sin ellas.'],
+     ['Dos días antes ya imagina que se va a quedar en blanco.','Anticipatorio','Darle vueltas antes del evento.'],
+     ['Al salir, se repite toda la tarde el error que cometió.','Posterior (rumiación)','Repasa después y se queda con lo negativo.'],
+     ['Evita mirar a los ojos para que no le pregunten.','Conducta de seguridad','Una forma sutil de protegerse que mantiene el miedo.'],
+     ['Mientras habla, se imagina cómo se ve "desde afuera".','Atención hacia adentro','La imagen de sí mismo visto desde afuera es parte de este proceso.']]},
+   {id:'etapa',title:'¿En qué etapa se rompe?',intro:'MacIntyre y Gardner: entrada, procesamiento o salida.',
+    opts:['Entrada','Procesamiento','Salida'],
+    items:[
+     ['Conoce las palabras, pero cuando el jefe habla rápido no capta qué le preguntó.','Entrada','Falla al recibir y atender la información.'],
+     ['Entiende la pregunta, pero no sabe por dónde empezar la respuesta.','Procesamiento','Falla al organizar lo que quiere decir.'],
+     ['Sabe exactamente qué decir, pero la palabra no le sale.','Salida','Falla al producir.'],
+     ['En un audio lento entiende todo; en la llamada real, nada.','Entrada','La ansiedad de la situación real afecta la recepción.']]},
+   {id:'afirmar',title:'¿Lo puedes afirmar?',intro:'Revisa si cada frase se sostiene con estas fuentes.',
+    opts:['Sí, se sostiene','No, va más allá'],
+    items:[
+     ['"La ansiedad en lengua extranjera está estudiada como un fenómeno propio desde 1986."','Sí, se sostiene','Es justo el aporte de Horwitz y colegas.'],
+     ['"Está demostrado que la ansiedad causa el bajo rendimiento en inglés."','No, va más allá','MacIntyre y Gardner muestran correlaciones, no causalidad.'],
+     ['"Beck demostró que corregir distorsiones mejora el inglés."','No, va más allá','Beck estudió depresión. La aplicación al aula es tuya.'],
+     ['"Según Bandura, la experiencia propia de logro es la fuente más fuerte de confianza."','Sí, se sostiene','Es lo que propone el artículo de 1977.'],
+     ['"Sebastián tiene fobia social."','No, va más allá','No puedes diagnosticar, y lo que describe parece ansiedad situacional.'],
+     ['"La disposición a hablar cambia según con quién hablas."','Sí, se sostiene','Es el centro del modelo de la WTC de 1998.']]}
+  ];
+  var ql=document.getElementById('quiz-list'), qa=document.getElementById('quiz-area');
+  QUIZZES.forEach(function(q,i){var b=el('button','qbtn',q.title);b.type='button';b.onclick=function(){run(i);};ql.appendChild(b);});
+  function run(i){
+    [].forEach.call(ql.children,function(b,j){b.setAttribute('aria-pressed',j===i?'true':'false');});
+    var q=QUIZZES[i], ok=0, done=0, box=el('div','quiz');
+    box.innerHTML='<div class="quiz-head"><h3 style="margin:0">'+q.title+'</h3><span class="score"></span></div><p style="margin-top:6px;color:var(--muted)">'+q.intro+'</p>';
+    var sc=box.querySelector('.score');
+    function upd(){sc.textContent=ok+' de '+done+' correctas · '+(q.items.length-done)+' pendientes';}
+    q.items.forEach(function(it){
+      var d=el('div','q','<div class="q-text">'+it[0]+'</div>'), o=el('div','opts');
+      q.opts.forEach(function(op){var b=el('button','opt',op);b.type='button';b.onclick=function(){
+        var right=op===it[1];done++;if(right)ok++;
+        [].forEach.call(o.children,function(x){x.disabled=true;if(x.textContent===it[1])x.classList.add('right');});
+        if(!right)b.classList.add('wrong');
+        d.appendChild(el('div','why '+(right?'ok':'no'),(right?'Correcto. ':'Es <b>'+it[1]+'</b>. ')+it[2]));upd();};o.appendChild(b);});
+      d.appendChild(o);box.appendChild(d);
+    });
+    var r=el('div','row');var rb=el('button','btn ghost','Reiniciar este ejercicio');rb.type='button';rb.onclick=function(){run(i);};r.appendChild(rb);box.appendChild(r);
+    qa.innerHTML='';qa.appendChild(box);upd();
+  }
+  run(0);
+})();
+</script>
