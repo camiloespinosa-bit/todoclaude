@@ -96,8 +96,8 @@
             <span>Mismos días y hora, por 4 semanas</span>
           </button>
           <button type="button" class="opcion" role="radio" aria-checked="false" data-modo="una">
-            <strong>Una sola clase</strong>
-            <span>Elige la fecha en el calendario</span>
+            <strong>Fechas sueltas</strong>
+            <span>Cada clase con su día y su hora</span>
           </button>
         </div>
 
@@ -111,7 +111,12 @@
 
         <div id="bloque-una" hidden>
           <div class="dias" id="dias" role="radiogroup" aria-label="Día"></div>
-          <div class="horas" id="horas" role="radiogroup" aria-label="Hora" aria-live="polite"></div>
+          <div class="horas" id="horas" aria-label="Hora" aria-live="polite"></div>
+          <div class="elegidas" id="sueltas" hidden>
+            <p class="opciones__titulo">Tus clases</p>
+            <ul class="elegidas__lista" id="lista-sueltas"></ul>
+            <p class="elegidas__ayuda" id="ayuda-sueltas">¿Más clases? Toca otro día y otra hora para agregarla.</p>
+          </div>
         </div>
       </section>
 

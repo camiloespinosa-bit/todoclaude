@@ -207,12 +207,16 @@ const contHorasFijas = document.getElementById("horas-fijas");
 const listaPlan = document.getElementById("plan");
 
 const SEMANAS_REPETIR = 4;
+const MAX_CLASES = 20; // las que acepta el servidor en una reserva
+const MAX_DIAS_SEMANA = 5; // 5 días x 4 semanas = 20 clases
 const DIAS_SEMANA = [[1, "Lun"], [2, "Mar"], [3, "Mié"], [4, "Jue"], [5, "Vie"], [6, "Sáb"]];
 
 // Dos formas de reservar:
 //   "fijo": días de la semana + una hora, durante 4 semanas (lo normal para los estudiantes).
-//   "una": una sola fecha y hora del calendario (y siempre para la clase de prueba).
-const estado = { tipo: null, modalidad: null, programa: null, modo: "fijo", fecha: null, hora: null, dias: new Set(), horaFija: null };
+//   "una": fechas sueltas, cada clase con su día y su hora del calendario. La clase de prueba
+//   siempre va así y es una sola.
+// fecha es el día que se está viendo en el calendario; sueltas, las clases elegidas.
+const estado = { tipo: null, modalidad: null, programa: null, modo: "fijo", fecha: null, sueltas: [], dias: new Set(), horaFija: null };
 let plan = [];
 
 const clave = (x) => `${x.fecha} ${x.hora}`;
@@ -228,7 +232,7 @@ const modoActual = () => (estado.tipo === "prueba" ? "una" : estado.modo);
 
 // Lo que se va a reservar, sin repetidos.
 function clasesAReservar() {
-  if (modoActual() === "una") return estado.fecha && estado.hora !== null ? [{ fecha: estado.fecha, hora: estado.hora }] : [];
+  if (modoActual() === "una") return ordenar([...estado.sueltas]);
   const lista = plan.flatMap((p) => (p.estado === "ok" ? [p] : p.estado === "cerrado" && p.cambio ? [p.cambio] : []));
   const vistas = new Set();
   return ordenar(lista.filter((x) => !vistas.has(clave(x)) && vistas.add(clave(x))).map(({ fecha, hora }) => ({ fecha, hora })));
@@ -255,7 +259,6 @@ function refrescarPaso3() {
   opcionesModo.hidden = prueba;
   bloqueFijo.hidden = modoActual() !== "fijo";
   bloqueUna.hidden = modoActual() !== "una";
-  estado.hora = null;
   if (modoActual() === "fijo") {
     pintarHorasFijas();
     calcularPlan();
@@ -272,12 +275,14 @@ for (const grupo of document.querySelectorAll("[data-grupo]")) {
     estado[grupo.dataset.grupo] = boton.dataset.valor;
     marcar(grupo, boton);
     campoPersonas.hidden = estado.tipo !== "prueba";
+    reiniciarSueltas();
     refrescarPaso3();
   });
 }
 
 campoFase.addEventListener("change", () => {
   estado.programa = campoFase.value || null;
+  reiniciarSueltas();
   refrescarPaso3();
 });
 
@@ -290,7 +295,65 @@ opcionesModo.addEventListener("click", (e) => {
   refrescarPaso3();
 });
 
-// ---------- Una sola clase ----------
+// ---------- Fechas sueltas ----------
+const contSueltas = document.getElementById("sueltas");
+const listaSueltas = document.getElementById("lista-sueltas");
+
+// Cambiar tipo, modalidad o fase cambia qué horas sirven: se empieza de nuevo.
+function reiniciarSueltas() {
+  estado.sueltas = [];
+  pintarSueltas();
+}
+
+const seCruzan = (a, b) => a.fecha === b.fecha
+  && a.hora < b.hora + TIPOS[estado.tipo].minutos && b.hora < a.hora + TIPOS[estado.tipo].minutos;
+
+function alternarSuelta(fecha, hora) {
+  mensaje.textContent = "";
+  const ya = estado.sueltas.findIndex((x) => x.fecha === fecha && x.hora === hora);
+  if (ya >= 0) {
+    estado.sueltas.splice(ya, 1);
+  } else if (estado.tipo === "prueba") {
+    estado.sueltas = [{ fecha, hora }];
+  } else if (estado.sueltas.length >= MAX_CLASES) {
+    mensaje.textContent = `Puedes reservar hasta ${MAX_CLASES} clases de una vez. Quita una para agregar otra.`;
+    return;
+  } else if (estado.sueltas.some((x) => seCruzan(x, { fecha, hora }))) {
+    mensaje.textContent = "Esa hora se cruza con otra de tus clases de ese día.";
+    return;
+  } else {
+    estado.sueltas.push({ fecha, hora });
+  }
+  for (const b of contHoras.querySelectorAll(".hora")) {
+    b.setAttribute("aria-pressed", String(estado.sueltas.some((x) => x.fecha === estado.fecha && x.hora === Number(b.dataset.hora))));
+  }
+  pintarSueltas();
+}
+
+function pintarSueltas() {
+  listaSueltas.replaceChildren();
+  contSueltas.hidden = !estado.sueltas.length;
+  document.getElementById("ayuda-sueltas").hidden = estado.tipo === "prueba";
+  for (const x of ordenar([...estado.sueltas])) {
+    const li = document.createElement("li");
+    li.className = "elegida";
+    const texto = document.createElement("span");
+    texto.textContent = textoFecha(x);
+    const quitar = document.createElement("button");
+    quitar.type = "button";
+    quitar.textContent = "×";
+    quitar.setAttribute("aria-label", `Quitar ${textoFecha(x)}`);
+    quitar.addEventListener("click", () => {
+      estado.sueltas = estado.sueltas.filter((y) => clave(y) !== clave(x));
+      pintarSueltas();
+      if (x.fecha === estado.fecha) pintarHoras();
+    });
+    li.append(texto, quitar);
+    listaSueltas.append(li);
+  }
+  actualizarResumen();
+}
+
 function pintarDias() {
   const { fecha: hoy } = hoyEnBogota();
   for (let i = 0; i < DIAS_A_MOSTRAR; i++) {
@@ -318,8 +381,6 @@ function pintarDias() {
 let consulta = 0; // evita pintar una respuesta vieja si cambian de día rápido
 
 async function pintarHoras() {
-  estado.hora = null;
-  actualizarResumen();
   const mia = ++consulta;
   contHoras.replaceChildren();
   const falta = !estado.tipo || !estado.modalidad || !estado.programa ? "Primero elige el tipo de clase, la modalidad y la fase."
@@ -343,19 +404,16 @@ async function pintarHoras() {
     contHoras.innerHTML = `<p class="horas__vacio">No quedan horas libres ese día para esta opción. Prueba otro día.</p>`;
     return;
   }
+  const fecha = estado.fecha;
   for (const { minutos: m, disponible, detalle } of opciones) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "hora";
-    btn.setAttribute("role", "radio");
-    btn.setAttribute("aria-checked", "false");
+    btn.dataset.hora = String(m);
+    btn.setAttribute("aria-pressed", String(estado.sueltas.some((x) => x.fecha === fecha && x.hora === m)));
     btn.disabled = !disponible;
     btn.innerHTML = `${textoHora(m)}<small>${detalle}</small>`;
-    btn.addEventListener("click", () => {
-      estado.hora = m;
-      marcar(contHoras, btn);
-      actualizarResumen();
-    });
+    btn.addEventListener("click", () => alternarSuelta(fecha, m));
     contHoras.append(btn);
   }
 }
@@ -387,8 +445,15 @@ function horasDelHorario(dia) {
     btn.textContent = nombre;
     btn.setAttribute("aria-pressed", "false");
     btn.addEventListener("click", () => {
-      if (estado.dias.has(dia)) estado.dias.delete(dia);
-      else estado.dias.add(dia);
+      mensaje.textContent = "";
+      if (estado.dias.has(dia)) {
+        estado.dias.delete(dia);
+      } else if (estado.dias.size >= MAX_DIAS_SEMANA) {
+        mensaje.textContent = `Puedes elegir hasta ${MAX_DIAS_SEMANA} días por semana. Para más, haz otra reserva.`;
+        return;
+      } else {
+        estado.dias.add(dia);
+      }
       btn.setAttribute("aria-pressed", String(estado.dias.has(dia)));
       pintarHorasFijas();
       calcularPlan();
