@@ -361,27 +361,22 @@ async function pintarHoras() {
 }
 
 // ---------- Clases fijas cada semana ----------
-// Primer día abierto con ese día de la semana, dentro de lo que muestra la página.
-function fechaDeReferencia(dia) {
-  const { fecha: hoy } = hoyEnBogota();
-  for (let i = 0; i < DIAS_A_MOSTRAR + 7 * SEMANAS_REPETIR; i++) {
-    const fecha = sumarDias(hoy, i);
-    if (diaSemana(fecha) === dia && franjasDe(fecha).length) return fecha;
-  }
-  return null;
-}
-
-// Horas en las que empieza una clase de este tipo en el horario de ese día de la semana.
+// Horas en las que empieza una clase de este tipo ese día de la semana: las de todas sus
+// fechas próximas, para que un día cerrado o unas horas bloqueadas en una sola semana no
+// quiten la hora de las demás (el plan muestra qué semanas no se pueden).
 function horasDelHorario(dia) {
-  const fecha = fechaDeReferencia(dia);
-  if (!fecha) return [];
+  const { fecha: hoy } = hoyEnBogota();
   const paso = 60;
   const minutos = TIPOS[estado.tipo].minutos;
-  return franjasDe(fecha).flatMap(([inicio, fin]) => {
-    const horas = [];
-    for (let m = Math.ceil(inicio / paso) * paso; m + minutos <= fin; m += paso) horas.push(m);
-    return horas;
-  });
+  const horas = new Set();
+  for (let i = 0; i < DIAS_A_MOSTRAR + 7 * SEMANAS_REPETIR; i++) {
+    const fecha = sumarDias(hoy, i);
+    if (diaSemana(fecha) !== dia) continue;
+    for (const [inicio, fin] of franjasDe(fecha)) {
+      for (let m = Math.ceil(inicio / paso) * paso; m + minutos <= fin; m += paso) horas.add(m);
+    }
+  }
+  return [...horas].sort((a, b) => a - b);
 }
 
 (function pintarSemana() {

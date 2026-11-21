@@ -452,22 +452,36 @@ async function panel(req: Request, datos: Record<string, unknown>) {
 
   try {
     if (datos.accion === "agenda") {
-      const [sesiones, cerrados] = await Promise.all([
+      const [sesiones, cerrados, bloqueos] = await Promise.all([
         rpc("panel_agenda", { p_desde: datos.desde, p_hasta: datos.hasta }),
         rpc("dias_cerrados_entre", { p_desde: datos.desde, p_hasta: datos.hasta }),
+        rpc("bloqueos_entre", { p_desde: datos.desde, p_hasta: datos.hasta }),
       ]);
-      return responder({ sesiones, cerrados });
+      return responder({ sesiones, cerrados, bloqueos });
     }
     if (datos.accion === "cerrados") {
-      return responder({ cerrados: await rpc("dias_cerrados_entre", { p_desde: datos.desde, p_hasta: datos.hasta }) });
+      const [cerrados, bloqueos] = await Promise.all([
+        rpc("dias_cerrados_entre", { p_desde: datos.desde, p_hasta: datos.hasta }),
+        rpc("bloqueos_entre", { p_desde: datos.desde, p_hasta: datos.hasta }),
+      ]);
+      return responder({ cerrados, bloqueos });
     }
     if (datos.accion === "cerrar") {
-      const r = await rpc("cerrar_dias", {
-        p_desde: datos.desde,
-        p_hasta: datos.hasta,
-        p_motivo: datos.motivo,
-        p_cancelar: Boolean(datos.cancelar),
-      });
+      // Con hora de inicio y fin se bloquean solo esas horas de un día; sin ellas, días completos.
+      const r = datos.inicio != null && datos.fin != null
+        ? await rpc("cerrar_horas", {
+          p_fecha: datos.desde,
+          p_inicio: datos.inicio,
+          p_fin: datos.fin,
+          p_motivo: datos.motivo,
+          p_cancelar: Boolean(datos.cancelar),
+        })
+        : await rpc("cerrar_dias", {
+          p_desde: datos.desde,
+          p_hasta: datos.hasta,
+          p_motivo: datos.motivo,
+          p_cancelar: Boolean(datos.cancelar),
+        });
       // Sin cerrar: hay reservas y el docente aún no confirmó cancelarlas.
       if (!r.cerrado || !r.sesiones?.length) return responder({ ...r, calendario: true });
       try {
@@ -479,7 +493,8 @@ async function panel(req: Request, datos: Record<string, unknown>) {
       }
     }
     if (datos.accion === "abrir") {
-      await rpc("abrir_dia", { p_fecha: datos.fecha });
+      if (datos.bloqueo) await rpc("abrir_horas", { p_bloqueo: datos.bloqueo });
+      else await rpc("abrir_dia", { p_fecha: datos.fecha });
       return responder({ ok: true });
     }
     if (datos.accion === "cancelar") {
