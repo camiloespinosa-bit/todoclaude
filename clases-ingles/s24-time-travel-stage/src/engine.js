@@ -6,6 +6,7 @@ import { OBJECTS, makeObject, mat, mesh, at, rod } from './objects.js';
 import { ACTIONS, LADDER_VERBS, DREAMS, OPINIONS } from './content.js';
 import { joinRoom, newRoomCode, PUBLIC_BROKERS, SAGA_SUPABASE } from './net.js';
 import { openTeacher, signPass, checkPass } from './pass.js';
+import { DB } from './db.js';
 
 const $ = (id) => document.getElementById(id);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -1506,6 +1507,7 @@ function start() {
     S.paused = false;
     S.Q = null;
     $('O-pause').classList.remove('on');
+    $('O-exit').classList.remove('on');
     finale.visible = false;
     loadWorld(GAME.titleWorld || 0);
     avatarHolder.visible = false;
@@ -1522,12 +1524,100 @@ function start() {
     S.mode = 'brief';
     $('b-hi').textContent = `Hi, ${PLAYERS[p].name}!`;
     showLayer('brief');
+    showResume(null);
+    findSave(p).then((sv) => S.mode === 'brief' && S.player === p && showResume(sv));
   }
-  function startTrip() {
+  // ---------- Saved progress (this device, and the class database when there is one) ----------
+  const saveKey = (p) => `ccaSave:${GAME.id}:${p}`;
+  function readLocalSave(p) {
+    try {
+      const sv = JSON.parse(lsGet(saveKey(p)) || 'null');
+      return sv && sv.v === 1 && sv.game === GAME.id && Date.now() - sv.savedAt < 30 * 864e5 ? sv : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  async function findSave(p) {
+    let sv = readLocalSave(p);
+    if (NET.room && WEB) {
+      const remote = await DB.resume(NET.room, GAME.id, p);
+      if (remote && remote.v === 1 && remote.game === GAME.id && (!sv || remote.savedAt > sv.savedAt)) sv = remote;
+    }
+    return sv;
+  }
+  function showResume(sv) {
+    S.save = sv;
+    document.body.classList.toggle('has-save', !!sv);
+    $('b-resume').classList.toggle('on', !!sv);
+    if (!sv) return;
+    const w = WORLDS[sv.wi];
+    const q = w && w.quests[sv.q];
+    $('b-rinfo').innerHTML = `You were in <b>${esc(w ? w.name : '')}</b>${q ? ` · ${esc(q.name)}` : ''}.`;
+  }
+  function snapshot(q) {
+    return {
+      v: 1, game: GAME.id, player: S.player, runId: NET.runId, wi: S.wi, q, savedAt: Date.now(),
+      where: `${WORLDS[S.wi].name}${WORLDS[S.wi].quests[q] ? ` · ${WORLDS[S.wi].quests[q].name}` : ''}`,
+      results: S.results, stars: S.stars, clues: S.clues, crystals: S.crystals, crystalsMax: S.crystalsMax,
+      met: S.met, events: S.events.slice(-30), lastTalkWi: S.lastTalkWi,
+    };
+  }
+  function saveProgress(q) {
+    if (S.mode === 'title' || S.mode === 'brief') return;
+    const sv = snapshot(q);
+    lsSet(saveKey(S.player), JSON.stringify(sv));
+    if (NET.room && WEB) DB.save({ run: NET.runId, room: NET.room, game: GAME.id, player: S.player, state: sv, status: 'playing' });
+  }
+  function clearSave(p, status) {
+    try {
+      localStorage.removeItem(saveKey(p));
+    } catch (e) {
+      /* private mode */
+    }
+    if (status && NET.runId && NET.room && WEB) DB.save({ run: NET.runId, room: NET.room, game: GAME.id, player: p, state: null, status });
+  }
+  $('b-cont').addEventListener('click', () => S.mode === 'brief' && S.save && startTrip(S.save));
+  $('b-again').addEventListener('click', () => S.mode === 'brief' && startTrip());
+  for (const id of ['b-cont', 'b-again', 'exit-yes', 'exit-no', 'btn-exit']) {
+    $(id).tabIndex = -1;
+    $(id).addEventListener('mousedown', (e) => e.preventDefault());
+  }
+
+  // ---------- Exit (the kid) ----------
+  function askExit(on) {
+    if (on && S.mode !== 'play' && S.mode !== 'talk') return;
+    $('O-exit').classList.toggle('on', on);
+    S.paused = on;
+    keys.clear();
+  }
+  function exitGame(reason, quiet = false) {
+    $('O-exit').classList.remove('on');
+    if (S.mode === 'play' || S.mode === 'talk' || S.mode === 'warp') logEvent(reason || 'Left the game', false);
+    const wasPlayer = NET.role === 'player' && NET.tx;
+    toTitle();
+    if (quiet) clearTimeout(liveTimer); // the teacher already cleared this card
+    else if (wasPlayer) pushLive();
+  }
+  $('btn-exit').addEventListener('click', () => askExit(true));
+  $('exit-no').addEventListener('click', () => askExit(false));
+  $('exit-yes').addEventListener('click', () => exitGame());
+
+  function startTrip(resume = null) {
     NET.role = 'player';
     NET.lastSession = null;
-    NET.runId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+    NET.runId = resume && resume.runId ? resume.runId : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
     S.lastTalkWi = null;
+    // "Start again" over a saved game: that old game is closed in the history
+    const old = !resume && S.save;
+    if (old) {
+      try {
+        localStorage.removeItem(saveKey(S.player));
+      } catch (e) {
+        /* private mode */
+      }
+      if (old.runId && NET.room && WEB) DB.save({ run: old.runId, room: NET.room, game: GAME.id, player: S.player, state: null, status: 'restarted' });
+    }
+    showResume(null);
     if (NET.tx) listenCommands();
     const n = WORLDS.length;
     S.results = Array.from({ length: n }, () => []);
@@ -1538,10 +1628,25 @@ function start() {
     S.met = Array.from({ length: n }, () => []);
     S.events = [];
     setAvatar(S.player);
+    if (resume && WORLDS[resume.wi]) {
+      const fit = (a, d) => Array.from({ length: n }, (x, i) => (a && a[i] != null ? a[i] : d()));
+      S.results = fit(resume.results, () => []);
+      S.stars = fit(resume.stars, () => 0);
+      S.clues = fit(resume.clues, () => []);
+      S.crystals = fit(resume.crystals, () => 0);
+      S.crystalsMax = fit(resume.crystalsMax, () => 0);
+      S.met = fit(resume.met, () => []);
+      S.events = (resume.events || []).slice(-30);
+      S.lastTalkWi = resume.lastTalkWi ?? null;
+      S.crystals[resume.wi] = 0; // the crystals of this world come back
+      logEvent(`Continued in ${WORLDS[resume.wi].name}`, true);
+      enterWorld(resume.wi, Math.min(resume.q || 0, WORLDS[resume.wi].quests.length - 1));
+      return;
+    }
     enterWorld(0);
   }
 
-  function enterWorld(wi) {
+  function enterWorld(wi, firstQuest = 0) {
     S.wi = wi;
     S.Q = null;
     loadWorld(wi);
@@ -1564,7 +1669,8 @@ function start() {
     arr.classList.add('on');
     startMusic(WORLDS[wi].music);
     logEvent(`Arrived in ${WORLDS[wi].name}`, true);
-    startQuest(0, 2600);
+    startQuest(firstQuest, 2600);
+    saveProgress(firstQuest);
   }
 
   // ---------- Quest engine ----------
@@ -1598,7 +1704,10 @@ function start() {
     task(null);
     logEvent(`${Q.def.name}${Q.max ? `: ${Q.score}/${Q.max}` : ''} ✔`, true);
     const next = S.q + 1;
-    if (next < WORLDS[S.wi].quests.length) startQuest(next, 700);
+    if (next < WORLDS[S.wi].quests.length) {
+      startQuest(next, 700);
+      saveProgress(next);
+    }
   }
   function backToStart(p) {
     placeAvatar(p.clone(), Math.PI);
@@ -2465,6 +2574,9 @@ function start() {
           S.stars[S.lastTalkWi] = c.n;
           logEvent(`Profe: ${c.n} ★ (${WORLDS[S.lastTalkWi].short})`, true);
         }
+      } else if (c.type === 'restart') {
+        clearSave(S.player, 'restarted');
+        exitGame('The teacher restarted the game', true);
       } else if (c.type === 'endTalk') endTalk();
       else if (c.type === 'skip') skip();
       else if (c.type === 'pause') {
@@ -2565,7 +2677,7 @@ function start() {
     const box = $('td-cards');
     box.innerHTML = PLAYERS.map((P, i) => {
       const d = T.docs[`p${i}`];
-      if (!d) return `<div class="tcard"><div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(P.name)}</b><span class="tst off">sin conectar</span></div><p class="tmuted">Todavía no ha entrado con el código en su dispositivo.</p></div>`;
+      if (!d || d.cleared) return `<div class="tcard"><div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(P.name)}</b><span class="tst off">sin conectar</span></div><p class="tmuted">Todavía no ha entrado con el código en su dispositivo.</p></div>`;
       const age = (Date.now() - (d.updatedAt || 0)) / 1000;
       const live = age < 120;
       const mode = (d.paused ? 'En pausa · ' : '') + (MODE_ES[d.mode] || d.mode);
@@ -2581,7 +2693,7 @@ function start() {
         <div class="tbtns">
           <span>Estrellas:</span>
           <button data-p="${i}" data-c="stars" data-n="1">★1</button><button data-p="${i}" data-c="stars" data-n="2">★2</button><button data-p="${i}" data-c="stars" data-n="3">★3</button>
-          <button data-p="${i}" data-c="endTalk">Terminar charla</button><button data-p="${i}" data-c="skip">Saltar reto</button><button data-p="${i}" data-c="pause">Pausa</button>
+          <button data-p="${i}" data-c="endTalk">Terminar charla</button><button data-p="${i}" data-c="skip">Saltar reto</button><button data-p="${i}" data-c="pause">Pausa</button><button data-p="${i}" data-c="restart" class="warn">Reiniciar</button>
         </div>
         <div class="tworlds">${worlds}</div>
         <div class="tcrys">Cristales: <b>${d.crystals || 0}/${d.crystalsMax || 0}</b></div>
@@ -2592,6 +2704,8 @@ function start() {
   $('td-cards').addEventListener('click', async (e) => {
     const b = e.target.closest('button[data-c]');
     if (!b || !NET.tx) return;
+    const who = PLAYERS[+b.dataset.p] ? PLAYERS[+b.dataset.p].name : '';
+    if (b.dataset.c === 'restart' && !confirm(`¿Reiniciar la partida de ${who}? Vuelve al menú y empieza de cero.`)) return;
     const cmd = { seq: Date.now(), type: b.dataset.c, n: +b.dataset.n || 0 };
     b.disabled = true;
     try {
@@ -2599,6 +2713,13 @@ function start() {
       if (!sent) throw new Error('offline');
       b.classList.add('sent');
       setTimeout(() => b.classList.remove('sent'), 900);
+      if (cmd.type === 'restart') {
+        // clear the old card right away (the device may already be closed)
+        const blank = { idx: +b.dataset.p, cleared: true, updatedAt: Date.now() };
+        T.docs[`p${b.dataset.p}`] = blank;
+        NET.tx.publish(`live/p${b.dataset.p}`, blank, true).catch(() => {});
+        renderTeacher();
+      }
     } catch (err) {
       $('td-status').textContent = 'No se pudo enviar la orden. Revisa la conexión a internet.';
     }
@@ -2871,6 +2992,8 @@ function start() {
       saveSession(S.rows.slice(before));
       logEvent('Finished the game! 🏆', true);
     }
+    clearSave(S.player);
+    if (NET.room && WEB) DB.save({ run: NET.runId, room: NET.room, game: GAME.id, player: S.player, state: null, status: 'finished', rows: S.rows.slice(before).map((r) => ({ ...r, player: `p${S.player}` })) });
     showLayer('final');
     camRig.pos.set(7.2, 3.4, 13);
     camRig.target.set(7.2, 1.8, 0);
@@ -2962,6 +3085,15 @@ function start() {
       $('O-help').classList.toggle('on');
       return;
     }
+    if ($('O-exit').classList.contains('on')) {
+      if (k === 'Enter' && !e.repeat) exitGame();
+      else if (k === 'Escape' && !e.repeat) askExit(false);
+      return;
+    }
+    if (k === 'Escape' && !e.repeat && (S.mode === 'play' || S.mode === 'talk')) {
+      askExit(true);
+      return;
+    }
     if ((k === 'p' || k === 'P') && (S.mode === 'play' || S.mode === 'talk')) {
       S.paused = !S.paused;
       $('O-pause').classList.toggle('on', S.paused);
@@ -2977,7 +3109,8 @@ function start() {
         else if (k === 't' || k === 'T') toTeacher();
         break;
       case 'brief':
-        if ((k === 'Enter' || k === ' ') && !e.repeat) startTrip();
+        if ((k === 'Enter' || k === ' ') && !e.repeat) startTrip(S.save || null);
+        else if ((k === 'n' || k === 'N') && S.save && !e.repeat) startTrip();
         else if (k === 'Escape' || k === 'Backspace') toTitle();
         break;
       case 'play':

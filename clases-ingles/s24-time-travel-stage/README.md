@@ -24,6 +24,17 @@ La página web está cerrada: sin enlace o código de clase nadie puede jugar.
 
 Privacidad: los mensajes van cifrados con el código de clase y sin nombres (p0 / p1). La llave para firmar enlaces está cifrada con la clave del profe. El candado vive en el navegador: frena a cualquier visitante, pero no es un login de servidor.
 
+## Salir, reiniciar y continuar
+- **Salir:** botón Exit (o `Esc`) en el juego. Pregunta antes; el avance queda guardado.
+- **Reiniciar:** en la vista en vivo, botón "Reiniciar" en la tarjeta de cada niño. Su dispositivo vuelve al menú y la tarjeta queda limpia.
+- **Continuar:** el avance se guarda al terminar cada reto. Al escoger el nombre sale "Continue" (sigue en el reto donde iba) o "Start again". Funciona en el mismo dispositivo y, con la base de datos activa, desde otro dispositivo con el mismo enlace de clase.
+
+## Base de datos (Supabase)
+1. Abre tu proyecto en supabase.com > SQL Editor.
+2. Pega todo `supabase/saga.sql` y pulsa Run (se puede repetir sin problema).
+3. Listo: cada partida se guarda (avance y resultados) y el Panel del profe muestra el "Historial de partidas" con CSV.
+Las tablas quedan cerradas a la llave pública; la página solo usa 3 funciones (guardar, continuar, historial). El historial pide el token del profe, que sale de la clave del profe. No se guardan nombres (0 = Jerónimo, 1 = Luciana).
+
 ## Cámaras
 Tecla `C` o el botón de la cámara: Normal, Aerial (desde arriba), Side (lateral) y Close (cerca). Las flechas siempre siguen la pantalla.
 

@@ -45,3 +45,10 @@ export async function checkPass(code, pass) {
     return 0;
   }
 }
+
+// token the teacher page shows to the results database (only its SHA-256 is stored there)
+export async function teacherToken(key) {
+  const base = await crypto.subtle.importKey("raw", enc.encode("cca-profe|" + cleanKey(key)), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: enc.encode("cca-db-token"), iterations: 250000, hash: "SHA-256" }, base, 256);
+  return [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}

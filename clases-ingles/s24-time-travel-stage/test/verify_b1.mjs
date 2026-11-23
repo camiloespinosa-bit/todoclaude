@@ -240,6 +240,12 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   await wait(1800);
   const q1 = await Qs(kid2.page);
   check('Remote "skip" reaches Luciana', q0 && q1 && (q1.type !== q0.type || q1.done), `${q0 && q0.type} -> ${q1 && q1.type}`);
+  teacher.page.once('dialog', (d) => d.accept());
+  await teacher.page.click('button[data-p="1"][data-c="restart"]');
+  await wait(2500);
+  check('Remote "restart" sends Luciana back to the menu', (await S(kid2.page)).mode === 'title');
+  await wait(1500);
+  check('Restart clears Luciana\'s card in the teacher view', /sin conectar/.test(await teacher.page.textContent('#td-cards')));
   let gave = false;
   for (let guard = 0; guard < 1000; guard++) {
     const s = await S(kid1.page);

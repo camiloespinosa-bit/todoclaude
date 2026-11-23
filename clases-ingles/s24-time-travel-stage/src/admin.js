@@ -1,6 +1,7 @@
 // Teacher admin page: log in with the teacher key, create class codes for any game,
 // copy or send the kids' link, and open the live view of a class.
-import { openTeacher, signPass, checkPass, cleanKey } from './pass.js';
+import { openTeacher, signPass, checkPass, cleanKey, teacherToken } from './pass.js';
+import { DB } from './db.js';
 import { joinRoom, newRoomCode, PUBLIC_BROKERS, SAGA_SUPABASE } from './net.js';
 
 const GAMES = [
@@ -13,6 +14,7 @@ const DAYS = [
   { d: 30, label: '1 mes' },
   { d: 90, label: '3 meses' },
 ];
+const PLAYERS = ['Jerónimo', 'Luciana'];
 const params = new URLSearchParams(location.search);
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -34,6 +36,8 @@ const ls = {
   },
 };
 let signer = null;
+let token = null;
+let runs = [];
 let codes = [];
 try {
   codes = JSON.parse(ls.get('ccaCodes') || '[]');
@@ -71,8 +75,70 @@ async function login(key, remember) {
   $('lg-msg').textContent = '';
   show('panel');
   renderCodes();
+  token = await teacherToken(key);
+  loadHistory();
   return true;
 }
+
+// ---------- history (class database) ----------
+const STATUS = { finished: 'Terminó', playing: 'Sin terminar', restarted: 'Reiniciada' };
+const noteOf = (room) => (codes.find((c) => c.code === room) || {}).note || '';
+const fmtWhen = (t) => new Date(t).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+async function loadHistory() {
+  if (!token) return;
+  $('hi-msg').textContent = 'Cargando...';
+  $('hi-msg').className = 'msg';
+  const r = await DB.history(token);
+  if (!r.ok) {
+    runs = [];
+    $('hi-list').innerHTML = '';
+    $('hi-msg').className = 'msg bad';
+    $('hi-msg').textContent = r.status === 404 || r.status === 400
+      ? 'La base de datos todavía no está activada (falta correr supabase/saga.sql en Supabase).'
+      : r.status === 0 ? 'No hay conexión con la base de datos. Revisa internet y pulsa Actualizar.' : `La base de datos respondió con un error (${r.status}).`;
+    return;
+  }
+  runs = r.data || [];
+  $('hi-msg').textContent = runs.length ? `${runs.length} partidas guardadas.` : 'Todavía no hay partidas guardadas.';
+  $('hi-list').innerHTML = runs.map((x) => {
+    const g = gameOf(x.game);
+    const rows = Array.isArray(x.rows) ? x.rows : [];
+    const pts = rows.filter((w) => !/crystals|Talk stars/i.test(w.challenge || '')).reduce((a, w) => [a[0] + (+w.score || 0), a[1] + (+w.max || 0)], [0, 0]);
+    const stars = rows.filter((w) => /Talk stars/i.test(w.challenge || '')).reduce((a, w) => a + (+w.score || 0), 0);
+    const note = noteOf(x.room);
+    const sum = x.status === 'finished' ? `${pts[0]}/${pts[1]} retos · ${stars} ★` : x.place ? `Iba en: ${esc(x.place)}` : '';
+    return `<div class="run">
+      <div><b>${esc(PLAYERS[x.player] || `Jugador ${x.player + 1}`)}</b> · ${esc(g.name)}<div class="meta">${fmtWhen(x.updated_at)} · código ${esc(x.room)}${note ? ` (${esc(note)})` : ''}${sum ? ` · ${sum}` : ''}</div></div>
+      <span class="st ${esc(x.status)}">${STATUS[x.status] || esc(x.status)}</span>
+      ${rows.length ? `<details><summary>Ver retos</summary><table>${rows.map((w) => `<tr><td>${esc(w.world || '')}</td><td>${esc(w.challenge || '')}${w.details ? `<div class="meta">${esc(w.details)}</div>` : ''}</td><td class="n">${esc(w.score)}/${esc(w.max)}</td></tr>`).join('')}</table></details>` : ''}
+    </div>`;
+  }).join('');
+}
+function historyCSV() {
+  const head = ['fecha', 'juego', 'codigo', 'para', 'jugador', 'estado', 'mundo', 'reto', 'puntaje', 'maximo', 'detalles'];
+  const cell = (v) => {
+    const t = String(v ?? '');
+    return /[",;\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+  };
+  const lines = [head.join(',')];
+  for (const x of runs) {
+    const base = [new Date(x.updated_at).toISOString().slice(0, 16).replace('T', ' '), gameOf(x.game).name, x.room, noteOf(x.room), PLAYERS[x.player] || x.player, STATUS[x.status] || x.status];
+    const rows = Array.isArray(x.rows) && x.rows.length ? x.rows : [{ world: '', challenge: x.place || '', score: '', max: '', details: '' }];
+    for (const w of rows) lines.push([...base, w.world, w.challenge, w.score, w.max, w.details].map(cell).join(','));
+  }
+  const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Juegos_historial_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 1000);
+}
+$('hi-reload').addEventListener('click', loadHistory);
+$('hi-csv').addEventListener('click', () => (runs.length ? historyCSV() : loadHistory()));
 
 // keep a copy of "this class is open until ..." on the live channel, so a kid who types the
 // 4 letters by hand (without the link) can also get in
@@ -176,6 +242,8 @@ $('cr-form').addEventListener('submit', (e) => {
 $('logout').addEventListener('click', () => {
   ls.set('ccaProfe', null);
   signer = null;
+  token = null;
+  runs = [];
   $('lg-key').value = '';
   show('login');
 });

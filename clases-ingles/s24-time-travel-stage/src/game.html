@@ -175,6 +175,16 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 /* ---------- v3 HUD ---------- */
 .pack { flex-direction: row; }
 .cambtn { position: absolute; top: calc(2.6vh + 2.6em); right: 2.4vw; display: flex; align-items: center; gap: .4em; padding: .35em .8em; font-weight: 700; color: var(--deep); font-size: var(--fs); }
+.exitbtn { top: calc(2.6vh + 5.2em); color: #C62828; }
+#exit-no { background: var(--blue); }
+#O-exit .btns { flex-direction: row; justify-content: center; gap: 1vw; }
+.resume { display: none; flex-direction: column; align-items: center; gap: 1.2vh; }
+.resume.on { display: flex; }
+.resume .rinfo { background: rgba(255, 255, 255, .92); border-radius: 18px; padding: .4em 1em; font-weight: 700; text-align: center; box-shadow: var(--shadow); }
+.resume .rbtns { display: flex; gap: 1vw; flex-wrap: wrap; justify-content: center; }
+.resume .btn.again { background: #fff; color: var(--deep); }
+.resume .btn.again .key { background: var(--deep); }
+body.has-save #b-go { display: none; }
 .cambtn svg { width: 1.2em; height: 1.2em; }
 .cambtn .key { font-size: .75em; }
 .crys { display: flex; align-items: center; gap: .35em; font-weight: 800; color: #00897B; margin-right: .3em; }
@@ -265,6 +275,7 @@ body.is-profe #btn-teacher { display: inline-flex; }
 .tbtns button { background: var(--deep); color: #fff; border-radius: 12px; padding: .3em .7em; font-weight: 800; font-size: .95em; }
 .tbtns button[data-c="stars"] { background: #E0A800; }
 .tbtns button.sent { background: var(--green); }
+.tbtns button.warn { background: #fff; color: #C62828; outline: 2px solid #C62828; }
 .tworlds { display: flex; flex-direction: column; gap: .4em; }
 .tworld { display: flex; flex-wrap: wrap; align-items: center; gap: .4em; padding: .3em .5em; border-radius: 12px; }
 .tworld.now { background: #FFFDE7; outline: 2px solid var(--yellow); }
@@ -328,6 +339,10 @@ body.is-profe #btn-teacher { display: inline-flex; }
       </div>
       <p class="small-p only-touch">Move with the joystick. Tap <b>JUMP</b> to jump and <b>OK</b> to go on.</p>
     </div>
+    <div class="resume" id="b-resume">
+      <div class="rinfo" id="b-rinfo">You were in HELLO PARK.</div>
+      <div class="rbtns"><button class="btn nextp" id="b-cont" type="button"><span class="only-keys"><span class="key">ENTER</span></span>Continue</button><button class="btn again" id="b-again" type="button"><span class="only-keys"><span class="key">N</span></span>Start again</button></div>
+    </div>
     <button class="instr gobtn" id="b-go" type="button"><span class="only-keys">Press <span class="key">ENTER</span> to start!</span><span class="only-touch">Tap here to start!</span></button>
     <div class="teacher">
       <span><b>Teacher:</b></span>
@@ -349,6 +364,7 @@ body.is-profe #btn-teacher { display: inline-flex; }
     </div>
     <div class="card pack"><div class="crys"><span class="gem"></span><span id="h-crys">0/0</span></div><div class="slots" id="h-slots"><div class="slot"></div><div class="slot"></div><div class="slot"></div></div></div>
     <button class="card cambtn" id="btn-cam" type="button" title="Camera (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="cam-name">Normal</span><span class="key">C</span></button>
+    <button class="card cambtn exitbtn" id="btn-exit" type="button" title="Exit (Esc)">Exit</button>
     <div class="hint" id="h-hint"></div>
     <div class="card task" id="h-task">
       <div class="lab" id="h-tlab"></div>
@@ -425,6 +441,11 @@ body.is-profe #btn-teacher { display: inline-flex; }
   </section>
 
   <div class="overlay" id="O-pause"><div class="card big-card"><h2>Paused</h2><p>Press <span class="key">P</span> to go on.</p></div></div>
+  <div class="overlay" id="O-exit"><div class="card big-card">
+    <h2>Leave the game?</h2>
+    <p>Your progress is saved. Next time you can continue.</p>
+    <div class="btns"><button class="btn" id="exit-no" type="button">Keep playing</button><button class="btn nextp" id="exit-yes" type="button">Yes, exit</button></div>
+  </div></div>
   <div class="overlay" id="O-help"><div class="card big-card">
     <h2>Help</h2>
     <div class="help-grid">

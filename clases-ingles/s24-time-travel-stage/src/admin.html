@@ -49,6 +49,21 @@ input:focus, select:focus { outline: none; border-color: var(--turq); }
 a.game { display: flex; flex-direction: column; gap: 2px; background: var(--soft); border-radius: 14px; padding: 14px 16px; text-decoration: none; color: var(--ink); font-weight: 700; border: 2px solid var(--line); }
 a.game:hover { border-color: var(--turq); }
 a.game span { font-weight: 500; font-size: .9rem; color: var(--muted); }
+.hh { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.hh h2 { margin: 0; }
+.run { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; border-top: 1px solid var(--line); padding: 10px 2px; }
+.run:first-child { border-top: 0; }
+.run b { font-weight: 700; }
+.run .meta { color: var(--muted); font-size: .9rem; }
+.run .st { font-weight: 700; font-size: .85rem; padding: 2px 10px; border-radius: 999px; align-self: start; white-space: nowrap; }
+.st.finished { background: #E8F5E9; color: #2E7D32; }
+.st.playing { background: #FFF3E0; color: #E65100; }
+.st.restarted { background: #ECEFF1; color: #607D8B; }
+.run details { grid-column: 1 / -1; font-size: .9rem; }
+.run summary { cursor: pointer; color: var(--turq); font-weight: 600; }
+.run table { border-collapse: collapse; width: 100%; margin-top: 6px; }
+.run td { padding: 3px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.run td.n { text-align: right; white-space: nowrap; font-weight: 700; }
 .note { font-size: .9rem; color: var(--muted); margin: 0; }
 </style>
 </head>
@@ -89,6 +104,12 @@ a.game span { font-weight: 500; font-size: .9rem; color: var(--muted); }
     <section style="margin-top:20px">
       <h2>Mis códigos</h2>
       <div id="list"></div>
+    </section>
+
+    <section style="margin-top:20px">
+      <div class="hh"><h2>Historial de partidas</h2><div class="cb"><button class="btn" id="hi-reload" type="button">Actualizar</button><button class="btn main" id="hi-csv" type="button">Descargar CSV</button></div></div>
+      <p class="msg" id="hi-msg">Cargando...</p>
+      <div id="hi-list"></div>
     </section>
 
     <section style="margin-top:20px">
