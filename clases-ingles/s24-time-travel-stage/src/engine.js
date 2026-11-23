@@ -4,7 +4,8 @@
 import * as THREE from 'three';
 import { OBJECTS, makeObject, mat, mesh, at, rod } from './objects.js';
 import { ACTIONS, LADDER_VERBS, DREAMS, OPINIONS } from './content.js';
-import { joinRoom, newRoomCode, PUBLIC_BROKERS, sha256Hex } from './net.js';
+import { joinRoom, newRoomCode, PUBLIC_BROKERS, SAGA_SUPABASE } from './net.js';
+import { openTeacher, signPass, checkPass } from './pass.js';
 
 const $ = (id) => document.getElementById(id);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -32,13 +33,10 @@ const DEFAULT_PLAYERS = [
 ];
 let GAME = null;
 // On the website nobody plays without a class code opened by the teacher.
-// The teacher view needs the teacher key (?profe=KEY, remembered on that device).
-// Only the SHA-256 of the key is in the page.
-const TEACHER_HASH = '74c7a31e74d9561c3c344c1bbf1f3a67b910c90172ac5b506af9eecb1327f93b';
+// The teacher view needs the teacher key (?profe=KEY, remembered on that device); the key is
+// checked by opening the sealed signing key (src/pass.js), it is not stored in the page.
+// Kids' links carry a pass signed by the teacher (?room=CODE&pase=...), valid until its date.
 const WEB = /^https?:$/.test(location.protocol);
-// Public by design (same project as gimnasiodelcerebro.co/reservas): only used for the
-// live "broadcast" channel between the kids' devices and the teacher view.
-const SAGA_SUPABASE = { url: 'https://xpqjejiezbxaxsdodkyb.supabase.co', key: 'sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd' };
 let WORLDS = [];
 let PLAYERS = DEFAULT_PLAYERS;
 
@@ -1470,6 +1468,11 @@ function start() {
     el.classList.add('on');
     $('h-hint').classList.remove('on');
   }
+  $('h-topts').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pick]');
+    if (b && S.mode === 'play' && S.Q && !S.Q.done && HANDLERS[S.Q.def.type].pick) HANDLERS[S.Q.def.type].pick(S.Q, +b.dataset.pick);
+  });
+  $('h-topts').addEventListener('mousedown', (e) => e.preventDefault());
   $('h-arrival').addEventListener('animationend', (e) => {
     if (e.animationName === 'arrive') $('h-arrival').classList.remove('on');
   });
@@ -1797,7 +1800,8 @@ function start() {
       },
     },
 
-    // ---- S2 / S6 Interview: walk to a person, listen, ask questions ----
+    // ---- S2 / S6 Interview: walk to a person, listen, choose a question, say it out loud ----
+    // listen -> choose (1/2/3) -> say it (the teacher hears it) -> the friend answers -> again or next
     interview: {
       start(Q) {
         Q.max = W.people.length;
@@ -1806,12 +1810,13 @@ function start() {
       },
       show(Q) {
         const met = W.people.filter((n) => n.met).length;
+        Q.chat = false;
         task(`${Q.def.name} ${met} / ${Q.max}`, met ? 'Walk to another friend!' : 'Walk to a new friend and say hello!');
         Q.ready = true;
       },
       count: (Q) => `${W.people.filter((n) => n.met).length}/${Q.max}`,
       goal(Q) {
-        if (Q.phase === 'ask') return null;
+        if (Q.chat) return null;
         let best = null, bd = 1e9;
         for (const n of W.people) {
           if (n.met) continue;
@@ -1823,12 +1828,54 @@ function start() {
         }
         return best;
       },
+      // a short phase with its own timer (Enter skips ahead)
+      phase(Q, name, secs, lab, s, opts = '') {
+        Q.phase = name;
+        Q.left = secs;
+        task(`${lab}${secs ? ` <span class="say" id="h-say">${Math.ceil(secs)}</span>` : ''}`, s, opts);
+      },
+      listen(Q) {
+        const p = Q.cur.person;
+        this.phase(Q, 'listen', Q.def.listen || 7, `${esc(p.name)} says... Listen!`, `<span class="who">${esc(p.name)}:</span> "${esc(p.facts)}"`);
+      },
+      choose(Q) {
+        const p = Q.cur.person;
+        if (!p.qs || !p.qs.length || Q.asked >= (Q.def.asks || 2)) return this.done(Q);
+        Q.phase = 'choose';
+        const opts = Q.left3.map((i, k) => `<button class="opt qbtn" data-pick="${k}"><b>${k + 1}</b>${esc(p.qs[i][0])}</button>`).join('');
+        task(`Ask ${esc(p.name)} a question! Press 1, 2 or 3`, Q.asked ? 'One more question!' : `What do you want to ask ${esc(p.name)}?`, opts);
+      },
+      pick(Q, k) {
+        if (Q.phase !== 'choose' || k >= Q.left3.length) return;
+        const p = Q.cur.person;
+        const i = Q.left3.splice(k, 1)[0];
+        Q.qa = p.qs[i];
+        Q.asked++;
+        Q.details.push(`${p.name}: ${Q.qa[0]}`);
+        logEvent(`Asked ${p.name}: "${Q.qa[0]}"`, true);
+        sfx.click();
+        this.phase(Q, 'say', Q.def.sayTime || 6, 'Say it out loud to your teacher!', `<span class="mic">🎤</span> "${esc(Q.qa[0])}"`);
+      },
+      answer(Q) {
+        const p = Q.cur.person;
+        sfx.good();
+        burst(V(Q.cur.spot.x, 3, Q.cur.spot.z), ['#FDD835', '#FFFFFF', WORLDS[S.wi].color], 14, { speed: 4, up: 6 });
+        this.phase(Q, 'answer', Q.def.answerTime || 5, `${esc(p.name)} answers:`, `<span class="who">${esc(p.name)}:</span> "${esc(Q.qa[1])}"`);
+      },
+      done(Q) {
+        Q.phase = '';
+        Q.chat = false;
+        if (Q.cur) Q.cur.talking = false;
+        if (W.people.every((n) => n.met)) setTimeout(() => S.Q === Q && completeQuest(), 600);
+        else this.show(Q);
+      },
       update(Q, dt) {
-        if (Q.phase === 'ask') {
-          Q.sayLeft -= dt;
+        if (Q.chat) {
+          if (Q.phase === 'choose') return;
+          Q.left -= dt;
           const el = $('h-say');
-          if (el) el.textContent = Math.max(0, Math.ceil(Q.sayLeft));
-          if (Q.sayLeft <= 0) this.next(Q);
+          if (el) el.textContent = Math.max(0, Math.ceil(Q.left));
+          if (Q.left <= 0) this.next(Q);
           return;
         }
         if (!Q.ready) return;
@@ -1839,34 +1886,35 @@ function start() {
             n.talking = true;
             Q.cur = n;
             Q.ready = false;
-            Q.phase = 'ask';
-            Q.sayLeft = Q.def.seconds || 15;
+            Q.chat = true;
+            Q.asked = 0;
+            Q.left3 = shuffle((n.person.qs || []).map((x, i) => i));
             Q.score++;
             Q.details.push(n.person.name);
             (S.met[S.wi] ||= []).push(n.person);
             S.clues[S.wi].push({ label: n.person.name });
             sfx.good();
             burst(V(n.spot.x, 3, n.spot.z), ['#FDD835', '#FFFFFF', WORLDS[S.wi].color], 20, { speed: 5, up: 7 });
-            const ask = (Q.def.ask || '').replace('{name}', esc(n.person.name));
-            task(`${Q.def.name} · Listen and ask! <span class="say" id="h-say">${Math.ceil(Q.sayLeft)}</span>`, `<b>${esc(n.person.name)}:</b> "${esc(n.person.facts)}"`, ask ? `<span class="ask">${ask}</span>` : '');
             logEvent(`${Q.def.name}: met ${n.person.name}`, true);
             renderQuests();
+            this.listen(Q);
             return;
           }
         }
       },
+      // Enter: go on to the next step
       next(Q) {
-        if (Q.phase !== 'ask') return;
-        Q.phase = '';
-        if (Q.cur) Q.cur.talking = false;
-        if (W.people.every((n) => n.met)) setTimeout(() => S.Q === Q && completeQuest(), 600);
-        else this.show(Q);
+        if (!Q.chat) return;
+        if (Q.phase === 'listen') this.choose(Q);
+        else if (Q.phase === 'say') this.answer(Q);
+        else if (Q.phase === 'answer') this.choose(Q);
       },
       skip(Q) {
         for (const n of W.people) if (!n.met) {
           n.met = true;
           (S.met[S.wi] ||= []).push(n.person);
         }
+        Q.chat = false;
         Q.details.push('skipped by teacher');
         completeQuest();
       },
@@ -2226,15 +2274,13 @@ function start() {
   }
   async function checkTeacherKey(typed) {
     const key = (typed || params.get('profe') || lsGet('ccaProfe') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (!key || !(window.crypto && crypto.subtle)) return;
-    try {
-      if ((await sha256Hex(`cca-profe|${key}`)) === TEACHER_HASH) {
-        NET.isTeacher = true;
-        NET.unlocked = true;
-        lsSet('ccaProfe', key);
-      }
-    } catch (e) {
-      /* stays locked */
+    if (!key) return false;
+    const signer = await openTeacher(key);
+    if (signer) {
+      NET.signer = signer;
+      NET.isTeacher = true;
+      NET.unlocked = true;
+      lsSet('ccaProfe', key);
     }
     updateLock();
     return !!NET.isTeacher;
@@ -2271,10 +2317,25 @@ function start() {
     } catch (e) {
       /* fall through to the class-code link */
     }
-    const fromUrl = (params.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
-    const code = fromUrl || '';
+    let code = (params.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    let pase = params.get('pase') || '';
+    if (!code && !NET.isTeacher) {
+      // the same device comes back without the link: reuse its last valid pass
+      try {
+        const last = JSON.parse(lsGet('ccaPass') || 'null');
+        if (last && last.room) ({ room: code, pase } = last);
+      } catch (e) {
+        /* nothing saved */
+      }
+    }
+    if (code && pase && !NET.unlocked && (await checkPass(code, pase))) {
+      NET.unlocked = true;
+      lsSet('ccaPass', JSON.stringify({ room: code, pase }));
+      updateLock();
+    }
     $('room-in').value = code;
-    if (code) joinClass(code);
+    if (code) await joinClass(code);
+    if (NET.isTeacher && params.get('panel')) toTeacher();
   }
 
   function setNetStatus(text, ok = true) {
@@ -2327,7 +2388,7 @@ function start() {
     } else if (!NET.unlocked) {
       const tx = NET.tx;
       tx.sub('open', (k, d) => {
-        if (NET.tx !== tx || NET.unlocked || !d || Date.now() - d.t > 12 * 3600 * 1000) return;
+        if (NET.tx !== tx || NET.unlocked || !d || (d.exp ? Date.now() > d.exp : Date.now() - d.t > 12 * 3600 * 1000)) return;
         NET.unlocked = true;
         updateLock();
         setNetStatus(`Class ${code} · online`, true);
@@ -2444,10 +2505,18 @@ function start() {
       T.sessions[k.split('/')[1]] = d;
     }));
   }
-  function renderRoomPanel() {
+  async function renderRoomPanel() {
     const code = NET.room || '';
     $('td-code').textContent = code || '----';
-    const kidUrl = code ? `${location.origin}${location.pathname}?room=${code}` : '';
+    let kidUrl = '';
+    if (code) {
+      kidUrl = `${location.origin}${location.pathname}?room=${code}`;
+      // signed pass: the link works for 30 days, even when this page is closed
+      if (NET.signer) {
+        if (!NET.pass || NET.pass.room !== code) NET.pass = { room: code, pase: await signPass(NET.signer, code, Date.now() + 30 * 864e5) };
+        kidUrl += `&pase=${NET.pass.pase}`;
+      }
+    }
     $('td-link').textContent = kidUrl || 'Crea un código para la clase.';
     $('td-copy').hidden = !kidUrl;
   }
@@ -2914,8 +2983,13 @@ function start() {
       case 'play':
         if (MOVE[e.code]) keys.add(MOVE[e.code]);
         if (k === ' ') AV.jumpBuf = 0.15;
+        if (e.code === 'KeyC' && !e.repeat) setCam(camIdx + 1);
         if ((k === 'k' || k === 'K') && !e.repeat) skip();
         if (k === 'Enter' && !e.repeat && S.Q && !S.Q.done && HANDLERS[S.Q.def.type].next) HANDLERS[S.Q.def.type].next(S.Q);
+        {
+          const dk = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
+          if (dk && !e.repeat && S.Q && !S.Q.done && HANDLERS[S.Q.def.type].pick) HANDLERS[S.Q.def.type].pick(S.Q, +dk[1] - 1);
+        }
         break;
       case 'talk':
         if (e.repeat) return;
@@ -2993,7 +3067,7 @@ function start() {
 
   function updateAvatar(dt) {
     let ix = 0, iz = 0;
-    if (S.mode === 'play') {
+    if (S.mode === 'play' && !(S.Q && S.Q.chat)) {
       ix = (keys.has('right') ? 1 : 0) - (keys.has('left') ? 1 : 0);
       iz = (keys.has('down') ? 1 : 0) - (keys.has('up') ? 1 : 0);
       const gp = gamepadInput();
@@ -3004,6 +3078,13 @@ function start() {
     if (len > 1) {
       ix /= len;
       iz /= len;
+    }
+    {
+      // arrows follow the screen, whatever camera is chosen
+      const [fx, fz] = CAMS[camIdx].f;
+      const mx = -fz * ix - fx * iz, mz = fx * ix - fz * iz;
+      ix = mx;
+      iz = mz;
     }
     const k = 1 - Math.exp(-dt * 12);
     AV.vel.x = lerp(AV.vel.x, ix * SPEED, k);
@@ -3107,6 +3188,26 @@ function start() {
 
   // ---------- Camera ----------
   const camRig = { pos: V(0, 30, 70), target: V(0, 0, 0) };
+  // views the player can choose (C key or the camera button); f = the camera's "forward" on the ground
+  const CAMS = [
+    { id: 'follow', name: 'Normal', f: [0, -1], p: (w) => V(0, 8.5, 13.5 * w), t: V(0, -0.5, 1.0) },
+    { id: 'aerial', name: 'Aerial', f: [0, -1], p: (w) => V(0, 22, 5 * w), t: V(0, 0, -0.5) },
+    { id: 'side', name: 'Side', f: [-1, 0], p: (w) => V(13 * w, 5, 0), t: V(0, 1.2, 0) },
+    { id: 'close', name: 'Close', f: [0, -1], p: () => V(0, 3.6, 7.5), t: V(0, 1.3, -2.5) },
+  ];
+  let camIdx = Math.max(0, CAMS.findIndex((c) => c.id === lsGet('ccaCam')));
+  function setCam(i) {
+    camIdx = (i + CAMS.length) % CAMS.length;
+    $('cam-name').textContent = CAMS[camIdx].name;
+    lsSet('ccaCam', CAMS[camIdx].id);
+  }
+  setCam(camIdx);
+  $('btn-cam').tabIndex = -1;
+  $('btn-cam').addEventListener('mousedown', (e) => e.preventDefault());
+  $('btn-cam').addEventListener('click', () => {
+    setCam(camIdx + 1);
+    sfx.click();
+  });
   function updateCamera(dt, t) {
     let wantP, wantT, k = 1 - Math.exp(-dt * 3.5);
     const wide = Math.max(1, 16 / 9 / camera.aspect);
@@ -3116,9 +3217,10 @@ function start() {
       wantT = V(0, 0, 0);
       k = 1;
     } else if (S.mode === 'play') {
-      wantP = AV.pos.clone().add(V(0, 8.5, 13.5 * wide));
-      wantT = AV.pos.clone().add(V(0, -0.5, 1.0));
-      wantP.y = Math.max(wantP.y, 8.5);
+      const C = CAMS[camIdx];
+      wantP = AV.pos.clone().add(C.p(wide));
+      wantT = AV.pos.clone().add(C.t);
+      if (C.id === 'follow') wantP.y = Math.max(wantP.y, 8.5);
     } else if (S.mode === 'talk') {
       wantP = V(STAGE.x + Math.sin(t * 0.15) * 1.5, STAGE.top + 3.0, STAGE.z + 10.5 * wide);
       wantT = V(STAGE.x, STAGE.top + 2.2, STAGE.z);

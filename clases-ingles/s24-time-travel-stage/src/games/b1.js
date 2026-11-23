@@ -14,37 +14,37 @@ const STATIONS = [
 
 // ---------- S2 · Question Master: friends to interview ----------
 const FRIENDS = [
-  { name: 'Leo', she: false, facts: "Hi! I'm Leo. I like pizza. I play soccer. My favorite color is blue.",
+  { name: 'Leo', qs: [["Do you like dogs?", "Yes, I do! I have a dog. His name is Max."], ["Do you play the guitar?", "No, I don't. I play soccer."], ["What is your favorite food?", "My favorite food is pizza!"]], she: false, facts: "Hi! I'm Leo. I like pizza. I play soccer. My favorite color is blue.",
     report: [
       { s: 'Leo ___ pizza.', a: ['likes', 'like', 'liking'] },
       { s: 'Leo ___ soccer.', a: ['plays', 'play', 'playing'] },
       { s: "Leo's favorite color ___ blue.", a: ['is', 'are', 'do'] },
     ] },
-  { name: 'Mia', she: true, facts: "Hi! I'm Mia. I like cats. I play the piano. My favorite food is ice cream.",
+  { name: 'Mia', qs: [["Do you like dogs?", "No, I don't. I like cats."], ["Do you play soccer?", "No, I don't. I play the piano."], ["What is your favorite color?", "My favorite color is purple."]], she: true, facts: "Hi! I'm Mia. I like cats. I play the piano. My favorite food is ice cream.",
     report: [
       { s: 'Mia ___ cats.', a: ['likes', 'like', 'liking'] },
       { s: 'Mia ___ the piano.', a: ['plays', 'play', 'playing'] },
       { s: "Mia's favorite food ___ ice cream.", a: ['is', 'are', 'does'] },
     ] },
-  { name: 'Tom', she: false, facts: "Hi! I'm Tom. I like Minecraft. I play basketball. My favorite animal is the dog.",
+  { name: 'Tom', qs: [["Do you like video games?", "Yes, I do! I play Minecraft."], ["Do you play tennis?", "No, I don't. I play basketball."], ["What is your favorite food?", "My favorite food is hamburgers."]], she: false, facts: "Hi! I'm Tom. I like Minecraft. I play basketball. My favorite animal is the dog.",
     report: [
       { s: 'Tom ___ Minecraft.', a: ['likes', 'like', 'liking'] },
       { s: 'Tom ___ basketball.', a: ['plays', 'play', 'playing'] },
       { s: '___ Tom like dogs? Yes, he does.', a: ['Does', 'Do', 'Is'] },
     ] },
-  { name: 'Sara', she: true, facts: "Hi! I'm Sara. I like music. I play tennis. My favorite color is pink.",
+  { name: 'Sara', qs: [["Do you like music?", "Yes, I do! I love pop music."], ["Do you play basketball?", "No, I don't. I play tennis."], ["What is your favorite animal?", "My favorite animal is the rabbit."]], she: true, facts: "Hi! I'm Sara. I like music. I play tennis. My favorite color is pink.",
     report: [
       { s: 'Sara ___ music.', a: ['likes', 'like', 'liking'] },
       { s: 'Sara ___ tennis.', a: ['plays', 'play', 'playing'] },
       { s: "Sara's favorite color ___ pink.", a: ['is', 'are', 'do'] },
     ] },
-  { name: 'Ben', she: false, facts: "Hi! I'm Ben. I like reggaeton. I play video games. My favorite subject is math.",
+  { name: 'Ben', qs: [["Do you like math?", "Yes, I do! Math is my favorite subject."], ["Do you play soccer?", "No, I don't. I play video games."], ["What is your favorite food?", "My favorite food is arepas."]], she: false, facts: "Hi! I'm Ben. I like reggaeton. I play video games. My favorite subject is math.",
     report: [
       { s: 'Ben ___ reggaeton.', a: ['likes', 'like', 'liking'] },
       { s: 'Ben ___ video games.', a: ['plays', 'play', 'playing'] },
       { s: "Ben's favorite subject ___ math.", a: ['is', 'are', 'does'] },
     ] },
-  { name: 'Ana', she: true, facts: "Hi! I'm Ana. I like horses. I play volleyball. My favorite food is chicken.",
+  { name: 'Ana', qs: [["Do you like horses?", "Yes, I do! I love horses."], ["Do you play volleyball?", "Yes, I do! I play on Saturdays."], ["What is your favorite color?", "My favorite color is red."]], she: true, facts: "Hi! I'm Ana. I like horses. I play volleyball. My favorite food is chicken.",
     report: [
       { s: 'Ana ___ horses.', a: ['likes', 'like', 'liking'] },
       { s: 'Ana ___ volleyball.', a: ['plays', 'play', 'playing'] },
@@ -114,25 +114,25 @@ const ROUTINE = [
 
 // ---------- S6 · Your Day vs My Day (interview cards) ----------
 const NEIGHBORS = [
-  { name: 'Pablo', she: false, facts: 'I wake up at six. I go to school by bus. After school, I play soccer.',
+  { name: 'Pablo', qs: [["What time do you wake up?", "I wake up at six."], ["How do you go to school?", "I go to school by bus."], ["What do you do after school?", "I play soccer."]], she: false, facts: 'I wake up at six. I go to school by bus. After school, I play soccer.',
     report: [
       { s: 'Pablo ___ up at six.', a: ['wakes', 'wake', 'waking'] },
       { s: 'Pablo ___ to school by bus.', a: ['goes', 'go', 'going'] },
       { s: 'After school, Pablo ___ soccer.', a: ['plays', 'play', 'playing'] },
     ] },
-  { name: 'Emma', she: true, facts: 'I wake up at seven. I eat cereal for breakfast. I go to bed at nine.',
+  { name: 'Emma', qs: [["What time do you wake up?", "I wake up at seven."], ["What do you eat for breakfast?", "I eat cereal."], ["What time do you go to bed?", "I go to bed at nine."]], she: true, facts: 'I wake up at seven. I eat cereal for breakfast. I go to bed at nine.',
     report: [
       { s: 'Emma ___ up at seven.', a: ['wakes', 'wake', 'waking'] },
       { s: 'Emma ___ cereal for breakfast.', a: ['eats', 'eat', 'eating'] },
       { s: 'Emma ___ to bed at nine.', a: ['goes', 'go', 'going'] },
     ] },
-  { name: 'Sam', she: false, facts: 'I wake up at half past six. I walk to school. After school, I do my homework.',
+  { name: 'Sam', qs: [["What time do you wake up?", "I wake up at half past six."], ["How do you go to school?", "I walk to school."], ["What do you do after school?", "I do my homework."]], she: false, facts: 'I wake up at half past six. I walk to school. After school, I do my homework.',
     report: [
       { s: 'Sam ___ to school.', a: ['walks', 'walk', 'walking'] },
       { s: 'After school, Sam ___ his homework.', a: ['does', 'do', 'doing'] },
       { s: "Sam ___ go to school by car.", a: ["doesn't", "don't", "isn't"] },
     ] },
-  { name: 'Lucy', she: true, facts: 'I wake up at eight. I take a shower in the morning. I watch TV after school.',
+  { name: 'Lucy', qs: [["What time do you wake up?", "I wake up at eight."], ["When do you take a shower?", "I take a shower in the morning."], ["What do you do after school?", "I watch TV."]], she: true, facts: 'I wake up at eight. I take a shower in the morning. I watch TV after school.',
     report: [
       { s: 'Lucy ___ a shower in the morning.', a: ['takes', 'take', 'taking'] },
       { s: 'Lucy ___ TV after school.', a: ['watches', 'watch', 'watching'] },
@@ -172,7 +172,7 @@ const WORLDS = [
     quests: [
       { type: 'stations', name: 'Presentation Stations', short: 'Stations', title: 'Presentation Stations', items: STATIONS },
       { type: 'interview', name: 'Meet 3 new friends', short: 'Friends', people: () => pick(FRIENDS, 3),
-        ask: 'Ask {name}: <b>Do you like</b> ...? <b>Do you play</b> ...? <b>What is your favorite</b> ...?' },
+        asks: 2 },
       { type: 'stones', name: 'Question Stones', short: 'Questions', title: 'Question Stones', bank: QUESTION_Q, count: 4 },
       { type: 'stones', name: 'Report Stones', short: 'He / She likes', title: 'Report Stones', count: 3,
         bank: (met) => (met.length ? met : pick(FRIENDS, 3)).map((p) => pick(p.report, 1)[0]) },
@@ -208,7 +208,7 @@ const WORLDS = [
     quests: [
       { type: 'ladder', name: 'My Day Track', short: 'My Day', sign: 'MY DAY TRACK', steps: ROUTINE },
       { type: 'interview', name: 'Your Day: meet 3 neighbors', short: 'Neighbors', people: () => pick(NEIGHBORS, 3),
-        ask: 'Ask {name}: <b>What time do you wake up?</b> <b>How do you go to school?</b>' },
+        asks: 2 },
       { type: 'zones', name: 'I or He / She?', short: 'I / He', labels: ['I', 'HE / SHE'], subs: ['MY DAY', 'YOUR DAY'], bank: I_OR_HE, count: 4 },
       { type: 'stones', name: 'He Wakes Up!', short: 'He wakes up', title: 'He Wakes Up!', count: 4,
         bank: (met) => [...(met.length ? met : pick(NEIGHBORS, 2)).slice(0, 2).map((p) => pick(p.report, 1)[0]), ...pick(THIRD_PERSON_Q, 2)] },

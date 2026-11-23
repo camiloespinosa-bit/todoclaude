@@ -148,6 +148,9 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 
 /* ---------- v3 HUD ---------- */
 .pack { flex-direction: row; }
+.cambtn { position: absolute; top: calc(2.6vh + 2.6em); right: 2.4vw; display: flex; align-items: center; gap: .4em; padding: .35em .8em; font-weight: 700; color: var(--deep); font-size: var(--fs); }
+.cambtn svg { width: 1.2em; height: 1.2em; }
+.cambtn .key { font-size: .75em; }
 .crys { display: flex; align-items: center; gap: .35em; font-weight: 800; color: #00897B; margin-right: .3em; }
 .gem { display: inline-block; width: .8em; height: .8em; background: linear-gradient(135deg, #A7FFEB, #00BFA5); transform: rotate(45deg); border-radius: 3px; box-shadow: 0 0 10px rgba(0,191,165,.6); vertical-align: middle; }
 .big-gem { width: .6em; height: .6em; margin-right: .2em; }
@@ -162,6 +165,11 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 .task .opt b { background: var(--deep); color: #fff; border-radius: 50%; width: 1.4em; height: 1.4em; display: inline-grid; place-items: center; font-size: .8em; }
 .task .ask { display: inline-block; background: #FFF8E1; border-radius: 16px; padding: .2em .7em; font-weight: 600; }
 .task .ask b { color: var(--world-ink, var(--world)); filter: brightness(.85); }
+.task .qbtn { pointer-events: auto; cursor: pointer; border: 2px solid transparent; font: inherit; font-weight: 700; color: var(--dark); font-size: var(--fs); }
+.task .qbtn:hover { border-color: var(--world-ink, var(--world)); }
+.task .s .who { color: var(--world-ink, var(--world)); filter: brightness(.8); }
+.task .s .mic { font-size: .9em; margin-right: .2em; }
+.task .s { color: var(--deep); }
 .task .say { display: inline-grid; place-items: center; background: var(--orange); color: #fff; border-radius: 50%; width: 1.6em; height: 1.6em; font-weight: 800; margin-left: .3em; }
 .clues { position: absolute; left: 2.4vw; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 1vh; align-items: flex-start; }
 .clues .lab { background: var(--deep); color: #fff; font-weight: 700; padding: .1em .7em; border-radius: 999px; }
@@ -313,6 +321,7 @@ body.teacher #btn-teacher { display: inline-flex; }
       <div class="card quests" id="h-quests"></div>
     </div>
     <div class="card pack"><div class="crys"><span class="gem"></span><span id="h-crys">0/0</span></div><div class="slots" id="h-slots"><div class="slot"></div><div class="slot"></div><div class="slot"></div></div></div>
+    <button class="card cambtn" id="btn-cam" type="button" title="Camera (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="cam-name">Normal</span><span class="key">C</span></button>
     <div class="hint" id="h-hint"></div>
     <div class="card task" id="h-task">
       <div class="lab" id="h-tlab"></div>
@@ -389,6 +398,7 @@ body.teacher #btn-teacher { display: inline-flex; }
       <h3>Traveler</h3>
       <span><span class="key">←</span><span class="key">↑</span><span class="key">↓</span><span class="key">→</span> or <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></span><span>move</span>
       <span><span class="key">SPACE</span></span><span>jump</span>
+      <span><span class="key">C</span></span><span>change the camera</span>
       <h3>Teacher</h3>
       <span><span class="key">1</span><span class="key">2</span><span class="key">3</span> <span class="key">0</span></span><span>stars on the stage</span>
       <span><span class="key">ENTER</span></span><span>end the talk</span>

@@ -72,7 +72,9 @@ async function openPage(query = '', online = false, base = URL0, viewport = { wi
   page.on('request', (r) => { const u = r.url(); if (!/^(file|data|blob):/.test(u) && !u.startsWith('http://127.0.0.1:18080/')) external.push(u); });
   if (online) await installFakeDb(page);
   await page.goto(base + query);
-  await page.waitForFunction(() => window.__TTS && window.__TTS.S);
+  const t0 = Date.now();
+  await page.waitForFunction(() => window.__TTS && window.__TTS.S, null, { timeout: 120000 });
+  if (Date.now() - t0 > 8000) console.log('slow page load', Date.now() - t0, query.slice(0, 30));
   await wait(1500);
   return { ctx, page, errors, external };
 }
@@ -86,7 +88,7 @@ const wrong = (page) => page.evaluate(() => window.__TTS.wrong());
 async function playAll(page, { shots = true, stars = 2 } = {}) {
   const seen = new Set();
   const order = [];
-  for (let guard = 0; guard < 400; guard++) {
+  for (let guard = 0; guard < 1000; guard++) {
     const s = await S(page);
     if (s.mode === 'finale') break;
     if (s.mode === 'warp' || s.mode === 'title' || s.mode === 'brief') { await wait(500); continue; }
@@ -111,7 +113,14 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
         if (w) { await tpTo(page, w); await wait(600); if (shots) await page.screenshot({ path: join(OUT, `w${s.wi}_q${s.q}_${q.type}_wrong.png`) }); await wait(900); continue; }
       }
     }
-    if (q.phase === 'say' || q.phase === 'ask') {
+    if (q.type === 'interview' && q.phase === 'choose') {
+      await wait(500);
+      if (shots && !seen.has(key + 'choose')) { seen.add(key + 'choose'); await page.screenshot({ path: join(OUT, `w${s.wi}_q${s.q}_${q.type}_choose.png`) }); }
+      await page.keyboard.press('1');
+      await wait(500);
+      continue;
+    }
+    if (['say', 'ask', 'listen', 'answer'].includes(q.phase)) {
       await wait(600);
       if (shots && !seen.has(key + 'say')) { seen.add(key + 'say'); await page.screenshot({ path: join(OUT, `w${s.wi}_q${s.q}_${q.type}_say.png`) }); }
       await page.keyboard.press('Enter');
@@ -149,6 +158,7 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   const csv = readFileSync(csvPath, 'utf8');
   console.log(csv);
   check('CSV rows for all challenges', (csv.match(/^Jerónimo,/gm) || []).length >= 15);
+  check('CSV records the questions the kid chose', /\?/.test(csv.split('\n').filter((l) => /friends|neighbors/i.test(l)).join(' ')), csv.split('\n').filter((l) => /friends/i.test(l)).join(' | ').slice(0, 200));
   check('Report stones used met friends', /Report Stones|He Wakes Up/.test(csv));
   check('No console errors (offline)', errors.length === 0, errors.slice(0, 5).join(' | '));
   {
@@ -230,7 +240,7 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   const q1 = await Qs(kid2.page);
   check('Remote "skip" reaches Luciana', q0 && q1 && (q1.type !== q0.type || q1.done), `${q0 && q0.type} -> ${q1 && q1.type}`);
   let gave = false;
-  for (let guard = 0; guard < 400; guard++) {
+  for (let guard = 0; guard < 1000; guard++) {
     const s = await S(kid1.page);
     if (s.mode === 'finale') break;
     if (s.mode === 'talk' && !gave) {
@@ -244,7 +254,8 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
     if (s.mode !== 'play') { await wait(400); continue; }
     const q = await Qs(kid1.page);
     if (!q || !q.started || q.done) { await wait(300); continue; }
-    if (q.phase === 'say' || q.phase === 'ask') { await kid1.page.keyboard.press('Enter'); await wait(600); continue; }
+    if (q.type === 'interview' && q.phase === 'choose') { await kid1.page.keyboard.press('1'); await wait(500); continue; }
+    if (['say', 'ask', 'listen', 'answer'].includes(q.phase)) { await kid1.page.keyboard.press('Enter'); await wait(600); continue; }
     if (!q.ready && ['stones', 'zones', 'stations', 'interview', 'opinion'].includes(q.type)) { await wait(300); continue; }
     const a = await answer(kid1.page);
     if (a) await tpTo(kid1.page, a);

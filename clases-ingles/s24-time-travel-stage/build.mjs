@@ -19,6 +19,7 @@ const targets = [
   { entry: 'src/games/b4.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html', title: 'The Time Travel Stage', site: 'time-travel.html' },
   { entry: 'src/games/b1.js', template: 'src/game.html', out: 'Bloque1_MeTown.html', title: 'Me Town', site: 'me-town.html' },
   { entry: 'src/main.js', template: 'src/template.html', out: 'S24_TimeTravelStage_v1.html' },
+  { entry: 'src/admin.js', template: 'src/admin.html', out: 'Panel_Profe.html', site: 'profe.html', noArtifact: true },
 ];
 
 for (const t of targets) {
@@ -43,6 +44,10 @@ for (const t of targets) {
     const siteDir = join(here, '..', '..', 'juegos');
     mkdirSync(siteDir, { recursive: true });
     writeFileSync(join(siteDir, t.site), html);
+  }
+  if (t.noArtifact) {
+    console.log(`Wrote ${t.out} (${(statSync(out).size / 1024).toFixed(0)} KB)`);
+    continue;
   }
   // claude.ai artifact version: the platform adds its own <html>/<head>/<body> skeleton.
   const art = html

@@ -11,18 +11,21 @@ Mismo motor y mismas mecánicas en todos los bloques (caminar, saltar, pisar la 
 | 5 · I Am Ready | (pendiente) | |
 
 ## Bloque 1 · Me Town
-- **HELLO PARK:** Presentation Stations (S1), Meet 3 new friends (S2), Question Stones (do/does), Report Stones (he likes / she plays).
+- **HELLO PARK:** Presentation Stations (S1), Meet 3 new friends (S2: escucha al amigo, escoge 2 preguntas, las dice en voz alta y oye la respuesta), Question Stones (do/does), Report Stones (he likes / she plays).
 - **DESCRIBE IT TOWN:** Opposites Run con objetos 3D (S3), Describe Stones, I Like It Because... (S7).
 - **MY DAY STREET:** My Day Track (S5), Your Day: meet 3 neighbors (S6), I or He / She?, He Wakes Up! (tercera persona, do/does/don't/doesn't), My 1-Minute Show (S8).
 
-## Modo en línea (los dos niños a la vez + vista del profe)
-La página web está cerrada: sin código de clase nadie puede jugar.
-1. Profe: abre el enlace privado del profe (`me-town.html?profe=CLAVE`) o escribe la clave en la casilla "Class code" y pulsa Go. La clave no está en el repositorio; el navegador la recuerda. Pulsa `T`, luego "Nuevo código". Sale un código de 4 letras y el enlace para los niños.
-2. Niños: abren el enlace (o escriben el código y pulsan Go). El código solo funciona mientras la vista del profe está abierta (y hasta 12 horas después).
-3. En la vista del profe ves en qué reto va cada uno, aciertos y errores, y puedes dar estrellas, terminar la charla, pausar o saltar un reto.
-4. "Descargar CSV" junta los resultados de las partidas terminadas.
+## Panel del profe y modo en línea
+La página web está cerrada: sin enlace o código de clase nadie puede jugar.
+1. Profe: abre `gimnasiodelcerebro.co/juegos/profe.html` y entra con la clave del profe (no está en el repositorio; el dispositivo la recuerda).
+2. "Crear código": eliges el juego y cuánto tiempo vale (1 día, 1 semana, 1 mes, 3 meses). Sale el código de 4 letras y el enlace para los niños, con botones para copiar o enviar por WhatsApp.
+3. El enlace lleva una firma del profe: abre el juego directo y funciona aunque el panel esté cerrado, hasta la fecha elegida. Si alguien cambia el código o la fecha del enlace, deja de funcionar.
+4. "Ver en vivo" abre la vista del profe de esa clase: en qué reto va cada niño, aciertos y errores, estrellas, terminar la charla, pausar o saltar un reto, y el CSV.
 
-Privacidad: los mensajes van cifrados con el código de clase y sin nombres (p0 / p1). El candado es del lado del navegador: frena a cualquier visitante, pero no es un login de servidor.
+Privacidad: los mensajes van cifrados con el código de clase y sin nombres (p0 / p1). La llave para firmar enlaces está cifrada con la clave del profe. El candado vive en el navegador: frena a cualquier visitante, pero no es un login de servidor.
+
+## Cámaras
+Tecla `C` o el botón de la cámara: Normal, Aerial (desde arriba), Side (lateral) y Close (cerca). Las flechas siempre siguen la pantalla.
 
 Sin internet, el archivo HTML funciona igual con doble clic (sin la vista del profe).
 

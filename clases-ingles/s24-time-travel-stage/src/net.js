@@ -7,6 +7,8 @@
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
+// Public by design: only used for the live broadcast channel (same project as /reservas).
+export const SAGA_SUPABASE = { url: 'https://xpqjejiezbxaxsdodkyb.supabase.co', key: 'sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd' };
 export const PUBLIC_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
 
 // ---------- crypto helpers ----------

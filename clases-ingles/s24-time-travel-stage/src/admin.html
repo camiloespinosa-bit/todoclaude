@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<script>if(location.protocol==='http:'&&!/^(localhost|127\.|\[::1\])/.test(location.hostname))location.replace('https:'+location.href.slice(5));</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Panel del profe</title>
+<style>
+/*FONTS*/
+:root { --bg: #F0F4F8; --card: #fff; --ink: #1D3F54; --muted: #546E7A; --turq: #57A6B5; --orange: #F57C00; --green: #7CB342; --red: #C62828; --line: #DCE5EC; --soft: #F6F9FB; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; font-size: 16px; line-height: 1.45; }
+main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.15; }
+h1 small { display: block; font-size: .95rem; font-weight: 600; color: var(--turq); letter-spacing: .02em; }
+h2 { margin: 0 0 12px; font-size: 1.2rem; }
+section { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 6px 20px rgba(29,63,84,.10); }
+label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 4px; }
+input, select { width: 100%; font: inherit; color: var(--ink); background: var(--soft); border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+input:focus, select:focus { outline: none; border-color: var(--turq); }
+.row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+.row3 { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; margin-top: 12px; }
+@media (max-width: 600px) { .row, .row3 { grid-template-columns: 1fr; } }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: inherit; font-weight: 700; font-size: .95rem; border: 0; border-radius: 12px; padding: 10px 16px; background: var(--soft); color: var(--ink); text-decoration: none; cursor: pointer; border: 2px solid var(--line); }
+.btn:hover { border-color: var(--turq); }
+.btn.main { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn.big { padding: 12px 22px; font-size: 1.05rem; background: var(--orange); border-color: var(--orange); color: #fff; }
+.btn.ghost { background: transparent; color: var(--muted); }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 500; margin: 10px 0 14px; }
+.check input { width: auto; }
+.msg { min-height: 1.4em; margin: 10px 0 0; color: var(--muted); }
+.msg.bad { color: var(--red); font-weight: 600; }
+#login { max-width: 440px; }
+.code { border: 2px solid var(--line); border-radius: 16px; padding: 14px 16px; margin-top: 12px; }
+.code.fresh { border-color: var(--orange); animation: pop .5s ease-out; }
+@keyframes pop { from { transform: scale(.98); opacity: .4; } to { transform: none; opacity: 1; } }
+.code.old { opacity: .55; }
+.ch { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.cc { font-size: 1.8rem; letter-spacing: .12em; margin-right: 10px; }
+.cg { font-weight: 700; color: var(--turq); margin-right: 10px; }
+.cn { color: var(--muted); }
+.cv { font-size: .9rem; color: var(--muted); font-weight: 600; }
+.cl { font-size: .85rem; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 8px 10px; margin: 10px 0; overflow-wrap: anywhere; user-select: all; }
+.cb { display: flex; gap: 8px; flex-wrap: wrap; }
+.empty { color: var(--muted); margin: 8px 0 0; }
+.games { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+a.game { display: flex; flex-direction: column; gap: 2px; background: var(--soft); border-radius: 14px; padding: 14px 16px; text-decoration: none; color: var(--ink); font-weight: 700; border: 2px solid var(--line); }
+a.game:hover { border-color: var(--turq); }
+a.game span { font-weight: 500; font-size: .9rem; color: var(--muted); }
+.note { font-size: .9rem; color: var(--muted); margin: 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1><small>Gimnasio del Cerebro · Juegos de inglés</small>Panel del profe</h1>
+    <button class="btn ghost" id="logout" type="button">Salir</button>
+  </header>
+
+  <section id="login" hidden>
+    <h2>Entrar</h2>
+    <form id="lg-form" autocomplete="off">
+      <label for="lg-key">Clave del profe</label>
+      <input id="lg-key" type="password" spellcheck="false" autocapitalize="characters">
+      <label class="check"><input type="checkbox" id="lg-rem" checked> Recordarme en este dispositivo</label>
+      <button class="btn main" type="submit">Entrar</button>
+      <p class="msg" id="lg-msg">Cargando...</p>
+    </form>
+  </section>
+
+  <div id="panel" hidden>
+    <section>
+      <h2>Crear un código</h2>
+      <form id="cr-form">
+        <div class="row">
+          <div><label for="cr-game">Juego</label><select id="cr-game"></select></div>
+          <div><label for="cr-days">Válido por</label><select id="cr-days"></select></div>
+        </div>
+        <div class="row3">
+          <div><label for="cr-note">Para quién (opcional, solo lo ves tú)</label><input id="cr-note" maxlength="60" placeholder="Ej.: Jero y Luciana"></div>
+          <button class="btn big" type="submit">Crear código</button>
+        </div>
+      </form>
+      <p class="note" style="margin-top:12px">El enlace abre el juego directo, sin escribir nada. El código de 4 letras también se puede escribir a mano en el juego.</p>
+    </section>
+
+    <section style="margin-top:20px">
+      <h2>Mis códigos</h2>
+      <div id="list"></div>
+    </section>
+
+    <section style="margin-top:20px">
+      <h2>Juegos</h2>
+      <div class="games" id="games"></div>
+    </section>
+  </div>
+</main>
+<script>
+/*BUNDLE*/
+</script>
+</body>
+</html>
