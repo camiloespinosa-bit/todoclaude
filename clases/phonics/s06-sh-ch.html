@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Phonics · Sesión 6 · Digraphs sh y ch</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#145389;--azulOscuro:#2C5F7C;--deep:#1D3F54;--verde:#7CB342;--naranja:#F57C00;--fondo:#F0F4F8;--tqL:#EAF4F6;--vdL:#F1F8E9;--naL:#FFF3E0;--ink:#1E2A33;--muted:#6B7C88;--line:#D9E1E7}
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:Letter;margin:0}
+body{font-family:'Poppins',sans-serif;color:var(--ink);background:#ccc;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:8.5in;height:11in;background:#fff;margin:0 auto 8mm;position:relative;overflow:hidden;page-break-after:always;padding:15mm 16mm 12mm 21mm;display:flex;flex-direction:column;gap:3.6mm;font-size:9.4pt;line-height:1.45}
+.page:last-child{page-break-after:avoid}
+@media print{body{background:#fff}.page{margin:0;box-shadow:none}}
+.stripe{position:absolute;left:0;top:0;bottom:0;width:6mm;background:linear-gradient(to bottom,var(--azul) 0 60%,var(--verde) 60% 80%,var(--naranja) 80% 100%)}
+.top{display:flex;align-items:center;justify-content:space-between;border-bottom:.7mm solid var(--azul);padding-bottom:2.2mm}
+.brand{display:flex;align-items:center;gap:3mm;font-weight:900;font-size:11pt;color:var(--azulOscuro);letter-spacing:.02em}
+.brand img{height:12mm}
+.top .sec{font-size:8pt;color:var(--muted)}
+.foot{margin-top:auto;display:flex;justify-content:space-between;font-size:7pt;color:var(--muted)}
+h1{font-size:21pt;font-weight:800;color:var(--azulOscuro);line-height:1.15;margin-top:1mm}
+.kicker{font-size:8pt;font-weight:700;color:var(--naranja);letter-spacing:.1em;text-transform:uppercase;margin-top:-1.5mm}
+.note{font-size:8pt;color:var(--muted)}
+.call{border-left:1.2mm solid var(--azul);background:var(--tqL);border-radius:0 2.5mm 2.5mm 0;padding:3mm 4mm;font-size:9.4pt}
+.call.or{border-color:var(--naranja);background:var(--naL)}
+.call.vd{border-color:var(--verde);background:var(--vdL)}
+.call b{color:var(--deep)}
+.call ul{padding-left:4.5mm;margin-top:1mm}
+h2{font-size:12pt;font-weight:700;color:var(--azulOscuro);display:flex;align-items:center;gap:2.5mm}
+h2::before{content:"";width:1.6mm;height:5mm;border-radius:1mm;background:var(--azul)}
+.tbl{border:1px solid var(--line);border-radius:2.5mm;overflow:hidden;flex:none}
+.tbl table{width:100%;border-collapse:collapse;font-size:8.6pt}
+.tbl th{background:var(--azulOscuro);color:#fff;text-align:left;font-weight:600;padding:2mm 3mm}
+.tbl td{padding:1.8mm 3mm;vertical-align:top;border-top:1px solid var(--line)}
+.tbl tr:nth-child(even) td{background:var(--fondo)}
+.tbl td.m{font-weight:700;color:var(--azulOscuro);white-space:nowrap;width:15mm}
+.tbl td.n{font-weight:700;color:var(--azulOscuro);width:30mm}
+.tbl td.c{text-align:center}
+.say{font-style:italic;color:#34495a}
+.cb{display:inline-block;width:3.6mm;height:3.6mm;border:1.4px solid var(--azulOscuro);border-radius:.8mm;vertical-align:-.6mm;margin:0 1mm}
+.ln{display:inline-block;border-bottom:1px solid #8a9aa6;min-width:18mm}
+.lines{background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 7.6mm,#b9c5ce 7.6mm,#b9c5ce 7.9mm)}
+.cutnote{font-size:7.6pt;color:var(--muted)}
+.cutgrid{display:grid;border:1px dashed #c3ccd3}
+.cut{border:1px dashed #c3ccd3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4mm;gap:2mm}
+.tag{font-size:8pt;font-weight:700;color:var(--naranja);letter-spacing:.1em;text-transform:uppercase}
+.secret{align-self:flex-start;background:var(--naranja);color:#fff;font-size:7.5pt;font-weight:800;letter-spacing:.1em;padding:1mm 3mm;border-radius:1.5mm}
+.mission{border:.9mm solid var(--azul);border-radius:5mm;padding:6mm 7mm;position:relative}
+.mission h3{font-size:19pt;font-weight:800;color:var(--azulOscuro);margin:1mm 0 3mm}
+.mission p{margin-bottom:2mm}
+.mission ul{padding-left:5mm;margin-top:1mm}
+.mission img{position:absolute;right:6mm;top:5mm;height:30mm}
+.sig{font-size:7.5pt;color:var(--muted);margin-top:2mm}
+.titlerow{display:flex;justify-content:space-between;align-items:flex-end;gap:4mm}
+.titlerow img{height:30mm;flex:none}
+
+/* Session-specific */
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:2mm 8mm;font-size:15pt;font-weight:700;color:var(--azulOscuro)}
+.pairs div{display:flex;align-items:center;gap:3mm}
+.pairs .ar{color:var(--verde);font-size:12pt}
+.pairs .add{background:var(--naL);color:var(--naranja);border-radius:1.5mm;padding:0 1mm}
+.boxes{display:flex;gap:5mm;justify-content:center}
+.sbox{width:38mm;height:52mm;border:1.2mm solid var(--azulOscuro);border-radius:5mm;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4mm}
+.sbox.end{border-color:var(--naranja);border-style:dashed}
+.sdot{width:7mm;height:7mm;border-radius:50%;background:var(--naranja)}
+.big{font-size:40pt;font-weight:800;color:var(--deep);text-align:center;line-height:1.1}
+.word{font-size:34pt;font-weight:800;color:var(--azulOscuro)}
+.bingo{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);border:.9mm solid var(--azul);border-radius:4mm;overflow:hidden;flex:1}
+.bingo div{border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:30pt;font-weight:800;color:var(--azulOscuro)}
+.bhead{display:flex;justify-content:space-between;align-items:center;background:var(--azulOscuro);color:#fff;border-radius:3mm;padding:2mm 4mm;font-weight:700}
+.bhead span:last-child{color:#FDD835}
+.check{display:grid;grid-template-columns:1fr 1fr;gap:3mm 12mm}
+.check div{font-size:36pt;font-weight:800;color:var(--deep);border-bottom:1px solid var(--line);padding:0 0 1mm 2mm}
+.check small{font-size:10pt;color:var(--azul);font-weight:700;margin-right:4mm;vertical-align:middle}
+.alien{background:var(--vdL);border-radius:3mm;padding:3mm 5mm;display:flex;align-items:center;gap:6mm}
+.alien .w{font-size:36pt;font-weight:800;color:var(--deep);flex:1;text-align:center}
+.draw{flex:1;border:.9mm solid var(--azulOscuro);border-radius:4mm;position:relative}
+.draw span{position:absolute;top:2mm;left:4mm;font-size:9pt;color:var(--azul);font-weight:600}
+.sentence{font-size:30pt;font-weight:800;color:var(--azulOscuro);text-align:center}
+.tricky{background:var(--naL);color:var(--naranja);border-radius:2mm;padding:0 2mm}
+.taps{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;text-align:center;font-size:8.6pt}
+.taps div{background:var(--fondo);border-radius:2.5mm;padding:2mm}
+.taps b{display:block;font-size:11pt;color:var(--azulOscuro)}
+.tbl.compact td{padding:1.2mm 3mm}
+.sbox.start{border-color:var(--naranja);border-style:dashed}
+.chainw{display:flex;flex-wrap:wrap;gap:2mm 3mm;align-items:center;font-size:17pt;font-weight:700;color:var(--azulOscuro)}
+.chainw .ar{color:var(--verde);font-size:12pt}
+.chg{background:var(--naL);color:var(--naranja);border-radius:1.5mm;padding:0 1mm}
+.act{font-size:40pt;font-weight:800;color:var(--azulOscuro)}
+.mem{font-size:26pt;font-weight:800;color:var(--azulOscuro)}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}
+.trio div{border-radius:2.5mm;padding:2.5mm 3mm;font-size:8.8pt}
+.trio b{display:block;font-size:10.5pt;color:var(--deep)}
+.sbox5{width:30mm;height:46mm;border:1.1mm solid var(--azulOscuro);border-radius:4mm;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4mm}
+.sbox5.new{border-color:var(--naranja);border-style:dashed}
+.ladder{display:grid;grid-template-columns:1fr 1fr;gap:2mm 8mm;font-size:14pt;font-weight:700;color:var(--azulOscuro)}
+.ladder div{display:flex;align-items:center;gap:2.5mm}
+.ladder .ar{color:var(--verde);font-size:11pt}
+.ladder .chg{padding:0 .3mm}
+.trays{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;flex:1}
+.tray{border:.9mm solid var(--azulOscuro);border-radius:4mm;display:flex;flex-direction:column;overflow:hidden}
+.tray .th{background:var(--azulOscuro);color:#fff;text-align:center;padding:3mm 0}
+.tray .th b{display:block;font-size:30pt;color:#FDD835;line-height:1}
+.tray .dots{display:flex;gap:2mm;justify-content:center;margin-top:2mm}
+.tray .dots i{width:4mm;height:4mm;border-radius:50%;background:var(--naranja);display:block}
+.sort{font-size:26pt;font-weight:800;color:var(--azulOscuro)}
+.dg{font-size:96pt;font-weight:900;line-height:1}
+.dgcap{font-size:10pt;font-weight:700;color:var(--azulOscuro)}
+.sbox3{width:40mm;height:44mm;border:1.1mm solid var(--azulOscuro);border-radius:4mm;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4mm}
+.sbox3.dgb{border-color:var(--naranja);border-style:dashed;width:52mm}
+.pairs2{display:grid;grid-template-columns:repeat(3,1fr);gap:2mm 6mm;font-size:15pt;font-weight:700;color:var(--azulOscuro)}
+.sh{color:var(--azul)}.ch{color:var(--naranja)}
+.fish{font-size:28pt;font-weight:800;color:var(--azulOscuro)}
+</style></head><body>
+
+<!-- 1. GUÍA DEL FACILITADOR -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Guía del facilitador</div></div>
+  <h1>Sesión 6 · Dos letras, un sonido: sh y ch</h1>
+  <div class="kicker">Guía del facilitador · 60 minutos · En inglés</div>
+  <div class="call"><b>Objetivo:</b> entender que algunas parejas de letras suenan como un solo sonido (digraphs), y leer y distinguir palabras con <b>sh</b> (ship, fish) y con <b>ch</b> (chip, lunch).</div>
+  <div class="call or"><b>Cuidar el ánimo:</b> después de cinco sesiones de "una letra, un sonido", esto rompe la regla. Preséntalo como un secreto: <span class="say">"Some letters are best friends. When they hold hands, they make one new sound!"</span> La ch ya la conoce del español (chocolate): úsala para que se sienta seguro antes de la sh.</div>
+  <h2>Plan minuto a minuto</h2>
+  <div class="tbl"><table>
+    <tr><th>Min</th><th>Momento</th><th>Qué hacer</th></tr>
+    <tr><td class="m">0 a 5</td><td class="n">Stomp and Clap</td><td>Repaso de la sesión 5: un pisotón por sonido y aplauso con la palabra: stomp, plant, frost, clamp.</td></tr>
+    <tr><td class="m">5 a 10</td><td class="n">Review</td><td>Lee 6 palabras de las sesiones 3 a 5: stamp, frog, nest, clap, plant, milk.</td></tr>
+    <tr><td class="m">10 a 18</td><td class="n">Best Friends</td><td>Presenta las digraph cards (pág. 5) con su gesto. <b>ch</b> primero: brazos de tren, <span class="say">"ch, ch, ch, like a train!"</span> Luego <b>sh</b>: dedo en la boca, <span class="say">"shhh, the baby is sleeping!"</span> Pares para escuchar (pág. 4): ship / chip, shop / chop, shin / chin. Él hace el gesto del sonido que oye.</td></tr>
+    <tr><td class="m">18 a 28</td><td class="n">One Box, Two Letters</td><td>Tableros de la pág. 6. La digraph card ocupa una sola caja. Arma ship, fish, chop, chin, much, shed. Después en 4 cajas: crash, shelf, lunch, bench. <span class="say">"How many letters? Four. How many sounds? Three!"</span></td></tr>
+    <tr><td class="m">28 a 34</td><td class="n">Train or Baby?</td><td>Pausa activa, oral. Di una palabra: si tiene ch, hace el tren por el salón; si tiene sh, se queda quieto con el dedo en la boca. Usa las palabras de la pág. 4.</td></tr>
+    <tr><td class="m">34 a 46</td><td class="n">Oki's Fishing</td><td>Las 16 cartas boca abajo en un "estanque" (pág. 7). Pesca una, la lee y la pone en la cubeta de sh o de ch (pág. 8). Si la lee mal, vuelve al estanque. <span class="say">"Catch a word! Read it! Train or baby?"</span></td></tr>
+    <tr><td class="m">46 a 52</td><td class="n">Quick Check 6</td><td>10 palabras nuevas y 2 alien words (pág. 9), sin ayuda. Anota en la pág. 4.</td></tr>
+    <tr><td class="m">52 a 57</td><td class="n">My Sentences</td><td>Lee y dibuja las dos oraciones (pág. 10). Oki es la tricky word que ya conoce del cuento.</td></tr>
+    <tr><td class="m">57 a 60</td><td class="n">Cierre</td><td>Sticker en su certificado. Entrega la misión para casa (pág. 11) a la familia.</td></tr>
+  </table></div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 2. GUÍA (CONT.) -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Guía del facilitador</div></div>
+  <div class="titlerow">
+    <div>
+      <h1>Antes de empezar</h1>
+      <div class="kicker">Sesión 6 · Requisitos, errores típicos y ajustes</div>
+    </div>
+    <img src="../../assets/img/oki/oki-pensando.svg" alt="Oki">
+  </div>
+  <div class="call"><b>Requisito:</b> 8 o más de 10 en el Quick Check 5. Si las palabras de 5 sonidos todavía le cuestan, esta sesión igual funciona: sh y ch se pueden aprender con palabras cortas. Solo salta crash, shelf, lunch y bench.</div>
+  <h2>Lo que entrena hoy</h2>
+  <div class="tbl"><table>
+    <tr><td class="n">Conciencia fonémica</td><td>Separar un sonido que se escribe con dos letras: ship tiene 4 letras pero 3 sonidos.</td></tr>
+    <tr><td class="n">Discriminación auditiva</td><td>Distinguir sh (largo, suave) de ch (corto, como un golpe).</td></tr>
+    <tr><td class="n">Flexibilidad</td><td>Cambiar la regla de "una letra, un sonido" por "a veces dos letras, un sonido". Es un ejercicio de función ejecutiva, no solo de lectura.</td></tr>
+  </table></div>
+  <h2>Error típico en hispanohablantes</h2>
+  <div class="call"><b>Dice ch cuando es sh:</b> lee "chip" por ship o "fich" por fish. En el español de Colombia casi no existe el sonido sh, así que el cuerpo lo cambia por el más cercano, la ch. Prueba que lo resuelve: <span class="say">"Can you make it long?"</span> La sh se puede estirar (shhhhh); la ch no (ch es un golpe corto). Si puede estirarlo, es sh.</div>
+  <div class="call"><b>Lee las dos letras por separado:</b> dice "s-h-i-p" o "c-h-i-p". Tapa la digraph card con dos dedos juntos: <span class="say">"These two are friends. They say ONE sound."</span></div>
+  <div class="call vd"><b>Si le cuesta:</b>
+    <ul>
+      <li>Haz toda la sesión solo con ch, que ya conoce del español, y deja sh para la próxima.</li>
+      <li>En Oki's Fishing usa solo 8 cartas: 4 de sh y 4 de ch.</li>
+      <li>Antes de leer, que diga el gesto: si ve sh, dedo en la boca; si ve ch, brazos de tren.</li>
+    </ul>
+  </div>
+  <div class="call vd"><b>Si arrasa:</b>
+    <ul>
+      <li>Reto con la sh al final y consonantes dobles: crash, brush, fresh.</li>
+      <li>Avísale lo que viene: th, el sonido que se hace con la lengua afuera, y la palabra "the".</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 3. MATERIALES Y REGISTRO -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Materiales y registro</div></div>
+  <h1>Materiales y registro</h1>
+  <div class="kicker">Sesión 6 · Estudiante: <span class="ln" style="min-width:45mm"></span> · Fecha: <span class="ln" style="min-width:30mm"></span></div>
+  <div class="tbl"><table>
+    <tr><th style="width:9mm"></th><th>Material</th></tr>
+    <tr><td><span class="cb"></span></td><td>Digraph cards sh y ch (en este PDF, pág. 5, recortadas)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Letter cards de las sesiones 1 y 2 (necesitas i, o, u, e, a, p, f, n, d, m, l, b, r, c, t a mano)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Tableros de 3 y 4 cajas (en este PDF, pág. 6)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Cartas de Oki's Fishing, 16 (pág. 7, recortadas) y cubetas sh / ch (pág. 8)</td></tr>
+    <tr><td><span class="cb"></span></td><td>Opcional: una caja o tazón como "estanque" para las cartas</td></tr>
+    <tr><td><span class="cb"></span></td><td>Quick Check 6 (pág. 9), oraciones (pág. 10), lápiz y colores</td></tr>
+    <tr><td><span class="cb"></span></td><td>Certificado con stickers y misión para casa (pág. 11)</td></tr>
+  </table></div>
+  <h2>Registro rápido</h2>
+  <div class="tbl"><table>
+    <tr><th style="width:52mm">Objetivo</th><th>Cómo le fue</th></tr>
+    <tr><td class="n">Ánimo al llegar / al salir</td><td>Llegó: 🙂 <span class="cb"></span> 😐 <span class="cb"></span> 🙁 <span class="cb"></span> &nbsp;&nbsp; Salió: 🙂 <span class="cb"></span> 😐 <span class="cb"></span> 🙁 <span class="cb"></span></td></tr>
+    <tr><td class="n">Distingue sh / ch de oído</td><td>Pares acertados: <span class="ln" style="min-width:12mm"></span> / 6</td></tr>
+    <tr><td class="n">Pone la digraph en una caja</td><td><span class="cb"></span> solo &nbsp; <span class="cb"></span> con ayuda &nbsp; <span class="cb"></span> todavía no</td></tr>
+    <tr><td class="n">Oki's Fishing</td><td>Cartas leídas y en la cubeta correcta: <span class="ln" style="min-width:12mm"></span> / 16</td></tr>
+    <tr><td class="n">Dice ch por sh</td><td><span class="cb"></span> casi nunca &nbsp; <span class="cb"></span> a veces &nbsp; <span class="cb"></span> casi siempre</td></tr>
+    <tr><td class="n">Quick Check 6</td><td>Reales: <span class="ln" style="min-width:12mm"></span> / 10 &nbsp;&nbsp; Alien words: <span class="ln" style="min-width:12mm"></span> / 2</td></tr>
+  </table></div>
+  <div><b>Notas</b> (ánimo, qué funcionó, qué costó):</div>
+  <div class="lines" style="flex:1"></div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 4. SOLO FACILITADOR -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Solo para el facilitador</div></div>
+  <div class="secret">SOLO PARA EL FACILITADOR</div>
+  <h2>Pares para escuchar · Best Friends y Train or Baby?</h2>
+  <div class="pairs2">
+    <div><span class="sh">ship</span> / <span class="ch">chip</span></div>
+    <div><span class="sh">shop</span> / <span class="ch">chop</span></div>
+    <div><span class="sh">shin</span> / <span class="ch">chin</span></div>
+    <div><span class="sh">fish</span> · <span class="sh">dish</span></div>
+    <div><span class="ch">much</span> · <span class="ch">rich</span></div>
+    <div><span class="sh">shut</span> · <span class="ch">chat</span></div>
+  </div>
+  <div class="note">Azul: sh (bebé, dedo en la boca). Naranja: ch (tren). Di los pares en desorden y que haga el gesto.</div>
+  <h2>Quick Check 6 · Registro</h2>
+  <div class="tbl compact"><table>
+    <tr><th style="width:8mm">#</th><th>Palabra</th><th>Digraph</th><th>✓ Lee la palabra</th><th>Cambia sh por ch</th><th>Qué dijo</th></tr>
+    <tr><td>1</td><td class="n">rush</td><td>sh</td><td></td><td></td><td></td></tr>
+    <tr><td>2</td><td class="n">chest</td><td>ch</td><td></td><td></td><td></td></tr>
+    <tr><td>3</td><td class="n">cash</td><td>sh</td><td></td><td></td><td></td></tr>
+    <tr><td>4</td><td class="n">chug</td><td>ch</td><td></td><td></td><td></td></tr>
+    <tr><td>5</td><td class="n">shift</td><td>sh</td><td></td><td></td><td></td></tr>
+    <tr><td>6</td><td class="n">punch</td><td>ch</td><td></td><td></td><td></td></tr>
+    <tr><td>7</td><td class="n">chimp</td><td>ch</td><td></td><td></td><td></td></tr>
+    <tr><td>8</td><td class="n">brush</td><td>sh</td><td></td><td></td><td></td></tr>
+    <tr><td>9</td><td class="n">shot</td><td>sh</td><td></td><td></td><td></td></tr>
+    <tr><td>10</td><td class="n">flash</td><td>sh</td><td></td><td></td><td></td></tr>
+    <tr><td colspan="3"><b>Total palabras reales</b></td><td><b>___ / 10</b></td><td><b>___ / 6</b></td><td></td></tr>
+    <tr><td>11</td><td class="n">shom</td><td>sh</td><td></td><td></td><td></td></tr>
+    <tr><td>12</td><td class="n">chep</td><td>ch</td><td></td><td></td><td></td></tr>
+  </table></div>
+  <div class="call"><b>Cómo leer el resultado:</b>
+    <ul>
+      <li><b>8 a 10 y al menos 1 alien word:</b> pasa a la sesión 7: th, ck y la palabra "the".</li>
+      <li><b>8 a 10 pero cambia sh por ch:</b> lee bien pero el sonido sh no está firme. Repite Train or Baby? al inicio de la próxima sesión.</li>
+      <li><b>5 a 7:</b> si los errores son solo en sh, otra sesión de sh antes de seguir. Si también falla ch, revisa que no esté leyendo las dos letras por separado.</li>
+      <li><b>0 a 4:</b> vuelve a palabras sin digraphs unos días más. Está bien.</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 5. DIGRAPH CARDS -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Recortables y tableros</div></div>
+  <div class="cutnote">Digraph cards: dos letras en una sola tarjeta, porque suenan como un solo sonido. Recortar por la línea punteada. Hay dos de cada una.</div>
+  <div class="cutgrid" style="grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);flex:1">
+    <div class="cut"><div class="dg sh">sh</div><div class="dgcap">🤫 shhh... the baby!</div></div>
+    <div class="cut"><div class="dg ch">ch</div><div class="dgcap">🚂 ch, ch, ch... the train!</div></div>
+    <div class="cut"><div class="dg sh">sh</div><div class="dgcap">🤫 shhh... the baby!</div></div>
+    <div class="cut"><div class="dg ch">ch</div><div class="dgcap">🚂 ch, ch, ch... the train!</div></div>
+    <div class="cut" style="grid-column:span 2;flex-direction:row;gap:8mm"><img src="../../assets/img/oki/oki-senalando.svg" style="height:40mm" alt="Oki"><div style="font-size:24pt;font-weight:800;color:var(--azulOscuro);text-align:left">Two letters,<br>one sound!</div></div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 6. BOARDS -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Recortables y tableros</div></div>
+  <h1>One Box, Two Letters</h1>
+  <div class="kicker">La digraph card va en la caja naranja, que es más ancha</div>
+  <div class="note">No se recorta. Arriba para palabras de 3 sonidos (ship, fish, chop, chin, much, shed). Abajo para palabras de 4 sonidos (crash, shelf, lunch, bench). Mueve la caja naranja al lugar donde va la sh o la ch: al inicio o al final.</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">
+    <div>
+      <div class="tag" style="margin-bottom:2mm">3 sounds</div>
+      <div class="boxes" style="gap:4mm">
+        <div class="sbox3 dgb"><div class="sdot"></div></div>
+        <div class="sbox3"><div class="sdot"></div></div>
+        <div class="sbox3"><div class="sdot"></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="tag" style="margin-bottom:2mm">4 sounds</div>
+      <div class="boxes" style="gap:3mm">
+        <div class="sbox3" style="width:32mm"><div class="sdot"></div></div>
+        <div class="sbox3" style="width:32mm"><div class="sdot"></div></div>
+        <div class="sbox3" style="width:32mm"><div class="sdot"></div></div>
+        <div class="sbox3 dgb" style="width:44mm"><div class="sdot"></div></div>
+      </div>
+    </div>
+    <div class="big" style="font-size:24pt">f · i · <span class="sh">sh</span> &nbsp;=&nbsp; 4 letters, 3 sounds!</div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 7. FISHING CARDS -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Recortables y tableros</div></div>
+  <div class="cutnote">Cartas de Oki's Fishing: 8 con sh y 8 con ch, todas del mismo color para que la diferencia la encuentre leyendo. Mejor en cartulina. Recortar por la línea punteada.</div>
+  <div class="cutgrid" style="grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);flex:1">
+    <div class="cut"><div class="fish">fish</div></div>
+    <div class="cut"><div class="fish">chip</div></div>
+    <div class="cut"><div class="fish">shed</div></div>
+    <div class="cut"><div class="fish">much</div></div>
+    <div class="cut"><div class="fish">chin</div></div>
+    <div class="cut"><div class="fish">dish</div></div>
+    <div class="cut"><div class="fish">bench</div></div>
+    <div class="cut"><div class="fish">ship</div></div>
+    <div class="cut"><div class="fish">shut</div></div>
+    <div class="cut"><div class="fish">chop</div></div>
+    <div class="cut"><div class="fish">shelf</div></div>
+    <div class="cut"><div class="fish">rich</div></div>
+    <div class="cut"><div class="fish">lunch</div></div>
+    <div class="cut"><div class="fish">shop</div></div>
+    <div class="cut"><div class="fish">chat</div></div>
+    <div class="cut"><div class="fish">crash</div></div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 8. BUCKETS -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Hoja del estudiante</div></div>
+  <h1>Train or Baby?</h1>
+  <div class="kicker">Catch it · Read it · Put it here</div>
+  <div class="trays" style="grid-template-columns:repeat(2,1fr)">
+    <div class="tray"><div class="th"><b>sh</b>🤫 shhh... the baby</div></div>
+    <div class="tray"><div class="th"><b>ch</b>🚂 ch, ch, ch... the train</div></div>
+  </div>
+  <div class="note">Respuestas: sh: fish, shed, dish, ship, shut, shelf, shop, crash. ch: chip, much, chin, bench, chop, rich, lunch, chat.</div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 9. QUICK CHECK -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Hoja del estudiante</div></div>
+  <div class="titlerow">
+    <div>
+      <h1>Can you read these words?</h1>
+      <div class="kicker">Quick Check 6 · Sin ayuda</div>
+    </div>
+    <img src="../../assets/img/oki/oki-leyendo.svg" alt="Oki">
+  </div>
+  <div class="check" style="flex:1;align-content:center">
+    <div><small>1</small>rush</div><div><small>2</small>chest</div>
+    <div><small>3</small>cash</div><div><small>4</small>chug</div>
+    <div><small>5</small>shift</div><div><small>6</small>punch</div>
+    <div><small>7</small>chimp</div><div><small>8</small>brush</div>
+    <div><small>9</small>shot</div><div><small>10</small>flash</div>
+  </div>
+  <div class="alien">
+    <div style="font-size:11pt;font-weight:800;color:var(--azulOscuro);width:30mm">Alien words!</div>
+    <div class="w"><small style="font-size:10pt;color:var(--azul);margin-right:4mm">11</small>shom</div>
+    <div class="w"><small style="font-size:10pt;color:var(--azul);margin-right:4mm">12</small>chep</div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 10. SENTENCES -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Hoja del estudiante</div></div>
+  <div class="titlerow">
+    <div>
+      <h1>My Sentences</h1>
+      <div class="kicker">Lee la oración y dibújala</div>
+    </div>
+    <img src="../../assets/img/oki/oki-celebrando.svg" alt="Oki">
+  </div>
+  <div class="sentence">Fred can hop on a ship.</div>
+  <div class="draw"><span>Draw it!</span></div>
+  <div class="sentence">Oki had a chip on a dish.</div>
+  <div class="draw"><span>Draw it!</span></div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+<!-- 11. MISIÓN PARA CASA -->
+<div class="page"><div class="stripe"></div>
+  <div class="top"><div class="brand"><img src="../../assets/img/oki/oki-base-saludo.svg" alt="Oki">GIMNASIO DEL CEREBRO</div><div class="sec">Misión para casa</div></div>
+  <div class="note">Para entregar a la familia al final de la sesión.</div>
+  <div class="mission">
+    <img src="../../assets/img/oki/oki-senalando.svg" alt="Oki">
+    <div class="tag">Misión para casa · Semana 6</div>
+    <h3>¿Tren o bebé?</h3>
+    <p style="max-width:120mm">Esta semana tu hijo/a descubrió que en inglés algunas letras se toman de la mano y suenan como una sola: <b>sh</b> (como cuando callamos a un bebé: shhh) y <b>ch</b> (como un tren: ch, ch, ch). La sh no la usamos en el español de aquí, por eso a veces sale "chip" cuando dice ship. Es normal.</p>
+    <p style="max-width:120mm"><b>Juego 1: Tren o bebé.</b> Di una palabra. Si tiene ch, hace el tren por la casa. Si tiene sh, se queda quieto con el dedo en la boca. Prueben con: ship, chip, fish, lunch, shop, chop.</p>
+    <p style="max-width:120mm"><b>Juego 2: ¿Se puede estirar?</b> La sh se puede alargar (shhhhh) y la ch no (es un golpe corto). Jueguen a quién hace la sh más larga sin respirar.</p>
+    <p><b>Juego 3: Pesca en la cocina.</b> Escriban en papelitos fish, dish, chip, lunch y peguen cada uno donde va: <b>dish</b> en un plato, <b>lunch</b> en la lonchera, <b>fish</b> en la nevera. Que los lea cada vez que pase.</p>
+    <div class="call" style="font-weight:600;font-size:12pt;margin:2mm 0 3mm">Palabras de la semana: ship · fish · shop · chip · chop · lunch</div>
+    <ul>
+      <li>Unos minutos varios días funcionan mejor que mucho tiempo un solo día.</li>
+      <li>Si dice "chip" por ship, no lo corrijas con un "no": pregúntale "¿se puede estirar?" y que lo descubra.</li>
+      <li>No hace falta que tú sepas inglés: con los gestos del tren y del bebé basta.</li>
+    </ul>
+    <div class="sig">______________________ · Facilitador · Gimnasio del Cerebro · 301 491 6120</div>
+  </div>
+  <div class="foot"><span>Phonics · Sesión 6</span><span>Gimnasio del Cerebro · WhatsApp +57 301 491 6120</span></div>
+</div>
+
+</body></html>
