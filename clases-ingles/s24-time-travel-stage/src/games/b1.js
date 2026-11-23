@@ -113,6 +113,16 @@ const ROUTINE = [
 ];
 
 // ---------- S6 · Your Day vs My Day (interview cards) ----------
+// S5 "Get dressed": the weather says what to put on; the traveler wears it and says the sentence.
+const GET_DRESSED = [
+  { s: "It's cold! ❄️ Put on your ___.", a: ['jacket', 'sunglasses', 'boots'], wear: 'jacket' },
+  { s: "It's cold! ❄️ Put on your ___.", a: ['scarf', 'cap', 'raincoat'], wear: 'scarf' },
+  { s: "It's sunny! ☀️ Put on your ___.", a: ['cap', 'scarf', 'raincoat'], wear: 'cap' },
+  { s: "It's sunny! ☀️ Put on your ___.", a: ['sunglasses', 'jacket', 'boots'], wear: 'sunglasses' },
+  { s: "It's raining! 🌧️ Put on your ___.", a: ['raincoat', 'sunglasses', 'cap'], wear: 'raincoat' },
+  { s: "It's raining! 🌧️ Put on your ___.", a: ['boots', 'scarf', 'sunglasses'], wear: 'boots' },
+];
+
 const NEIGHBORS = [
   { name: 'Pablo', qs: [["What time do you wake up?", "I wake up at six."], ["How do you go to school?", "I go to school by bus."], ["What do you do after school?", "I play soccer."]], she: false, facts: 'I wake up at six. I go to school by bus. After school, I play soccer.',
     report: [
@@ -207,6 +217,7 @@ const WORLDS = [
     ],
     quests: [
       { type: 'ladder', name: 'My Day Track', short: 'My Day', sign: 'MY DAY TRACK', steps: ROUTINE },
+      { type: 'stones', name: 'Get dressed!', short: 'Get dressed', title: 'Get Dressed!', bank: GET_DRESSED, count: 4, dress: true },
       { type: 'interview', name: 'Your Day: meet 3 neighbors', short: 'Neighbors', people: () => pick(NEIGHBORS, 3),
         asks: 2 },
       { type: 'zones', name: 'I or He / She?', short: 'I / He', labels: ['I', 'HE / SHE'], subs: ['MY DAY', 'YOUR DAY'], bank: I_OR_HE, count: 4 },

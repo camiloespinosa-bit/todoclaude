@@ -187,6 +187,38 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 body.has-save #b-go { display: none; }
 .cambtn svg { width: 1.2em; height: 1.2em; }
 .cambtn .key { font-size: .75em; }
+.wal { display: flex; align-items: center; gap: .25em; font-weight: 800; color: var(--deep); position: relative; margin-left: .4em; }
+.wal .earn { position: absolute; left: 50%; top: -0.2em; color: #00BFA5; font-weight: 800; opacity: 0; pointer-events: none; }
+.wal .earn.on { animation: earnUp 1.4s ease-out both; }
+@keyframes earnUp { 0% { opacity: 0; transform: translate(-50%, 0) scale(.8); } 15% { opacity: 1; transform: translate(-50%, -0.6em) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -2.2em) scale(1); } }
+.earned { background: #E0F7FA; color: var(--deep); border-radius: 16px; padding: .4em .8em; font-weight: 600; text-align: center; }
+.brief-crys { display: inline-flex; align-items: center; gap: .3em; font-weight: 800; color: #00897B; }
+.lookbtn { background: #8E24AA; color: #fff; }
+/* ---------- My Look ---------- */
+#L-look { pointer-events: auto; }
+.look-panel { position: absolute; right: 2vw; top: 2vh; bottom: 2vh; width: min(44vw, 620px); display: flex; flex-direction: column; gap: 1vh; padding: 1.6vh 1.4vw; }
+.look-top { display: flex; justify-content: space-between; align-items: center; }
+.look-top b { font-size: var(--fs-l); }
+.lk-crys { display: inline-flex; align-items: center; gap: .3em; font-weight: 800; color: #00897B; font-size: var(--fs-l); }
+.lk-tabs { display: flex; flex-wrap: wrap; gap: .35em; }
+.lk-tabs button { background: #F0F4F8; color: var(--deep); border-radius: 999px; padding: .2em .8em; font-weight: 700; font-size: .85em; }
+.lk-tabs button.on { background: var(--deep); color: #fff; }
+.lk-items { flex: 1; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr)); gap: .5em; align-content: start; padding: .2em; }
+.lk-items button { background: #F7FAFC; border: 3px solid transparent; border-radius: 16px; padding: .4em; display: flex; flex-direction: column; align-items: center; gap: .2em; font-weight: 700; color: var(--deep); font-size: .85em; min-height: 4.6em; }
+.lk-items button.on { border-color: var(--green); background: #F1F8E9; }
+.lk-items button .sw { width: 2em; height: 2em; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(0,0,0,.12); }
+.lk-items button .price { display: inline-flex; align-items: center; gap: .2em; color: #00897B; font-size: .9em; }
+.lk-items button.locked { opacity: .9; }
+.lk-items button.locked .price::before { content: '🔒'; font-size: .85em; }
+.lk-name { display: flex; align-items: center; justify-content: space-between; gap: .6em; background: #FFF8E1; border-radius: 16px; padding: .4em .8em; min-height: 2.6em; }
+.lk-name .say { font-size: var(--fs-l); font-weight: 800; }
+.lk-name button { background: #00897B; color: #fff; border-radius: 12px; padding: .3em .8em; font-weight: 800; }
+.lk-name button.speak { background: var(--deep); }
+.lk-msg { color: #C62828; font-weight: 700; min-height: 1.2em; }
+#lk-done { justify-content: center; }
+@media (orientation: portrait) {
+  .look-panel { left: 2vw; right: 2vw; top: auto; bottom: 1vh; width: auto; height: 56vh; }
+}
 .crys { display: flex; align-items: center; gap: .35em; font-weight: 800; color: #00897B; margin-right: .3em; }
 .gem { display: inline-block; width: .8em; height: .8em; background: linear-gradient(135deg, #A7FFEB, #00BFA5); transform: rotate(45deg); border-radius: 3px; box-shadow: 0 0 10px rgba(0,191,165,.6); vertical-align: middle; }
 .big-gem { width: .6em; height: .6em; margin-right: .2em; }
@@ -345,6 +377,7 @@ body.is-profe #btn-teacher { display: inline-flex; }
         <div class="ctrl"><span class="key">←</span><span class="key">↑</span><span class="key">↓</span><span class="key">→</span> move</div>
         <div class="ctrl"><span class="key">SPACE</span> jump</div>
       </div>
+      <p class="small-p"><span class="brief-crys"><span class="gem"></span> <span id="b-crys">0</span> crystals</span> · <button class="btn lookbtn" id="b-look" type="button" style="display:inline-flex">👕 My Look</button></p>
       <p class="small-p only-touch">Move with the joystick. Tap <b>JUMP</b> to jump and <b>OK</b> to go on.</p>
     </div>
     <div class="resume" id="b-resume">
@@ -370,7 +403,7 @@ body.is-profe #btn-teacher { display: inline-flex; }
       <div class="pill" id="h-world">YESTERDAY LAND</div>
       <div class="card quests" id="h-quests"></div>
     </div>
-    <div class="card pack"><div class="crys"><span class="gem"></span><span id="h-crys">0/0</span></div><div class="slots" id="h-slots"><div class="slot"></div><div class="slot"></div><div class="slot"></div></div></div>
+    <div class="card pack"><div class="crys"><span class="gem"></span><span id="h-crys">0/0</span></div><div class="wal" title="My crystals">💎 <span id="h-wallet">0</span><span class="earn" id="h-earn"></span></div><div class="slots" id="h-slots"><div class="slot"></div><div class="slot"></div><div class="slot"></div></div></div>
     <button class="card cambtn" id="btn-cam" type="button" title="Camera (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="cam-name">Normal</span><span class="key">C</span></button>
     <button class="card cambtn exitbtn" id="btn-exit" type="button" title="Exit (Esc)">Exit</button>
     <div class="hint" id="h-hint"></div>
@@ -384,6 +417,17 @@ body.is-profe #btn-teacher { display: inline-flex; }
   </section>
 
   <!-- Talk HUD -->
+  <section id="L-look" class="layer">
+    <div class="card look-panel">
+      <div class="look-top"><b>My Look</b><span class="lk-crys"><span class="gem"></span><span id="lk-crys">0</span></span></div>
+      <div class="lk-tabs" id="lk-tabs"></div>
+      <div class="lk-items" id="lk-items"></div>
+      <div class="lk-name" id="lk-name"><span class="say" id="lk-say">Choose your look!</span><span id="lk-act"></span></div>
+      <div class="lk-msg" id="lk-msg"></div>
+      <button class="btn nextp" id="lk-done" type="button">Done ✓</button>
+    </div>
+  </section>
+
   <div id="tc" aria-hidden="true">
     <div id="joy"><div id="joy-k"></div></div>
     <button id="tc-ok" type="button">OK</button>
@@ -422,6 +466,7 @@ body.is-profe #btn-teacher { display: inline-flex; }
         <div class="tot"><div class="big" style="color:var(--green)">✓<span id="f-pts">0</span></div><small>challenges</small></div>
         <div class="tot"><div class="big" style="color:#00BFA5"><span class="gem big-gem"></span><span id="f-crys">0</span></div><small>crystals</small></div>
       </div>
+      <div class="earned"><span class="gem big-gem"></span> You earned <b id="f-earn">+0</b> crystals! You have <b id="f-wallet">0</b>. Spend them in <b>My Look</b>.</div>
       <div class="edit-tip">Teacher: click the stars to change them.</div>
       <div id="f-rows" style="display:flex;flex-direction:column;gap:1vh"></div>
       <div class="btns">

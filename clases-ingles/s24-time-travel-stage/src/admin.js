@@ -2,6 +2,7 @@
 // copy or send the kids' link, and open the live view of a class.
 import { openTeacher, signPass, checkPass, cleanKey, teacherToken } from './pass.js';
 import { DB } from './db.js';
+import { ITEMS } from './looks.js';
 import { joinRoom, newRoomCode, PUBLIC_BROKERS, SAGA_SUPABASE } from './net.js';
 
 const GAMES = [
@@ -141,7 +142,7 @@ function historyCSV() {
 const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
 const isTalk = (w) => /Talk stars/i.test(w.challenge || '');
 const isCrys = (w) => /crystals/i.test(w.challenge || '');
-function buildReport(kid, fromMs) {
+function buildReport(kid, fromMs, wallet) {
   const mine = runs.filter((x) => x.player === kid && new Date(x.updated_at).getTime() >= fromMs);
   const done = mine.filter((x) => x.status === 'finished' && Array.isArray(x.rows));
   const rows = done.flatMap((x) => x.rows.map((w) => ({ ...w, game: gameOf(x.game).name, when: x.updated_at })));
@@ -185,8 +186,13 @@ function buildReport(kid, fromMs) {
       <div class="kpi"><b>${pct(score, max)}%</b><span>aciertos en los retos (${score}/${max})</span></div>
       <div class="kpi"><b>${stars}/${talk.length * 3}</b><span>estrellas hablando en el escenario</span></div>
       <div class="kpi"><b>${qs.size}</b><span>preguntas distintas que hizo en inglés</span></div>
-      <div class="kpi"><b>${crys}</b><span>cristales del tiempo</span></div>
+      <div class="kpi"><b>${crys}</b><span>cristales recogidos en los mundos</span></div>
+      ${wallet ? `<div class="kpi"><b>${wallet.crystals}</b><span>cristales en su cofre hoy</span></div>` : ''}
     </div>
+    ${wallet && wallet.owned && wallet.owned.length ? `<p class="fine" style="margin-top:10px">Con sus cristales compró para su personaje: ${wallet.owned.map((id) => {
+      const it = ITEMS.find((i) => i.id === id);
+      return esc(it ? it.name : id.replace(':', ' '));
+    }).join(', ')}.</p>` : ''}
     <div class="two">
       <div><h3>Lo que mejor le salió</h3>${best.length ? `<ul>${best.map(item).join('')}</ul>` : '<p class="fine">Todavía no hay suficientes datos.</p>'}</div>
       <div><h3>Para seguir practicando</h3>${practice.length ? `<ul>${practice.map(item).join('')}</ul>` : '<p class="fine">Todos los retos por encima del 80%.</p>'}</div>
@@ -203,7 +209,8 @@ $('rp-go').addEventListener('click', async () => {
   if (!runs.length) await loadHistory();
   const kid = +$('rp-kid').value;
   const from = $('rp-from').value ? new Date($('rp-from').value + 'T00:00').getTime() : 0;
-  $('rp-body').innerHTML = buildReport(kid, from);
+  const w = await DB.wallet(kid, { op: 'get' });
+  $('rp-body').innerHTML = buildReport(kid, from, w.ok ? w.data : null);
   $('report').hidden = false;
   window.scrollTo(0, 0);
   const c = $('rp-comment');

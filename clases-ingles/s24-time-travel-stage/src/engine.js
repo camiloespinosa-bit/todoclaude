@@ -7,6 +7,8 @@ import { ACTIONS, LADDER_VERBS, DREAMS, OPINIONS } from './content.js';
 import { joinRoom, newRoomCode, PUBLIC_BROKERS, SAGA_SUPABASE } from './net.js';
 import { openTeacher, signPass, checkPass } from './pass.js';
 import { DB } from './db.js';
+import { makeWallet } from './wallet.js';
+import { SLOTS, ITEMS, SKINS, PAID_COLORS, GOLD, defaultLook, colorName } from './looks.js';
 
 const $ = (id) => document.getElementById(id);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -371,59 +373,122 @@ function start() {
   const thumbImg = (id, alt) => (id && thumbs[id] ? `<img alt="${esc(alt || objName(id))}" src="${thumbs[id]}">` : '');
 
   // ---------- Characters ----------
+  // A traveler or an NPC. Old looks ({suit, hair, long, hero}) still work; "My Look" adds
+  // hairStyle, shirt, shoes, print, hat, glasses, back, ears, and wear[] (clothes put on in a challenge).
   function makeAvatar(p) {
     const root = new THREE.Group();
     const body = new THREE.Group();
     root.add(body);
     const skin = p.skin || '#E9B48A';
+    const shirt = p.shirt || p.suit;
+    const hairStyle = p.hairStyle || (p.long ? 'long' : 'short');
+    const glasses = p.glasses || (p.hero ? 'goggles' : 'none');
+    const back = p.back || (p.hero ? 'clockpack' : 'none');
+    const wear = new Set(p.wear || []);
+    const coat = wear.has('raincoat') ? '#FDD835' : wear.has('jacket') ? '#3949AB' : null;
     const leg = (x) => {
       const g = new THREE.Group();
       g.position.set(x, 0.95, 0);
       g.add(at(mesh(new THREE.BoxGeometry(0.28, 0.9, 0.3), p.pants || '#1D3F54'), 0, -0.45, 0));
-      g.add(at(mesh(new THREE.BoxGeometry(0.32, 0.18, 0.46), '#F7FAFC'), 0, -0.86, 0.06));
+      if (wear.has('boots')) g.add(at(mesh(new THREE.BoxGeometry(0.34, 0.42, 0.36), '#795548'), 0, -0.7, 0.02));
+      g.add(at(mesh(new THREE.BoxGeometry(0.32, 0.18, 0.46), wear.has('boots') ? '#5D4037' : p.shoes || '#F7FAFC'), 0, -0.86, 0.06));
       body.add(g);
       return g;
     };
     const legL = leg(-0.2), legR = leg(0.2);
-    body.add(at(mesh(new THREE.BoxGeometry(0.82, 0.88, 0.52), p.suit), 0, 1.4, 0));
+    body.add(at(mesh(new THREE.BoxGeometry(0.82, 0.88, 0.52), shirt), 0, 1.4, 0));
+    if (coat) {
+      body.add(at(mesh(new THREE.BoxGeometry(0.9, 0.94, 0.6), coat), 0, 1.38, 0));
+      body.add(at(mesh(new THREE.BoxGeometry(0.06, 0.8, 0.02), '#ECEFF1'), 0, 1.38, 0.31));
+    }
     body.add(at(mesh(new THREE.BoxGeometry(0.86, 0.14, 0.56), '#1D3F54'), 0, 1.02, 0));
     if (p.hero) {
       const buckle = at(mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.05, 10), '#FDD835'), 0, 1.02, 0.29);
       buckle.rotation.x = Math.PI / 2;
       body.add(buckle);
+    }
+    // T-shirt picture
+    if (!coat && p.print && p.print !== 'none') {
+      const sh = new THREE.Shape();
+      if (p.print === 'star') {
+        for (let i = 0; i < 10; i++) {
+          const r = i % 2 ? 0.09 : 0.2, a2 = (i / 10) * Math.PI * 2 + Math.PI / 2;
+          i ? sh.lineTo(Math.cos(a2) * r, Math.sin(a2) * r) : sh.moveTo(Math.cos(a2) * r, Math.sin(a2) * r);
+        }
+      } else if (p.print === 'heart') {
+        sh.moveTo(0, -0.17);
+        sh.bezierCurveTo(-0.3, 0.02, -0.12, 0.24, 0, 0.09);
+        sh.bezierCurveTo(0.12, 0.24, 0.3, 0.02, 0, -0.17);
+      } else {
+        [[0.05, 0.22], [-0.1, 0.0], [0.0, 0.0], [-0.06, -0.22], [0.11, 0.04], [0.01, 0.04], [0.09, 0.22]].forEach(([x, y], i) => (i ? sh.lineTo(x, y) : sh.moveTo(x, y)));
+      }
+      const pic = new THREE.Mesh(new THREE.ShapeGeometry(sh), mat(p.print === 'heart' ? '#EC407A' : '#FDD835'));
+      pic.position.set(0, 1.48, 0.265);
+      body.add(pic);
+    }
+    // on the back
+    if (back === 'clockpack') {
       body.add(at(mesh(new THREE.BoxGeometry(0.62, 0.66, 0.3), '#2C5F7C'), 0, 1.45, -0.4));
       const clockFace = at(mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.06, 14), '#FDD835', { emissive: '#B08800', emissiveIntensity: 0.6 }), 0, 1.5, -0.57);
       clockFace.rotation.x = Math.PI / 2;
       body.add(clockFace);
+    } else if (back === 'backpack') {
+      body.add(at(mesh(new THREE.BoxGeometry(0.64, 0.72, 0.3), '#43A047'), 0, 1.42, -0.41));
+      body.add(at(mesh(new THREE.BoxGeometry(0.44, 0.3, 0.1), '#2E7D32'), 0, 1.3, -0.6));
+    } else if (back === 'cape') {
+      const cape = at(mesh(new THREE.BoxGeometry(0.92, 1.25, 0.05), '#C62828'), 0, 1.2, -0.33);
+      cape.rotation.x = 0.12;
+      body.add(cape);
     }
     const arm = (x) => {
       const g = new THREE.Group();
       g.position.set(x, 1.78, 0);
-      g.add(at(mesh(new THREE.BoxGeometry(0.22, 0.74, 0.24), p.suit), 0, -0.36, 0));
+      g.add(at(mesh(new THREE.BoxGeometry(0.22, 0.74, 0.24), coat || shirt), 0, -0.36, 0));
       g.add(at(mesh(new THREE.SphereGeometry(0.14, 8, 6), skin), 0, -0.8, 0));
       body.add(g);
       return g;
     };
     const armL = arm(-0.53), armR = arm(0.53);
-    const scarf = at(mesh(new THREE.TorusGeometry(0.3, 0.11, 6, 14), p.scarf), 0, 1.86, 0);
-    scarf.rotation.x = Math.PI / 2;
-    body.add(scarf);
+    const scarfColor = wear.has('scarf') ? '#E53935' : p.scarf;
+    if (scarfColor && scarfColor !== 'none') {
+      const scarf = at(mesh(new THREE.TorusGeometry(0.3, wear.has('scarf') ? 0.15 : 0.11, 6, 14), scarfColor), 0, 1.86, 0);
+      scarf.rotation.x = Math.PI / 2;
+      body.add(scarf);
+    }
     const tail = new THREE.Group();
     tail.position.set(0.18, 1.86, -0.28);
-    if (p.hero) tail.add(at(mesh(new THREE.BoxGeometry(0.2, 0.08, 0.6), p.scarf), 0, 0, -0.3));
+    if (p.hero && scarfColor && scarfColor !== 'none') tail.add(at(mesh(new THREE.BoxGeometry(0.2, 0.08, 0.6), scarfColor), 0, 0, -0.3));
     body.add(tail);
     const head = new THREE.Group();
     head.position.y = 2.35;
     body.add(head);
     head.add(mesh(new THREE.SphereGeometry(0.48, 14, 10), skin));
-    const hair = mesh(new THREE.SphereGeometry(0.51, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), p.hair);
-    hair.rotation.x = -0.3;
-    hair.position.set(0, 0.05, -0.03);
-    head.add(hair);
-    if (p.long) {
-      head.add(at(mesh(new THREE.BoxGeometry(0.86, 0.75, 0.26), p.hair), 0, -0.3, -0.33));
-      head.add(at(mesh(new THREE.SphereGeometry(0.2, 8, 6), p.hair), 0, 0.15, -0.6));
-      head.add(at(mesh(new THREE.SphereGeometry(0.1, 8, 6), '#E53935'), 0, 0.3, -0.52));
+    const hat = wear.has('cap') ? 'cap' : p.hat || 'none';
+    // hair (a hat hides the top)
+    if (hairStyle !== 'none') {
+      const hair = mesh(new THREE.SphereGeometry(0.51, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), p.hair);
+      hair.rotation.x = -0.3;
+      hair.position.set(0, 0.05, -0.03);
+      head.add(hair);
+      if (hairStyle === 'long') {
+        head.add(at(mesh(new THREE.BoxGeometry(0.86, 0.75, 0.26), p.hair), 0, -0.3, -0.33));
+        head.add(at(mesh(new THREE.SphereGeometry(0.2, 8, 6), p.hair), 0, 0.15, -0.6));
+        head.add(at(mesh(new THREE.SphereGeometry(0.1, 8, 6), '#E53935'), 0, 0.3, -0.52));
+      } else if (hairStyle === 'spiky' && hat === 'none') {
+        for (let i = 0; i < 7; i++) {
+          const a2 = (i / 7) * Math.PI * 2;
+          const c = at(mesh(new THREE.ConeGeometry(0.12, 0.34, 6), p.hair), Math.cos(a2) * 0.26, 0.48, Math.sin(a2) * 0.26 - 0.05);
+          c.rotation.set(Math.sin(a2) * 0.5, 0, -Math.cos(a2) * 0.5);
+          head.add(c);
+        }
+        head.add(at(mesh(new THREE.ConeGeometry(0.13, 0.4, 6), p.hair), 0, 0.6, -0.05));
+      } else if (hairStyle === 'curly') {
+        for (let i = 0; i < 12; i++) {
+          const a2 = (i / 12) * Math.PI * 2;
+          head.add(at(mesh(new THREE.SphereGeometry(0.15, 8, 6), p.hair), Math.cos(a2) * 0.45, 0.12 + (i % 2) * 0.12, Math.sin(a2) * 0.42 - 0.08));
+        }
+        if (hat === 'none') head.add(at(mesh(new THREE.SphereGeometry(0.3, 10, 8), p.hair), 0, 0.42, -0.05));
+      }
     }
     const eye = new THREE.SphereGeometry(0.075, 8, 6);
     head.add(at(mesh(eye, '#1D3F54'), -0.17, 0.04, 0.43), at(mesh(eye, '#1D3F54'), 0.17, 0.04, 0.43));
@@ -432,13 +497,53 @@ function start() {
     const smile = at(mesh(new THREE.TorusGeometry(0.11, 0.025, 4, 10, Math.PI), '#1D3F54'), 0, -0.12, 0.45);
     smile.rotation.z = Math.PI;
     head.add(smile);
-    if (p.hero) {
+    // glasses
+    const shades = wear.has('sunglasses') ? 'sunglasses' : glasses;
+    if (shades === 'goggles') {
       for (const s of [-1, 1]) {
         const gg = at(mesh(new THREE.TorusGeometry(0.11, 0.04, 6, 12), '#57A6B5'), s * 0.15, 0.3, 0.42);
         gg.rotation.x = -0.3;
         head.add(gg);
       }
       head.add(at(mesh(new THREE.BoxGeometry(0.98, 0.06, 0.1), '#1D3F54'), 0, 0.3, 0.3));
+    } else if (shades === 'sunglasses') {
+      for (const s of [-1, 1]) head.add(at(mesh(new THREE.BoxGeometry(0.26, 0.15, 0.05), '#111111'), s * 0.17, 0.05, 0.47));
+      head.add(at(mesh(new THREE.BoxGeometry(0.12, 0.04, 0.04), '#111111'), 0, 0.08, 0.48));
+    } else if (shades === 'round') {
+      for (const s of [-1, 1]) head.add(at(mesh(new THREE.TorusGeometry(0.12, 0.025, 6, 14), '#3E2723'), s * 0.17, 0.04, 0.47));
+      head.add(at(mesh(new THREE.BoxGeometry(0.1, 0.03, 0.03), '#3E2723'), 0, 0.06, 0.48));
+    }
+    // hats
+    if (hat === 'cap') {
+      head.add(at(mesh(new THREE.SphereGeometry(0.53, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.5), '#E53935'), 0, 0.06, 0));
+      head.add(at(mesh(new THREE.BoxGeometry(0.56, 0.05, 0.42), '#C62828'), 0, 0.1, 0.55));
+    } else if (hat === 'beanie') {
+      head.add(at(mesh(new THREE.SphereGeometry(0.54, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.52), '#7E57C2'), 0, 0.05, 0));
+      const band = at(mesh(new THREE.TorusGeometry(0.5, 0.07, 6, 18), '#5E35B1'), 0, 0.08, 0);
+      band.rotation.x = Math.PI / 2;
+      head.add(band, at(mesh(new THREE.SphereGeometry(0.14, 8, 6), '#FFFFFF'), 0, 0.62, 0));
+    } else if (hat === 'sunhat') {
+      head.add(at(mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.05, 20), '#E8C770'), 0, 0.3, 0));
+      head.add(at(mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.36, 16), '#E8C770'), 0, 0.48, 0));
+      head.add(at(mesh(new THREE.CylinderGeometry(0.51, 0.51, 0.08, 16), '#E53935'), 0, 0.36, 0));
+    } else if (hat === 'crown') {
+      const gold = { emissive: '#8D6E00', emissiveIntensity: 0.35, metalness: 0.4, roughness: 0.35 };
+      head.add(at(mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.22, 16, 1, true), '#FDD835', gold), 0, 0.55, 0));
+      for (let i = 0; i < 6; i++) {
+        const a2 = (i / 6) * Math.PI * 2;
+        head.add(at(mesh(new THREE.ConeGeometry(0.07, 0.2, 5), '#FDD835', gold), Math.cos(a2) * 0.34, 0.75, Math.sin(a2) * 0.34));
+      }
+      head.add(at(mesh(new THREE.SphereGeometry(0.06, 8, 6), '#E53935'), 0, 0.56, 0.37));
+    }
+    // ears
+    if (p.ears === 'headphones') {
+      const arc = at(mesh(new THREE.TorusGeometry(0.53, 0.05, 6, 18, Math.PI), '#263238'), 0, 0.05, 0);
+      head.add(arc);
+      for (const s of [-1, 1]) {
+        const cup = at(mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.12, 12), '#57A6B5'), s * 0.52, 0.02, 0);
+        cup.rotation.z = Math.PI / 2;
+        head.add(cup);
+      }
     }
     const blob = new THREE.Mesh(new THREE.CircleGeometry(0.75, 16), new THREE.MeshBasicMaterial({ color: '#000000', transparent: true, opacity: 0.22, depthWrite: false }));
     blob.rotation.x = -Math.PI / 2;
@@ -1422,10 +1527,50 @@ function start() {
     document.documentElement.style.setProperty('--world-ink', inkOf(WORLDS[wi]));
   }
 
-  function setAvatar(p) {
+  function lookOf(p) {
+    const w = WALLETS[p];
+    return { ...defaultLook(PLAYERS[p]), ...((w && w.look) || {}) };
+  }
+  function setAvatar(p, look = null) {
     while (avatarHolder.children.length) avatarHolder.remove(avatarHolder.children[0]);
-    AV.model = makeAvatar({ ...PLAYERS[p], hero: true });
+    AV.model = makeAvatar({ ...(look || lookOf(p)), hero: true, wear: AV.wear || [] });
     avatarHolder.add(AV.model.root, AV.model.blob);
+    AV.model.root.position.copy(AV.pos);
+    AV.model.root.rotation.y = AV.yaw;
+  }
+
+  // ---------- Crystal wallet (crystals are money: they buy clothes in "My Look") ----------
+  const WALLETS = {};
+  function walletFor(p) {
+    if (!WALLETS[p]) {
+      WALLETS[p] = makeWallet(p, () => WEB && NET.unlocked && !params.has('nodb'));
+      WALLETS[p].onChange(() => {
+        if (S.player !== p) return;
+        renderWallet();
+        if (S.mode === 'brief') setAvatar(p);
+      });
+    }
+    return WALLETS[p];
+  }
+  function renderWallet() {
+    const w = WALLETS[S.player];
+    const n = w ? w.crystals : 0;
+    for (const id of ['b-crys', 'lk-crys', 'h-wallet']) if ($(id)) $(id).textContent = n;
+  }
+  // rewards for using English (and a little for exploring)
+  function earn(n, why = '') {
+    n = Math.round(n);
+    if (n <= 0 || S.mode === 'title' || S.mode === 'brief') return;
+    walletFor(S.player).earn(n);
+    S.earned = (S.earned || 0) + n;
+    const el = $('h-earn');
+    if (el) {
+      el.textContent = `+${n}`;
+      el.classList.remove('on');
+      void el.offsetWidth;
+      el.classList.add('on');
+    }
+    if (why) logEvent(`+${n} crystals: ${why}`, true);
   }
 
   function placeAvatar(pos, yaw = Math.PI) {
@@ -1525,6 +1670,9 @@ function start() {
     $('b-hi').textContent = `Hi, ${PLAYERS[p].name}!`;
     showLayer('brief');
     showResume(null);
+    walletFor(p);
+    renderWallet();
+    walletFor(p).sync();
     findSave(p).then((sv) => S.mode === 'brief' && S.player === p && showResume(sv));
   }
   // ---------- Saved progress (this device, and the class database when there is one) ----------
@@ -1583,6 +1731,131 @@ function start() {
     $(id).addEventListener('mousedown', (e) => e.preventDefault());
   }
 
+  // ---------- My Look (wardrobe + crystal shop) ----------
+  const SKIN_NAMES = ['light skin', 'light brown skin', 'brown skin', 'dark brown skin', 'dark skin'];
+  const LK = { slot: 'shirt', edit: null, pending: null };
+  function speak(text) {
+    try {
+      if (!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      u.rate = 0.9;
+      const v = speechSynthesis.getVoices().find((x) => /^en(-|_)US/i.test(x.lang)) || speechSynthesis.getVoices().find((x) => /^en/i.test(x.lang));
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    } catch (e) {
+      /* no voice on this device */
+    }
+  }
+  // all the choices of one slot: { key (to own it), value, name, price, hex? }
+  function lookOptions(slot) {
+    const S0 = SLOTS.find((x) => x.id === slot);
+    if (S0.kind === 'skin') return SKINS.map((hex, i) => ({ key: '', value: hex, name: SKIN_NAMES[i], price: 0, hex }));
+    if (S0.kind === 'item') return ITEMS.filter((i) => i.slot === slot).map((i) => ({ key: i.price ? i.id : '', value: i.value, name: i.name, price: i.price }));
+    const list = S0.colors.map((c) => ({ key: '', value: c.hex, name: `${c.id} ${S0.noun}`, price: 0, hex: c.hex }));
+    const goldPrice = PAID_COLORS[`${slot}:gold`];
+    if (goldPrice) list.push({ key: `${slot}:gold`, value: GOLD.hex, name: `gold ${S0.noun}`, price: goldPrice, hex: GOLD.hex });
+    if (S0.none) list.unshift({ key: '', value: 'none', name: `no ${S0.noun}`, price: 0, hex: 'transparent' });
+    return list;
+  }
+  const owns = (o) => !o.price || walletFor(S.player).has(o.key);
+  function openLook() {
+    if (S.mode !== 'brief') return;
+    S.mode = 'look';
+    LK.edit = lookOf(S.player);
+    LK.pending = null;
+    AV.wear = [];
+    placeAvatar(SPAWN.clone(), 0);
+    setAvatar(S.player, LK.edit);
+    avatarHolder.visible = true;
+    showLayer('look');
+    renderWallet();
+    renderLook();
+    $('lk-say').textContent = 'Choose your look!';
+    $('lk-act').innerHTML = '';
+    $('lk-msg').textContent = '';
+  }
+  function renderLook() {
+    $('lk-tabs').innerHTML = SLOTS.map((x) => `<button type="button" data-slot="${x.id}" class="${x.id === LK.slot ? 'on' : ''}">${esc(x.label)}</button>`).join('');
+    const cur = LK.edit[LK.slot];
+    $('lk-items').innerHTML = lookOptions(LK.slot).map((o, i) => `<button type="button" data-i="${i}" class="${o.value === cur ? 'on' : ''}${owns(o) ? '' : ' locked'}">
+        ${o.hex ? `<span class="sw" style="background:${o.hex}${o.value === 'none' ? ';border:2px dashed #90A4AE' : ''}"></span>` : ''}
+        <span>${esc(o.name)}</span>${o.price ? `<span class="price">${owns(o) ? '✓' : `<span class="gem"></span>${o.price}`}</span>` : ''}
+      </button>`).join('');
+  }
+  function pickLook(i) {
+    const o = lookOptions(LK.slot)[i];
+    if (!o) return;
+    LK.edit[LK.slot] = o.value;
+    setAvatar(S.player, LK.edit);
+    sfx.click();
+    speak(o.name);
+    $('lk-say').textContent = o.name;
+    $('lk-msg').textContent = '';
+    LK.pending = owns(o) ? null : o;
+    $('lk-act').innerHTML = `<button type="button" class="speak" id="lk-speak">🔊</button>${LK.pending ? ` <button type="button" id="lk-buy">Buy · ${o.price} 💎</button>` : ''}`;
+    renderLook();
+  }
+  function buyLook() {
+    const o = LK.pending;
+    if (!o) return;
+    const w = walletFor(S.player);
+    if (!w.buy(o.key, o.price)) {
+      $('lk-msg').textContent = `You need ${o.price - w.crystals} more crystals! Play and speak English to win more.`;
+      sfx.bad();
+      return;
+    }
+    sfx.gem();
+    burst(AV.pos.clone().add(V(0, 2.5, 0)), ['#64FFDA', '#FDD835', '#FFFFFF'], 30, { speed: 5, up: 7, geo: starGeo, size: 0.3 });
+    $('lk-say').textContent = `New: ${o.name}!`;
+    LK.pending = null;
+    $('lk-act').innerHTML = '';
+    renderWallet();
+    renderLook();
+  }
+  function closeLook() {
+    if (S.mode !== 'look') return;
+    // take off what was only tried on (not bought)
+    const saved = lookOf(S.player);
+    for (const x of SLOTS) {
+      const o = lookOptions(x.id).find((y) => y.value === LK.edit[x.id]);
+      if (o && !owns(o)) LK.edit[x.id] = saved[x.id];
+    }
+    walletFor(S.player).setLook({ ...LK.edit });
+    try {
+      speechSynthesis.cancel();
+    } catch (e) {
+      /* no voice */
+    }
+    S.mode = 'brief';
+    avatarHolder.visible = false;
+    setAvatar(S.player);
+    showLayer('brief');
+  }
+  $('b-look').addEventListener('click', openLook);
+  $('lk-done').addEventListener('click', closeLook);
+  $('lk-tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-slot]');
+    if (!b) return;
+    LK.slot = b.dataset.slot;
+    LK.pending = null;
+    $('lk-act').innerHTML = '';
+    renderLook();
+  });
+  $('lk-items').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-i]');
+    if (b) pickLook(+b.dataset.i);
+  });
+  $('lk-name').addEventListener('click', (e) => {
+    if (e.target.id === 'lk-buy') buyLook();
+    else if (e.target.id === 'lk-speak') speak($('lk-say').textContent.replace(/^New: |!$/g, ''));
+  });
+  for (const id of ['b-look', 'lk-done']) {
+    $(id).tabIndex = -1;
+    $(id).addEventListener('mousedown', (e) => e.preventDefault());
+  }
+
   // ---------- Exit (the kid) ----------
   function askExit(on) {
     if (on && S.mode !== 'play' && S.mode !== 'talk') return;
@@ -1627,6 +1900,10 @@ function start() {
     S.crystalsMax = Array(n).fill(0);
     S.met = Array.from({ length: n }, () => []);
     S.events = [];
+    S.earned = 0;
+    S.starsPaid = [];
+    AV.wear = [];
+    walletFor(S.player);
     setAvatar(S.player);
     if (resume && WORLDS[resume.wi]) {
       const fit = (a, d) => Array.from({ length: n }, (x, i) => (a && a[i] != null ? a[i] : d()));
@@ -1638,6 +1915,7 @@ function start() {
       S.met = fit(resume.met, () => []);
       S.events = (resume.events || []).slice(-30);
       S.lastTalkWi = resume.lastTalkWi ?? null;
+      S.starsPaid = S.stars.slice(); // those stars were already paid
       S.crystals[resume.wi] = 0; // the crystals of this world come back
       logEvent(`Continued in ${WORLDS[resume.wi].name}`, true);
       enterWorld(resume.wi, Math.min(resume.q || 0, WORLDS[resume.wi].quests.length - 1));
@@ -1648,6 +1926,10 @@ function start() {
 
   function enterWorld(wi, firstQuest = 0) {
     S.wi = wi;
+    if (AV.wear && AV.wear.length) {
+      AV.wear = [];
+      setAvatar(S.player);
+    }
     S.Q = null;
     loadWorld(wi);
     S.crystalsMax[wi] = W.crystals.length;
@@ -1700,6 +1982,7 @@ function start() {
     Q.done = true;
     if (Q.def.type !== 'talk' && Q.def.type !== 'portal') {
       S.results[S.wi].push({ name: Q.def.name, short: Q.def.short || Q.def.name, score: Q.score, max: Q.max, details: Q.details.join('; ') });
+      if (Q.score > 0 && !Q.details.includes('skipped by teacher')) earn(Q.score * 2, Q.def.name);
     }
     task(null);
     logEvent(`${Q.def.name}${Q.max ? `: ${Q.score}/${Q.max}` : ''} ✔`, true);
@@ -2081,6 +2364,14 @@ function start() {
             $('h-ts').innerHTML = `<i>"${esc(it.p)}"</i> → <u>${esc(it.a[0])}</u>`;
             if (W.patient) burst(W.patient.getWorldPosition(new THREE.Vector3()).add(V(0, 1.5, 0)), ['#E91E63', '#FFFFFF'], 14, { speed: 3, up: 5 });
           } else $('h-ts').innerHTML = esc(it.s).replace('___', `<u>${esc(it.a[0])}</u>`);
+          if (Q.def.dress && it.wear) {
+            // the traveler puts it on, then the kid says it
+            AV.wear = [...new Set([...(AV.wear || []), it.wear])];
+            setAvatar(S.player);
+            const line = `I put on my ${it.a[0]}.`;
+            $('h-ts').innerHTML = `<span class="mic">🎤</span> Say it: "${esc(line)}"`;
+            Q.details.push(it.a[0]);
+          }
           setTimeout(() => {
             if (S.Q !== Q) return;
             Q.idx++;
@@ -2096,7 +2387,7 @@ function start() {
               backToStart(PADS.start);
               this.load(Q);
             }
-          }, 2000);
+          }, Q.def.dress ? 4000 : 2000);
         } else {
           sfx.bad();
           pad.flash = 0.9;
@@ -2538,6 +2829,7 @@ function start() {
       stars: S.stars.slice(), talkWorlds: WORLDS.map((ww) => ww.quests.some((q) => q.type === 'talk')),
       crystals: S.crystals.reduce((a, b) => a + b, 0), crystalsMax: S.crystalsMax.reduce((a, b) => a + b, 0),
       events: S.events.slice(-14), updatedAt: Date.now(),
+      wallet: WALLETS[S.player] ? WALLETS[S.player].crystals : null, earned: S.earned || 0,
     };
   }
   let pushing = false, pushAgain = false;
@@ -2570,8 +2862,12 @@ function start() {
       NET.lastSeq = seq;
       if (c.type === 'stars') {
         if (S.mode === 'talk') giveStars(c.n);
-        else if (S.lastTalkWi != null) {
+        else if (S.mode === 'finale' && S.lastTalkWi != null) {
+          setFinalStars(S.lastTalkWi, c.n);
+          logEvent(`Profe: ${c.n} ★ (${WORLDS[S.lastTalkWi].short})`, true);
+        } else if (S.lastTalkWi != null) {
           S.stars[S.lastTalkWi] = c.n;
+          payStars(S.lastTalkWi);
           logEvent(`Profe: ${c.n} ★ (${WORLDS[S.lastTalkWi].short})`, true);
         }
       } else if (c.type === 'restart') {
@@ -2710,7 +3006,7 @@ function start() {
           <button data-p="${i}" data-c="endTalk">Terminar charla</button><button data-p="${i}" data-c="skip">Saltar reto</button><button data-p="${i}" data-c="pause">Pausa</button><button data-p="${i}" data-c="restart" class="warn">Reiniciar</button>
         </div>
         <div class="tworlds">${worlds}</div>
-        <div class="tcrys">Cristales: <b>${d.crystals || 0}/${d.crystalsMax || 0}</b></div>
+        <div class="tcrys">Cristales recogidos: <b>${d.crystals || 0}/${d.crystalsMax || 0}</b>${d.wallet != null ? ` · Cofre: <b>${d.wallet}</b> 💎 (+${d.earned || 0} en esta partida)` : ''}</div>
         <ul class="tev">${ev || '<li class="tmuted">Sin eventos todavía.</li>'}</ul>
       </div>`;
     }).join('');
@@ -2836,9 +3132,18 @@ function start() {
     startMusic(WORLDS[S.wi].music);
     completeQuest();
   }
+  function payStars(wi) {
+    S.starsPaid = S.starsPaid || [];
+    const extra = (S.stars[wi] || 0) - (S.starsPaid[wi] || 0);
+    if (extra > 0) {
+      S.starsPaid[wi] = S.stars[wi];
+      earn(extra * 5, `${extra} ★ from the teacher`);
+    }
+  }
   function giveStars(n) {
     if (S.mode !== 'talk') return;
     S.stars[S.wi] = n;
+    payStars(S.wi);
     renderStars(true);
     logEvent(`Talk stars: ${n} ★`, true);
     if (n > 0) {
@@ -2915,6 +3220,7 @@ function start() {
     sky.visible = true;
     scene.fog.near = 60;
     scene.fog.far = 170;
+    earn(10, `${WORLDS[warp.next - 1] ? WORLDS[warp.next - 1].name : 'World'} done`);
     if (warp.next < WORLDS.length) enterWorld(warp.next);
     else toFinale();
   }
@@ -2931,12 +3237,23 @@ function start() {
     const box = e.target.closest('.st.edit');
     if (!star || !box || S.mode !== 'finale') return;
     const w = +box.dataset.w, n = +star.dataset.n;
-    S.stars[w] = S.stars[w] === n ? n - 1 : n;
-    box.querySelectorAll('.fs').forEach((el) => el.classList.toggle('on', +el.dataset.n <= S.stars[w]));
-    if (talkRows[w]) talkRows[w].score = S.stars[w];
-    $('f-stars').textContent = S.stars.reduce((a, b) => a + b, 0);
-    sfx.stars(Math.max(1, S.stars[w]));
+    setFinalStars(w, S.stars[w] === n ? n - 1 : n);
   });
+  // stars that arrive after the game ended still count (and are saved again)
+  function setFinalStars(w, n) {
+    S.stars[w] = n;
+    const box = document.querySelector(`#f-rows .st.edit[data-w="${w}"]`);
+    if (box) box.querySelectorAll('.fs').forEach((el) => el.classList.toggle('on', +el.dataset.n <= n));
+    if (talkRows[w]) talkRows[w].score = n;
+    $('f-stars').textContent = S.stars.reduce((a, b) => a + b, 0);
+    sfx.stars(Math.max(1, n));
+    payStars(w);
+    $('f-earn').textContent = `+${S.earned || 0}`;
+    if (S.finalRows) {
+      if (NET.tx) saveSession(S.finalRows);
+      if (NET.room && WEB) DB.save({ run: NET.runId, room: NET.room, game: GAME.id, player: S.player, state: null, status: 'finished', rows: S.finalRows.map((r) => ({ ...r, player: `p${S.player}` })) });
+    }
+  }
   const pad2 = (n) => String(n).padStart(2, '0');
   const stamp = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 
@@ -3002,6 +3319,9 @@ function start() {
       }
       S.rows.push({ player: name, world: w.short, challenge: 'Time crystals (bonus)', score: S.crystals[i], max: S.crystalsMax[i], details: '', date: when });
     });
+    S.finalRows = S.rows.slice(before);
+    $('f-earn').textContent = `+${S.earned || 0}`;
+    $('f-wallet').textContent = walletFor(S.player).crystals;
     if (NET.tx) {
       saveSession(S.rows.slice(before));
       logEvent('Finished the game! 🏆', true);
@@ -3122,8 +3442,12 @@ function start() {
         else if (k === '2') choosePlayer(1);
         else if (k === 't' || k === 'T') toTeacher();
         break;
+      case 'look':
+        if ((k === 'Enter' || k === 'Escape') && !e.repeat) closeLook();
+        break;
       case 'brief':
-        if ((k === 'Enter' || k === ' ') && !e.repeat) startTrip(S.save || null);
+        if ((k === 'l' || k === 'L') && !e.repeat) openLook();
+        else if ((k === 'Enter' || k === ' ') && !e.repeat) startTrip(S.save || null);
         else if ((k === 'n' || k === 'N') && S.save && !e.repeat) startTrip();
         else if (k === 'Escape' || k === 'Backspace') toTitle();
         break;
@@ -3438,6 +3762,11 @@ function start() {
       wantP = AV.pos.clone().add(C.p(wideP));
       wantT = AV.pos.clone().add(C.t);
       if (C.id === 'follow') wantP.y = Math.max(wantP.y, 8.5);
+    } else if (S.mode === 'look') {
+      const portrait = camera.aspect < 1;
+      const side = portrait ? V(0, 0.2, 0) : V(2.1, 1.5, 0);
+      wantT = AV.pos.clone().add(side);
+      wantP = AV.pos.clone().add(V(side.x, portrait ? 2.6 : 2.3, portrait ? 10 : 7.2));
     } else if (S.mode === 'talk') {
       wantP = V(STAGE.x + Math.sin(t * 0.15) * 1.5, STAGE.top + 3.0, STAGE.z + 10.5 * wideP);
       wantT = V(STAGE.x, STAGE.top + 2.2, STAGE.z);
@@ -3460,6 +3789,7 @@ function start() {
     if (W) for (const u of W.updaters) u(t, dt);
     if (W) for (const c of W.group.children) if (c.userData.spin) c.rotation.y += dt * c.userData.spin;
     syncTouchClasses();
+    if (S.mode === 'look') AV.yaw = Math.sin(t * 0.7) * 0.7;
     if (S.mode === 'play' || S.mode === 'talk' || S.mode === 'finale') updateAvatar(dt);
     if (S.mode !== 'title' && S.mode !== 'brief' && S.mode !== 'teacher') animateAvatar(dt, t);
 
@@ -3531,6 +3861,7 @@ function start() {
           c.taken = true;
           c.mesh.visible = false;
           S.crystals[S.wi]++;
+          earn(1);
           schedulePush();
           sfx.gem();
           burst(c.pos.clone(), ['#64FFDA', '#FFFFFF'], 10, { speed: 3, up: 4 });

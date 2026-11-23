@@ -150,7 +150,7 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   const order = await playAll(page);
   const s = await S(page);
   check('Played all 3 worlds to the finale', s.mode === 'finale', `quests=${order.join(' ')}`);
-  check('15 challenges visited', order.length === 15, `${order.length}`);
+  check('16 challenges visited (with Get dressed!)', order.length === 16, `${order.length}`);
   await wait(2500);
   await page.screenshot({ path: join(OUT, '99_finale.png') });
   const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#btn-csv')]);

@@ -40,6 +40,10 @@ export const DB = {
     const r = await rpc('saga_resume', { p_room: room, p_game: game, p_player: player }, 5000);
     return r.ok ? r.data : null;
   },
+  // crystals, things bought and look of one kid: op = get | earn | buy | look
+  wallet(player, { op, amount = 0, item = null, price = 0, look = null }) {
+    return rpc('saga_wallet', { p_player: player, p_op: op, p_amount: amount, p_item: item, p_price: price, p_look: look }, 8000);
+  },
   // teacher only: token derived from the teacher key (see teacherToken in pass.js)
   history(token, days = 365) {
     return rpc('saga_history', { p_token: token, p_days: days }, 15000);

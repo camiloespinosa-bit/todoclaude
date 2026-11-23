@@ -85,3 +85,48 @@ revoke all on function public.saga_history(text, int) from public;
 grant execute on function public.saga_save(text, text, text, int, jsonb, text, jsonb) to anon, authenticated;
 grant execute on function public.saga_resume(text, text, int) to anon, authenticated;
 grant execute on function public.saga_history(text, int) to anon, authenticated;
+
+-- ---------- Cofre de cristales ("My Look") ----------
+-- Un cofre por niño, compartido por todos los juegos: cristales, cosas compradas y su look.
+create table if not exists public.saga_players (
+  player     smallint primary key,
+  crystals   int not null default 0,
+  owned      jsonb not null default '[]'::jsonb,
+  look       jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table public.saga_players enable row level security;
+revoke all on public.saga_players from anon, authenticated;
+-- regalo de la primera clase (23 nov 2026): los cristales que recogieron ese día
+insert into public.saga_players (player, crystals) values (0, 45), (1, 44) on conflict (player) do nothing;
+
+create or replace function public.saga_wallet(
+  p_player int, p_op text default 'get', p_amount int default 0,
+  p_item text default null, p_price int default 0, p_look jsonb default null)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare w saga_players;
+begin
+  if p_player not between 0 and 9 then raise exception 'saga_wallet: bad player'; end if;
+  insert into saga_players (player) values (p_player) on conflict (player) do nothing;
+  select * into w from saga_players where player = p_player for update;
+  if p_op = 'earn' then
+    if p_amount not between 0 and 200 then raise exception 'saga_wallet: bad amount'; end if;
+    update saga_players set crystals = crystals + p_amount, updated_at = now() where player = p_player;
+  elsif p_op = 'buy' then
+    if p_item is null or length(p_item) > 40 or p_price not between 0 and 500 then raise exception 'saga_wallet: bad item'; end if;
+    if not (w.owned ? p_item) then
+      if w.crystals < p_price then raise exception 'saga_wallet: not enough crystals'; end if;
+      update saga_players set crystals = crystals - p_price, owned = owned || to_jsonb(p_item), updated_at = now()
+        where player = p_player;
+    end if;
+  elsif p_op = 'look' then
+    if p_look is null or pg_column_size(p_look) > 4000 then raise exception 'saga_wallet: bad look'; end if;
+    update saga_players set look = p_look, updated_at = now() where player = p_player;
+  elsif p_op <> 'get' then
+    raise exception 'saga_wallet: bad op';
+  end if;
+  select * into w from saga_players where player = p_player;
+  return jsonb_build_object('crystals', w.crystals, 'owned', w.owned, 'look', w.look);
+end $$;
+revoke all on function public.saga_wallet(int, text, int, text, int, jsonb) from public;
+grant execute on function public.saga_wallet(int, text, int, text, int, jsonb) to anon, authenticated;
