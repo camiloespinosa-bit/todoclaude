@@ -16,8 +16,8 @@ const faces = [400, 600, 700, 800]
   .join('\n');
 
 const targets = [
-  { entry: 'src/games/b4.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html' },
-  { entry: 'src/games/b1.js', template: 'src/game.html', out: 'Bloque1_MeTown.html' },
+  { entry: 'src/games/b4.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html', title: 'The Time Travel Stage' },
+  { entry: 'src/games/b1.js', template: 'src/game.html', out: 'Bloque1_MeTown.html', title: 'Me Town' },
   { entry: 'src/main.js', template: 'src/template.html', out: 'S24_TimeTravelStage_v1.html' },
 ];
 
@@ -34,7 +34,8 @@ for (const t of targets) {
   const js = res.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
   const html = readFileSync(join(here, t.template), 'utf8')
     .replace('/*FONTS*/', () => '/* Poppins (SIL Open Font License 1.1) embedded */\n' + faces)
-    .replace('/*BUNDLE*/', () => js);
+    .replace('/*BUNDLE*/', () => js)
+    .replace(/<title>[^<]*<\/title>/, (m) => (t.title ? `<title>${t.title}</title>` : m));
   const out = join(here, t.out);
   writeFileSync(out, html);
   // claude.ai artifact version: the platform adds its own <html>/<head>/<body> skeleton.

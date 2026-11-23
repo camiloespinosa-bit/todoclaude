@@ -2415,6 +2415,7 @@ function start() {
     arrow.visible = false;
     task(null);
     if (W.stageSign) W.stageSign.visible = false;
+    W.ladder.forEach((l) => (l.sp.visible = false));
     while (talkGroup.children.length) talkGroup.remove(talkGroup.children[0]);
     clues.filter((c) => c.obj).forEach((c, k) => {
       const o = makeObject(c.obj, 1.5);
@@ -2432,6 +2433,7 @@ function start() {
     sfx.end();
     talkGroup.visible = false;
     if (W.stageSign) W.stageSign.visible = true;
+    W.ladder.forEach((l) => (l.sp.visible = true));
     S.mode = 'play';
     showLayer('play');
     arrow.visible = true;

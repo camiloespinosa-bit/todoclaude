@@ -1,3 +1,28 @@
+# Time Travel Saga · un juego 3D por bloque (CCA, Jero y Luciana)
+
+Mismo motor y mismas mecánicas en todos los bloques (caminar, saltar, pisar la respuesta, hablar en el escenario, portal). Cada bloque es un archivo de contenido en `src/games/`.
+
+| Bloque | Archivo | Estado |
+|---|---|---|
+| 1 · Me and My World | `Bloque1_MeTown.html` | Listo · en línea: https://claude.ai/artifact/8wVsAzuXV2NQU9upDGLmmD |
+| 2 · My World Around Me | (pendiente) | |
+| 3 · My Stories | (pendiente) | |
+| 4 · The World is Mine | `S24_TimeTravelStage.html` | Listo (sin conexión) |
+| 5 · I Am Ready | (pendiente) | |
+
+## Bloque 1 · Me Town
+- **HELLO PARK:** Presentation Stations (S1), Meet 3 new friends (S2), Question Stones (do/does), Report Stones (he likes / she plays).
+- **DESCRIBE IT TOWN:** Opposites Run con objetos 3D (S3), Describe Stones, I Like It Because... (S7).
+- **MY DAY STREET:** My Day Track (S5), Your Day: meet 3 neighbors (S6), I or He / She?, He Wakes Up! (tercera persona, do/does/don't/doesn't), My 1-Minute Show (S8).
+
+## Modo en línea (los dos niños a la vez + vista del profe)
+1. Abre el enlace del artifact en cada dispositivo con tu cuenta de claude.ai.
+2. En el de cada niño: elegir 1 (Jerónimo) o 2 (Luciana) y Enter. Hacer clic en el juego para que reciba el teclado.
+3. En el tuyo: tecla `T` o botón "Vista del profe (en vivo)". Ves en qué reto va cada uno, sus aciertos y errores, y puedes dar estrellas, terminar la charla, pausar o saltar un reto a distancia.
+4. "Descargar CSV de partidas" junta los resultados de todas las partidas terminadas.
+
+Sin internet, el archivo HTML funciona igual con doble clic (sin la vista del profe).
+
 # S24 · The Time Travel Stage (CCA, Show Bloque 4)
 
 Abrir `S24_TimeTravelStage.html` con doble clic (Chrome o Edge). Funciona sin internet y sin servidor.
