@@ -2224,8 +2224,8 @@ function start() {
     document.body.classList.toggle('locked', !NET.unlocked);
     document.body.classList.toggle('teacher', !!NET.isTeacher);
   }
-  async function checkTeacherKey() {
-    const key = (params.get('profe') || lsGet('ccaProfe') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  async function checkTeacherKey(typed) {
+    const key = (typed || params.get('profe') || lsGet('ccaProfe') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (!key || !(window.crypto && crypto.subtle)) return;
     try {
       if ((await sha256Hex(`cca-profe|${key}`)) === TEACHER_HASH) {
@@ -2237,6 +2237,20 @@ function start() {
       /* stays locked */
     }
     updateLock();
+    return !!NET.isTeacher;
+  }
+  // the class code box also takes the teacher key (longer than a class code)
+  async function submitCode(value) {
+    const v = (value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (v.length > 6) {
+      if (await checkTeacherKey(v)) {
+        $('room-in').value = '';
+        setNetStatus('Teacher', true);
+        toTeacher();
+      } else setNetStatus('That code is not right.', false);
+      return;
+    }
+    return joinClass(v);
   }
   async function initNet() {
     NET.unlocked = !WEB;
@@ -2317,7 +2331,7 @@ function start() {
         NET.unlocked = true;
         updateLock();
         setNetStatus(`Class ${code} · online`, true);
-        sfx.good();
+        if (!navigator.userActivation || navigator.userActivation.hasBeenActive) sfx.good();
       });
       clearTimeout(NET.gateTimer);
       NET.gateTimer = setTimeout(() => {
@@ -2330,12 +2344,11 @@ function start() {
     e.stopPropagation();
     if (e.key === 'Enter') {
       e.preventDefault();
-      joinClass($('room-in').value);
+      submitCode($('room-in').value);
       $('room-in').blur();
     }
   });
-  $('room-in').addEventListener('change', () => joinClass($('room-in').value));
-  $('room-go').addEventListener('click', () => joinClass($('room-in').value));
+  $('room-go').addEventListener('click', () => submitCode($('room-in').value));
 
   let liveTimer = null;
   function schedulePush() {

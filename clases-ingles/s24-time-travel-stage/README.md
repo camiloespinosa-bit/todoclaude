@@ -17,7 +17,7 @@ Mismo motor y mismas mecánicas en todos los bloques (caminar, saltar, pisar la 
 
 ## Modo en línea (los dos niños a la vez + vista del profe)
 La página web está cerrada: sin código de clase nadie puede jugar.
-1. Profe: abre el enlace privado del profe (`me-town.html?profe=CLAVE`, la clave no está en el repositorio; el navegador la recuerda). Pulsa `T`, luego "Nuevo código". Sale un código de 4 letras y el enlace para los niños.
+1. Profe: abre el enlace privado del profe (`me-town.html?profe=CLAVE`) o escribe la clave en la casilla "Class code" y pulsa Go. La clave no está en el repositorio; el navegador la recuerda. Pulsa `T`, luego "Nuevo código". Sale un código de 4 letras y el enlace para los niños.
 2. Niños: abren el enlace (o escriben el código y pulsan Go). El código solo funciona mientras la vista del profe está abierta (y hasta 12 horas después).
 3. En la vista del profe ves en qué reto va cada uno, aciertos y errores, y puedes dar estrellas, terminar la charla, pausar o saltar un reto.
 4. "Descargar CSV" junta los resultados de las partidas terminadas.
