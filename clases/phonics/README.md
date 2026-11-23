@@ -12,6 +12,7 @@ minuto, materiales y registro, misión para casa).
 | 3 | Palabras de 4 sonidos (CVCC): -st, -nd, -mp... | `s03-cvcc.html` | `pdf/s03-cvcc.pdf` |
 | 4 | Dos consonantes al inicio (CCVC): fr, cl, st... | `s04-ccvc.html` | `pdf/s04-ccvc.pdf` |
 | 5 | Palabras de 5 sonidos (CCVCC): stamp, plant... | `s05-ccvcc.html` | `pdf/s05-ccvcc.pdf` |
+| 6 | Digraphs sh y ch: ship, chip, fish, lunch | `s06-sh-ch.html` | `pdf/s06-sh-ch.pdf` |
 
 Progresión prevista: CVC → CVCC (hand, milk) → CCVC (stop, frog) → CCVCC (stamp) → digraphs (sh, ch, th).
 Cada sesión termina con un Quick Check que decide si se avanza o se repite.
