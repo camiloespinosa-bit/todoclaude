@@ -42,7 +42,7 @@ const FRIENDS = [
     report: [
       { s: 'Ben ___ reggaeton.', a: ['likes', 'like', 'liking'] },
       { s: 'Ben ___ video games.', a: ['plays', 'play', 'playing'] },
-      { s: "Ben ___ like math. He loves it!", a: ['does', 'do', 'is'] },
+      { s: "Ben's favorite subject ___ math.", a: ['is', 'are', 'does'] },
     ] },
   { name: 'Ana', she: true, facts: "Hi! I'm Ana. I like horses. I play volleyball. My favorite food is chicken.",
     report: [

@@ -1023,7 +1023,7 @@ function start() {
     startRing.position.set(L.start.x, 0.1, L.start.z);
     B.group.add(startRing);
     const center = new THREE.Group();
-    center.position.set((L.a.x + L.b.x) / 2, 2.8, (L.a.z + L.b.z) / 2 - 1.5);
+    center.position.set(L.start.x, 2.8, L.start.z - 4.2);
     B.group.add(center);
     return { L, areas, center };
   }
@@ -1837,7 +1837,7 @@ function start() {
             sfx.good();
             burst(V(n.spot.x, 3, n.spot.z), ['#FDD835', '#FFFFFF', WORLDS[S.wi].color], 20, { speed: 5, up: 7 });
             const ask = (Q.def.ask || '').replace('{name}', esc(n.person.name));
-            task(`${Q.def.name} · Listen and ask! <span class="say" id="h-say">${Math.ceil(Q.sayLeft)}</span>`, `<b>${esc(n.person.name)}:</b> "${esc(n.person.facts)}"`, ask ? `<span class="opt">${ask}</span>` : '');
+            task(`${Q.def.name} · Listen and ask! <span class="say" id="h-say">${Math.ceil(Q.sayLeft)}</span>`, `<b>${esc(n.person.name)}:</b> "${esc(n.person.facts)}"`, ask ? `<span class="ask">${ask}</span>` : '');
             logEvent(`${Q.def.name}: met ${n.person.name}`, true);
             renderQuests();
             return;
@@ -1881,7 +1881,7 @@ function start() {
         });
         if (W.showcase) {
           while (W.showcase.children.length) W.showcase.remove(W.showcase.children[0]);
-          if (it.obj) W.showcase.add(makeObject(it.obj, 2.4));
+          if (it.obj) W.showcase.add(makeObject(it.obj, 3.2));
         }
         const lab = `${Q.def.title} ${Q.idx + 1} / ${Q.max} · Step on the right answer!`;
         const s = Q.def.advice ? `The patient says: <i>"${esc(it.p)}"</i>` : esc(it.s).replace('___', '<u>&nbsp;?&nbsp;</u>');
@@ -2986,7 +2986,7 @@ function start() {
       if (W.patient) W.patient.rotation.z = Math.sin(t * 1.5) * 0.08;
       if (W.showcase) {
         W.showcase.rotation.y += dt * 0.8;
-        W.showcase.position.y = 2.6 + Math.sin(t * 2) * 0.15;
+        W.showcase.position.y = 3.2 + Math.sin(t * 2) * 0.15;
       }
       if (W.people) for (const npc of W.people) {
         npc.f(t);
@@ -3152,7 +3152,7 @@ function start() {
         const n = W.people.find((x) => !x.met);
         return n ? { x: n.spot.x, z: n.spot.z + 1.6, y: 0 } : null;
       }
-      if (T === 'ladder') return { x: W.ladder[Q.idx].x, z: LADDER.z, y: 0.2 };
+      if (T === 'ladder') return W.ladder[Q.idx] ? { x: W.ladder[Q.idx].x, z: LADDER.z, y: 0.2 } : null;
       if (T === 'actions') {
         const t = Q.targets[Q.idx];
         const p = t.M.root.getWorldPosition(new THREE.Vector3());
@@ -3160,7 +3160,7 @@ function start() {
       }
       if (T === 'collect') {
         const pk = W.pickups.find((p) => !p.taken);
-        return { x: pk.x, z: pk.z, y: pk.top };
+        return pk ? { x: pk.x, z: pk.z, y: pk.top } : null;
       }
       if (T === 'talk') return { x: STAGE.x, z: STAGE.z, y: STAGE.top };
       if (T === 'portal') return { x: PORTAL.x, z: PORTAL.z + 1, y: 0.4 };
