@@ -336,6 +336,156 @@ function microphone() {
   return g;
 }
 
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+
+function elephant() {
+  const g = new THREE.Group();
+  const grey = '#90A4AE';
+  const body = at(mesh(new THREE.SphereGeometry(0.9, 12, 10), grey), 0, 1.3, 0);
+  body.scale.set(1.3, 1, 0.95);
+  g.add(body);
+  g.add(at(mesh(new THREE.SphereGeometry(0.6, 12, 10), grey), 1.2, 1.7, 0));
+  g.add(rod(V3(1.65, 1.6, 0), V3(1.95, 0.9, 0), 0.14, grey), rod(V3(1.95, 0.9, 0), V3(2.05, 0.5, 0), 0.11, grey));
+  for (const s of [-1, 1]) {
+    const ear = at(mesh(new THREE.CircleGeometry(0.5, 12), '#B0BEC5', { side: THREE.DoubleSide }), 1.0, 1.8, s * 0.55);
+    ear.rotation.y = s * 0.4;
+    g.add(ear);
+    g.add(at(mesh(new THREE.SphereGeometry(0.08, 6, 4), C.deep), 1.6, 1.85, s * 0.3));
+    g.add(at(mesh(new THREE.ConeGeometry(0.06, 0.4, 6), '#FFFFFF'), 1.65, 1.3, s * 0.25));
+  }
+  for (const x of [-0.6, 0.6]) for (const z of [-0.4, 0.4]) g.add(at(mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.8, 8), grey), x, 0.4, z));
+  return g;
+}
+
+function ant() {
+  const g = new THREE.Group();
+  const black = '#263238';
+  g.add(at(mesh(new THREE.SphereGeometry(0.28, 10, 8), black), -0.5, 0.45, 0));
+  g.add(at(mesh(new THREE.SphereGeometry(0.2, 10, 8), black), 0, 0.45, 0));
+  g.add(at(mesh(new THREE.SphereGeometry(0.22, 10, 8), black), 0.42, 0.5, 0));
+  for (const s of [-1, 1]) {
+    for (const x of [-0.15, 0, 0.15]) g.add(rod(V3(x, 0.4, 0), V3(x * 2, 0.05, s * 0.45), 0.025, black));
+    g.add(rod(V3(0.55, 0.6, s * 0.08), V3(0.8, 0.95, s * 0.25), 0.02, black));
+  }
+  return g;
+}
+
+function car() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.BoxGeometry(2.2, 0.55, 1.0), C.red), 0, 0.55, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(1.1, 0.5, 0.9), C.red), -0.1, 1.05, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(1.0, 0.38, 0.92), '#B3E5FC'), -0.1, 1.07, 0));
+  const wheel = new THREE.CylinderGeometry(0.28, 0.28, 0.2, 12);
+  for (const x of [-0.7, 0.7]) for (const z of [-0.5, 0.5]) {
+    const w = at(mesh(wheel, C.deep), x, 0.3, z);
+    w.rotation.x = Math.PI / 2;
+    g.add(w);
+  }
+  g.add(at(mesh(new THREE.BoxGeometry(0.05, 0.15, 0.2), C.yellow), 1.11, 0.62, 0.3), at(mesh(new THREE.BoxGeometry(0.05, 0.15, 0.2), C.yellow), 1.11, 0.62, -0.3));
+  g.rotation.y = -0.5;
+  return g;
+}
+
+function turtle() {
+  const g = new THREE.Group();
+  const shell = at(mesh(new THREE.SphereGeometry(0.8, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), '#558B2F'), 0, 0.3, 0);
+  shell.scale.y = 0.75;
+  g.add(shell);
+  g.add(at(mesh(new THREE.CylinderGeometry(0.82, 0.82, 0.12, 12), '#9CCC65'), 0, 0.3, 0));
+  g.add(at(mesh(new THREE.SphereGeometry(0.28, 10, 8), '#9CCC65'), 1.0, 0.45, 0));
+  for (const s of [-1, 1]) g.add(at(mesh(new THREE.SphereGeometry(0.05, 6, 4), C.deep), 1.2, 0.55, s * 0.12));
+  for (const x of [-0.5, 0.5]) for (const z of [-0.5, 0.5]) g.add(at(mesh(new THREE.SphereGeometry(0.18, 8, 6), '#9CCC65'), x, 0.18, z));
+  g.rotation.y = -0.4;
+  return g;
+}
+
+function phone() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.BoxGeometry(0.9, 1.7, 0.12), '#263238'));
+  g.add(at(mesh(new THREE.BoxGeometry(0.78, 1.45, 0.02), '#4DD0E1', { emissive: '#00ACC1', emissiveIntensity: 0.7 }), 0, 0.03, 0.07));
+  g.add(at(mesh(new THREE.BoxGeometry(0.2, 0.2, 0.02), C.yellow, { emissive: '#B08800', emissiveIntensity: 0.6 }), -0.2, 0.4, 0.09));
+  g.add(at(mesh(new THREE.BoxGeometry(0.2, 0.2, 0.02), C.white), 0.2, 0.4, 0.09));
+  g.rotation.set(-0.2, -0.4, 0.15);
+  return g;
+}
+
+function feather() {
+  const g = new THREE.Group();
+  const vane = mesh(new THREE.SphereGeometry(0.5, 10, 8), C.white);
+  vane.scale.set(0.35, 1.5, 0.08);
+  vane.position.y = 0.9;
+  g.add(vane, rod(V3(0, -0.1, 0), V3(0, 1.8, 0), 0.03, '#BDBDBD'));
+  g.rotation.z = -0.6;
+  return g;
+}
+
+function dumbbell() {
+  const g = new THREE.Group();
+  g.add(rod(V3(-1, 0.4, 0), V3(1, 0.4, 0), 0.08, '#9E9E9E'));
+  for (const s of [-1, 1]) {
+    const w = at(mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.35, 12), '#37474F'), s * 0.85, 0.4, 0);
+    w.rotation.z = Math.PI / 2;
+    g.add(w);
+  }
+  const lab = at(mesh(new THREE.BoxGeometry(0.4, 0.2, 0.02), C.yellow), 0, 0.85, 0);
+  g.add(lab);
+  return g;
+}
+
+function flower() {
+  const g = new THREE.Group();
+  g.add(rod(V3(0, 0, 0), V3(0, 1.4, 0), 0.05, '#43A047'));
+  const leaf = at(mesh(new THREE.SphereGeometry(0.2, 8, 6), '#43A047'), 0.18, 0.6, 0);
+  leaf.scale.set(1.5, 0.5, 0.6);
+  g.add(leaf);
+  for (let k = 0; k < 6; k++) {
+    const a = (k / 6) * Math.PI * 2;
+    g.add(at(mesh(new THREE.SphereGeometry(0.22, 8, 6), '#F06292'), Math.cos(a) * 0.3, 1.5 + Math.sin(a) * 0.3, 0.02));
+  }
+  g.add(at(mesh(new THREE.SphereGeometry(0.18, 8, 6), C.yellow), 0, 1.5, 0.12));
+  return g;
+}
+
+function bug() {
+  const g = new THREE.Group();
+  const body = at(mesh(new THREE.DodecahedronGeometry(0.6, 0), '#6D7B2F'), 0, 0.6, 0);
+  body.scale.set(1.3, 0.8, 1);
+  g.add(body);
+  for (const s of [-1, 1]) {
+    g.add(rod(V3(0.4, 0.9, s * 0.15), V3(0.7, 1.4, s * 0.35), 0.03, '#4E342E'));
+    g.add(at(mesh(new THREE.SphereGeometry(0.12, 8, 6), C.white), 0.7, 1.45, s * 0.35));
+    g.add(at(mesh(new THREE.SphereGeometry(0.06, 6, 4), '#D50000'), 0.78, 1.47, s * 0.35));
+    for (const x of [-0.4, 0, 0.4]) g.add(rod(V3(x, 0.5, s * 0.3), V3(x * 1.3, 0.02, s * 0.75), 0.04, '#4E342E'));
+  }
+  for (let k = 0; k < 5; k++) g.add(at(mesh(new THREE.ConeGeometry(0.08, 0.25, 5), '#827717'), -0.5 + k * 0.25, 1.05, 0));
+  return g;
+}
+
+function coffee() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.CylinderGeometry(0.5, 0.4, 0.9, 14), C.white), 0, 0.45, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.04, 14), '#5D4037'), 0, 0.86, 0));
+  const handle = at(mesh(new THREE.TorusGeometry(0.22, 0.06, 6, 12), C.white), 0.52, 0.5, 0);
+  g.add(handle);
+  for (let k = 0; k < 3; k++) {
+    const s = at(mesh(new THREE.SphereGeometry(0.12 + k * 0.03, 8, 6), '#ECEFF1'), (k - 1) * 0.15, 1.1 + k * 0.28, 0);
+    g.add(s);
+  }
+  g.add(at(mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.05, 14), C.white), 0, 0.02, 0));
+  return g;
+}
+
+function iceCube() {
+  const g = new THREE.Group();
+  const cube = at(mesh(new THREE.BoxGeometry(1, 1, 1), '#B3E5FC', { transparent: true, opacity: 0.8, roughness: 0.1 }), 0, 0.5, 0);
+  cube.rotation.set(0.3, 0.6, 0);
+  g.add(cube);
+  const cube2 = at(mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), '#E1F5FE', { transparent: true, opacity: 0.85, roughness: 0.1 }), 0.7, 0.3, 0.4);
+  cube2.rotation.set(0.2, 0.2, 0.4);
+  g.add(cube2);
+  return g;
+}
+
 export const OBJECTS = [
   { id: 'bike', name: 'Bike', make: bike },
   { id: 'guitar', name: 'Guitar', make: guitar },
@@ -353,6 +503,17 @@ export const OBJECTS = [
   { id: 'chef', name: 'Chef hat', make: chefHat },
   { id: 'palette', name: 'Paints', make: palette },
   { id: 'mic', name: 'Microphone', make: microphone },
+  { id: 'elephant', name: 'Elephant', make: elephant },
+  { id: 'ant', name: 'Ant', make: ant },
+  { id: 'car', name: 'Car', make: car },
+  { id: 'turtle', name: 'Turtle', make: turtle },
+  { id: 'phone', name: 'Phone', make: phone },
+  { id: 'feather', name: 'Feather', make: feather },
+  { id: 'dumbbell', name: 'Weight', make: dumbbell },
+  { id: 'flower', name: 'Flower', make: flower },
+  { id: 'bug', name: 'Bug', make: bug },
+  { id: 'coffee', name: 'Coffee', make: coffee },
+  { id: 'ice', name: 'Ice', make: iceCube },
 ];
 
 // Returns a group centered at the origin whose largest side equals `size`.

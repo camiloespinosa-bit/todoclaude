@@ -2,7 +2,7 @@
 //   S24_TimeTravelStage.html     -> GAME edition (src/game.js + src/game.html)
 //   S24_TimeTravelStage_v1.html  -> first, simpler "stage" edition (src/main.js + src/template.html)
 import { build } from 'esbuild';
-import { readFileSync, writeFileSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, statSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -16,7 +16,8 @@ const faces = [400, 600, 700, 800]
   .join('\n');
 
 const targets = [
-  { entry: 'src/game.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html' },
+  { entry: 'src/games/b4.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html' },
+  { entry: 'src/games/b1.js', template: 'src/game.html', out: 'Bloque1_MeTown.html' },
   { entry: 'src/main.js', template: 'src/template.html', out: 'S24_TimeTravelStage_v1.html' },
 ];
 
@@ -36,5 +37,13 @@ for (const t of targets) {
     .replace('/*BUNDLE*/', () => js);
   const out = join(here, t.out);
   writeFileSync(out, html);
+  // claude.ai artifact version: the platform adds its own <html>/<head>/<body> skeleton.
+  const art = html
+    .replace(/^<!doctype html>\s*/i, '')
+    .replace(/<html[^>]*>|<\/html>|<head>|<\/head>|<body>|<\/body>/gi, '')
+    .replace(/<meta charset="utf-8">\s*/i, '')
+    .replace(/<meta name="viewport"[^>]*>\s*/i, '');
+  mkdirSync(join(here, 'artifact'), { recursive: true });
+  writeFileSync(join(here, 'artifact', t.out), art.trimStart());
   console.log(`Wrote ${t.out} (${(statSync(out).size / 1024).toFixed(0)} KB)`);
 }

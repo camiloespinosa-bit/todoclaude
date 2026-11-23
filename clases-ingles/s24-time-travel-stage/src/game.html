@@ -187,6 +187,47 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 .edit-tip { font-weight: 600; color: var(--dark); font-size: var(--fs); }
 .small-p { font-size: var(--fs) !important; font-weight: 600; margin-top: 1.2vh !important; }
 
+/* ---------- Online / teacher ---------- */
+.teacher-btn { display: none; background: var(--card); color: var(--deep); font-weight: 700; font-size: var(--fs); padding: .35em 1em; border-radius: 999px; box-shadow: var(--shadow); }
+body.online .teacher-btn { display: inline-flex; align-items: center; gap: .5em; }
+.net-warn { display: none; background: #FFF3E0; color: #E65100; font-weight: 700; padding: .4em 1em; border-radius: 16px; max-width: 80vw; text-align: center; }
+.net-warn.on { display: block; }
+#L-teacher { pointer-events: auto; background: rgba(240, 244, 248, .96); overflow: auto; }
+.tdash { padding: 2.4vh 2.4vw; display: flex; flex-direction: column; gap: 2vh; min-height: 100%; }
+.tdh { display: flex; justify-content: space-between; align-items: center; gap: 2vw; flex-wrap: wrap; }
+.tdt { font-size: var(--fs-l); font-weight: 800; }
+.tds { font-weight: 600; color: var(--dark); }
+.tdbtns { display: flex; gap: 1vw; }
+.tdbtns .btn { padding: .35em 1em; }
+.tcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 620px), 1fr)); gap: 2vw; }
+.tcard { background: #fff; border-radius: 24px; box-shadow: var(--shadow); padding: 1.6vh 1.4vw; display: flex; flex-direction: column; gap: 1.2vh; font-size: clamp(20px, 1.25vw, 28px); }
+.th { display: flex; align-items: center; gap: .6em; font-size: 1.3em; }
+.tav { width: 1.8em; height: 1.8em; border-radius: 50%; color: #fff; display: grid; place-items: center; font-weight: 800; }
+.tst { margin-left: auto; font-size: .7em; font-weight: 800; padding: .2em .8em; border-radius: 999px; }
+.tst.on { background: #E8F5E9; color: #2E7D32; }
+.tst.off { background: #ECEFF1; color: #607D8B; }
+.tnow { background: #F0F4F8; border-radius: 14px; padding: .5em .8em; line-height: 1.4; }
+.tbtns { display: flex; flex-wrap: wrap; gap: .4em; align-items: center; font-weight: 700; }
+.tbtns button { background: var(--deep); color: #fff; border-radius: 12px; padding: .3em .7em; font-weight: 800; font-size: .95em; }
+.tbtns button[data-c="stars"] { background: #E0A800; }
+.tbtns button.sent { background: var(--green); }
+.tworlds { display: flex; flex-direction: column; gap: .4em; }
+.tworld { display: flex; flex-wrap: wrap; align-items: center; gap: .4em; padding: .3em .5em; border-radius: 12px; }
+.tworld.now { background: #FFFDE7; outline: 2px solid var(--yellow); }
+.twn { color: #fff; font-weight: 800; padding: .05em .6em; border-radius: 999px; }
+.tstars { color: #E0A800; letter-spacing: .05em; }
+.tdim { color: #CFD8DC; }
+.tchips { display: flex; flex-wrap: wrap; gap: .3em; }
+.tchip { background: #F0F4F8; border-radius: 10px; padding: 0 .45em; font-weight: 600; }
+.tchip.full b { color: var(--green); }
+.tcrys { font-weight: 600; }
+.tev { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .2em; max-height: 14em; overflow: auto; }
+.tev li { display: flex; gap: .5em; padding: .15em .4em; border-radius: 8px; }
+.tev li.ok span { color: var(--green); font-weight: 800; }
+.tev li.bad { background: #FFEBEE; }
+.tev li.bad span { color: #E53935; font-weight: 800; }
+.tmuted { color: #90A4AE; }
+
 #nogl { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: var(--bg); padding: 5vw; text-align: center; }
 #nogl.on { display: flex; }
 #nogl div { background: #fff; border-radius: 32px; padding: 5vh 4vw; box-shadow: var(--shadow); max-width: 1100px; }
@@ -200,22 +241,24 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
   <!-- Title -->
   <section id="L-title" class="layer center-col">
     <div class="card title-card">
-      <div class="brand">CCA · Show Bloque 4</div>
-      <h1>The <span class="p">Time</span> <span class="n">Travel</span> <span class="f">Stage</span></h1>
+      <div class="brand" id="t-brand">CCA · Show Bloque 4</div>
+      <h1 id="t-h1">The <span class="p">Time</span> <span class="n">Travel</span> <span class="f">Stage</span></h1>
     </div>
-    <div class="instr">Who is the Time Traveler today?</div>
+    <div class="instr" id="t-ask">Who is the Time Traveler today?</div>
     <div class="players">
       <button class="player" data-p="0"><span class="avatar">J</span><span>Jerónimo</span><span class="key">1</span></button>
       <button class="player" data-p="1"><span class="avatar">L</span><span>Luciana</span><span class="key">2</span></button>
     </div>
+    <button class="teacher-btn" id="btn-teacher"><span class="key">T</span> Vista del profe (en vivo)</button>
+    <div class="net-warn" id="net-warn">Este dispositivo no puede guardar el avance en línea. Abre el juego con la cuenta del profe.</div>
   </section>
 
   <!-- Briefing -->
   <section id="L-brief" class="layer center-col">
     <div class="card brief">
       <h2 id="b-hi">Hi, Jerónimo!</h2>
-      <p>You are a Time Traveler. Visit 4 worlds!</p>
-      <div class="worlds-row">
+      <p id="b-sub">You are a Time Traveler. Visit 4 worlds!</p>
+      <div class="worlds-row" id="b-worlds">
         <span style="background:var(--orange)">PAST</span>
         <span style="background:var(--turq)">PRESENT</span>
         <span style="background:var(--green)">FUTURE</span>
@@ -297,6 +340,17 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
         <button class="btn nextp" id="btn-next"><span class="key">N</span>Next player</button>
       </div>
       <div class="saved" id="f-saved"></div>
+    </div>
+  </section>
+
+  <!-- Teacher dashboard (online only) -->
+  <section id="L-teacher" class="layer">
+    <div class="tdash">
+      <div class="tdh">
+        <div><div class="tdt">Vista del profe</div><div class="tds" id="td-status">Conectando...</div></div>
+        <div class="tdbtns"><button class="btn csv" id="td-csv">Descargar CSV de partidas</button><button class="btn nextp" id="td-back">Volver</button></div>
+      </div>
+      <div class="tcards" id="td-cards"></div>
     </div>
   </section>
 

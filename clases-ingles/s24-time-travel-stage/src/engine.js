@@ -1,9 +1,9 @@
-// The Time Travel Stage · GAME edition, Bloque 4 complete (CCA S24 "Show Bloque 4")
+// CCA Time Travel Saga · reusable 3D game engine (one game per block, content in src/games/*.js)
 // The child walks a Time Traveler through 4 worlds. Same mechanics everywhere:
 // walk, jump, step on the answer, talk on the stage, go into the portal.
 import * as THREE from 'three';
 import { OBJECTS, makeObject, mat, mesh, at, rod } from './objects.js';
-import { ACTIONS, EVERY_RIGHT, LADDER_VERBS, TODAY_TOMORROW, CAN_Q, ADVICE_Q, DREAMS, OPINIONS, PAST_Q, MIX_Q } from './content.js';
+import { ACTIONS, LADDER_VERBS, DREAMS, OPINIONS } from './content.js';
 
 const $ = (id) => document.getElementById(id);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -25,10 +25,13 @@ const TALK_SECONDS = clamp(parseInt(params.get('t'), 10) || 60, 3, 600);
 const SAY_SECONDS = 10;
 const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg>';
 
-const PLAYERS = [
+const DEFAULT_PLAYERS = [
   { name: 'Jerónimo', suit: '#145389', scarf: '#FDD835', hair: '#3B2A20', long: false },
   { name: 'Luciana', suit: '#F57C00', scarf: '#57A6B5', hair: '#5A3A22', long: true },
 ];
+let GAME = null;
+let WORLDS = [];
+let PLAYERS = DEFAULT_PLAYERS;
 
 // ---------- Map (same layout in every world) ----------
 const ISLAND_R = 39.5;
@@ -53,63 +56,6 @@ const COLLECT_SPOTS = [
 const ACTION_SPOTS = [V(-15, 0, 21), V(15, 0, 21), V(-26, 0, 9), V(26, 0, 9), V(-7, 0, 10), V(8, 0, 10)];
 const TRAMPOLINES = [V(-31, 0, 19), V(31, 0, -9), V(-5, 0, 24)];
 
-// ---------- Worlds ----------
-const WORLDS = [
-  {
-    key: 'past', short: 'Past', name: 'YESTERDAY LAND', tense: 'This is the PAST.',
-    color: '#F57C00', light: '#FFCC80', ground: '#E8A15A', ground2: '#D98A3E', path: '#F6D2A2', rock: '#7A4A2A', rock2: '#5B3820',
-    skyTop: '#F4A259', skyBottom: '#FDEBD3', fog: '#F9DDBF', hemi: ['#FFF3E0', '#B07A4E', 1.9], sun: ['#FFE0B2', 2.4],
-    music: [261.6, 293.7, 329.6, 392.0, 440.0, 523.3],
-    frames: ['<b>Yesterday</b>, I ...', '<b>Last year</b>, I <b>went</b> to ...'],
-    quests: [
-      { type: 'collect', name: 'Find 3 things', short: 'Things', items: ['bike', 'ball', 'dog', 'plane', 'rain', 'book'] },
-      { type: 'stones', name: 'Word Stones', short: 'Words', title: 'Word Stones', bank: PAST_Q, count: 3 },
-      { type: 'talk', name: 'Talk on the stage' },
-      { type: 'portal', name: 'Go into the portal' },
-    ],
-  },
-  {
-    key: 'present', short: 'Present', name: 'TODAY TOWN', tense: 'This is the PRESENT.',
-    color: '#57A6B5', light: '#B2E0E8', ground: '#7CC08A', ground2: '#5FA56E', path: '#E6EEF2', rock: '#2C5F7C', rock2: '#1D3F54',
-    skyTop: '#62B6CB', skyBottom: '#EAF6F8', fog: '#DDEFF3', hemi: ['#FFFFFF', '#6E9A7A', 2.0], sun: ['#FFFFFF', 2.3],
-    music: [392.0, 440.0, 493.9, 587.3, 659.3, 784.0],
-    frames: ['<b>Right now</b>, I <b>am</b> ...<b>ing</b>', '<b>Every day</b>, I ...', 'I <b>can</b> ...', 'I <b>think</b> ... <b>because</b> ...'],
-    quests: [
-      { type: 'actions', name: 'What are they doing?', short: 'Actions' },
-      { type: 'zones', name: 'Every day or right now?', short: 'Every day / Right now', labels: ['EVERY DAY', 'RIGHT NOW'], subs: ['always · usually · every day', 'now · right now · Look!'], bank: EVERY_RIGHT, count: 4 },
-      { type: 'stones', name: 'Can Stones', short: 'Can', title: 'Can Stones', bank: CAN_Q, count: 3 },
-      { type: 'opinion', name: 'Opinion Corner', short: 'Opinions', count: 2 },
-      { type: 'talk', name: 'Talk on the stage' },
-      { type: 'portal', name: 'Go into the portal' },
-    ],
-  },
-  {
-    key: 'future', short: 'Future', name: 'TOMORROW CITY', tense: 'This is the FUTURE.',
-    color: '#7CB342', light: '#C5E1A5', ground: '#3E6B7E', ground2: '#2F5566', path: '#7FD3C4', rock: '#1D3F54', rock2: '#122A38',
-    skyTop: '#10273A', skyBottom: '#2E6F78', fog: '#24525E', hemi: ['#B3E5FC', '#1D3F54', 1.5], sun: ['#C8F7FF', 1.6],
-    music: [220.0, 261.6, 293.7, 329.6, 392.0, 440.0],
-    frames: ["<b>Someday</b>, I'm <b>going to</b> ...", "<b>I'd like to</b> ... <b>because</b> ...", '<b>Next year</b>, I <b>am going to</b> ...', 'If you are tired, you <b>should</b> ...'],
-    quests: [
-      { type: 'collect', name: 'Pick 3 dreams', short: 'Dreams', dreams: true },
-      { type: 'ladder', name: 'Prediction Track', short: 'Prediction Track' },
-      { type: 'zones', name: 'Today or tomorrow?', short: 'Today / Tomorrow', labels: ['TODAY', 'TOMORROW'], subs: ['I play · I am playing', 'I am going to play'], bank: TODAY_TOMORROW, count: 3 },
-      { type: 'stones', name: 'Advice Clinic', short: 'Advice', title: 'Advice Clinic', bank: ADVICE_Q, count: 3, advice: true },
-      { type: 'talk', name: 'Talk on the stage' },
-      { type: 'portal', name: 'Go into the portal' },
-    ],
-  },
-  {
-    key: 'arena', short: 'Ultimate', name: 'ULTIMATE CHALLENGE', tense: 'Everything together!',
-    color: '#FDD835', light: '#FFF59D', ground: '#E9C46A', ground2: '#D9AE4C', path: '#FFF3C4', rock: '#145389', rock2: '#0E3A63',
-    skyTop: '#145389', skyBottom: '#F9C784', fog: '#E9CFA0', hemi: ['#FFF8E1', '#145389', 1.9], sun: ['#FFF3C4', 2.3],
-    music: [329.6, 392.0, 440.0, 523.3, 587.3, 659.3],
-    frames: [],
-    quests: [
-      { type: 'stones', name: 'Ultimate Stones', short: 'Mixed review', title: 'Ultimate Stones', bank: MIX_Q, count: 5 },
-      { type: 'portal', name: 'Go to the Time Master stage', final: true },
-    ],
-  },
-];
 const PRON = (npc) => (npc.she ? 'She' : 'He');
 
 // ---------- WebGL ----------
@@ -126,15 +72,23 @@ function showNoGL() {
   $('ui').style.display = 'none';
 }
 let renderer = null;
-if (!webglAvailable()) showNoGL();
-else {
+export function runGame(cfg) {
+  GAME = cfg;
+  PLAYERS = cfg.players || DEFAULT_PLAYERS;
+  WORLDS = cfg.worlds.map((w) => ({ theme: w.key, ...w }));
+  document.title = cfg.title || document.title;
+  const setText = (id, v) => { const el = $(id); if (el && v != null) el.innerHTML = v; };
+  setText('t-brand', cfg.brand);
+  setText('t-h1', cfg.h1);
+  setText('t-ask', cfg.ask);
+  setText('b-sub', cfg.briefLine);
+  setText('b-worlds', WORLDS.map((w) => `<span style="background:${w.color};${w.theme === 'arena' ? 'color:var(--blue)' : ''}">${w.short.toUpperCase()}</span>`).join(''));
+  if (!webglAvailable()) return showNoGL();
   try {
     renderer = new THREE.WebGLRenderer({ canvas: $('c'), antialias: true, powerPreference: 'high-performance' });
   } catch (e) {
-    showNoGL();
+    return showNoGL();
   }
-}
-if (renderer) {
   const ready = document.fonts && document.fonts.load
     ? Promise.all([document.fonts.load('800 100px Poppins'), document.fonts.load('700 40px Poppins')])
     : Promise.resolve();
@@ -192,7 +146,7 @@ function start() {
     hemi.intensity = w.hemi[2];
     sun.color.set(w.sun[0]);
     sun.intensity = w.sun[1];
-    nightStars.visible = w.key === 'future' || w.key === 'finale';
+    nightStars.visible = w.theme === 'future' || w.theme === 'finale';
   }
 
   // ---------- Shared helpers ----------
@@ -523,6 +477,15 @@ function start() {
           M.blob.position.set(M.root.position.x, 0.03, M.root.position.z);
         };
         break;
+      case 'waving':
+        f = (t) => {
+          const fast = npc.talking ? 2.2 : 1;
+          M.armR.rotation.set(up - 0.4, 0, 0.5 + Math.sin(t * 6 * fast + npc.phase) * 0.45);
+          M.armL.rotation.set(0, 0, -0.08);
+          M.head.rotation.z = Math.sin(t * 2 + npc.phase) * 0.12;
+          M.body.position.y = npc.talking ? Math.abs(Math.sin(t * 5)) * 0.15 : 0;
+        };
+        break;
       case 'jumping':
         f = (t) => {
           const j = Math.abs(Math.sin(t * 3.4 + npc.phase));
@@ -705,11 +668,13 @@ function start() {
     wi: 0,
     q: 0,
     Q: null,
-    results: [[], [], [], []],
-    stars: [0, 0, 0, 0],
-    clues: [[], [], [], []],
-    crystals: [0, 0, 0, 0],
-    crystalsMax: [0, 0, 0, 0],
+    results: [],
+    stars: [],
+    clues: [],
+    crystals: [],
+    crystalsMax: [],
+    met: [],
+    events: [],
     talkLeft: TALK_SECONDS,
     talkRunning: false,
     paused: false,
@@ -764,7 +729,8 @@ function start() {
     }
 
     // landmark
-    const landmark = w.key === 'past' ? hourglass() : w.key === 'present' ? clockTower() : w.key === 'future' ? rocket() : bigTrophy();
+    const lm = w.landmark || { past: 'hourglass', present: 'clock', future: 'rocket' }[w.theme] || 'trophy';
+    const landmark = LANDMARKS[lm] ? LANDMARKS[lm](w) : bigTrophy();
     landmark.position.copy(LANDMARK);
     g.add(landmark);
     B.colliders.push({ x: LANDMARK.x, z: LANDMARK.z, r: 2.6 });
@@ -793,14 +759,14 @@ function start() {
         B.colliders.push({ x, z, r: big ? 2.6 : 1.1 });
       }
     }
-    if (w.key === 'past') {
+    if (w.theme === 'past') {
       const wm = windmill();
       wm.position.set(33, 0, 20);
       g.add(wm);
       B.colliders.push({ x: 33, z: 20, r: 2.2 });
       B.updaters.push((t) => (wm.userData.blades.rotation.z = t * 0.8));
     }
-    if (w.key === 'present') {
+    if (w.theme === 'present') {
       const ft = fountain();
       ft.position.set(-33, 0, -2);
       g.add(ft);
@@ -816,7 +782,7 @@ function start() {
         });
       }
     }
-    if (w.key === 'future') {
+    if (w.theme === 'future') {
       for (let k = 0; k < 4; k++) {
         const car = hoverCar(['#FDD835', '#F57C00', '#57A6B5', '#E91E63'][k]);
         g.add(car);
@@ -828,7 +794,7 @@ function start() {
         });
       }
     }
-    if (w.key === 'arena') {
+    if (w.theme === 'arena') {
       for (let k = 0; k < 4; k++) {
         const bal = balloon(['#F57C00', '#57A6B5', '#7CB342', '#E91E63'][k]);
         g.add(bal);
@@ -842,7 +808,7 @@ function start() {
       const tg = new THREE.Group();
       tg.position.copy(tp);
       tg.add(at(mesh(new THREE.CylinderGeometry(1.8, 1.9, 0.25, 16), '#1D3F54'), 0, 0.12, 0));
-      const pad = at(mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.1, 16), w.key === 'arena' ? '#E91E63' : w.color), 0, 0.3, 0);
+      const pad = at(mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.1, 16), w.theme === 'arena' ? '#E91E63' : w.color), 0, 0.3, 0);
       tg.add(pad);
       const rim = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.12, 6, 24), glow('#FFFFFF', 0.7));
       rim.rotation.x = Math.PI / 2;
@@ -877,13 +843,15 @@ function start() {
     }
 
     // quest stations
+    const padQs = w.quests.filter((q) => q.type === 'stones' || q.type === 'stations');
+    if (padQs.length) buildPads(B, padQs);
     for (const q of w.quests) {
       if (q.type === 'collect') buildCollect(B, q);
       if (q.type === 'actions') buildActions(B);
-      if (q.type === 'stones') buildPads(B, q);
-      if (q.type === 'zones') B.zones = buildTwoAreas(B, ZONES, q.labels, q.subs);
-      if (q.type === 'opinion') B.opin = buildTwoAreas(B, OPIN, ['', ''], ['', '']);
-      if (q.type === 'ladder') buildLadder(B);
+      if (q.type === 'interview' && !B.people) buildPeople(B, q);
+      if (q.type === 'zones' && !B.zones) B.zones = buildTwoAreas(B, ZONES, q.labels, q.subs);
+      if (q.type === 'opinion' && !B.opin) B.opin = buildTwoAreas(B, OPIN, ['', ''], ['', '']);
+      if (q.type === 'ladder') buildLadder(B, q);
       if (q.type === 'talk') buildStage(B);
       if (q.type === 'portal') buildPortal(B, q);
     }
@@ -898,13 +866,13 @@ function start() {
     for (let i = 0; i < N; i++) pp.set([Math.random() * 84 - 42, Math.random() * 18, Math.random() * 84 - 42], i * 3);
     const pgeo = new THREE.BufferGeometry();
     pgeo.setAttribute('position', new THREE.BufferAttribute(pp, 3));
-    const pcol = { past: '#E65100', present: '#FFFFFF', future: '#B2FF59', arena: '#FDD835' }[w.key];
-    g.add(new THREE.Points(pgeo, new THREE.PointsMaterial({ color: pcol, size: w.key === 'past' ? 0.35 : 0.22, transparent: true, opacity: 0.85, depthWrite: false })));
+    const pcol = { past: '#E65100', present: '#FFFFFF', future: '#B2FF59', arena: '#FDD835' }[w.theme] || '#FFFFFF';
+    g.add(new THREE.Points(pgeo, new THREE.PointsMaterial({ color: pcol, size: w.theme === 'past' ? 0.35 : 0.22, transparent: true, opacity: 0.85, depthWrite: false })));
     B.updaters.push((t, dt) => {
       const a = pgeo.attributes.position;
       for (let i = 0; i < N; i++) {
         let y = a.getY(i);
-        if (w.key === 'past') {
+        if (w.theme === 'past') {
           y -= dt * 1.2;
           a.setX(i, a.getX(i) + Math.sin(t * 1.3 + i) * dt * 0.8);
           if (y < 0) y = 18;
@@ -921,7 +889,7 @@ function start() {
     return B;
   }
 
-  const inkOf = (w) => (w.key === 'arena' ? '#145389' : w.color);
+  const inkOf = (w) => (w.theme === 'arena' ? '#145389' : w.color);
 
   function addPlatform(B, x, z, r, top, w) {
     B.group.add(at(mesh(new THREE.CylinderGeometry(r, r * 1.08, top, 10), w.ground2), x, top / 2, z));
@@ -970,13 +938,14 @@ function start() {
     });
   }
 
-  function buildPads(B, q) {
+  function buildPads(B, qs) {
     const w = B.def;
+    const q = qs[0];
     PADS.xs.forEach((x, k) => {
       const pad = at(mesh(new THREE.BoxGeometry(PADS.half * 2, 0.3, PADS.half * 2), '#E3EAF0'), x, 0.15, PADS.z);
       B.group.add(pad);
       B.group.add(at(new THREE.Mesh(new THREE.BoxGeometry(PADS.half * 2 + 0.4, 0.12, PADS.half * 2 + 0.4), glow(w.light, 0.5)), x, 0.06, PADS.z));
-      const word = textSprite('', { bg: '#1D3F54', font: 120, w: 1024, h: 220, scale: q.advice ? 0.68 : 0.8 });
+      const word = textSprite('', { bg: '#1D3F54', font: 120, w: 1024, h: 220, scale: qs.some((x) => x.advice) ? 0.68 : 0.8 });
       word.position.set(x, 3.4, PADS.z);
       B.group.add(word);
       const letter = textSprite(['A', 'B', 'C'][k], { bg: inkOf(w), font: 120, w: 256, h: 220, scale: 0.45 });
@@ -992,7 +961,20 @@ function start() {
     const sign = textSprite(q.title.toUpperCase(), { bg: inkOf(w), scale: 0.8 });
     sign.position.set(PADS.xs[1], 7.6, PADS.z - 2);
     B.group.add(sign);
-    if (q.advice) {
+    B.padSign = sign;
+    if (qs.some((x) => x.showcase)) {
+      const ped = new THREE.Group();
+      ped.position.set(PADS.xs[1], 0, PADS.z - 5.5);
+      ped.add(at(mesh(new THREE.CylinderGeometry(1.4, 1.6, 1.2, 12), '#F7FAFC'), 0, 0.6, 0));
+      ped.add(at(mesh(new THREE.CylinderGeometry(1.45, 1.45, 0.12, 12), w.color), 0, 1.22, 0));
+      const holder = new THREE.Group();
+      holder.position.y = 2.6;
+      ped.add(holder);
+      B.group.add(ped);
+      B.colliders.push({ x: PADS.xs[1], z: PADS.z - 5.5, r: 1.7 });
+      B.showcase = holder;
+    }
+    if (qs.some((x) => x.advice)) {
       const bed = new THREE.Group();
       bed.add(at(mesh(new THREE.BoxGeometry(3, 0.7, 1.4), '#FFFFFF'), 0, 0.35, 0));
       bed.add(at(mesh(new THREE.BoxGeometry(0.2, 1.4, 1.4), '#57A6B5'), -1.5, 0.7, 0));
@@ -1040,12 +1022,31 @@ function start() {
     startRing.rotation.x = Math.PI / 2;
     startRing.position.set(L.start.x, 0.1, L.start.z);
     B.group.add(startRing);
-    return { L, areas };
+    const center = new THREE.Group();
+    center.position.set((L.a.x + L.b.x) / 2, 2.8, (L.a.z + L.b.z) / 2 - 1.5);
+    B.group.add(center);
+    return { L, areas, center };
   }
 
-  function buildLadder(B) {
+  function buildPeople(B, q) {
+    const people = q.people();
+    const looksShe = shuffle(NPC_LOOKS.filter((l) => l.long)), looksHe = shuffle(NPC_LOOKS.filter((l) => !l.long));
+    B.people = people.map((p, k) => {
+      const look = p.she ? looksShe[k % looksShe.length] : looksHe[k % looksHe.length];
+      const npc = makeNPC('waving', ACTION_SPOTS[k], look, k);
+      npc.person = p;
+      npc.label.userData.draw(`Hi! I'm ${p.name}.`, inkOf(B.def));
+      npc.label.visible = true;
+      B.group.add(npc.group);
+      B.colliders.push({ x: npc.spot.x, z: npc.spot.z, r: 1.0 });
+      return npc;
+    });
+  }
+
+  function buildLadder(B, q = {}) {
     const w = B.def;
-    const verbs = shuffle(LADDER_VERBS).slice(0, LADDER.xs.length);
+    const steps = q.steps || shuffle(LADDER_VERBS).slice(0, LADDER.xs.length).map((v) => ({ label: v, say: `I am going to <u>${v}</u>!` }));
+    const verbs = steps.map((st) => st.label);
     const x0 = LADDER.xs[0] - LADDER.half, x1 = LADDER.xs[LADDER.xs.length - 1] + LADDER.half;
     for (const dz of [-LADDER.half - 0.15, LADDER.half + 0.15]) B.group.add(at(mesh(new THREE.BoxGeometry(x1 - x0, 0.2, 0.25), '#FDD835'), (x0 + x1) / 2, 0.1, LADDER.z + dz));
     LADDER.xs.forEach((x, k) => {
@@ -1054,10 +1055,10 @@ function start() {
       const sp = textSprite(verbs[k], { bg: '#1D3F54', font: 120, w: 768, h: 220, scale: 0.55 });
       sp.position.set(x, 2.4, LADDER.z);
       B.group.add(sp);
-      B.ladder.push({ x, verb: verbs[k], tile, sp, done: false });
+      B.ladder.push({ x, verb: verbs[k], say: steps[k].say, tile, sp, done: false });
       B.platforms.push({ rect: true, x, z: LADDER.z, hw: LADDER.half - 0.15, hd: LADDER.half, top: 0.2 });
     });
-    const sign = textSprite('PREDICTION TRACK', { bg: inkOf(w), scale: 0.8 });
+    const sign = textSprite(q.sign || 'PREDICTION TRACK', { bg: inkOf(w), scale: 0.8 });
     sign.position.set(15.5, 6.2, LADDER.z - 2.5);
     B.group.add(sign);
   }
@@ -1125,19 +1126,19 @@ function start() {
   function tree(w, n) {
     const g = new THREE.Group();
     const h = 0.9 + (n % 4) * 0.15;
-    if (w.key === 'future') {
+    if (w.theme === 'future') {
       g.add(at(mesh(new THREE.CylinderGeometry(0.15, 0.25, 1.4 * h, 6), '#455A64'), 0, 0.7 * h, 0));
       const cr = at(mesh(new THREE.OctahedronGeometry(1.1 * h, 0), n % 2 ? '#64FFDA' : '#B2FF59', { emissive: n % 2 ? '#00897B' : '#558B2F', emissiveIntensity: 0.7 }), 0, 2.4 * h, 0);
       cr.scale.y = 1.5;
       g.add(cr);
       return g;
     }
-    if (w.key === 'arena') {
+    if (w.theme === 'arena') {
       g.add(rod(V(0, 0, 0), V(0, 5, 0), 0.1, '#1D3F54'));
       g.add(at(mesh(new THREE.BoxGeometry(1.6, 1, 0.06), ['#F57C00', '#57A6B5', '#7CB342', '#E91E63'][n % 4]), 0.8, 4.4, 0));
       return g;
     }
-    const leaf = w.key === 'past' ? ['#E65100', '#F9A825', '#C62828'][n % 3] : ['#43A047', '#2E7D32', '#7CB342'][n % 3];
+    const leaf = w.theme === 'past' ? ['#E65100', '#F9A825', '#C62828'][n % 3] : ['#43A047', '#2E7D32', '#7CB342'][n % 3];
     g.add(at(mesh(new THREE.CylinderGeometry(0.22 * h, 0.32 * h, 1.3 * h, 6), '#7B4A26'), 0, 0.65 * h, 0));
     g.add(at(mesh(new THREE.ConeGeometry(1.3 * h, 2 * h, 7), leaf), 0, 2.1 * h, 0));
     g.add(at(mesh(new THREE.ConeGeometry(0.95 * h, 1.6 * h, 7), leaf), 0, 3.0 * h, 0));
@@ -1146,21 +1147,21 @@ function start() {
 
   function building(w, n) {
     const g = new THREE.Group();
-    if (w.key === 'future') {
+    if (w.theme === 'future') {
       const h = 7 + (n % 3) * 3;
       g.add(at(mesh(new THREE.BoxGeometry(3.4, h, 3.4), '#CFD8DC'), 0, h / 2, 0));
       for (let y = 1.2; y < h - 0.5; y += 1.3) g.add(at(mesh(new THREE.BoxGeometry(3.5, 0.35, 3.5), '#4DD0E1', { emissive: '#00ACC1', emissiveIntensity: 0.9 }), 0, y, 0));
       g.add(at(mesh(new THREE.ConeGeometry(0.4, 2, 6), '#FDD835', { emissive: '#F57C00', emissiveIntensity: 0.5 }), 0, h + 1, 0));
       return g;
     }
-    if (w.key === 'arena') {
+    if (w.theme === 'arena') {
       g.add(at(mesh(new THREE.CylinderGeometry(0.9, 1.1, 6, 10), '#FFF8E1'), 0, 3, 0));
       g.add(at(mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.5, 10), '#145389'), 0, 6.2, 0));
       g.add(at(mesh(new THREE.ConeGeometry(0.6, 1.2, 8), '#FDD835', { emissive: '#F57C00', emissiveIntensity: 0.7 }), 0, 7.0, 0));
       return g;
     }
-    const wall = w.key === 'past' ? ['#F3E0C0', '#E7CBA0'][n % 2] : ['#FFFFFF', '#FFE082', '#B3E5FC'][n % 3];
-    const roof = w.key === 'past' ? '#8D4E2A' : ['#E53935', '#145389', '#F57C00'][n % 3];
+    const wall = w.theme === 'past' ? ['#F3E0C0', '#E7CBA0'][n % 2] : ['#FFFFFF', '#FFE082', '#B3E5FC'][n % 3];
+    const roof = w.theme === 'past' ? '#8D4E2A' : ['#E53935', '#145389', '#F57C00'][n % 3];
     g.add(at(mesh(new THREE.BoxGeometry(3.6, 3, 3.2), wall), 0, 1.5, 0));
     const r = at(mesh(new THREE.ConeGeometry(3, 2, 4), roof), 0, 4, 0);
     r.rotation.y = Math.PI / 4;
@@ -1257,6 +1258,79 @@ function start() {
     t.position.y = 3.8;
     g.add(t);
     g.userData.update = (time) => (t.rotation.y = time * 0.4);
+    return g;
+  }
+
+  const LANDMARKS = {
+    hourglass: () => hourglass(),
+    clock: () => clockTower(),
+    rocket: () => rocket(),
+    trophy: () => bigTrophy(),
+    hello: (w) => helloSign(w),
+    magnifier: (w) => magnifier(w),
+    sun: (w) => morningSun(w),
+  };
+
+  function helloSign(w) {
+    const g = new THREE.Group();
+    for (const s of [-1, 1]) g.add(rod(V(s * 2.2, 0, 0), V(s * 2.2, 5.5, 0), 0.18, '#8D5A2B'));
+    g.add(at(mesh(new THREE.BoxGeometry(6, 2.6, 0.3), '#FFFFFF'), 0, 5.2, 0));
+    g.add(at(mesh(new THREE.BoxGeometry(6.3, 2.9, 0.2), w.color), 0, 5.2, -0.1));
+    const txt = textSprite('HELLO!', { bg: w.color, font: 130, scale: 0.9 });
+    txt.userData.noFade = true;
+    txt.position.set(0, 5.2, 0.4);
+    g.add(txt);
+    const balloons = [];
+    ['#F57C00', '#FDD835', '#7CB342'].forEach((c, k) => {
+      const b = new THREE.Group();
+      const ball = mesh(new THREE.SphereGeometry(0.55, 12, 10), c);
+      ball.scale.y = 1.2;
+      b.add(ball, rod(V(0, -0.65, 0), V(0, -2.2, 0), 0.02, '#1D3F54'));
+      b.position.set(-3 + k * 0.6, 7.6 + k * 0.3, 0.2);
+      g.add(b);
+      balloons.push(b);
+    });
+    g.userData.update = (t) => balloons.forEach((b, k) => (b.rotation.z = Math.sin(t * 1.3 + k) * 0.15));
+    return g;
+  }
+
+  function magnifier(w) {
+    const g = new THREE.Group();
+    const lens = new THREE.Group();
+    lens.add(mesh(new THREE.TorusGeometry(2, 0.35, 10, 32), w.color));
+    lens.add(new THREE.Mesh(new THREE.CircleGeometry(2, 32), new THREE.MeshStandardMaterial({ color: '#B3E5FC', transparent: true, opacity: 0.45, side: THREE.DoubleSide })));
+    lens.add(rod(V(0, -2.2, 0), V(0, -4.8, 0), 0.32, '#5D4037'));
+    lens.position.y = 5.4;
+    g.add(lens);
+    g.add(at(mesh(new THREE.CylinderGeometry(1.6, 1.9, 0.5, 12), '#5D4037'), 0, 0.25, 0));
+    g.userData.update = (t) => {
+      lens.rotation.y = Math.sin(t * 0.5) * 0.6;
+      lens.rotation.z = Math.sin(t * 0.7) * 0.08;
+    };
+    return g;
+  }
+
+  function morningSun(w) {
+    const g = new THREE.Group();
+    g.add(rod(V(0, 0, 0), V(0, 4, 0), 0.25, '#8D5A2B'));
+    const sunG = new THREE.Group();
+    sunG.position.y = 6;
+    sunG.add(mesh(new THREE.SphereGeometry(1.6, 16, 12), '#FDD835', { emissive: '#F9A825', emissiveIntensity: 0.6 }));
+    for (let k = 0; k < 10; k++) {
+      const a = (k / 10) * Math.PI * 2;
+      const ray = at(mesh(new THREE.ConeGeometry(0.3, 1.1, 6), '#FFB300', { emissive: '#F57C00', emissiveIntensity: 0.4 }), Math.cos(a) * 2.3, Math.sin(a) * 2.3, 0);
+      ray.rotation.z = a - Math.PI / 2;
+      sunG.add(ray);
+    }
+    for (const s of [-1, 1]) sunG.add(at(mesh(new THREE.SphereGeometry(0.18, 8, 6), '#1D3F54'), s * 0.55, 0.3, 1.5));
+    const smile = at(mesh(new THREE.TorusGeometry(0.5, 0.08, 6, 12, Math.PI), '#1D3F54'), 0, -0.2, 1.55);
+    smile.rotation.z = Math.PI;
+    sunG.add(smile);
+    g.add(sunG);
+    g.userData.update = (t) => {
+      sunG.rotation.z = Math.sin(t * 0.6) * 0.15;
+      sunG.position.y = 6 + Math.sin(t * 1.2) * 0.2;
+    };
     return g;
   }
 
@@ -1421,7 +1495,7 @@ function start() {
     S.Q = null;
     $('O-pause').classList.remove('on');
     finale.visible = false;
-    loadWorld(1);
+    loadWorld(GAME.titleWorld || 0);
     avatarHolder.visible = false;
     arrow.visible = false;
     W.beacon.visible = false;
@@ -1437,11 +1511,18 @@ function start() {
     showLayer('brief');
   }
   function startTrip() {
-    S.results = [[], [], [], []];
-    S.stars = [0, 0, 0, 0];
-    S.clues = [[], [], [], []];
-    S.crystals = [0, 0, 0, 0];
-    S.crystalsMax = [0, 0, 0, 0];
+    NET.role = 'player';
+    NET.runId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+    S.lastTalkWi = null;
+    if (NET.online) listenCommands();
+    const n = WORLDS.length;
+    S.results = Array.from({ length: n }, () => []);
+    S.stars = Array(n).fill(0);
+    S.clues = Array.from({ length: n }, () => []);
+    S.crystals = Array(n).fill(0);
+    S.crystalsMax = Array(n).fill(0);
+    S.met = Array.from({ length: n }, () => []);
+    S.events = [];
     setAvatar(S.player);
     enterWorld(0);
   }
@@ -1468,6 +1549,7 @@ function start() {
     void arr.offsetWidth;
     arr.classList.add('on');
     startMusic(WORLDS[wi].music);
+    logEvent(`Arrived in ${WORLDS[wi].name}`, true);
     startQuest(0, 2600);
   }
 
@@ -1487,6 +1569,7 @@ function start() {
       Q.started = true;
       H.start(Q);
       renderQuests();
+      schedulePush();
     };
     if (delay) setTimeout(go, delay);
     else go();
@@ -1499,6 +1582,7 @@ function start() {
       S.results[S.wi].push({ name: Q.def.name, short: Q.def.short || Q.def.name, score: Q.score, max: Q.max, details: Q.details.join('; ') });
     }
     task(null);
+    logEvent(`${Q.def.name}${Q.max ? `: ${Q.score}/${Q.max}` : ''} ✔`, true);
     const next = S.q + 1;
     if (next < WORLDS[S.wi].quests.length) startQuest(next, 700);
   }
@@ -1624,11 +1708,168 @@ function start() {
       },
     },
 
+    // ---- S1 Presentation Stations: step on a station, say it out loud ----
+    stations: {
+      start(Q) {
+        Q.items = Q.def.items;
+        Q.max = Q.items.length;
+        Q.done = false;
+        Q.doneK = new Set();
+        if (W.padSign) W.padSign.userData.draw(Q.def.title.toUpperCase(), inkOf(WORLDS[S.wi]));
+        W.pads.forEach((p, k) => {
+          p.answer = Q.items[k] ? Q.items[k].label : '';
+          p.word.userData.draw(p.answer, '#1D3F54');
+          p.mesh.material = mat(WORLDS[S.wi].light);
+        });
+        this.show(Q);
+      },
+      show(Q) {
+        Q.phase = '';
+        task(`${Q.def.title} ${Q.doneK.size} / ${Q.max} · Step on a station and talk!`, 'Visit all the stations!', optsHTML(Q.items.map((x) => x.label)));
+        Q.ready = true;
+      },
+      count: (Q) => `${Q.doneK.size}/${Q.max}`,
+      goal(Q) {
+        if (Q.phase === 'say') return null;
+        let best = null, bd = 1e9;
+        W.pads.forEach((p, k) => {
+          if (Q.doneK.has(k) || !Q.items[k]) return;
+          const d = Math.hypot(p.x - AV.pos.x, p.z - AV.pos.z);
+          if (d < bd) {
+            bd = d;
+            best = V(p.x, 0, p.z);
+          }
+        });
+        return best;
+      },
+      update(Q, dt) {
+        if (Q.phase === 'say') {
+          Q.sayLeft -= dt;
+          const el = $('h-say');
+          if (el) el.textContent = Math.max(0, Math.ceil(Q.sayLeft));
+          if (Q.sayLeft <= 0) this.next(Q);
+          return;
+        }
+        if (!Q.ready || !AV.onGround) return;
+        W.pads.forEach((p, k) => {
+          if (!Q.ready || Q.doneK.has(k) || !Q.items[k]) return;
+          if (Math.abs(AV.pos.x - p.x) < PADS.half && Math.abs(AV.pos.z - p.z) < PADS.half) {
+            Q.ready = false;
+            Q.phase = 'say';
+            Q.cur = k;
+            Q.sayLeft = Q.def.seconds || 12;
+            sfx.good();
+            p.mesh.material = mat('#FDD835');
+            burst(V(p.x, 1, p.z), ['#FDD835', '#FFFFFF'], 16, { speed: 4, up: 6 });
+            task(`${Q.items[k].label} · Say it out loud! <span class="say" id="h-say">${Math.ceil(Q.sayLeft)}</span>`, Q.items[k].say);
+            logEvent(`${Q.def.title}: talking at ${Q.items[k].label}`, true);
+          }
+        });
+      },
+      next(Q) {
+        if (Q.phase !== 'say') return;
+        const k = Q.cur;
+        Q.doneK.add(k);
+        Q.score = Q.doneK.size;
+        Q.details.push(Q.items[k].label);
+        W.pads[k].mesh.material = mat('#7CB342');
+        feedback('Great!', true);
+        renderQuests();
+        if (Q.doneK.size >= Q.max) {
+          Q.phase = '';
+          setTimeout(() => S.Q === Q && completeQuest(), 900);
+        } else this.show(Q);
+      },
+      skip(Q) {
+        Q.details.push('skipped by teacher');
+        completeQuest();
+      },
+    },
+
+    // ---- S2 / S6 Interview: walk to a person, listen, ask questions ----
+    interview: {
+      start(Q) {
+        Q.max = W.people.length;
+        Q.phase = '';
+        this.show(Q);
+      },
+      show(Q) {
+        const met = W.people.filter((n) => n.met).length;
+        task(`${Q.def.name} ${met} / ${Q.max}`, met ? 'Walk to another friend!' : 'Walk to a new friend and say hello!');
+        Q.ready = true;
+      },
+      count: (Q) => `${W.people.filter((n) => n.met).length}/${Q.max}`,
+      goal(Q) {
+        if (Q.phase === 'ask') return null;
+        let best = null, bd = 1e9;
+        for (const n of W.people) {
+          if (n.met) continue;
+          const d = Math.hypot(n.spot.x - AV.pos.x, n.spot.z - AV.pos.z);
+          if (d < bd) {
+            bd = d;
+            best = V(n.spot.x, 0, n.spot.z);
+          }
+        }
+        return best;
+      },
+      update(Q, dt) {
+        if (Q.phase === 'ask') {
+          Q.sayLeft -= dt;
+          const el = $('h-say');
+          if (el) el.textContent = Math.max(0, Math.ceil(Q.sayLeft));
+          if (Q.sayLeft <= 0) this.next(Q);
+          return;
+        }
+        if (!Q.ready) return;
+        for (const n of W.people) {
+          if (n.met) continue;
+          if (Math.hypot(AV.pos.x - n.spot.x, AV.pos.z - n.spot.z) < 2.9) {
+            n.met = true;
+            n.talking = true;
+            Q.cur = n;
+            Q.ready = false;
+            Q.phase = 'ask';
+            Q.sayLeft = Q.def.seconds || 15;
+            Q.score++;
+            Q.details.push(n.person.name);
+            (S.met[S.wi] ||= []).push(n.person);
+            S.clues[S.wi].push({ label: n.person.name });
+            sfx.good();
+            burst(V(n.spot.x, 3, n.spot.z), ['#FDD835', '#FFFFFF', WORLDS[S.wi].color], 20, { speed: 5, up: 7 });
+            const ask = (Q.def.ask || '').replace('{name}', esc(n.person.name));
+            task(`${Q.def.name} · Listen and ask! <span class="say" id="h-say">${Math.ceil(Q.sayLeft)}</span>`, `<b>${esc(n.person.name)}:</b> "${esc(n.person.facts)}"`, ask ? `<span class="opt">${ask}</span>` : '');
+            logEvent(`${Q.def.name}: met ${n.person.name}`, true);
+            renderQuests();
+            return;
+          }
+        }
+      },
+      next(Q) {
+        if (Q.phase !== 'ask') return;
+        Q.phase = '';
+        if (Q.cur) Q.cur.talking = false;
+        if (W.people.every((n) => n.met)) setTimeout(() => S.Q === Q && completeQuest(), 600);
+        else this.show(Q);
+      },
+      skip(Q) {
+        for (const n of W.people) if (!n.met) {
+          n.met = true;
+          (S.met[S.wi] ||= []).push(n.person);
+        }
+        Q.details.push('skipped by teacher');
+        completeQuest();
+      },
+    },
+
     // ---- Stones: Word / Can / Advice / Ultimate ----
     stones: {
       start(Q) {
-        Q.list = shuffle(Q.def.bank).slice(0, Q.def.count).map((x) => ({ ...x, opts: shuffle(x.a) }));
+        let bank = typeof Q.def.bank === 'function' ? Q.def.bank(S.met[S.wi] || []) : Q.def.bank;
+        bank = (bank || []).filter(Boolean);
+        Q.list = shuffle(bank).slice(0, Q.def.count).map((x) => ({ ...x, opts: shuffle(x.a) }));
         Q.max = Q.list.length;
+        if (W.padSign) W.padSign.userData.draw(Q.def.title.toUpperCase(), inkOf(WORLDS[S.wi]));
+        if (!Q.max) return completeQuest();
         this.load(Q);
       },
       load(Q) {
@@ -1638,6 +1879,10 @@ function start() {
           p.word.userData.draw(p.answer, '#1D3F54');
           p.mesh.material = mat(WORLDS[S.wi].light);
         });
+        if (W.showcase) {
+          while (W.showcase.children.length) W.showcase.remove(W.showcase.children[0]);
+          if (it.obj) W.showcase.add(makeObject(it.obj, 2.4));
+        }
         const lab = `${Q.def.title} ${Q.idx + 1} / ${Q.max} · Step on the right answer!`;
         const s = Q.def.advice ? `The patient says: <i>"${esc(it.p)}"</i>` : esc(it.s).replace('___', '<u>&nbsp;?&nbsp;</u>');
         task(lab, s, optsHTML(it.opts));
@@ -1656,6 +1901,7 @@ function start() {
         const pad = W.pads[k];
         Q.ready = false;
         Q.attempts++;
+        logEvent(`${Q.def.title}: "${it.s || it.p}" → ${pad.answer}`, pad.answer === it.a[0]);
         if (pad.answer === it.a[0]) {
           if (Q.attempts === 1) Q.score++;
           sfx.good();
@@ -1711,13 +1957,30 @@ function start() {
         const bank = Q.def.bank;
         const a = shuffle(bank.filter((x) => x.z === 0)), b = shuffle(bank.filter((x) => x.z === 1));
         const half = Math.ceil(Q.def.count / 2);
-        Q.list = shuffle([...a.slice(0, half), ...b.slice(0, Q.def.count - half)]);
+        Q.list = shuffle([...a.slice(0, half), ...b.slice(0, Q.def.count - half)]).map((x) => {
+          if (!x.labels || Math.random() < 0.5) return x;
+          return { ...x, labels: [x.labels[1], x.labels[0]], z: 1 - x.z };
+        });
         Q.max = Q.list.length;
+        if (!Q.def.perItem) this.signs(Q.def.labels, Q.def.subs);
         this.load(Q);
+      },
+      signs(labels, subs = ['', '']) {
+        W.zones.areas.forEach((ar, k) => {
+          ar.sign.userData.draw(labels[k], ar.col);
+          ar.sub.userData.draw(subs[k] || '', '#1D3F54');
+          ar.sub.visible = !!subs[k];
+        });
       },
       load(Q) {
         const it = Q.list[Q.idx];
-        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Run to the right zone!`, `"${esc(it.s)}"`, optsHTML(Q.def.labels).replace(/<b>[AB]<\/b>/g, ''));
+        const labels = it.labels || Q.def.labels;
+        if (it.labels) this.signs(it.labels);
+        const C = W.zones.center;
+        while (C.children.length) C.remove(C.children[0]);
+        if (it.obj) C.add(makeObject(it.obj, 2.4));
+        const text = esc(it.s).replace('___', '<u>&nbsp;?&nbsp;</u>');
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Run to the right zone!`, it.obj ? text : `"${text}"`, optsHTML(labels).replace(/<b>[AB]<\/b>/g, ''));
         Q.ready = true;
       },
       count: (Q) => `${Q.idx}/${Q.max}`,
@@ -1731,14 +1994,16 @@ function start() {
       enter(Q, k) {
         const it = Q.list[Q.idx];
         const ar = W.zones.areas[k];
+        const labels = it.labels || Q.def.labels;
         Q.ready = false;
         Q.attempts++;
+        logEvent(`${Q.def.name}: "${it.s}" → ${labels[k]}`, k === it.z);
         if (k === it.z) {
           if (Q.attempts === 1) Q.score++;
           sfx.good();
           ar.flash = 1.2;
           burst(ar.c.clone().add(V(0, 1.5, 0)), ['#FDD835', '#FFFFFF', ar.col], 30, { speed: 7, up: 9, geo: starGeo, size: 0.3 });
-          feedback(`Yes! ${Q.def.labels[k]}!`, true);
+          feedback(`Yes! ${labels[k]}!`, true);
           setTimeout(() => {
             if (S.Q !== Q) return;
             Q.idx++;
@@ -1777,7 +2042,7 @@ function start() {
       show(Q) {
         const t = W.ladder[Q.idx];
         W.ladder.forEach((l, k) => (l.tile.material = mat(l.done ? '#7CB342' : k === Q.idx ? '#FDD835' : '#E3EAF0')));
-        task(`Prediction Track ${Q.idx + 1} / ${Q.max} · Say it, then step on the yellow box!`, `I am going to <u>${esc(t.verb)}</u>!`);
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Say it, then step on the yellow box!`, t.say);
       },
       count: (Q) => `${Q.idx}/${Q.max}`,
       goal: (Q) => (W.ladder[Q.idx] ? V(W.ladder[Q.idx].x, 0, LADDER.z) : null),
@@ -1790,7 +2055,8 @@ function start() {
           Q.details.push(t.verb);
           sfx.step(Q.idx);
           burst(V(t.x, 0.6, LADDER.z), ['#FDD835', '#7CB342'], 12, { speed: 3, up: 6 });
-          feedback(`I am going to ${t.verb}!`, true);
+          feedback(t.say.replace(/<[^>]+>/g, ''), true);
+          logEvent(`${Q.def.name}: ${t.say.replace(/<[^>]+>/g, '')}`, true);
           Q.idx++;
           renderQuests();
           if (Q.idx >= Q.max) {
@@ -1809,7 +2075,7 @@ function start() {
     // ---- S21 Opinion Corner ----
     opinion: {
       start(Q) {
-        Q.list = shuffle(OPINIONS).slice(0, Q.def.count);
+        Q.list = shuffle(Q.def.pairs || OPINIONS).slice(0, Q.def.count);
         Q.max = Q.list.length;
         this.load(Q);
       },
@@ -1823,7 +2089,7 @@ function start() {
           if (id) A[k].icon.add(makeObject(id, 1.8));
         });
         Q.phase = 'choose';
-        task(`Opinion Corner ${Q.idx + 1} / ${Q.max} · There is no wrong answer!`, `${esc(it.a)} or ${esc(it.b)}? Stand on your favorite!`);
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · There is no wrong answer!`, `${esc(it.a)} or ${esc(it.b)}? Stand on your favorite!`);
         Q.ready = true;
       },
       count: (Q) => `${Q.idx}/${Q.max}`,
@@ -1850,7 +2116,8 @@ function start() {
             sfx.good();
             ar.flash = 1;
             burst(ar.c.clone().add(V(0, 1.5, 0)), ['#FDD835', '#FFFFFF', ar.col], 24, { speed: 6, up: 8 });
-            task(`Opinion Corner · Say it out loud! <span class="say" id="h-say">${SAY_SECONDS}</span>`, `I think <u>${esc(choice.toLowerCase())}</u> are better because ...`);
+            task(`${Q.def.name} · Say it out loud! <span class="say" id="h-say">${SAY_SECONDS}</span>`, (Q.def.frame || 'I think <u>{x}</u> are better because ...').replace('{x}', esc(choice.toLowerCase())));
+            logEvent(`${Q.def.name}: chose "${choice}" (${it.a} vs ${it.b})`, true);
           }
         });
       },
@@ -1904,6 +2171,203 @@ function start() {
     },
   };
 
+  // ---------- Event log (shown on the teacher dashboard when online) ----------
+  function logEvent(text, ok = true) {
+    S.events.push({ t: Date.now(), text, ok, wi: S.wi });
+    if (S.events.length > 200) S.events.shift();
+    if (NET.onEvent) NET.onEvent();
+  }
+  const NET = { online: false, role: 'player' };
+
+  // ---------- Online mode (claude.ai artifact with the `db` capability) ----------
+  // Each kid's device writes its live progress; the teacher view reads it live and
+  // sends commands (stars, end talk, skip). Offline (double-click file) nothing changes.
+  const base = () => `games/${GAME.id}`;
+  async function initNet() {
+    try {
+      if (!window.claude || typeof window.claude.use !== 'function') return;
+      const db = await window.claude.use('db');
+      if (!db) return;
+      NET.db = db;
+      NET.online = true;
+      document.body.classList.add('online');
+      const user = await window.claude.use('user').catch(() => null);
+      if (user && user.can) {
+        const ok = await user.can('data.write').catch(() => null);
+        if (ok === false) $('net-warn').classList.add('on');
+      }
+    } catch (e) {
+      NET.online = false;
+    }
+  }
+  let liveBusy = false, liveDirty = false, liveTimer = null;
+  function schedulePush() {
+    if (!NET.online || NET.role !== 'player' || S.mode === 'title' || S.mode === 'brief') return;
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(pushLive, 250);
+  }
+  NET.onEvent = schedulePush;
+  function liveDoc() {
+    const w = WORLDS[S.wi] || {};
+    return {
+      player: PLAYERS[S.player].name, idx: S.player, runId: NET.runId || '',
+      mode: S.mode, paused: !!S.paused, wi: S.wi, world: w.name || '',
+      quest: S.Q && !S.Q.done ? S.Q.def.name : '', questType: S.Q && !S.Q.done ? S.Q.def.type : '',
+      progress: S.Q && !S.Q.done && S.Q.count && S.Q.max ? S.Q.count() : '',
+      results: WORLDS.map((ww, i) => ({ world: ww.short, color: ww.color, items: (S.results[i] || []).map((r) => ({ name: r.short, score: r.score, max: r.max })) })),
+      stars: S.stars.slice(), talkWorlds: WORLDS.map((ww) => ww.quests.some((q) => q.type === 'talk')),
+      crystals: S.crystals.reduce((a, b) => a + b, 0), crystalsMax: S.crystalsMax.reduce((a, b) => a + b, 0),
+      events: S.events.slice(-14), updatedAt: Date.now(),
+    };
+  }
+  async function pushLive() {
+    if (!NET.db) return;
+    if (liveBusy) {
+      liveDirty = true;
+      return;
+    }
+    liveBusy = true;
+    try {
+      await NET.db.doc(`${base()}/live/p${S.player}`).set(liveDoc());
+    } catch (e) {
+      /* keep playing offline */
+    }
+    liveBusy = false;
+    if (liveDirty) {
+      liveDirty = false;
+      schedulePush();
+    }
+  }
+  function listenCommands() {
+    if (!NET.db) return;
+    if (NET.unsubCmd) NET.unsubCmd();
+    NET.lastSeq = null;
+    NET.unsubCmd = NET.db.doc(`${base()}/cmd/p${S.player}`).onSnapshot((snap) => {
+      const c = snap.exists ? snap.data() : null;
+      const seq = c && c.seq ? c.seq : 0;
+      if (NET.lastSeq === null) {
+        NET.lastSeq = seq; // ignore commands sent before this trip
+        return;
+      }
+      if (!c || seq <= NET.lastSeq) return;
+      NET.lastSeq = seq;
+      if (c.type === 'stars') {
+        if (S.mode === 'talk') giveStars(c.n);
+        else if (S.lastTalkWi != null) {
+          S.stars[S.lastTalkWi] = c.n;
+          logEvent(`Profe: ${c.n} ★ (${WORLDS[S.lastTalkWi].short})`, true);
+        }
+      } else if (c.type === 'endTalk') endTalk();
+      else if (c.type === 'skip') skip();
+      else if (c.type === 'pause') {
+        if (S.mode === 'play' || S.mode === 'talk') {
+          S.paused = !S.paused;
+          $('O-pause').classList.toggle('on', S.paused);
+          keys.clear();
+          schedulePush();
+        }
+      }
+    }, () => {});
+  }
+  async function saveSession(rows) {
+    if (!NET.db) return;
+    try {
+      await NET.db.collection(`${base()}/sessions`).add({ player: PLAYERS[S.player].name, runId: NET.runId, date: Date.now(), rows });
+    } catch (e) {
+      /* the local CSV still works */
+    }
+  }
+
+  // ---------- Teacher dashboard ----------
+  const T = { docs: {}, unsub: null };
+  function toTeacher() {
+    if (!NET.online) return;
+    NET.role = 'teacher';
+    S.mode = 'teacher';
+    showLayer('teacher');
+    stopMusic();
+    $('td-status').textContent = 'Conectando...';
+    if (T.unsub) T.unsub();
+    const timer = setTimeout(() => ($('td-status').textContent = 'Aún no llegan datos. Revisa la conexión a internet.'), 10000);
+    T.unsub = NET.db.collection(`${base()}/live`).onSnapshot((snap) => {
+      clearTimeout(timer);
+      T.docs = {};
+      snap.docs.forEach((d) => (T.docs[d.id] = d.data()));
+      $('td-status').textContent = snap.empty ? 'Esperando a que un niño empiece a jugar en su dispositivo...' : 'En vivo';
+      renderTeacher();
+    }, () => ($('td-status').textContent = 'Se perdió la conexión con la base de datos.'));
+    clearInterval(T.tick);
+    T.tick = setInterval(renderTeacher, 5000);
+  }
+  const MODE_ES = { play: 'Jugando', talk: 'En el escenario', warp: 'Viajando por el portal', finale: 'Terminó', title: 'En el menú', brief: 'En el menú' };
+  function renderTeacher() {
+    if (S.mode !== 'teacher') return;
+    const box = $('td-cards');
+    const keysP = PLAYERS.map((_, i) => `p${i}`);
+    box.innerHTML = keysP.map((key, i) => {
+      const d = T.docs[key];
+      const P = PLAYERS[i];
+      if (!d) return `<div class="tcard"><div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(P.name)}</b><span class="tst off">sin conectar</span></div><p class="tmuted">Todavía no ha empezado en su dispositivo.</p></div>`;
+      const age = (Date.now() - (d.updatedAt || 0)) / 1000;
+      const live = age < 90;
+      const mode = (d.paused ? 'En pausa · ' : '') + (MODE_ES[d.mode] || d.mode);
+      const worlds = (d.results || []).map((r, wi) => {
+        const st = d.talkWorlds && d.talkWorlds[wi] ? ` <span class="tstars">${'★'.repeat(d.stars[wi] || 0)}<span class="tdim">${'★'.repeat(3 - (d.stars[wi] || 0))}</span></span>` : '';
+        const chips = r.items.map((x) => `<span class="tchip ${x.score === x.max ? 'full' : ''}">${esc(x.name)} <b>${x.score}/${x.max}</b></span>`).join('') || '<span class="tmuted">—</span>';
+        return `<div class="tworld ${wi === d.wi && d.mode !== 'finale' ? 'now' : ''}"><span class="twn" style="background:${r.color}">${esc(r.world)}</span>${st}<div class="tchips">${chips}</div></div>`;
+      }).join('');
+      const ev = (d.events || []).slice().reverse().slice(0, 8).map((e) => `<li class="${e.ok ? 'ok' : 'bad'}"><span>${e.ok ? '✓' : '✗'}</span>${esc(e.text)}</li>`).join('');
+      return `<div class="tcard">
+        <div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(d.player)}</b><span class="tst ${live ? 'on' : 'off'}">${live ? 'en vivo' : 'sin señal'}</span></div>
+        <div class="tnow"><b>${esc(mode)}</b>${d.world && d.mode !== 'finale' ? ` · ${esc(d.world)}` : ''}${d.quest ? `<br>Reto: <b>${esc(d.quest)}</b> ${esc(d.progress || '')}` : ''}</div>
+        <div class="tbtns">
+          <span>Estrellas:</span>
+          <button data-p="${i}" data-c="stars" data-n="1">★1</button><button data-p="${i}" data-c="stars" data-n="2">★2</button><button data-p="${i}" data-c="stars" data-n="3">★3</button>
+          <button data-p="${i}" data-c="endTalk">Terminar charla</button><button data-p="${i}" data-c="skip">Saltar reto</button><button data-p="${i}" data-c="pause">Pausa</button>
+        </div>
+        <div class="tworlds">${worlds}</div>
+        <div class="tcrys">Cristales: <b>${d.crystals || 0}/${d.crystalsMax || 0}</b></div>
+        <ul class="tev">${ev || '<li class="tmuted">Sin eventos todavía.</li>'}</ul>
+      </div>`;
+    }).join('');
+  }
+  $('td-cards').addEventListener('click', async (e) => {
+    const b = e.target.closest('button[data-c]');
+    if (!b || !NET.db) return;
+    const cmd = { seq: Date.now(), type: b.dataset.c, n: +b.dataset.n || 0 };
+    b.disabled = true;
+    try {
+      await NET.db.doc(`${base()}/cmd/p${b.dataset.p}`).set(cmd);
+      b.classList.add('sent');
+      setTimeout(() => b.classList.remove('sent'), 900);
+    } catch (err) {
+      $('td-status').textContent = 'No se pudo enviar la orden. Intenta de nuevo.';
+    }
+    b.disabled = false;
+  });
+  $('td-csv').addEventListener('click', async () => {
+    if (!NET.db) return;
+    try {
+      const snap = await NET.db.collection(`${base()}/sessions`).orderBy('date', 'asc').get();
+      const rows = [];
+      snap.docs.forEach((d) => (d.data().rows || []).forEach((r) => rows.push(r)));
+      if (!rows.length) {
+        $('td-status').textContent = 'Todavía no hay partidas terminadas para descargar.';
+        return;
+      }
+      csvDownload(rows);
+    } catch (err) {
+      $('td-status').textContent = 'No se pudieron leer los resultados.';
+    }
+  });
+  $('td-back').addEventListener('click', () => {
+    if (T.unsub) T.unsub();
+    clearInterval(T.tick);
+    NET.role = 'player';
+    toTitle();
+  });
+  $('btn-teacher').addEventListener('click', () => toTeacher());
+
   // ---------- Talk ----------
   const talkGroup = new THREE.Group();
   scene.add(talkGroup);
@@ -1936,6 +2400,8 @@ function start() {
   function startTalk() {
     if (S.mode !== 'play') return;
     S.mode = 'talk';
+    S.lastTalkWi = S.wi;
+    logEvent('On the stage: talking now', true);
     S.talkLeft = TALK_SECONDS;
     S.talkRunning = true;
     S.stars[S.wi] = 0;
@@ -1978,6 +2444,7 @@ function start() {
     if (S.mode !== 'talk') return;
     S.stars[S.wi] = n;
     renderStars(true);
+    logEvent(`Talk stars: ${n} ★`, true);
     if (n > 0) {
       sfx.stars(n);
       burst(AV.pos.clone().add(V(0, 3, 0)), ['#FDD835'], 6 + n * 5, { speed: 5, up: 8, geo: starGeo, size: 0.35 });
@@ -2035,7 +2502,7 @@ function start() {
     const to = nextWi < WORLDS.length ? WORLDS[nextWi] : null;
     warp.tU.c1.value.set(WORLDS[S.wi].color);
     warp.tU.c2.value.set(to ? to.color : '#FDD835');
-    $('w-to').textContent = to ? to.name : 'THE TIME MASTER STAGE';
+    $('w-to').textContent = to ? to.name : (GAME.finaleStage || 'THE TIME MASTER STAGE');
     showLayer('warp');
     W.group.visible = false;
     sky.visible = false;
@@ -2080,18 +2547,19 @@ function start() {
   function toFinale() {
     S.mode = 'finale';
     if (W) W.group.visible = false;
-    applyAtmosphere({ key: 'finale', skyTop: '#0E2233', skyBottom: '#2C5F7C', fog: '#1D3F54', hemi: ['#E1F5FE', '#1D3F54', 1.9], sun: ['#FFFFFF', 2.2] });
+    applyAtmosphere({ theme: 'finale', skyTop: '#0E2233', skyBottom: '#2C5F7C', fog: '#1D3F54', hemi: ['#E1F5FE', '#1D3F54', 1.9], sun: ['#FFFFFF', 2.2] });
     while (finale.children.length) finale.remove(finale.children[0]);
     finale.visible = true;
     finale.add(at(mesh(new THREE.CylinderGeometry(3, 3.4, 1.2, 16), '#FDD835', { metalness: 0.3, roughness: 0.5 }), 0, -0.6, 0));
     finale.add(at(mesh(new THREE.CylinderGeometry(4.2, 4.6, 0.6, 16), '#145389'), 0, -1.5, 0));
-    WORLDS.slice(0, 3).forEach((w, i) => {
+    const minis = WORLDS.filter((w) => w.theme !== 'arena').slice(0, 4);
+    minis.forEach((w, i) => {
       const mini = new THREE.Group();
       mini.add(mesh(new THREE.CylinderGeometry(3, 2.8, 0.8, 12), w.color));
       const c = at(mesh(new THREE.ConeGeometry(2.8, 4, 12), w.rock), 0, -2.4, 0);
       c.rotation.x = Math.PI;
       mini.add(c);
-      mini.position.set(-14 + i * 14, 6 + (i % 2) * 2, -22);
+      mini.position.set((i - (minis.length - 1) / 2) * 14, 6 + (i % 2) * 2, -22);
       mini.userData.phase = i;
       const lab = textSprite(w.short.toUpperCase(), { bg: w.color, scale: 0.7 });
       lab.position.set(0, 3, 0);
@@ -2116,7 +2584,7 @@ function start() {
       ptsMax += r.max;
     });
     const crys = S.crystals.reduce((a, b) => a + b, 0), crysMax = S.crystalsMax.reduce((a, b) => a + b, 0);
-    $('f-title').textContent = `You are a Time Master, ${name}!`;
+    $('f-title').textContent = (GAME.finaleTitle || 'You are a Time Master, {name}!').replace('{name}', name);
     $('f-stars').textContent = S.stars.reduce((a, b) => a + b, 0);
     $('f-pts').textContent = `${pts}/${ptsMax}`;
     $('f-crys').textContent = `${crys}/${crysMax}`;
@@ -2125,9 +2593,10 @@ function start() {
       const hasTalk = w.quests.some((q) => q.type === 'talk');
       const stars = hasTalk ? `<span class="st edit" data-w="${i}">${[1, 2, 3].map((n) => `<span class="fs${n <= S.stars[i] ? ' on' : ''}" data-n="${n}">★</span>`).join('')}</span>` : '<span class="st"></span>';
       const chips = S.results[i].map((r) => `<span class="rc">${esc(r.short)} <b>${r.score}/${r.max}</b></span>`).join('');
-      return `<div class="wrow"><span class="nm" style="background:${w.color};${w.key === 'arena' ? 'color:#145389' : ''}">${w.short}</span>${stars}<span class="chips">${chips}</span></div>`;
+      return `<div class="wrow"><span class="nm" style="background:${w.color};${w.theme === 'arena' ? 'color:#145389' : ''}">${w.short}</span>${stars}<span class="chips">${chips}</span></div>`;
     }).join('');
     const when = stamp(new Date());
+    const before = S.rows.length;
     WORLDS.forEach((w, i) => {
       for (const r of S.results[i]) S.rows.push({ player: name, world: w.short, challenge: r.name, score: r.score, max: r.max, details: r.details, date: when });
       if (w.quests.some((q) => q.type === 'talk')) {
@@ -2137,6 +2606,10 @@ function start() {
       }
       S.rows.push({ player: name, world: w.short, challenge: 'Time crystals (bonus)', score: S.crystals[i], max: S.crystalsMax[i], details: '', date: when });
     });
+    if (NET.online) {
+      saveSession(S.rows.slice(before));
+      logEvent('Finished the game! 🏆', true);
+    }
     showLayer('final');
     camRig.pos.set(7.2, 3.4, 13);
     camRig.target.set(7.2, 1.8, 0);
@@ -2148,22 +2621,38 @@ function start() {
     return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   function downloadCSV() {
+    csvDownload(S.rows);
+    $('f-saved').textContent = 'Saved! Check your Downloads folder.';
+    sfx.click();
+  }
+  async function csvDownload(rowsIn) {
     const head = ['player', 'world', 'challenge', 'score', 'max', 'details', 'date'];
     const lines = [head.join(',')];
-    for (const r of S.rows) lines.push(head.map((h) => csvCell(r[h])).join(','));
+    for (const r of rowsIn) lines.push(head.map((h) => csvCell(r[h])).join(','));
+    if (NET.online && window.claude && window.claude.use) {
+      // Inside claude.ai the page cannot download by itself: ask the viewer through `downloads`.
+      const dl = await window.claude.use('downloads').catch(() => null);
+      if (dl) {
+        const d0 = new Date();
+        try {
+          await dl.save({ filename: `${GAME.csvPrefix || 'TimeTravel'}_results_${d0.getFullYear()}-${pad2(d0.getMonth() + 1)}-${pad2(d0.getDate())}.csv`, data: '\uFEFF' + lines.join('\r\n') + '\r\n' });
+        } catch (e) {
+          /* viewer declined or saves are off here */
+        }
+        return;
+      }
+    }
     const blob = new Blob(['﻿' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
     const d = new Date();
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `S24_TimeTravel_results_${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}.csv`;
+    a.download = `${GAME.csvPrefix || 'S24_TimeTravel'}_results_${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}.csv`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
       URL.revokeObjectURL(a.href);
       a.remove();
     }, 1000);
-    $('f-saved').textContent = 'Saved! Check your Downloads folder.';
-    sfx.click();
   }
   $('btn-csv').addEventListener('click', downloadCSV);
   $('btn-next').addEventListener('click', () => toTitle());
@@ -2222,6 +2711,7 @@ function start() {
       case 'title':
         if (k === '1') choosePlayer(0);
         else if (k === '2') choosePlayer(1);
+        else if ((k === 't' || k === 'T') && NET.online) toTeacher();
         break;
       case 'brief':
         if ((k === 'Enter' || k === ' ') && !e.repeat) startTrip();
@@ -2231,7 +2721,7 @@ function start() {
         if (MOVE[e.code]) keys.add(MOVE[e.code]);
         if (k === ' ') AV.jumpBuf = 0.15;
         if ((k === 'k' || k === 'K') && !e.repeat) skip();
-        if (k === 'Enter' && !e.repeat && S.Q && S.Q.def.type === 'opinion') HANDLERS.opinion.next(S.Q);
+        if (k === 'Enter' && !e.repeat && S.Q && !S.Q.done && HANDLERS[S.Q.def.type].next) HANDLERS[S.Q.def.type].next(S.Q);
         break;
       case 'talk':
         if (e.repeat) return;
@@ -2426,7 +2916,7 @@ function start() {
   function updateCamera(dt, t) {
     let wantP, wantT, k = 1 - Math.exp(-dt * 3.5);
     const wide = Math.max(1, 16 / 9 / camera.aspect);
-    if (S.mode === 'title' || S.mode === 'brief') {
+    if (S.mode === 'title' || S.mode === 'brief' || S.mode === 'teacher') {
       const a = t * 0.06;
       wantP = V(Math.sin(a) * 64 * wide, 34, Math.cos(a) * 64 * wide);
       wantT = V(0, 0, 0);
@@ -2457,7 +2947,7 @@ function start() {
     if (W) for (const u of W.updaters) u(t, dt);
     if (W) for (const c of W.group.children) if (c.userData.spin) c.rotation.y += dt * c.userData.spin;
     if (S.mode === 'play' || S.mode === 'talk' || S.mode === 'finale') updateAvatar(dt);
-    if (S.mode !== 'title' && S.mode !== 'brief') animateAvatar(dt, t);
+    if (S.mode !== 'title' && S.mode !== 'brief' && S.mode !== 'teacher') animateAvatar(dt, t);
 
     if (W && W.group.visible) {
       for (const pk of W.pickups) {
@@ -2494,8 +2984,20 @@ function start() {
         p.word.position.y = 3.4 + Math.sin(t * 2 + k) * 0.15;
       }
       if (W.patient) W.patient.rotation.z = Math.sin(t * 1.5) * 0.08;
+      if (W.showcase) {
+        W.showcase.rotation.y += dt * 0.8;
+        W.showcase.position.y = 2.6 + Math.sin(t * 2) * 0.15;
+      }
+      if (W.people) for (const npc of W.people) {
+        npc.f(t);
+        npc.ring.material.opacity = npc.met ? 0.15 : 0.3 + Math.sin(t * 3 + npc.phase) * 0.2;
+      }
       for (const two of [W.zones, W.opin]) {
         if (!two) continue;
+        if (two.center) {
+          two.center.rotation.y += dt * 0.8;
+          two.center.position.y = 2.8 + Math.sin(t * 2) * 0.2;
+        }
         for (const ar of two.areas) {
           ar.flash = Math.max(0, ar.flash - dt);
           ar.disc.position.y = 0.15 + (ar.flash > 0 ? Math.abs(Math.sin(t * 20)) * 0.25 : 0);
@@ -2515,6 +3017,7 @@ function start() {
           c.taken = true;
           c.mesh.visible = false;
           S.crystals[S.wi]++;
+          schedulePush();
           sfx.gem();
           burst(c.pos.clone(), ['#64FFDA', '#FFFFFF'], 10, { speed: 3, up: 4 });
           renderPack();
@@ -2623,7 +3126,7 @@ function start() {
 
   // Test / debug hooks (harmless in class).
   window.__TTS = {
-    S, AV, TALK_SECONDS,
+    S, AV, TALK_SECONDS, GAME: () => GAME,
     WORLDS: WORLDS.map((w) => ({ key: w.key, quests: w.quests.map((q) => q.type) })),
     world: () => W,
     quest: () => (S.Q ? { type: S.Q.def.type, idx: S.Q.idx, max: S.Q.max, score: S.Q.score, done: !!S.Q.done, started: !!S.Q.started, phase: S.Q.phase, ready: S.Q.ready } : null),
@@ -2641,6 +3144,14 @@ function start() {
         return { x: c.x, z: c.z, y: 0.3 };
       }
       if (T === 'opinion') return { x: OPIN.a.x, z: OPIN.a.z, y: 0.3 };
+      if (T === 'stations') {
+        const k = W.pads.findIndex((p, i) => !Q.doneK.has(i) && Q.items[i]);
+        return k < 0 ? null : { x: W.pads[k].x, z: PADS.z, y: 0.3 };
+      }
+      if (T === 'interview') {
+        const n = W.people.find((x) => !x.met);
+        return n ? { x: n.spot.x, z: n.spot.z + 1.6, y: 0 } : null;
+      }
       if (T === 'ladder') return { x: W.ladder[Q.idx].x, z: LADDER.z, y: 0.2 };
       if (T === 'actions') {
         const t = Q.targets[Q.idx];
@@ -2677,5 +3188,6 @@ function start() {
   };
 
   toTitle();
+  initNet();
   requestAnimationFrame(loop);
 }
