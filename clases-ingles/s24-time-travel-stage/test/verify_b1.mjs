@@ -69,7 +69,7 @@ async function openPage(query = '', online = false, base = URL0, viewport = { wi
   const errors = [], external = [];
   page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[${m.type()}] ${m.text()}`); });
   page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message));
-  page.on('request', (r) => { const u = r.url(); if (!/^(file|data|blob):/.test(u) && !u.startsWith('http://127.0.0.1:18080/')) external.push(u); });
+  page.on('request', (r) => { const u = r.url(); if (!/^(file|data|blob):/.test(u) && !u.startsWith('http://127.0.0.1:18080/') && !u.startsWith('http://127.0.0.1:18091/')) external.push(u); });
   if (online) await installFakeDb(page);
   page.setDefaultTimeout(120000);
   await page.goto(base + query);
@@ -185,7 +185,17 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   const { WebSocketServer, createWebSocketStream } = require('ws');
   const wss = new WebSocketServer({ port: 18883 });
   wss.on('connection', (ws) => broker.handle(createWebSocketStream(ws)));
-  const B = '&broker=' + encodeURIComponent('ws://127.0.0.1:18883');
+  // stand-in for the results database: accepts saves, has nothing to continue
+  const dbCalls = [];
+  const dbSrv = require('node:http').createServer((req, res) => {
+    res.setHeader('access-control-allow-origin', '*');
+    res.setHeader('access-control-allow-headers', 'apikey, content-type');
+    if (req.method !== 'OPTIONS') dbCalls.push(req.url);
+    res.statusCode = req.method === 'OPTIONS' || /saga_save/.test(req.url) ? 204 : 200;
+    res.end(/saga_resume/.test(req.url) ? 'null' : undefined);
+  });
+  await new Promise((r) => dbSrv.listen(18091, '127.0.0.1', r));
+  const B = '&broker=' + encodeURIComponent('ws://127.0.0.1:18883') + '&db=' + encodeURIComponent('http://127.0.0.1:18091');
   const http = require('node:http');
   const html = readFileSync(FILE);
   const srv = http.createServer((req, res) => { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(html); });
@@ -309,6 +319,8 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   wss.close();
   broker.close();
   srv.close();
+  check('Kids save their progress to the results database', dbCalls.filter((u) => /saga_save/.test(u)).length >= 5, `${dbCalls.length} calls`);
+  dbSrv.close();
 }
 
 await browser.close();
