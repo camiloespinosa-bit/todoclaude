@@ -71,6 +71,7 @@ async function openPage(query = '', online = false, base = URL0, viewport = { wi
   page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message));
   page.on('request', (r) => { const u = r.url(); if (!/^(file|data|blob):/.test(u) && !u.startsWith('http://127.0.0.1:18080/')) external.push(u); });
   if (online) await installFakeDb(page);
+  page.setDefaultTimeout(120000);
   await page.goto(base + query);
   const t0 = Date.now();
   await page.waitForFunction(() => window.__TTS && window.__TTS.S, null, { timeout: 120000 });
