@@ -190,8 +190,18 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 .small-p { font-size: var(--fs) !important; font-weight: 600; margin-top: 1.2vh !important; }
 
 /* ---------- Online / teacher ---------- */
-.teacher-btn { display: none; background: var(--card); color: var(--deep); font-weight: 700; font-size: var(--fs); padding: .35em 1em; border-radius: 999px; box-shadow: var(--shadow); }
-body.online .teacher-btn { display: inline-flex; align-items: center; gap: .5em; }
+.room-row { display: flex; gap: 2vw; align-items: center; flex-wrap: wrap; justify-content: center; pointer-events: auto; }
+.room-box { display: flex; align-items: center; gap: .6em; background: var(--card); border-radius: 999px; padding: .3em .5em .3em 1em; box-shadow: var(--shadow); font-weight: 700; }
+.room-box input { font-family: inherit; font-size: var(--fs); font-weight: 800; letter-spacing: .25em; width: 6.2em; text-transform: uppercase; border: 3px solid var(--turq); border-radius: 14px; padding: .1em .4em; color: var(--deep); background: #fff; }
+.room-box input:focus { outline: 3px solid var(--yellow); }
+#room-st { font-size: .8em; color: #E65100; }
+#room-st.ok { color: #2E7D32; }
+.teacher-btn { background: var(--card); color: var(--deep); font-weight: 700; font-size: var(--fs); padding: .35em 1em; border-radius: 999px; box-shadow: var(--shadow); display: inline-flex; align-items: center; gap: .5em; }
+.troom { display: flex; flex-wrap: wrap; gap: 2vw; align-items: center; background: #fff; border-radius: 24px; box-shadow: var(--shadow); padding: 1.4vh 1.6vw; font-weight: 600; }
+.tcode { font-size: var(--fs-xl); font-weight: 800; letter-spacing: .2em; color: var(--blue); line-height: 1.1; }
+.tlinkbox { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .3em; }
+.tlink { font-weight: 800; color: var(--deep); word-break: break-all; user-select: all; background: #F0F4F8; border-radius: 10px; padding: .2em .5em; }
+.tcopy { align-self: flex-start; background: var(--deep); color: #fff; border-radius: 12px; padding: .25em .8em; font-weight: 800; font-size: var(--fs); }
 .net-warn { display: none; background: #FFF3E0; color: #E65100; font-weight: 700; padding: .4em 1em; border-radius: 16px; max-width: 80vw; text-align: center; }
 .net-warn.on { display: block; }
 #L-teacher { pointer-events: auto; background: rgba(240, 244, 248, .96); overflow: auto; }
@@ -251,8 +261,10 @@ body.online .teacher-btn { display: inline-flex; align-items: center; gap: .5em;
       <button class="player" data-p="0"><span class="avatar">J</span><span>Jerónimo</span><span class="key">1</span></button>
       <button class="player" data-p="1"><span class="avatar">L</span><span>Luciana</span><span class="key">2</span></button>
     </div>
-    <button class="teacher-btn" id="btn-teacher"><span class="key">T</span> Vista del profe (en vivo)</button>
-    <div class="net-warn" id="net-warn">Este dispositivo no puede guardar el avance en línea. Abre el juego con la cuenta del profe.</div>
+    <div class="room-row">
+      <div class="room-box"><label for="room-in">Class code</label><input id="room-in" maxlength="6" autocomplete="off" spellcheck="false" placeholder="- - - -"><span id="room-st"></span></div>
+      <button class="teacher-btn" id="btn-teacher"><span class="key">T</span> Vista del profe</button>
+    </div>
   </section>
 
   <!-- Briefing -->
@@ -351,6 +363,11 @@ body.online .teacher-btn { display: inline-flex; align-items: center; gap: .5em;
       <div class="tdh">
         <div><div class="tdt">Vista del profe</div><div class="tds" id="td-status">Conectando...</div></div>
         <div class="tdbtns"><button class="btn csv" id="td-csv">Descargar CSV de partidas</button><button class="btn nextp" id="td-back">Volver</button></div>
+      </div>
+      <div class="troom">
+        <div class="tcodebox"><div>Código de la clase</div><div class="tcode" id="td-code">----</div></div>
+        <div class="tlinkbox"><div>Enlace para los dispositivos de los niños:</div><div class="tlink" id="td-link"></div><button class="tcopy" id="td-copy">Copiar enlace</button></div>
+        <button class="btn csv" id="td-new">Crear código nuevo</button>
       </div>
       <div class="tcards" id="td-cards"></div>
     </div>

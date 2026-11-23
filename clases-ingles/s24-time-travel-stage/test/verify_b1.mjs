@@ -131,7 +131,7 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
 {
   const { ctx, page, errors, external } = await openPage();
   await page.screenshot({ path: join(OUT, '00_title.png') });
-  check('Title visible, teacher button hidden offline', await page.isVisible('#L-title') && !(await page.isVisible('#btn-teacher')));
+  check('Title visible', await page.isVisible('#L-title'));
   await page.keyboard.press('1');
   await wait(500);
   await page.screenshot({ path: join(OUT, '01_brief.png') });
@@ -155,32 +155,46 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   await ctx.close();
 }
 
-// ================= Run B: online · two kids + teacher =================
+// ================= Run B: online on the web · class code over a real MQTT broker =================
 {
-  const teacher = await openPage('', true);
-  const kid1 = await openPage('?t=5', true);
-  const kid2 = await openPage('?t=5', true);
-  check('Teacher button visible online', await teacher.page.isVisible('#btn-teacher'));
+  const mod = require('aedes');
+  const broker = mod.createBroker ? await mod.createBroker() : typeof mod === 'function' ? mod() : new mod.Aedes();
+  const { WebSocketServer, createWebSocketStream } = require('ws');
+  const wss = new WebSocketServer({ port: 18883 });
+  wss.on('connection', (ws) => broker.handle(createWebSocketStream(ws)));
+  const B = '&broker=' + encodeURIComponent('ws://127.0.0.1:18883');
+
+  const teacher = await openPage('?x=1' + B);
+  check('Class code field and teacher button visible', await teacher.page.isVisible('#room-in') && await teacher.page.isVisible('#btn-teacher'));
   await teacher.page.keyboard.press('t');
-  await wait(1200);
-  check('Teacher dashboard opens', (await S(teacher.page)).mode === 'teacher');
+  await wait(800);
+  await teacher.page.click('#td-new');
+  await wait(1500);
+  const code = (await teacher.page.textContent('#td-code')).trim();
+  const link = (await teacher.page.textContent('#td-link')).trim();
+  check('Teacher creates a 4-letter class code + kids link', /^[A-Z2-9]{4}$/.test(code) && link.includes('room=' + code), `${code} ${link.slice(-30)}`);
+  await teacher.page.screenshot({ path: join(OUT, 'web_teacher_code.png') });
+
+  const kid1 = await openPage(`?room=${code}&t=5` + B);
+  const kid2 = await openPage(`?room=${code}&t=5` + B);
+  await wait(1500);
+  check('Kid page joins the class from the link', /online/.test(await kid1.page.textContent('#room-st')), await kid1.page.textContent('#room-st'));
+  await kid1.page.screenshot({ path: join(OUT, 'web_kid_title.png') });
   await kid1.page.keyboard.press('1'); await kid1.page.keyboard.press('Enter');
   await kid2.page.keyboard.press('2'); await kid2.page.keyboard.press('Enter');
   await wait(4500);
-  // kid1 plays world 1 partially
   for (let i = 0; i < 3; i++) { const a = await answer(kid1.page); if (a) await tpTo(kid1.page, a); await wait(900); await kid1.page.keyboard.press('Enter'); await wait(700); }
   await wait(2000);
-  await teacher.page.screenshot({ path: join(OUT, 'online_teacher_live.png') });
+  await teacher.page.screenshot({ path: join(OUT, 'web_teacher_live.png') });
   const txt = await teacher.page.textContent('#td-cards');
-  check('Dashboard shows both kids live', txt.includes('Jerónimo') && txt.includes('Luciana') && (txt.match(/en vivo/g) || []).length === 2, txt.slice(0, 200));
+  check('Dashboard shows both kids live', (txt.match(/en vivo/g) || []).length === 2, txt.slice(0, 160).replace(/\s+/g, ' '));
   check('Dashboard shows events', /Presentation Stations/.test(txt));
-  // teacher skips kid2 challenge remotely
+
   const q0 = await Qs(kid2.page);
   await teacher.page.click('button[data-p="1"][data-c="skip"]');
   await wait(1800);
   const q1 = await Qs(kid2.page);
   check('Remote "skip" reaches Luciana', q0 && q1 && (q1.type !== q0.type || q1.done), `${q0 && q0.type} -> ${q1 && q1.type}`);
-  // kid1 completes the whole game; teacher gives stars remotely on the stage
   let gave = false;
   for (let guard = 0; guard < 400; guard++) {
     const s = await S(kid1.page);
@@ -205,12 +219,43 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   check('Remote stars from the teacher reach the stage', gave);
   check('Kid finished online', (await S(kid1.page)).mode === 'finale');
   await wait(2500);
-  await teacher.page.screenshot({ path: join(OUT, 'online_teacher_after.png') });
+  await teacher.page.screenshot({ path: join(OUT, 'web_teacher_after.png') });
   const [dl] = await Promise.all([teacher.page.waitForEvent('download'), teacher.page.click('#td-csv')]);
   const csv = readFileSync(await dl.path(), 'utf8');
-  check('Teacher downloads CSV of finished games', (csv.match(/^Jerónimo,/gm) || []).length >= 15 && /Talk stars,3,3/.test(csv));
+  check('Teacher downloads CSV of finished games (names restored)', (csv.match(/^Jerónimo,/gm) || []).length >= 15 && /Talk stars,3,3/.test(csv));
+
+  // teacher reloads the page: the class code is remembered and the live state comes back (retained)
+  await teacher.page.reload();
+  await teacher.page.waitForFunction(() => window.__TTS && window.__TTS.S);
+  await wait(1200);
+  await teacher.page.keyboard.press('t');
+  await wait(2500);
+  const again = await teacher.page.textContent('#td-cards');
+  check('After reload the teacher sees the class again', (await teacher.page.textContent('#td-code')).trim() === code && /Terminó/.test(again));
+
+  // no names on the wire: inspect what the broker stored
+  let leaked = false;
+  await new Promise((res) => {
+    broker.persistence.createRetainedStream('#').on('data', (p) => { if (/Jer|Luc/.test(Buffer.from(p.payload).toString('latin1'))) leaked = true; }).on('end', res);
+  });
+  check('No names or readable text reach the broker', !leaked);
+
   for (const [n, x] of [['teacher', teacher], ['kid1', kid1], ['kid2', kid2]]) check(`No console errors (${n})`, x.errors.length === 0, x.errors.slice(0, 4).join(' | '));
+  const ext = [teacher, kid1, kid2].flatMap((x) => x.external).filter((u) => !u.startsWith('ws://127.0.0.1'));
+  check('Only the class broker is contacted', ext.length === 0, ext.join(' '));
   await teacher.ctx.close(); await kid1.ctx.close(); await kid2.ctx.close();
+  // a wrong code must not see anything
+  const spy = await openPage('?x=2' + B);
+  await spy.page.keyboard.press('t');
+  await wait(500);
+  await spy.page.click('#td-new');
+  await wait(2500);
+  const spyTxt = await spy.page.textContent('#td-cards');
+  check('Another class code sees nothing', !(/en vivo/.test(spyTxt)));
+  await spy.ctx.close();
+
+  wss.close();
+  broker.close();
 }
 
 await browser.close();

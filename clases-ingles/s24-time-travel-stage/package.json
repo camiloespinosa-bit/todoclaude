@@ -11,7 +11,9 @@
   },
   "devDependencies": {
     "@fontsource/poppins": "5.1.0",
+    "aedes": "^0.51.3",
     "esbuild": "0.24.0",
-    "three": "0.170.0"
+    "three": "0.170.0",
+    "ws": "^8.18.0"
   }
 }

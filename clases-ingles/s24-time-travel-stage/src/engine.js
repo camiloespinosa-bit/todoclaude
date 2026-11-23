@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { OBJECTS, makeObject, mat, mesh, at, rod } from './objects.js';
 import { ACTIONS, LADDER_VERBS, DREAMS, OPINIONS } from './content.js';
+import { joinRoom, newRoomCode, PUBLIC_BROKERS } from './net.js';
 
 const $ = (id) => document.getElementById(id);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -30,6 +31,9 @@ const DEFAULT_PLAYERS = [
   { name: 'Luciana', suit: '#F57C00', scarf: '#57A6B5', hair: '#5A3A22', long: true },
 ];
 let GAME = null;
+// Public by design (same project as gimnasiodelcerebro.co/reservas): only used for the
+// live "broadcast" channel between the kids' devices and the teacher view.
+const SAGA_SUPABASE = { url: 'https://xpqjejiezbxaxsdodkyb.supabase.co', key: 'sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd' };
 let WORLDS = [];
 let PLAYERS = DEFAULT_PLAYERS;
 
@@ -1512,9 +1516,10 @@ function start() {
   }
   function startTrip() {
     NET.role = 'player';
+    NET.lastSession = null;
     NET.runId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
     S.lastTalkWi = null;
-    if (NET.online) listenCommands();
+    if (NET.tx) listenCommands();
     const n = WORLDS.length;
     S.results = Array.from({ length: n }, () => []);
     S.stars = Array(n).fill(0);
@@ -2179,30 +2184,113 @@ function start() {
   }
   const NET = { online: false, role: 'player' };
 
-  // ---------- Online mode (claude.ai artifact with the `db` capability) ----------
-  // Each kid's device writes its live progress; the teacher view reads it live and
-  // sends commands (stars, end talk, skip). Offline (double-click file) nothing changes.
+  // ---------- Online mode ----------
+  // Two transports with the same small API (publish / sub):
+  //  · on the web (gimnasiodelcerebro.co or any page): a class code + MQTT link (src/net.js)
+  //  · inside a claude.ai artifact: the `db` capability
+  // Kids' devices publish their live progress; the teacher view reads it live and sends
+  // commands (stars, end talk, pause, skip). Without a code, the game plays offline as before.
   const base = () => `games/${GAME.id}`;
+  const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } };
+
+  function dbTransport(db) {
+    return {
+      kind: 'db',
+      async publish(k, obj) {
+        await db.doc(`${base()}/${k}`).set(obj);
+        return 1;
+      },
+      sub(pattern, cb) {
+        const parts = pattern.split('/');
+        if (parts[parts.length - 1] === '+') {
+          const coll = parts.slice(0, -1).join('/');
+          return db.collection(`${base()}/${coll}`).onSnapshot((snap) => snap.docs.forEach((d) => cb(`${coll}/${d.id}`, d.data())), () => {});
+        }
+        return db.doc(`${base()}/${pattern}`).onSnapshot((snap) => snap.exists && cb(pattern, snap.data()), () => {});
+      },
+      connected: () => 1,
+      close() {},
+    };
+  }
+
   async function initNet() {
+    // claude.ai artifact? then use its database.
     try {
-      if (!window.claude || typeof window.claude.use !== 'function') return;
-      const db = await window.claude.use('db');
-      if (!db) return;
-      NET.db = db;
-      NET.online = true;
-      document.body.classList.add('online');
-      const user = await window.claude.use('user').catch(() => null);
-      if (user && user.can) {
-        const ok = await user.can('data.write').catch(() => null);
-        if (ok === false) $('net-warn').classList.add('on');
+      if (window.claude && typeof window.claude.use === 'function') {
+        const db = await window.claude.use('db');
+        if (db) {
+          NET.tx = dbTransport(db);
+          NET.online = true;
+          setNetStatus('Online (claude.ai)');
+          document.body.classList.add('online');
+          return;
+        }
       }
     } catch (e) {
-      NET.online = false;
+      /* fall through to the class-code link */
+    }
+    const fromUrl = (params.get('room') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    const code = fromUrl || '';
+    $('room-in').value = code;
+    if (code) joinClass(code);
+  }
+
+  function setNetStatus(text, ok = true) {
+    const el = $('room-st');
+    if (el) {
+      el.textContent = text;
+      el.classList.toggle('ok', ok);
     }
   }
-  let liveBusy = false, liveDirty = false, liveTimer = null;
+
+  async function joinClass(code) {
+    code = (code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    if (code.length < 4) {
+      setNetStatus('The code has 4 letters.', false);
+      return false;
+    }
+    if (!(window.crypto && crypto.subtle && window.WebSocket)) {
+      setNetStatus('This browser cannot connect.', false);
+      return false;
+    }
+    if (NET.tx && NET.room === code) return true;
+    if (NET.tx) NET.tx.close();
+    const brokers = params.get('broker') ? [params.get('broker')] : PUBLIC_BROKERS;
+    NET.room = code;
+    const supa = params.get('broker') ? null : GAME.supabase || SAGA_SUPABASE;
+    NET.tx = await joinRoom(code, GAME.id, brokers, (n) => {
+      setNetStatus(n ? `Class ${code} · online` : `Class ${code} · connecting...`, n > 0);
+      if (n && NET.role === 'player' && S.mode !== 'title' && S.mode !== 'brief') schedulePush();
+    }, supa);
+    // broadcast channels keep nothing: re-send the state every 12 s (and the result after the game)
+    clearInterval(NET.beat);
+    NET.beat = setInterval(() => {
+      if (NET.role !== 'player') return;
+      if (S.mode !== 'title' && S.mode !== 'brief') pushLive();
+      if (NET.lastSession) NET.tx.publish(`sessions/${NET.runId}`, NET.lastSession, true).catch(() => {});
+    }, 12000);
+    NET.online = true;
+    document.body.classList.add('online');
+    $('room-in').value = code;
+    lsSet('ccaRoom', code);
+    if (NET.role === 'player' && S.mode !== 'title' && S.mode !== 'brief') listenCommands();
+    if (NET.role === 'teacher') teacherSubscribe();
+    return true;
+  }
+  $('room-in').addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      joinClass($('room-in').value);
+      $('room-in').blur();
+    }
+  });
+  $('room-in').addEventListener('change', () => joinClass($('room-in').value));
+
+  let liveTimer = null;
   function schedulePush() {
-    if (!NET.online || NET.role !== 'player' || S.mode === 'title' || S.mode === 'brief') return;
+    if (!NET.tx || NET.role !== 'player' || S.mode === 'title' || S.mode === 'brief') return;
     clearTimeout(liveTimer);
     liveTimer = setTimeout(pushLive, 250);
   }
@@ -2210,7 +2298,7 @@ function start() {
   function liveDoc() {
     const w = WORLDS[S.wi] || {};
     return {
-      player: PLAYERS[S.player].name, idx: S.player, runId: NET.runId || '',
+      idx: S.player, runId: NET.runId || '',
       mode: S.mode, paused: !!S.paused, wi: S.wi, world: w.name || '',
       quest: S.Q && !S.Q.done ? S.Q.def.name : '', questType: S.Q && !S.Q.done ? S.Q.def.type : '',
       progress: S.Q && !S.Q.done && S.Q.count && S.Q.max ? S.Q.count() : '',
@@ -2220,36 +2308,33 @@ function start() {
       events: S.events.slice(-14), updatedAt: Date.now(),
     };
   }
+  let pushing = false, pushAgain = false;
   async function pushLive() {
-    if (!NET.db) return;
-    if (liveBusy) {
-      liveDirty = true;
+    if (!NET.tx) return;
+    if (pushing) {
+      pushAgain = true;
       return;
     }
-    liveBusy = true;
+    pushing = true;
     try {
-      await NET.db.doc(`${base()}/live/p${S.player}`).set(liveDoc());
+      await NET.tx.publish(`live/p${S.player}`, liveDoc(), true);
     } catch (e) {
-      /* keep playing offline */
+      /* keep playing; the next event retries */
     }
-    liveBusy = false;
-    if (liveDirty) {
-      liveDirty = false;
+    pushing = false;
+    if (pushAgain) {
+      pushAgain = false;
       schedulePush();
     }
   }
   function listenCommands() {
-    if (!NET.db) return;
+    if (!NET.tx) return;
     if (NET.unsubCmd) NET.unsubCmd();
-    NET.lastSeq = null;
-    NET.unsubCmd = NET.db.doc(`${base()}/cmd/p${S.player}`).onSnapshot((snap) => {
-      const c = snap.exists ? snap.data() : null;
+    NET.tripStart = Date.now();
+    NET.lastSeq = 0;
+    NET.unsubCmd = NET.tx.sub(`cmd/p${S.player}`, (k, c) => {
       const seq = c && c.seq ? c.seq : 0;
-      if (NET.lastSeq === null) {
-        NET.lastSeq = seq; // ignore commands sent before this trip
-        return;
-      }
-      if (!c || seq <= NET.lastSeq) return;
+      if (!c || seq <= NET.lastSeq || seq < NET.tripStart) return; // old commands from before this trip
       NET.lastSeq = seq;
       if (c.type === 'stars') {
         if (S.mode === 'talk') giveStars(c.n);
@@ -2267,49 +2352,90 @@ function start() {
           schedulePush();
         }
       }
-    }, () => {});
+    });
   }
   async function saveSession(rows) {
-    if (!NET.db) return;
+    if (!NET.tx) return;
+    // names stay on the devices: rows travel with the player number only
+    const anon = rows.map((r) => ({ ...r, player: `p${S.player}` }));
+    NET.lastSession = { idx: S.player, runId: NET.runId, date: Date.now(), rows: anon };
     try {
-      await NET.db.collection(`${base()}/sessions`).add({ player: PLAYERS[S.player].name, runId: NET.runId, date: Date.now(), rows });
+      await NET.tx.publish(`sessions/${NET.runId}`, NET.lastSession, true);
     } catch (e) {
       /* the local CSV still works */
     }
   }
 
-  // ---------- Teacher dashboard ----------
-  const T = { docs: {}, unsub: null };
-  function toTeacher() {
-    if (!NET.online) return;
+  // ---------- Teacher view ----------
+  const T = { docs: {}, sessions: {}, unsubs: [] };
+  function teacherSubscribe() {
+    T.unsubs.forEach((u) => u && u());
+    T.unsubs = [];
+    if (!NET.tx) return;
+    $('td-status').textContent = 'Esperando a que los niños entren con el código...';
+    T.unsubs.push(NET.tx.sub('live/+', (k, d) => {
+      T.docs[k.split('/')[1]] = d;
+      $('td-status').textContent = 'En vivo';
+      renderTeacher();
+    }));
+    T.unsubs.push(NET.tx.sub('sessions/+', (k, d) => {
+      T.sessions[k.split('/')[1]] = d;
+    }));
+  }
+  function renderRoomPanel() {
+    const code = NET.room || '';
+    $('td-code').textContent = code || '----';
+    const kidUrl = code ? `${location.origin}${location.pathname}?room=${code}` : '';
+    $('td-link').textContent = kidUrl || 'Crea un código para la clase.';
+    $('td-copy').hidden = !kidUrl;
+  }
+  async function toTeacher() {
     NET.role = 'teacher';
     S.mode = 'teacher';
     showLayer('teacher');
     stopMusic();
-    $('td-status').textContent = 'Conectando...';
-    if (T.unsub) T.unsub();
-    const timer = setTimeout(() => ($('td-status').textContent = 'Aún no llegan datos. Revisa la conexión a internet.'), 10000);
-    T.unsub = NET.db.collection(`${base()}/live`).onSnapshot((snap) => {
-      clearTimeout(timer);
-      T.docs = {};
-      snap.docs.forEach((d) => (T.docs[d.id] = d.data()));
-      $('td-status').textContent = snap.empty ? 'Esperando a que un niño empiece a jugar en su dispositivo...' : 'En vivo';
-      renderTeacher();
-    }, () => ($('td-status').textContent = 'Se perdió la conexión con la base de datos.'));
+    if (!NET.tx) {
+      const saved = (lsGet('ccaRoom') || '').toUpperCase();
+      if (saved) await joinClass(saved);
+    }
+    if (NET.tx) teacherSubscribe();
+    else $('td-status').textContent = 'Crea un código de clase para empezar.';
+    renderRoomPanel();
     clearInterval(T.tick);
     T.tick = setInterval(renderTeacher, 5000);
+    renderTeacher();
   }
+  $('td-new').addEventListener('click', async () => {
+    T.docs = {};
+    T.sessions = {};
+    await joinClass(newRoomCode());
+    renderRoomPanel();
+    renderTeacher();
+  });
+  $('td-copy').addEventListener('click', async () => {
+    const text = $('td-link').textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      $('td-copy').textContent = 'Copiado';
+    } catch (e) {
+      const r = document.createRange();
+      r.selectNodeContents($('td-link'));
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      $('td-copy').textContent = 'Selecciona y copia';
+    }
+    setTimeout(() => ($('td-copy').textContent = 'Copiar enlace'), 1500);
+  });
   const MODE_ES = { play: 'Jugando', talk: 'En el escenario', warp: 'Viajando por el portal', finale: 'Terminó', title: 'En el menú', brief: 'En el menú' };
   function renderTeacher() {
     if (S.mode !== 'teacher') return;
     const box = $('td-cards');
-    const keysP = PLAYERS.map((_, i) => `p${i}`);
-    box.innerHTML = keysP.map((key, i) => {
-      const d = T.docs[key];
-      const P = PLAYERS[i];
-      if (!d) return `<div class="tcard"><div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(P.name)}</b><span class="tst off">sin conectar</span></div><p class="tmuted">Todavía no ha empezado en su dispositivo.</p></div>`;
+    box.innerHTML = PLAYERS.map((P, i) => {
+      const d = T.docs[`p${i}`];
+      if (!d) return `<div class="tcard"><div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(P.name)}</b><span class="tst off">sin conectar</span></div><p class="tmuted">Todavía no ha entrado con el código en su dispositivo.</p></div>`;
       const age = (Date.now() - (d.updatedAt || 0)) / 1000;
-      const live = age < 90;
+      const live = age < 120;
       const mode = (d.paused ? 'En pausa · ' : '') + (MODE_ES[d.mode] || d.mode);
       const worlds = (d.results || []).map((r, wi) => {
         const st = d.talkWorlds && d.talkWorlds[wi] ? ` <span class="tstars">${'★'.repeat(d.stars[wi] || 0)}<span class="tdim">${'★'.repeat(3 - (d.stars[wi] || 0))}</span></span>` : '';
@@ -2318,7 +2444,7 @@ function start() {
       }).join('');
       const ev = (d.events || []).slice().reverse().slice(0, 8).map((e) => `<li class="${e.ok ? 'ok' : 'bad'}"><span>${e.ok ? '✓' : '✗'}</span>${esc(e.text)}</li>`).join('');
       return `<div class="tcard">
-        <div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(d.player)}</b><span class="tst ${live ? 'on' : 'off'}">${live ? 'en vivo' : 'sin señal'}</span></div>
+        <div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(P.name)}</b><span class="tst ${live ? 'on' : 'off'}">${live ? 'en vivo' : 'sin señal'}</span></div>
         <div class="tnow"><b>${esc(mode)}</b>${d.world && d.mode !== 'finale' ? ` · ${esc(d.world)}` : ''}${d.quest ? `<br>Reto: <b>${esc(d.quest)}</b> ${esc(d.progress || '')}` : ''}</div>
         <div class="tbtns">
           <span>Estrellas:</span>
@@ -2333,35 +2459,36 @@ function start() {
   }
   $('td-cards').addEventListener('click', async (e) => {
     const b = e.target.closest('button[data-c]');
-    if (!b || !NET.db) return;
+    if (!b || !NET.tx) return;
     const cmd = { seq: Date.now(), type: b.dataset.c, n: +b.dataset.n || 0 };
     b.disabled = true;
     try {
-      await NET.db.doc(`${base()}/cmd/p${b.dataset.p}`).set(cmd);
+      const sent = await NET.tx.publish(`cmd/p${b.dataset.p}`, cmd, false);
+      if (!sent) throw new Error('offline');
       b.classList.add('sent');
       setTimeout(() => b.classList.remove('sent'), 900);
     } catch (err) {
-      $('td-status').textContent = 'No se pudo enviar la orden. Intenta de nuevo.';
+      $('td-status').textContent = 'No se pudo enviar la orden. Revisa la conexión a internet.';
     }
     b.disabled = false;
   });
-  $('td-csv').addEventListener('click', async () => {
-    if (!NET.db) return;
-    try {
-      const snap = await NET.db.collection(`${base()}/sessions`).orderBy('date', 'asc').get();
-      const rows = [];
-      snap.docs.forEach((d) => (d.data().rows || []).forEach((r) => rows.push(r)));
-      if (!rows.length) {
-        $('td-status').textContent = 'Todavía no hay partidas terminadas para descargar.';
-        return;
-      }
-      csvDownload(rows);
-    } catch (err) {
-      $('td-status').textContent = 'No se pudieron leer los resultados.';
+  $('td-csv').addEventListener('click', () => {
+    const rows = [];
+    Object.values(T.sessions)
+      .sort((a, b) => (a.date || 0) - (b.date || 0))
+      .forEach((s) => (s.rows || []).forEach((r) => {
+        const m = /^p(\d)$/.exec(r.player || '');
+        rows.push({ ...r, player: m && PLAYERS[+m[1]] ? PLAYERS[+m[1]].name : r.player });
+      }));
+    if (!rows.length) {
+      $('td-status').textContent = 'Todavía no hay partidas terminadas en esta clase.';
+      return;
     }
+    csvDownload(rows);
   });
   $('td-back').addEventListener('click', () => {
-    if (T.unsub) T.unsub();
+    T.unsubs.forEach((u) => u && u());
+    T.unsubs = [];
     clearInterval(T.tick);
     NET.role = 'player';
     toTitle();
@@ -2608,7 +2735,7 @@ function start() {
       }
       S.rows.push({ player: name, world: w.short, challenge: 'Time crystals (bonus)', score: S.crystals[i], max: S.crystalsMax[i], details: '', date: when });
     });
-    if (NET.online) {
+    if (NET.tx) {
       saveSession(S.rows.slice(before));
       logEvent('Finished the game! 🏆', true);
     }
@@ -2631,7 +2758,7 @@ function start() {
     const head = ['player', 'world', 'challenge', 'score', 'max', 'details', 'date'];
     const lines = [head.join(',')];
     for (const r of rowsIn) lines.push(head.map((h) => csvCell(r[h])).join(','));
-    if (NET.online && window.claude && window.claude.use) {
+    if (NET.tx && NET.tx.kind === 'db' && window.claude && window.claude.use) {
       // Inside claude.ai the page cannot download by itself: ask the viewer through `downloads`.
       const dl = await window.claude.use('downloads').catch(() => null);
       if (dl) {
@@ -2683,6 +2810,7 @@ function start() {
   });
   window.addEventListener('blur', () => keys.clear());
   window.addEventListener('keydown', (e) => {
+    if (e.target && e.target.tagName === 'INPUT') return;
     const k = e.key;
     if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Backspace', 'Enter'].includes(k)) e.preventDefault();
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
@@ -2713,7 +2841,7 @@ function start() {
       case 'title':
         if (k === '1') choosePlayer(0);
         else if (k === '2') choosePlayer(1);
-        else if ((k === 't' || k === 'T') && NET.online) toTeacher();
+        else if (k === 't' || k === 'T') toTeacher();
         break;
       case 'brief':
         if ((k === 'Enter' || k === ' ') && !e.repeat) startTrip();

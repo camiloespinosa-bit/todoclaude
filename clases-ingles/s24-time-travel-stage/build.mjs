@@ -16,8 +16,8 @@ const faces = [400, 600, 700, 800]
   .join('\n');
 
 const targets = [
-  { entry: 'src/games/b4.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html', title: 'The Time Travel Stage' },
-  { entry: 'src/games/b1.js', template: 'src/game.html', out: 'Bloque1_MeTown.html', title: 'Me Town' },
+  { entry: 'src/games/b4.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html', title: 'The Time Travel Stage', site: 'time-travel.html' },
+  { entry: 'src/games/b1.js', template: 'src/game.html', out: 'Bloque1_MeTown.html', title: 'Me Town', site: 'me-town.html' },
   { entry: 'src/main.js', template: 'src/template.html', out: 'S24_TimeTravelStage_v1.html' },
 ];
 
@@ -38,6 +38,12 @@ for (const t of targets) {
     .replace(/<title>[^<]*<\/title>/, (m) => (t.title ? `<title>${t.title}</title>` : m));
   const out = join(here, t.out);
   writeFileSync(out, html);
+  // short public path on gimnasiodelcerebro.co/juegos/
+  if (t.site) {
+    const siteDir = join(here, '..', '..', 'juegos');
+    mkdirSync(siteDir, { recursive: true });
+    writeFileSync(join(siteDir, t.site), html);
+  }
   // claude.ai artifact version: the platform adds its own <html>/<head>/<body> skeleton.
   const art = html
     .replace(/^<!doctype html>\s*/i, '')
