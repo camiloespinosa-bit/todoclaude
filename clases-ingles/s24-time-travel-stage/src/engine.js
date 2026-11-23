@@ -1843,7 +1843,7 @@ function start() {
         if (!p.qs || !p.qs.length || Q.asked >= (Q.def.asks || 2)) return this.done(Q);
         Q.phase = 'choose';
         const opts = Q.left3.map((i, k) => `<button class="opt qbtn" data-pick="${k}"><b>${k + 1}</b>${esc(p.qs[i][0])}</button>`).join('');
-        task(`Ask ${esc(p.name)} a question! Press 1, 2 or 3`, Q.asked ? 'One more question!' : `What do you want to ask ${esc(p.name)}?`, opts);
+        task(`Ask ${esc(p.name)} a question! ${document.body.classList.contains('touch') ? 'Tap one' : 'Press 1, 2 or 3'}`, Q.asked ? 'One more question!' : `What do you want to ask ${esc(p.name)}?`, opts);
       },
       pick(Q, k) {
         if (Q.phase !== 'choose' || k >= Q.left3.length) return;
@@ -2270,7 +2270,7 @@ function start() {
 
   function updateLock() {
     document.body.classList.toggle('locked', !NET.unlocked);
-    document.body.classList.toggle('teacher', !!NET.isTeacher);
+    document.body.classList.toggle('is-profe', !!NET.isTeacher);
   }
   async function checkTeacherKey(typed) {
     const key = (typed || params.get('profe') || lsGet('ccaProfe') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -3017,6 +3017,75 @@ function start() {
     return null;
   }
 
+  // ---------- Touch controls (joystick, JUMP, OK) ----------
+  const TOUCH = { x: 0, z: 0, id: null };
+  const isTouch = () => (window.matchMedia && matchMedia('(pointer: coarse)').matches) || params.has('touch');
+  if (isTouch()) document.body.classList.add('touch');
+  window.addEventListener('touchstart', () => document.body.classList.add('touch'), { once: true, passive: true });
+  {
+    const joy = $('joy'), knob = $('joy-k');
+    const move = (e) => {
+      const r = joy.getBoundingClientRect();
+      const R = r.width / 2;
+      let dx = e.clientX - (r.left + R), dy = e.clientY - (r.top + R);
+      const d = Math.hypot(dx, dy);
+      if (d > R) {
+        dx *= R / d;
+        dy *= R / d;
+      }
+      knob.style.transform = `translate(${dx}px, ${dy}px)`;
+      const m = Math.hypot(dx, dy) / R;
+      TOUCH.x = m < 0.18 ? 0 : dx / R;
+      TOUCH.z = m < 0.18 ? 0 : dy / R;
+    };
+    const end = (e) => {
+      if (e.pointerId !== TOUCH.id) return;
+      TOUCH.id = null;
+      TOUCH.x = TOUCH.z = 0;
+      knob.style.transform = '';
+    };
+    joy.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      TOUCH.id = e.pointerId;
+      try {
+        joy.setPointerCapture(e.pointerId);
+      } catch (err) {
+        /* old browser */
+      }
+      move(e);
+    });
+    joy.addEventListener('pointermove', (e) => e.pointerId === TOUCH.id && move(e));
+    joy.addEventListener('pointerup', end);
+    joy.addEventListener('pointercancel', end);
+    const press = (key, code) => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key, code }));
+      window.dispatchEvent(new KeyboardEvent('keyup', { key, code }));
+    };
+    $('tc-jump').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      AV.jumpBuf = 0.15;
+    });
+    $('tc-ok').addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      press('Enter', 'Enter');
+    });
+    $('b-go').addEventListener('click', () => S.mode === 'brief' && startTrip());
+    for (const b of [$('tc-jump'), $('tc-ok'), $('b-go')]) b.tabIndex = -1;
+  }
+  let lastPlayCls = '';
+  function syncTouchClasses() {
+    const c = S.mode === 'play' || S.mode === 'talk' ? S.mode : '';
+    if (c === lastPlayCls) return;
+    lastPlayCls = c;
+    document.body.classList.toggle('playing', !!c);
+    document.body.classList.toggle('talking', c === 'talk');
+    if (!c) {
+      TOUCH.x = TOUCH.z = 0;
+      TOUCH.id = null;
+      $('joy-k').style.transform = '';
+    }
+  }
+
   function gamepadInput() {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     for (const gp of pads) {
@@ -3071,8 +3140,8 @@ function start() {
       ix = (keys.has('right') ? 1 : 0) - (keys.has('left') ? 1 : 0);
       iz = (keys.has('down') ? 1 : 0) - (keys.has('up') ? 1 : 0);
       const gp = gamepadInput();
-      ix += gp.x;
-      iz += gp.z;
+      ix += gp.x + TOUCH.x;
+      iz += gp.z + TOUCH.z;
     }
     const len = Math.hypot(ix, iz);
     if (len > 1) {
@@ -3211,6 +3280,7 @@ function start() {
   function updateCamera(dt, t) {
     let wantP, wantT, k = 1 - Math.exp(-dt * 3.5);
     const wide = Math.max(1, 16 / 9 / camera.aspect);
+    const wideP = Math.min(wide, 1.7); // phones held upright: keep the hero big
     if (S.mode === 'title' || S.mode === 'brief' || S.mode === 'teacher') {
       const a = t * 0.06;
       wantP = V(Math.sin(a) * 64 * wide, 34, Math.cos(a) * 64 * wide);
@@ -3218,11 +3288,11 @@ function start() {
       k = 1;
     } else if (S.mode === 'play') {
       const C = CAMS[camIdx];
-      wantP = AV.pos.clone().add(C.p(wide));
+      wantP = AV.pos.clone().add(C.p(wideP));
       wantT = AV.pos.clone().add(C.t);
       if (C.id === 'follow') wantP.y = Math.max(wantP.y, 8.5);
     } else if (S.mode === 'talk') {
-      wantP = V(STAGE.x + Math.sin(t * 0.15) * 1.5, STAGE.top + 3.0, STAGE.z + 10.5 * wide);
+      wantP = V(STAGE.x + Math.sin(t * 0.15) * 1.5, STAGE.top + 3.0, STAGE.z + 10.5 * wideP);
       wantT = V(STAGE.x, STAGE.top + 2.2, STAGE.z);
     } else if (S.mode === 'warp') {
       wantP = V(Math.sin(t * 2) * 0.6, 500 + Math.cos(t * 1.7) * 0.4, 0);
@@ -3242,6 +3312,7 @@ function start() {
   function update(dt, t, realDt) {
     if (W) for (const u of W.updaters) u(t, dt);
     if (W) for (const c of W.group.children) if (c.userData.spin) c.rotation.y += dt * c.userData.spin;
+    syncTouchClasses();
     if (S.mode === 'play' || S.mode === 'talk' || S.mode === 'finale') updateAvatar(dt);
     if (S.mode !== 'title' && S.mode !== 'brief' && S.mode !== 'teacher') animateAvatar(dt, t);
 
