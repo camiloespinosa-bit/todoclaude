@@ -2686,8 +2686,22 @@ function start() {
         const chips = r.items.map((x) => `<span class="tchip ${x.score === x.max ? 'full' : ''}">${esc(x.name)} <b>${x.score}/${x.max}</b></span>`).join('') || '<span class="tmuted">—</span>';
         return `<div class="tworld ${wi === d.wi && d.mode !== 'finale' ? 'now' : ''}"><span class="twn" style="background:${r.color}">${esc(r.world)}</span>${st}<div class="tchips">${chips}</div></div>`;
       }).join('');
+      // on the stage: big, impossible-to-miss star buttons
+      const onStage = live && d.mode === 'talk';
+      T.prevMode = T.prevMode || {};
+      if (onStage && T.prevMode[i] !== 'talk') {
+        sfx.good();
+        setTimeout(() => sfx.good(), 260);
+      }
+      T.prevMode[i] = live ? d.mode : '';
+      const given = (d.stars || [])[d.wi] || 0;
+      const stage = onStage ? `<div class="tstage">
+          <div class="tsh">🎤 ¡${esc(P.name)} está en el escenario! Escúchalo y dale estrellas.</div>
+          <div class="tsb">${[1, 2, 3].map((n) => `<button data-p="${i}" data-c="stars" data-n="${n}" class="big${n <= given ? ' on' : ''}">${'★'.repeat(n)}</button>`).join('')}<button data-p="${i}" data-c="endTalk" class="big end">Terminar charla</button></div>
+        </div>` : '';
       const ev = (d.events || []).slice().reverse().slice(0, 8).map((e) => `<li class="${e.ok ? 'ok' : 'bad'}"><span>${e.ok ? '✓' : '✗'}</span>${esc(e.text)}</li>`).join('');
-      return `<div class="tcard">
+      return `<div class="tcard${onStage ? ' onstage' : ''}">
+        ${stage}
         <div class="th"><span class="tav" style="background:${P.suit}">${esc(P.name[0])}</span><b>${esc(P.name)}</b><span class="tst ${live ? 'on' : 'off'}">${live ? 'en vivo' : 'sin señal'}</span></div>
         <div class="tnow"><b>${esc(mode)}</b>${d.world && d.mode !== 'finale' ? ` · ${esc(d.world)}` : ''}${d.quest ? `<br>Reto: <b>${esc(d.quest)}</b> ${esc(d.progress || '')}` : ''}</div>
         <div class="tbtns">

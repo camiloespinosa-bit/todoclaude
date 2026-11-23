@@ -64,6 +64,42 @@ a.game span { font-weight: 500; font-size: .9rem; color: var(--muted); }
 .run table { border-collapse: collapse; width: 100%; margin-top: 6px; }
 .run td { padding: 3px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .run td.n { text-align: right; white-space: nowrap; font-weight: 700; }
+#report { position: fixed; inset: 0; background: var(--bg); overflow: auto; z-index: 10; padding: 16px; }
+.rp-bar { max-width: 820px; margin: 0 auto 12px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.rp { max-width: 820px; margin: 0 auto; background: #fff; border-radius: 20px; padding: 32px; box-shadow: 0 6px 20px rgba(29,63,84,.10); }
+.rp header { display: block; border-bottom: 3px solid var(--turq); padding-bottom: 12px; margin-bottom: 18px; }
+.rp .brand { color: var(--turq); font-weight: 700; font-size: .9rem; letter-spacing: .03em; }
+.rp h1 { font-size: 1.8rem; margin: 4px 0; }
+.rp h3 { margin: 22px 0 8px; font-size: 1.1rem; color: var(--ink); }
+.rp .period { color: var(--muted); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.kpi { background: var(--soft); border-radius: 14px; padding: 12px 14px; }
+.kpi b { display: block; font-size: 1.6rem; line-height: 1.1; }
+.kpi span { color: var(--muted); font-size: .9rem; }
+.rp table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.rp th { text-align: left; color: var(--muted); font-weight: 600; font-size: .85rem; border-bottom: 2px solid var(--line); padding: 6px; }
+.rp td { border-bottom: 1px solid var(--line); padding: 6px; vertical-align: top; }
+.rp td.n { text-align: right; white-space: nowrap; font-weight: 700; }
+.bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; min-width: 80px; }
+.bar i { display: block; height: 100%; background: var(--green); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .two { grid-template-columns: 1fr; } .rp { padding: 18px; } }
+.rp ul { margin: 0; padding-left: 1.2em; }
+.rp .qs li { margin: 2px 0; }
+.rp .comment { min-height: 110px; border: 2px dashed var(--line); border-radius: 12px; padding: 10px 12px; white-space: pre-wrap; }
+.rp .comment:empty::before { content: 'Escribe aquí tu comentario para la familia...'; color: var(--muted); }
+.rp .fine { color: var(--muted); font-size: .85rem; margin-top: 18px; }
+@media print {
+  body { background: #fff; }
+  main, .rp-bar { display: none !important; }
+  #report { position: static; padding: 0; background: #fff; }
+  .rp { box-shadow: none; border-radius: 0; padding: 0; max-width: none; }
+  .rp .comment { border-color: #ccc; }
+  .rp .comment:empty::before { content: ''; }
+  .rp h3 { break-after: avoid; }
+  .kpis { grid-template-columns: repeat(5, 1fr); break-inside: avoid; }
+  .rp tr { break-inside: avoid; }
+}
 .note { font-size: .9rem; color: var(--muted); margin: 0; }
 </style>
 </head>
@@ -107,6 +143,16 @@ a.game span { font-weight: 500; font-size: .9rem; color: var(--muted); }
     </section>
 
     <section style="margin-top:20px">
+      <h2>Informe para padres</h2>
+      <div class="row">
+        <div><label for="rp-kid">Niño</label><select id="rp-kid"><option value="0">Jerónimo</option><option value="1">Luciana</option></select></div>
+        <div><label for="rp-from">Desde</label><input id="rp-from" type="date"></div>
+      </div>
+      <div class="cb" style="margin-top:12px"><button class="btn big" id="rp-go" type="button">Ver informe</button></div>
+      <p class="note" style="margin-top:10px">Sale de las partidas guardadas en el historial. Puedes escribir tu comentario y luego imprimirlo o guardarlo como PDF.</p>
+    </section>
+
+    <section style="margin-top:20px">
       <div class="hh"><h2>Historial de partidas</h2><div class="cb"><button class="btn" id="hi-reload" type="button">Actualizar</button><button class="btn main" id="hi-csv" type="button">Descargar CSV</button></div></div>
       <p class="msg" id="hi-msg">Cargando...</p>
       <div id="hi-list"></div>
@@ -118,6 +164,10 @@ a.game span { font-weight: 500; font-size: .9rem; color: var(--muted); }
     </section>
   </div>
 </main>
+<div id="report" hidden>
+  <div class="rp-bar"><button class="btn" id="rp-close" type="button">← Volver al panel</button><button class="btn main" id="rp-print" type="button">Imprimir o guardar PDF</button></div>
+  <article class="rp" id="rp-body"></article>
+</div>
 <script>
 /*BUNDLE*/
 </script>

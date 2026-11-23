@@ -137,6 +137,80 @@ function historyCSV() {
     a.remove();
   }, 1000);
 }
+// ---------- parent report ----------
+const pct = (a, b) => (b ? Math.round((100 * a) / b) : 0);
+const isTalk = (w) => /Talk stars/i.test(w.challenge || '');
+const isCrys = (w) => /crystals/i.test(w.challenge || '');
+function buildReport(kid, fromMs) {
+  const mine = runs.filter((x) => x.player === kid && new Date(x.updated_at).getTime() >= fromMs);
+  const done = mine.filter((x) => x.status === 'finished' && Array.isArray(x.rows));
+  const rows = done.flatMap((x) => x.rows.map((w) => ({ ...w, game: gameOf(x.game).name, when: x.updated_at })));
+  const ch = rows.filter((w) => !isTalk(w) && !isCrys(w) && +w.max > 0);
+  const talk = rows.filter(isTalk);
+  const crys = rows.filter(isCrys).reduce((a, w) => a + (+w.score || 0), 0);
+  const score = ch.reduce((a, w) => a + (+w.score || 0), 0), max = ch.reduce((a, w) => a + (+w.max || 0), 0);
+  const stars = talk.reduce((a, w) => a + (+w.score || 0), 0);
+  // per challenge: best result and how many times
+  const by = new Map();
+  for (const w of ch) {
+    const k = `${w.game}|${w.world}|${w.challenge}`;
+    const o = by.get(k) || { game: w.game, world: w.world, challenge: w.challenge, times: 0, best: 0, max: +w.max, sum: 0, sumMax: 0 };
+    o.times++;
+    o.best = Math.max(o.best, +w.score || 0);
+    o.sum += +w.score || 0;
+    o.sumMax += +w.max || 0;
+    by.set(k, o);
+  }
+  const list = [...by.values()];
+  const ranked = list.slice().sort((a, b) => pct(b.sum, b.sumMax) - pct(a.sum, a.sumMax));
+  const best = ranked.filter((o) => pct(o.sum, o.sumMax) >= 80).slice(0, 4);
+  const practice = ranked.slice().reverse().filter((o) => pct(o.sum, o.sumMax) < 80).slice(0, 4);
+  // the questions the kid chose and said out loud ("Ana: Do you like horses?")
+  const qs = new Map();
+  for (const w of rows) for (const part of String(w.details || '').split(';')) {
+    const m = /^\s*([A-Z][a-z]+):\s*(.+\?)\s*$/.exec(part);
+    if (m) qs.set(m[2], (qs.get(m[2]) || 0) + 1);
+  }
+  const dates = mine.map((x) => new Date(x.updated_at).getTime());
+  const name = PLAYERS[kid] || `Jugador ${kid + 1}`;
+  const fmt = (t) => new Date(t).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+  const period = dates.length ? `${fmt(Math.min(...dates))} a ${fmt(Math.max(...dates))}` : 'Sin partidas en este periodo';
+  const commentKey = `ccaComment:${kid}`;
+  const row = (o) => `<tr><td>${esc(o.game)}</td><td>${esc(o.world)}</td><td>${esc(o.challenge)}</td><td class="n">${o.best}/${o.max}</td><td>${o.times}</td><td><div class="bar"><i style="width:${pct(o.sum, o.sumMax)}%"></i></div></td></tr>`;
+  const item = (o) => `<li><b>${esc(o.challenge)}</b> <span style="color:var(--muted)">(${esc(o.world)}, ${pct(o.sum, o.sumMax)}%)</span></li>`;
+  return `
+    <header><div class="brand">Gimnasio del Cerebro · Inglés</div><h1>Informe de ${esc(name)}</h1><div class="period">${esc(period)}</div></header>
+    <div class="kpis">
+      <div class="kpi"><b>${done.length}</b><span>${done.length === 1 ? 'partida terminada' : 'partidas terminadas'}${mine.length > done.length ? ` (+${mine.length - done.length} sin terminar)` : ''}</span></div>
+      <div class="kpi"><b>${pct(score, max)}%</b><span>aciertos en los retos (${score}/${max})</span></div>
+      <div class="kpi"><b>${stars}/${talk.length * 3}</b><span>estrellas hablando en el escenario</span></div>
+      <div class="kpi"><b>${qs.size}</b><span>preguntas distintas que hizo en inglés</span></div>
+      <div class="kpi"><b>${crys}</b><span>cristales del tiempo</span></div>
+    </div>
+    <div class="two">
+      <div><h3>Lo que mejor le salió</h3>${best.length ? `<ul>${best.map(item).join('')}</ul>` : '<p class="fine">Todavía no hay suficientes datos.</p>'}</div>
+      <div><h3>Para seguir practicando</h3>${practice.length ? `<ul>${practice.map(item).join('')}</ul>` : '<p class="fine">Todos los retos por encima del 80%.</p>'}</div>
+    </div>
+    <h3>Preguntas que hizo en inglés</h3>
+    ${qs.size ? `<ul class="qs">${[...qs.keys()].map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : '<p class="fine">No hay preguntas registradas.</p>'}
+    <h3>Retos jugados</h3>
+    ${list.length ? `<table><thead><tr><th>Juego</th><th>Mundo</th><th>Reto</th><th>Mejor</th><th>Veces</th><th>Aciertos</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table>` : '<p class="fine">No hay partidas terminadas en este periodo.</p>'}
+    <h3>Comentario del profe</h3>
+    <div class="comment" id="rp-comment" contenteditable="true">${esc(ls.get(commentKey) || '')}</div>
+    <p class="fine">Este informe muestra lo que ${esc(name)} hizo dentro de los juegos: retos, aciertos, preguntas y estrellas que dio el profe al escucharle hablar. La pronunciación y la fluidez las valora el profe en clase.</p>`;
+}
+$('rp-go').addEventListener('click', async () => {
+  if (!runs.length) await loadHistory();
+  const kid = +$('rp-kid').value;
+  const from = $('rp-from').value ? new Date($('rp-from').value + 'T00:00').getTime() : 0;
+  $('rp-body').innerHTML = buildReport(kid, from);
+  $('report').hidden = false;
+  window.scrollTo(0, 0);
+  const c = $('rp-comment');
+  c.addEventListener('input', () => ls.set(`ccaComment:${kid}`, c.innerText));
+});
+$('rp-close').addEventListener('click', () => ($('report').hidden = true));
+$('rp-print').addEventListener('click', () => window.print());
 $('hi-reload').addEventListener('click', loadHistory);
 $('hi-csv').addEventListener('click', () => (runs.length ? historyCSV() : loadHistory()));
 

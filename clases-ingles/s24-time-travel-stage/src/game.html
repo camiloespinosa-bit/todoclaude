@@ -275,6 +275,14 @@ body.is-profe #btn-teacher { display: inline-flex; }
 .tbtns button { background: var(--deep); color: #fff; border-radius: 12px; padding: .3em .7em; font-weight: 800; font-size: .95em; }
 .tbtns button[data-c="stars"] { background: #E0A800; }
 .tbtns button.sent { background: var(--green); }
+.tcard.onstage { outline: 5px solid #E0A800; animation: stagePulse 1.6s ease-in-out infinite; }
+@keyframes stagePulse { 50% { outline-color: #FFE082; } }
+.tstage { background: #FFF8E1; border-radius: 16px; padding: .6em .8em; display: flex; flex-direction: column; gap: .5em; }
+.tsh { font-weight: 800; font-size: 1.1em; color: var(--deep); }
+.tsb { display: flex; flex-wrap: wrap; gap: .5em; }
+.tsb button { background: #E0A800; color: #fff; border-radius: 14px; padding: .35em .9em; font-size: 1.25em; font-weight: 800; letter-spacing: .05em; }
+.tsb button.on { background: var(--green); }
+.tsb button.end { background: var(--deep); font-size: 1em; }
 .tbtns button.warn { background: #fff; color: #C62828; outline: 2px solid #C62828; }
 .tworlds { display: flex; flex-direction: column; gap: .4em; }
 .tworld { display: flex; flex-wrap: wrap; align-items: center; gap: .4em; padding: .3em .5em; border-radius: 12px; }
