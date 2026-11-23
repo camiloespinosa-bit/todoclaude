@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { OBJECTS, makeObject, mat, mesh, at, rod } from './objects.js';
 import { ACTIONS, LADDER_VERBS, DREAMS, OPINIONS } from './content.js';
-import { joinRoom, newRoomCode, PUBLIC_BROKERS } from './net.js';
+import { joinRoom, newRoomCode, PUBLIC_BROKERS, sha256Hex } from './net.js';
 
 const $ = (id) => document.getElementById(id);
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -31,6 +31,11 @@ const DEFAULT_PLAYERS = [
   { name: 'Luciana', suit: '#F57C00', scarf: '#57A6B5', hair: '#5A3A22', long: true },
 ];
 let GAME = null;
+// On the website nobody plays without a class code opened by the teacher.
+// The teacher view needs the teacher key (?profe=KEY, remembered on that device).
+// Only the SHA-256 of the key is in the page.
+const TEACHER_HASH = '74c7a31e74d9561c3c344c1bbf1f3a67b910c90172ac5b506af9eecb1327f93b';
+const WEB = /^https?:$/.test(location.protocol);
 // Public by design (same project as gimnasiodelcerebro.co/reservas): only used for the
 // live "broadcast" channel between the kids' devices and the teacher view.
 const SAGA_SUPABASE = { url: 'https://xpqjejiezbxaxsdodkyb.supabase.co', key: 'sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd' };
@@ -1508,6 +1513,7 @@ function start() {
   }
   for (const b of document.querySelectorAll('.player')) b.addEventListener('click', () => choosePlayer(+b.dataset.p));
   function choosePlayer(p) {
+    if (!NET.unlocked) return;
     S.player = p;
     sfx.click();
     S.mode = 'brief';
@@ -2214,7 +2220,28 @@ function start() {
     };
   }
 
+  function updateLock() {
+    document.body.classList.toggle('locked', !NET.unlocked);
+    document.body.classList.toggle('teacher', !!NET.isTeacher);
+  }
+  async function checkTeacherKey() {
+    const key = (params.get('profe') || lsGet('ccaProfe') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!key || !(window.crypto && crypto.subtle)) return;
+    try {
+      if ((await sha256Hex(`cca-profe|${key}`)) === TEACHER_HASH) {
+        NET.isTeacher = true;
+        NET.unlocked = true;
+        lsSet('ccaProfe', key);
+      }
+    } catch (e) {
+      /* stays locked */
+    }
+    updateLock();
+  }
   async function initNet() {
+    NET.unlocked = !WEB;
+    updateLock();
+    await checkTeacherKey();
     // claude.ai artifact? then use its database.
     try {
       if (window.claude && typeof window.claude.use === 'function') {
@@ -2260,7 +2287,8 @@ function start() {
     NET.room = code;
     const supa = params.get('broker') ? null : GAME.supabase || SAGA_SUPABASE;
     NET.tx = await joinRoom(code, GAME.id, brokers, (n) => {
-      setNetStatus(n ? `Class ${code} · online` : `Class ${code} · connecting...`, n > 0);
+      if (!NET.unlocked) setNetStatus(n ? 'Checking the code...' : 'Connecting...', n > 0);
+      else setNetStatus(n ? `Class ${code} · online` : `Class ${code} · connecting...`, n > 0);
       if (n && NET.role === 'player' && S.mode !== 'title' && S.mode !== 'brief') schedulePush();
     }, supa);
     // broadcast channels keep nothing: re-send the state every 12 s (and the result after the game)
@@ -2276,6 +2304,26 @@ function start() {
     lsSet('ccaRoom', code);
     if (NET.role === 'player' && S.mode !== 'title' && S.mode !== 'brief') listenCommands();
     if (NET.role === 'teacher') teacherSubscribe();
+    if (NET.isTeacher) {
+      // tell the kids' devices this class is open (kept on the brokers, refreshed every 10 s)
+      const openMsg = () => NET.tx && NET.tx.publish('open', { t: Date.now() }, true).catch(() => {});
+      openMsg();
+      clearInterval(NET.openBeat);
+      NET.openBeat = setInterval(openMsg, 10000);
+    } else if (!NET.unlocked) {
+      const tx = NET.tx;
+      tx.sub('open', (k, d) => {
+        if (NET.tx !== tx || NET.unlocked || !d || Date.now() - d.t > 12 * 3600 * 1000) return;
+        NET.unlocked = true;
+        updateLock();
+        setNetStatus(`Class ${code} · online`, true);
+        sfx.good();
+      });
+      clearTimeout(NET.gateTimer);
+      NET.gateTimer = setTimeout(() => {
+        if (!NET.unlocked && NET.tx === tx) setNetStatus('This class is not open. Ask your teacher.', false);
+      }, 9000);
+    }
     return true;
   }
   $('room-in').addEventListener('keydown', (e) => {
@@ -2287,6 +2335,7 @@ function start() {
     }
   });
   $('room-in').addEventListener('change', () => joinClass($('room-in').value));
+  $('room-go').addEventListener('click', () => joinClass($('room-in').value));
 
   let liveTimer = null;
   function schedulePush() {
@@ -2390,6 +2439,7 @@ function start() {
     $('td-copy').hidden = !kidUrl;
   }
   async function toTeacher() {
+    if (!NET.isTeacher) return;
     NET.role = 'teacher';
     S.mode = 'teacher';
     showLayer('teacher');
@@ -2839,6 +2889,7 @@ function start() {
     if (S.paused) return;
     switch (S.mode) {
       case 'title':
+        if (!NET.unlocked) break;
         if (k === '1') choosePlayer(0);
         else if (k === '2') choosePlayer(1);
         else if (k === 't' || k === 'T') toTeacher();
@@ -3053,7 +3104,7 @@ function start() {
       k = 1;
     } else if (S.mode === 'play') {
       wantP = AV.pos.clone().add(V(0, 8.5, 13.5 * wide));
-      wantT = AV.pos.clone().add(V(0, 1.5, -2.5));
+      wantT = AV.pos.clone().add(V(0, -0.5, 1.0));
       wantP.y = Math.max(wantP.y, 8.5);
     } else if (S.mode === 'talk') {
       wantP = V(STAGE.x + Math.sin(t * 0.15) * 1.5, STAGE.top + 3.0, STAGE.z + 10.5 * wide);

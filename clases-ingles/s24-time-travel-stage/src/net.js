@@ -10,7 +10,7 @@ const dec = new TextDecoder();
 export const PUBLIC_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
 
 // ---------- crypto helpers ----------
-async function sha256Hex(text) {
+export async function sha256Hex(text) {
   const buf = await crypto.subtle.digest('SHA-256', enc.encode(text));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }

@@ -63,15 +63,15 @@ async function installFakeDb(page) {
   });
 }
 
-async function openPage(query = '', online = false) {
-  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, acceptDownloads: true });
+async function openPage(query = '', online = false, base = URL0, viewport = { width: 1920, height: 1080 }) {
+  const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, acceptDownloads: true });
   const page = await ctx.newPage();
   const errors = [], external = [];
   page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[${m.type()}] ${m.text()}`); });
   page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message));
-  page.on('request', (r) => { const u = r.url(); if (!/^(file|data|blob):/.test(u)) external.push(u); });
+  page.on('request', (r) => { const u = r.url(); if (!/^(file|data|blob):/.test(u) && !u.startsWith('http://127.0.0.1:18080/')) external.push(u); });
   if (online) await installFakeDb(page);
-  await page.goto(URL0 + query);
+  await page.goto(base + query);
   await page.waitForFunction(() => window.__TTS && window.__TTS.S);
   await wait(1500);
   return { ctx, page, errors, external };
@@ -151,6 +151,18 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   check('CSV rows for all challenges', (csv.match(/^Jerónimo,/gm) || []).length >= 15);
   check('Report stones used met friends', /Report Stones|He Wakes Up/.test(csv));
   check('No console errors (offline)', errors.length === 0, errors.slice(0, 5).join(' | '));
+  {
+    const small = await openPage('', false, URL0, { width: 1277, height: 580 });
+    await small.page.keyboard.press('1'); await small.page.keyboard.press('Enter');
+    await wait(4500);
+    await small.page.screenshot({ path: join(OUT, 'small_window_play.png') });
+    const box = await small.page.evaluate(() => {
+      const r = document.getElementById('h-task').getBoundingClientRect();
+      return { top: r.top, h: innerHeight };
+    });
+    check('Small window: task card leaves the upper part free for the hero', box.top > box.h * 0.4, JSON.stringify(box));
+    await small.ctx.close();
+  }
   check('No external requests (offline)', external.length === 0, external.join(' '));
   await ctx.close();
 }
@@ -163,8 +175,28 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   const wss = new WebSocketServer({ port: 18883 });
   wss.on('connection', (ws) => broker.handle(createWebSocketStream(ws)));
   const B = '&broker=' + encodeURIComponent('ws://127.0.0.1:18883');
+  const http = require('node:http');
+  const html = readFileSync(FILE);
+  const srv = http.createServer((req, res) => { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(html); });
+  await new Promise((r) => srv.listen(18080, '127.0.0.1', r));
+  const WEBURL = 'http://127.0.0.1:18080/me-town.html';
+  const KEY = process.env.PROFE_KEY || '';
 
-  const teacher = await openPage('?x=1' + B);
+  // a visitor with no code cannot play and sees no teacher button
+  const visitor = await openPage('?x=0' + B, false, WEBURL);
+  check('Website: without a code the players are hidden', !(await visitor.page.isVisible('.players')) && await visitor.page.isVisible('#gate'));
+  check('Website: no teacher button for visitors', !(await visitor.page.isVisible('#btn-teacher')));
+  await visitor.page.keyboard.press('1');
+  await wait(600);
+  check('Website: key 1 does nothing while locked', (await S(visitor.page)).mode === 'title');
+  await visitor.page.screenshot({ path: join(OUT, 'web_locked.png') });
+  await visitor.page.fill('#room-in', 'ZZZZ');
+  await visitor.page.click('#room-go');
+  await wait(10500);
+  check('Website: a code that is not open stays locked', !(await visitor.page.isVisible('.players')), await visitor.page.textContent('#room-st'));
+  await visitor.ctx.close();
+
+  const teacher = await openPage('?profe=' + KEY + B, false, WEBURL);
   check('Class code field and teacher button visible', await teacher.page.isVisible('#room-in') && await teacher.page.isVisible('#btn-teacher'));
   await teacher.page.keyboard.press('t');
   await wait(800);
@@ -175,9 +207,11 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   check('Teacher creates a 4-letter class code + kids link', /^[A-Z2-9]{4}$/.test(code) && link.includes('room=' + code), `${code} ${link.slice(-30)}`);
   await teacher.page.screenshot({ path: join(OUT, 'web_teacher_code.png') });
 
-  const kid1 = await openPage(`?room=${code}&t=5` + B);
-  const kid2 = await openPage(`?room=${code}&t=5` + B);
-  await wait(1500);
+  const kid1 = await openPage(`?room=${code}&t=5` + B, false, WEBURL);
+  const kid2 = await openPage(`?room=${code}&t=5` + B, false, WEBURL);
+  await wait(2500);
+  check('Website: the open class code unlocks the kids', await kid1.page.isVisible('.players') && await kid2.page.isVisible('.players'));
+  check('Website: kids do not get the teacher button', !(await kid1.page.isVisible('#btn-teacher')));
   check('Kid page joins the class from the link', /online/.test(await kid1.page.textContent('#room-st')), await kid1.page.textContent('#room-st'));
   await kid1.page.screenshot({ path: join(OUT, 'web_kid_title.png') });
   await kid1.page.keyboard.press('1'); await kid1.page.keyboard.press('Enter');
@@ -245,7 +279,7 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
   check('Only the class broker is contacted', ext.length === 0, ext.join(' '));
   await teacher.ctx.close(); await kid1.ctx.close(); await kid2.ctx.close();
   // a wrong code must not see anything
-  const spy = await openPage('?x=2' + B);
+  const spy = await openPage('?profe=' + KEY + B, false, WEBURL);
   await spy.page.keyboard.press('t');
   await wait(500);
   await spy.page.click('#td-new');
@@ -256,6 +290,7 @@ async function playAll(page, { shots = true, stars = 2 } = {}) {
 
   wss.close();
   broker.close();
+  srv.close();
 }
 
 await browser.close();

@@ -4,7 +4,7 @@ Mismo motor y mismas mecánicas en todos los bloques (caminar, saltar, pisar la 
 
 | Bloque | Archivo | Estado |
 |---|---|---|
-| 1 · Me and My World | `Bloque1_MeTown.html` | Listo · en línea: https://claude.ai/artifact/8wVsAzuXV2NQU9upDGLmmD |
+| 1 · Me and My World | `Bloque1_MeTown.html` | Listo · en línea: gimnasiodelcerebro.co/juegos/me-town.html |
 | 2 · My World Around Me | (pendiente) | |
 | 3 · My Stories | (pendiente) | |
 | 4 · The World is Mine | `S24_TimeTravelStage.html` | Listo (sin conexión) |
@@ -16,10 +16,13 @@ Mismo motor y mismas mecánicas en todos los bloques (caminar, saltar, pisar la 
 - **MY DAY STREET:** My Day Track (S5), Your Day: meet 3 neighbors (S6), I or He / She?, He Wakes Up! (tercera persona, do/does/don't/doesn't), My 1-Minute Show (S8).
 
 ## Modo en línea (los dos niños a la vez + vista del profe)
-1. Abre el enlace del artifact en cada dispositivo con tu cuenta de claude.ai.
-2. En el de cada niño: elegir 1 (Jerónimo) o 2 (Luciana) y Enter. Hacer clic en el juego para que reciba el teclado.
-3. En el tuyo: tecla `T` o botón "Vista del profe (en vivo)". Ves en qué reto va cada uno, sus aciertos y errores, y puedes dar estrellas, terminar la charla, pausar o saltar un reto a distancia.
-4. "Descargar CSV de partidas" junta los resultados de todas las partidas terminadas.
+La página web está cerrada: sin código de clase nadie puede jugar.
+1. Profe: abre el enlace privado del profe (`me-town.html?profe=CLAVE`, la clave no está en el repositorio; el navegador la recuerda). Pulsa `T`, luego "Nuevo código". Sale un código de 4 letras y el enlace para los niños.
+2. Niños: abren el enlace (o escriben el código y pulsan Go). El código solo funciona mientras la vista del profe está abierta (y hasta 12 horas después).
+3. En la vista del profe ves en qué reto va cada uno, aciertos y errores, y puedes dar estrellas, terminar la charla, pausar o saltar un reto.
+4. "Descargar CSV" junta los resultados de las partidas terminadas.
+
+Privacidad: los mensajes van cifrados con el código de clase y sin nombres (p0 / p1). El candado es del lado del navegador: frena a cualquier visitante, pero no es un login de servidor.
 
 Sin internet, el archivo HTML funciona igual con doble clic (sin la vista del profe).
 
