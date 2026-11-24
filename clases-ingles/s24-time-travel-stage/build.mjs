@@ -18,6 +18,7 @@ const faces = [400, 600, 700, 800]
 const targets = [
   { entry: 'src/games/b4.js', template: 'src/game.html', out: 'S24_TimeTravelStage.html', title: 'The Time Travel Stage', site: 'time-travel.html' },
   { entry: 'src/games/b1.js', template: 'src/game.html', out: 'Bloque1_MeTown.html', title: 'Me Town', site: 'me-town.html' },
+  { entry: 'src/games/b2.js', template: 'src/game.html', out: 'Bloque2_MyWorld.html', title: 'My World', site: 'my-world.html' },
   { entry: 'src/main.js', template: 'src/template.html', out: 'S24_TimeTravelStage_v1.html' },
   { entry: 'src/admin.js', template: 'src/admin.html', out: 'Panel_Profe.html', site: 'profe.html', noArtifact: true },
 ];

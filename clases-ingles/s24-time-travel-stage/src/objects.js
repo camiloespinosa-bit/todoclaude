@@ -486,6 +486,98 @@ function iceCube() {
   return g;
 }
 
+// ---------- Bloque 2: house things, the cat, the giraffe ----------
+function cat() {
+  const g = new THREE.Group();
+  const fur = '#F2A65A', dark = '#C46F2A';
+  g.add(at(mesh(new THREE.BoxGeometry(0.9, 0.42, 0.42), fur), 0, 0.5, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(0.46, 0.42, 0.42), fur), 0.55, 0.82, 0));
+  for (const s of [-1, 1]) {
+    const e = at(mesh(new THREE.ConeGeometry(0.1, 0.2, 4), dark), 0.55, 1.1, s * 0.13);
+    g.add(e);
+    g.add(at(mesh(new THREE.SphereGeometry(0.045, 6, 4), C.deep), 0.79, 0.88, s * 0.1));
+  }
+  g.add(at(mesh(new THREE.SphereGeometry(0.04, 6, 4), '#EC407A'), 0.8, 0.78, 0));
+  const leg = new THREE.CylinderGeometry(0.07, 0.07, 0.32, 6);
+  for (const x of [-0.32, 0.32]) for (const z of [-0.14, 0.14]) g.add(at(mesh(leg, dark), x, 0.16, z));
+  g.add(rod(V(-0.45, 0.6, 0), V(-0.8, 1.05, 0), 0.05, dark));
+  g.rotation.y = -0.6;
+  return g;
+}
+function bed() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.BoxGeometry(2.2, 0.3, 1.3), C.brown), 0, 0.55, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(2.1, 0.22, 1.24), C.white), 0, 0.81, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(1.4, 0.24, 1.26), '#5C8DD6'), 0.35, 0.86, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(0.4, 0.16, 0.8), '#FFFFFF'), -0.8, 1.0, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(0.12, 1.1, 1.3), C.brownDark), -1.1, 0.75, 0));
+  const leg = new THREE.BoxGeometry(0.12, 0.42, 0.12);
+  for (const x of [-1, 1]) for (const z of [-0.55, 0.55]) g.add(at(mesh(leg, C.brownDark), x, 0.21, z));
+  return g;
+}
+function table() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.BoxGeometry(1.8, 0.12, 1.1), C.brown), 0, 1.0, 0));
+  const leg = new THREE.BoxGeometry(0.12, 0.95, 0.12);
+  for (const x of [-0.78, 0.78]) for (const z of [-0.45, 0.45]) g.add(at(mesh(leg, C.brownDark), x, 0.48, z));
+  return g;
+}
+function chair() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.BoxGeometry(0.8, 0.1, 0.8), '#E57373'), 0, 0.6, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), '#E57373'), 0, 1.0, -0.36));
+  const leg = new THREE.BoxGeometry(0.08, 0.58, 0.08);
+  for (const x of [-0.34, 0.34]) for (const z of [-0.34, 0.34]) g.add(at(mesh(leg, C.brownDark), x, 0.29, z));
+  return g;
+}
+function sofa() {
+  const g = new THREE.Group();
+  const c = '#3F7FBF';
+  g.add(at(mesh(new THREE.BoxGeometry(2.2, 0.45, 1), c), 0, 0.4, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(2.2, 0.8, 0.28), c), 0, 0.85, -0.38));
+  for (const s of [-1, 1]) g.add(at(mesh(new THREE.BoxGeometry(0.28, 0.7, 1), '#2F6AA5'), s * 1.1, 0.55, 0));
+  for (const s of [-1, 1]) g.add(at(mesh(new THREE.BoxGeometry(0.95, 0.16, 0.85), '#5B9BD5'), s * 0.5, 0.7, 0.06));
+  return g;
+}
+function lamp() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.CylinderGeometry(0.35, 0.4, 0.1, 12), C.deep), 0, 0.05, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.6, 8), C.deep), 0, 0.85, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.25, 0.45, 0.5, 12), C.yellow, { emissive: '#C79100', emissiveIntensity: 0.4 }), 0, 1.75, 0));
+  return g;
+}
+function box() {
+  const g = new THREE.Group();
+  const c = '#C8955A';
+  g.add(at(mesh(new THREE.BoxGeometry(1.3, 0.08, 1.3), c), 0, 0.04, 0));
+  for (const [x, z, w, d] of [[0, 0.62, 1.3, 0.08], [0, -0.62, 1.3, 0.08], [0.62, 0, 0.08, 1.3], [-0.62, 0, 0.08, 1.3]]) g.add(at(mesh(new THREE.BoxGeometry(w, 0.9, d), c), x, 0.45, z));
+  const flap = at(mesh(new THREE.BoxGeometry(1.3, 0.06, 0.5), '#B5814A'), 0, 0.95, 0.85);
+  flap.rotation.x = -0.6;
+  g.add(flap);
+  return g;
+}
+function tv() {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.BoxGeometry(1.8, 1.1, 0.12), '#263238'), 0, 1.0, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(1.6, 0.92, 0.02), '#4FC3F7', { emissive: '#0277BD', emissiveIntensity: 0.35 }), 0, 1.0, 0.07));
+  g.add(at(mesh(new THREE.BoxGeometry(0.2, 0.4, 0.2), '#37474F'), 0, 0.25, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(0.8, 0.06, 0.4), '#37474F'), 0, 0.03, 0));
+  return g;
+}
+function giraffe() {
+  const g = new THREE.Group();
+  const y = '#F2C14E', spot = '#A0683A';
+  g.add(at(mesh(new THREE.BoxGeometry(1.1, 0.6, 0.55), y), 0, 1.4, 0));
+  const leg = new THREE.CylinderGeometry(0.07, 0.07, 1.1, 6);
+  for (const x of [-0.4, 0.4]) for (const z of [-0.18, 0.18]) g.add(at(mesh(leg, y), x, 0.55, z));
+  g.add(rod(V(0.45, 1.6, 0), V(0.75, 3.1, 0), 0.13, y));
+  g.add(at(mesh(new THREE.BoxGeometry(0.55, 0.3, 0.3), y), 0.95, 3.2, 0));
+  for (const s of [-1, 1]) g.add(at(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.2, 5), spot), 0.75, 3.45, s * 0.1));
+  for (const [x, yy, z] of [[-0.2, 1.6, 0.28], [0.25, 1.3, 0.28], [-0.3, 1.25, -0.28], [0.2, 1.62, -0.28]]) g.add(at(mesh(new THREE.BoxGeometry(0.2, 0.18, 0.02), spot), x, yy, z));
+  g.add(at(mesh(new THREE.SphereGeometry(0.05, 6, 4), C.deep), 1.12, 3.27, 0.12));
+  return g;
+}
+
 export const OBJECTS = [
   { id: 'bike', name: 'Bike', make: bike },
   { id: 'guitar', name: 'Guitar', make: guitar },
@@ -514,6 +606,15 @@ export const OBJECTS = [
   { id: 'bug', name: 'Bug', make: bug },
   { id: 'coffee', name: 'Coffee', make: coffee },
   { id: 'ice', name: 'Ice', make: iceCube },
+  { id: 'cat', name: 'Cat', make: cat },
+  { id: 'bed', name: 'Bed', make: bed },
+  { id: 'table', name: 'Table', make: table },
+  { id: 'chair', name: 'Chair', make: chair },
+  { id: 'sofa', name: 'Sofa', make: sofa },
+  { id: 'lamp', name: 'Lamp', make: lamp },
+  { id: 'box', name: 'Box', make: box },
+  { id: 'tv', name: 'TV', make: tv },
+  { id: 'giraffe', name: 'Giraffe', make: giraffe },
 ];
 
 // Returns a group centered at the origin whose largest side equals `size`.

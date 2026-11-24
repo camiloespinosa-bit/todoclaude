@@ -843,7 +843,7 @@ function start() {
 
     // landmark
     const lm = w.landmark || { past: 'hourglass', present: 'clock', future: 'rocket' }[w.theme] || 'trophy';
-    const landmark = LANDMARKS[lm] ? LANDMARKS[lm](w) : bigTrophy();
+    const landmark = lm === 'none' ? new THREE.Group() : LANDMARKS[lm] ? LANDMARKS[lm](w) : bigTrophy();
     landmark.position.copy(LANDMARK);
     g.add(landmark);
     B.colliders.push({ x: LANDMARK.x, z: LANDMARK.z, r: 2.6 });
@@ -966,6 +966,8 @@ function start() {
       if (q.type === 'opinion' && !B.opin) B.opin = buildTwoAreas(B, OPIN, ['', ''], ['', '']);
       if (q.type === 'ladder') buildLadder(B, q);
       if (q.type === 'talk') buildStage(B);
+      if (q.type === 'carry' && !B.room) buildRoom(B);
+      if (['places', 'follow', 'guide'].includes(q.type) && !B.town) buildTown(B);
       if (q.type === 'portal') buildPortal(B, q);
     }
 
@@ -1014,7 +1016,7 @@ function start() {
     const w = B.def;
     const items = q.dreams
       ? shuffle(DREAMS).slice(0, 8).map((d) => ({ id: d.obj, label: d.label, say: d.say }))
-      : shuffle(q.items).map((id) => ({ id, label: objName(id), say: '' }));
+      : shuffle(q.items).map((x) => (typeof x === 'string' ? { id: x, label: objName(x), say: '' } : x));
     COLLECT_SPOTS.slice(0, items.length).forEach((sp, k) => {
       if (sp.top > 0) {
         addPlatform(B, sp.x, sp.z, sp.r, sp.top, w);
@@ -1075,7 +1077,19 @@ function start() {
     sign.position.set(PADS.xs[1], 7.6, PADS.z - 2);
     B.group.add(sign);
     B.padSign = sign;
-    if (qs.some((x) => x.showcase)) {
+    if (qs.some((x) => x.showcase === 'wide')) {
+      const ped = new THREE.Group();
+      ped.position.set(PADS.xs[1], 0, PADS.z - 7.5);
+      ped.add(at(mesh(new THREE.BoxGeometry(12, 2, 4.6), '#F7FAFC'), 0, 1, 0));
+      ped.add(at(mesh(new THREE.BoxGeometry(12.2, 0.12, 4.8), w.color), 0, 2.02, 0));
+      const holder = new THREE.Group();
+      holder.position.y = 2.08;
+      holder.scale.setScalar(1.35);
+      ped.add(holder);
+      B.group.add(ped);
+      B.colliders.push({ x: PADS.xs[1] - 3.8, z: PADS.z - 7.5, r: 2.4 }, { x: PADS.xs[1], z: PADS.z - 7.5, r: 2.4 }, { x: PADS.xs[1] + 3.8, z: PADS.z - 7.5, r: 2.4 });
+      B.showcase = holder;
+    } else if (qs.some((x) => x.showcase)) {
       const ped = new THREE.Group();
       ped.position.set(PADS.xs[1], 0, PADS.z - 5.5);
       ped.add(at(mesh(new THREE.CylinderGeometry(1.4, 1.6, 1.2, 12), '#F7FAFC'), 0, 0.6, 0));
@@ -1174,6 +1188,212 @@ function start() {
     const sign = textSprite(q.sign || 'PREDICTION TRACK', { bg: inkOf(w), scale: 0.8 });
     sign.position.set(15.5, 6.2, LADDER.z - 2.5);
     B.group.add(sign);
+  }
+
+  // ---------- Bloque 2: scenes, the room, the town ----------
+  // put `thing` in relation to `ref` (both already sized, standing on y = 0 in the same group)
+  const boxOf = (o) => new THREE.Box3().setFromObject(o);
+  function ground(o) {
+    o.updateMatrixWorld(true);
+    const b = boxOf(o);
+    o.position.y -= b.min.y;
+    return o;
+  }
+  function topAt(ref, x, z) {
+    ref.updateMatrixWorld(true);
+    const rc = new THREE.Raycaster(V(x, 50, z), V(0, -1, 0));
+    const hit = rc.intersectObject(ref, true)[0];
+    return hit ? hit.point.y : boxOf(ref).max.y;
+  }
+  function placeRel(thing, ref, prep, ref2 = null) {
+    ref.updateMatrixWorld(true);
+    thing.updateMatrixWorld(true);
+    const R = boxOf(ref), T = boxOf(thing);
+    const tw = T.max.x - T.min.x, td = T.max.z - T.min.z, th = T.max.y - T.min.y;
+    const cx = (R.min.x + R.max.x) / 2, cz = (R.min.z + R.max.z) / 2;
+    let x = cx, y = 0, z = cz;
+    if (prep === 'on') y = topAt(ref, cx, cz);
+    else if (prep === 'under') y = 0;
+    else if (prep === 'in') y = Math.max(0.05, R.max.y - th * 0.75);
+    else if (prep === 'next to') x = R.max.x + tw / 2 + 0.35;
+    else if (prep === 'behind') z = R.min.z - td / 2 - 0.3;
+    else if (prep === 'in front of') z = R.max.z + td / 2 + 0.3;
+    else if (prep === 'between' && ref2) {
+      ref2.updateMatrixWorld(true);
+      const R2 = boxOf(ref2);
+      x = (R.max.x + R2.min.x) / 2;
+    }
+    const tc = T.getCenter(new THREE.Vector3());
+    thing.position.x += x - tc.x;
+    thing.position.z += z - tc.z;
+    thing.position.y += y - T.min.y;
+  }
+  // a little scene for "Where is it?": { thing, ref, prep, ref2? }
+  function makeScene(sc) {
+    const g = new THREE.Group();
+    const ref = ground(makeObject(sc.ref, sc.refSize || 2.6));
+    g.add(ref);
+    let ref2 = null;
+    if (sc.ref2) {
+      ref.position.x -= 2.2;
+      ref2 = ground(makeObject(sc.ref2, sc.refSize || 2.2));
+      ref2.position.x += 2.2;
+      g.add(ref2);
+    }
+    const small = sc.prep === 'under' ? 0.75 : sc.prep === 'in' ? 1.2 : 1.1;
+    const thing = ground(makeObject(sc.thing, sc.thingSize || small));
+    g.add(thing);
+    placeRel(thing, ref, sc.prep, ref2);
+    return g;
+  }
+  // two things side by side, at their real sizes, for comparatives: { a, as, b, bs }
+  function makeCmp(c) {
+    const g = new THREE.Group();
+    const A = ground(makeObject(c.a, c.as)), Bo = ground(makeObject(c.b, c.bs));
+    A.position.x = -c.as / 2 - 0.6;
+    Bo.position.x = c.bs / 2 + 0.6;
+    g.add(A, Bo);
+    for (const [o, name, x] of [[A, c.an || objName(c.a), A.position.x], [Bo, c.bn || objName(c.b), Bo.position.x]]) {
+      const lab = textSprite(name.toUpperCase(), { bg: '#1D3F54', font: 120, scale: 0.42 });
+      lab.position.set(x, -0.45, 1.6);
+      g.add(lab);
+    }
+    return g;
+  }
+  function makeDisplay(it, size = 3.2) {
+    if (it.scene) return makeScene(it.scene);
+    if (it.cmp) return makeCmp(it.cmp);
+    if (it.obj) return makeObject(it.obj, size);
+    return null;
+  }
+
+  // The room for "Put it there!": furniture you walk to.
+  const ROOM = [
+    { id: 'table', name: 'table', x: 9, z: -21, size: 3.4 },
+    { id: 'bed', name: 'bed', x: 21, z: -22, size: 4.2 },
+    { id: 'sofa', name: 'sofa', x: 15, z: -12.5, size: 4 },
+    { id: 'box', name: 'box', x: 24.5, z: -12, size: 2.6 },
+    { id: 'chair', name: 'chair', x: 7, z: -12.5, size: 2.6 },
+  ];
+  function buildRoom(B) {
+    const w = B.def;
+    // floor and low walls
+    B.group.add(at(mesh(new THREE.BoxGeometry(24, 0.12, 17), '#E8D9C0'), 16, 0.06, -17));
+    for (const [x, z, ww, dd] of [[16, -25.6, 24, 0.4], [4.2, -17, 0.4, 17], [27.8, -17, 0.4, 17]]) B.group.add(at(mesh(new THREE.BoxGeometry(ww, 1.2, dd), '#F7FAFC'), x, 0.6, z));
+    const sign = textSprite('MY HOUSE', { bg: inkOf(w), scale: 0.8 });
+    sign.position.set(16, 6.5, -25.5);
+    B.group.add(sign);
+    B.room = ROOM.map((f) => {
+      const o = ground(makeObject(f.id, f.size));
+      o.position.x += f.x;
+      o.position.z += f.z;
+      B.group.add(o);
+      const lab = textSprite(f.name.toUpperCase(), { bg: '#1D3F54', font: 120, scale: 0.45 });
+      lab.position.set(f.x, f.size + 1.6, f.z);
+      B.group.add(lab);
+      B.colliders.push({ x: f.x, z: f.z, r: f.size * 0.42 });
+      return { ...f, obj: o, extras: [] };
+    });
+  }
+
+  // The town: 3 x 3 crossings; every crossing but the start has a place.
+  const TOWN = { xs: [-4, 10, 24], zs: [-26, -14, -2], start: { i: 1, j: 2 }, r: 3 };
+  const PLACES = [
+    { i: 0, j: 0, name: 'library', color: '#8D6E63', obj: 'book' },
+    { i: 1, j: 0, name: 'school', color: '#FDD835', obj: 'trophy' },
+    { i: 2, j: 0, name: 'hospital', color: '#ECEFF1', obj: 'doctor' },
+    { i: 0, j: 1, name: 'bank', color: '#90A4AE', obj: 'trophy' },
+    { i: 1, j: 1, name: 'park', color: '#7CB342', park: true },
+    { i: 2, j: 1, name: 'bakery', color: '#F8BBD0', obj: 'chef' },
+    { i: 0, j: 2, name: 'supermarket', color: '#4FC3F7', obj: 'coffee' },
+    { i: 2, j: 2, name: 'police station', color: '#3949AB', obj: 'car' },
+  ];
+  const HEAD = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // north, east, south, west
+  const nodeXZ = (i, j) => V(TOWN.xs[i], 0, TOWN.zs[j]);
+  const placeAt = (i, j) => PLACES.find((p) => p.i === i && p.j === j) || null;
+  // follow commands from the start (facing north); "turn left" = turn, then walk one block
+  function runRoute(cmds) {
+    let i = TOWN.start.i, j = TOWN.start.j, h = 0;
+    const path = [{ i, j }];
+    for (const c of cmds) {
+      if (c === 'left') h = (h + 3) % 4;
+      if (c === 'right') h = (h + 1) % 4;
+      const ni = i + HEAD[h][0], nj = j + HEAD[h][1];
+      if (ni < 0 || ni > 2 || nj < 0 || nj > 2) return { path, off: true, i, j };
+      i = ni;
+      j = nj;
+      path.push({ i, j });
+    }
+    return { path, off: false, i, j };
+  }
+  const CMD_TEXT = { straight: 'Go straight.', left: 'Turn left.', right: 'Turn right.' };
+  function buildTown(B) {
+    const w = B.def;
+    const street = '#B0BEC5';
+    for (let j = 0; j < 3; j++) B.group.add(at(mesh(new THREE.BoxGeometry(28 + 3, 0.1, 3), street), 10, 0.05, TOWN.zs[j]));
+    for (let i = 0; i < 3; i++) B.group.add(at(mesh(new THREE.BoxGeometry(3, 0.1, 24 + 3), street), TOWN.xs[i], 0.05, -14));
+    // white dashes
+    for (let j = 0; j < 3; j++) for (let x = -2; x < 24; x += 3) B.group.add(at(mesh(new THREE.BoxGeometry(1.2, 0.12, 0.18), '#FFFFFF'), x + 0.5, 0.06, TOWN.zs[j]));
+    B.town = { nodes: [] };
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+      const c = nodeXZ(i, j);
+      const pl = placeAt(i, j);
+      const plate = at(mesh(new THREE.CylinderGeometry(TOWN.r, TOWN.r, 0.14, 24), pl ? '#CFD8DC' : '#FFFFFF'), c.x, 0.07, c.z);
+      B.group.add(plate);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(TOWN.r - 0.2, 0.1, 6, 28), glow(pl ? pl.color : '#FDD835', 0.85));
+      ring.rotation.x = Math.PI / 2;
+      ring.position.set(c.x, 0.16, c.z);
+      B.group.add(ring);
+      const node = { i, j, x: c.x, z: c.z, place: pl, plate, flash: 0 };
+      B.town.nodes.push(node);
+      if (!pl) {
+        const st = textSprite('START', { bg: '#1D3F54', font: 120, scale: 0.5 });
+        st.position.set(c.x, 2.4, c.z + 1.5);
+        B.group.add(st);
+        // an arrow on the ground: you start facing north
+        const arr = at(mesh(new THREE.ConeGeometry(0.8, 1.6, 4), '#FDD835'), c.x, 0.3, c.z - 1.2);
+        arr.rotation.x = -Math.PI / 2;
+        B.group.add(arr);
+        continue;
+      }
+      const bx = c.x + 5, bz = c.z + 5;
+      if (pl.park) {
+        B.group.add(at(mesh(new THREE.BoxGeometry(6, 0.2, 6), '#8BC34A'), bx, 0.1, bz));
+        for (const [dx, dz] of [[-1.6, -1.4], [1.5, 1.2], [1.4, -1.6]]) {
+          B.group.add(at(mesh(new THREE.CylinderGeometry(0.2, 0.3, 1.4, 6), '#6D4C41'), bx + dx, 0.8, bz + dz));
+          B.group.add(at(mesh(new THREE.ConeGeometry(1.1, 2.4, 8), '#2E7D32'), bx + dx, 2.6, bz + dz));
+        }
+        B.colliders.push({ x: bx, z: bz, r: 2.6 });
+      } else {
+        B.group.add(at(mesh(new THREE.BoxGeometry(5.4, 4, 5.4), pl.color), bx, 2, bz));
+        B.group.add(at(mesh(new THREE.BoxGeometry(5.8, 0.5, 5.8), '#1D3F54'), bx, 4.25, bz));
+        B.group.add(at(mesh(new THREE.BoxGeometry(1.4, 2.2, 0.1), '#5D4037'), bx - 1, 1.1, bz - 2.75));
+        const win = new THREE.BoxGeometry(1, 1, 0.1);
+        B.group.add(at(mesh(win, '#E3F2FD'), bx + 1.3, 2.4, bz - 2.75));
+        if (pl.name === 'hospital') {
+          B.group.add(at(mesh(new THREE.BoxGeometry(1.6, 0.5, 0.12), '#E53935'), bx, 3.4, bz - 2.8));
+          B.group.add(at(mesh(new THREE.BoxGeometry(0.5, 1.6, 0.12), '#E53935'), bx, 3.4, bz - 2.8));
+        }
+        if (pl.obj) {
+          const o = makeObject(pl.obj, 1.6);
+          o.position.set(bx, 5.4, bz);
+          B.group.add(o);
+        }
+        B.colliders.push({ x: bx, z: bz, r: 3.3 });
+      }
+      const lab = textSprite(pl.name.toUpperCase(), { bg: inkOf(w), font: 120, scale: 0.6 });
+      lab.position.set(bx, pl.park ? 5 : 7.4, bz);
+      B.group.add(lab);
+    }
+    // the tourist who asks for directions
+    const T = makeAvatar({ suit: '#F57C00', scarf: '#FFFFFF', hair: '#FBC02D', long: false, skin: '#F1C27D', pants: '#455A64', hat: 'sunhat', glasses: 'sunglasses', back: 'backpack' });
+    const tg = new THREE.Group();
+    tg.add(T.root);
+    tg.add(T.blob);
+    T.blob.position.y = 0.03;
+    tg.visible = false;
+    B.group.add(tg);
+    B.town.tourist = { M: T, group: tg };
   }
 
   function buildStage(B) {
@@ -2003,7 +2223,7 @@ function start() {
     collect: {
       start(Q) {
         Q.max = 3;
-        showHint(Q.def.dreams ? 'Walk to your dreams! Pick 3.' : 'Walk to the shining things!');
+        showHint(Q.def.hint || (Q.def.dreams ? 'Walk to your dreams! Pick 3.' : 'Walk to the shining things!'));
       },
       count: (Q) => `${Q.score}/3`,
       goal() {
@@ -2034,7 +2254,7 @@ function start() {
         burst(V(pk.x, pk.top + 1.7, pk.z), ['#FDD835', '#FFFFFF', WORLDS[S.wi].color], 22, { speed: 5, up: 7 });
         if (pk.say) {
           feedback('Say it!', true);
-          task(`Dream ${Q.score} / 3 · Say it out loud!`, esc(pk.say));
+          task(`${Q.def.sayLab || 'Dream'} ${Q.score} / 3 · Say it out loud!`, esc(pk.say));
           clearTimeout(Q.tt);
           Q.tt = setTimeout(() => S.Q === Q && !Q.done && task(null), 3500);
         } else feedback(`${pk.label}!`, true);
@@ -2312,6 +2532,327 @@ function start() {
       },
     },
 
+    // ---- B2 S13/S14: walk to the places of the neighborhood ----
+    places: {
+      start(Q) {
+        Q.list = shuffle(PLACES.slice()).slice(0, Q.def.count || 3);
+        Q.max = Q.list.length;
+        this.show(Q);
+      },
+      show(Q) {
+        const p = Q.list[Q.idx];
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Walk there!`, `Where is the <u>${esc(p.name)}</u>? Walk to it!`);
+        Q.ready = true;
+      },
+      count: (Q) => `${Q.idx}/${Q.max}`,
+      goal: () => null,
+      update(Q) {
+        if (!Q.ready) return;
+        const p = Q.list[Q.idx];
+        for (const n of W.town.nodes) {
+          if (!n.place || Math.hypot(AV.pos.x - n.x, AV.pos.z - n.z) > TOWN.r - 0.4) {
+            if (n.place) n.inside = false;
+            continue;
+          }
+          if (n.inside) continue;
+          n.inside = true;
+          if (n.place === p) {
+            Q.ready = false;
+            Q.score++;
+            Q.details.push(p.name);
+            sfx.good();
+            burst(V(n.x, 1.5, n.z), ['#FDD835', '#FFFFFF', p.color], 26, { speed: 6, up: 8, geo: starGeo, size: 0.3 });
+            $('h-ts').innerHTML = `<span class="mic">🎤</span> Say it: "This is the ${esc(p.name)}."`;
+            logEvent(`${Q.def.name}: found the ${p.name}`, true);
+            setTimeout(() => {
+              if (S.Q !== Q) return;
+              Q.idx++;
+              renderQuests();
+              if (Q.idx >= Q.max) completeQuest();
+              else this.show(Q);
+            }, 2600);
+          } else feedback(`That's the ${n.place.name}!`, false);
+        }
+      },
+      skip(Q) {
+        Q.details.push('skipped by teacher');
+        completeQuest();
+      },
+    },
+
+    // ---- B2 S13: read the directions, walk them, stop at the right place ----
+    follow: {
+      start(Q) {
+        // every route of 1 to 3 moves that ends at a place
+        const all = [];
+        const C = ['straight', 'left', 'right'];
+        const walk = (cmds) => {
+          if (cmds.length) {
+            const r = runRoute(cmds);
+            if (r.off) return;
+            if (r.path.slice(1).some((n) => n.i === TOWN.start.i && n.j === TOWN.start.j)) return;
+            if (cmds.length >= 2 && placeAt(r.i, r.j)) all.push(cmds.slice());
+          }
+          if (cmds.length < 3) for (const c of C) walk([...cmds, c]);
+        };
+        walk([]);
+        Q.list = shuffle(all).slice(0, Q.def.count || 3);
+        Q.max = Q.list.length;
+        this.load(Q);
+      },
+      load(Q) {
+        const cmds = Q.list[Q.idx];
+        Q.target = placeAt(runRoute(cmds).i, runRoute(cmds).j);
+        const st = nodeXZ(TOWN.start.i, TOWN.start.j);
+        placeAvatar(st.clone(), Math.PI);
+        Q.still = 0;
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Start at START. Each order = one block.`, cmds.map((c) => esc(CMD_TEXT[c])).join(' ') + ' <u>Stop!</u>', '<span class="ask">Stop on a circle and wait. Where are you?</span>');
+        Q.ready = true;
+      },
+      count: (Q) => `${Q.idx}/${Q.max}`,
+      goal: () => null,
+      update(Q, dt) {
+        if (!Q.ready) return;
+        const moving = Math.hypot(AV.vel.x, AV.vel.z) > 0.6;
+        const n = W.town.nodes.find((x) => x.place && Math.hypot(AV.pos.x - x.x, AV.pos.z - x.z) < TOWN.r - 0.4);
+        if (!n || moving) {
+          Q.still = 0;
+          return;
+        }
+        Q.still += dt;
+        if (Q.still < 1.1) return;
+        Q.ready = false;
+        Q.attempts++;
+        const ok = n.place === Q.target;
+        logEvent(`${Q.def.name}: ${Q.list[Q.idx].map((c) => CMD_TEXT[c]).join(' ')} → ${n.place.name}`, ok);
+        if (ok) {
+          if (Q.attempts === 1) Q.score++;
+          Q.details.push(n.place.name);
+          sfx.good();
+          burst(V(n.x, 1.5, n.z), ['#FDD835', '#FFFFFF', n.place.color], 30, { speed: 6, up: 9, geo: starGeo, size: 0.3 });
+          task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Yes!`, `<span class="mic">🎤</span> Say it: "I am at the ${esc(n.place.name)}."`);
+          setTimeout(() => {
+            if (S.Q !== Q) return;
+            Q.idx++;
+            Q.attempts = 0;
+            renderQuests();
+            if (Q.idx >= Q.max) completeQuest();
+            else this.load(Q);
+          }, 3000);
+        } else {
+          sfx.bad();
+          feedback(`This is the ${n.place.name}. Try again!`, false);
+          setTimeout(() => S.Q === Q && this.load(Q), 1600);
+        }
+      },
+      skip(Q) {
+        Q.details.push('skipped by teacher');
+        completeQuest();
+      },
+    },
+
+    // ---- B2 S13/S14: give directions to a lost tourist ----
+    guide: {
+      start(Q) {
+        Q.list = shuffle(PLACES.filter((p) => !(p.i === TOWN.start.i && p.j === TOWN.start.j - 1))).slice(0, Q.def.count || 3);
+        Q.max = Q.list.length;
+        const st = nodeXZ(TOWN.start.i, TOWN.start.j);
+        placeAvatar(st.clone().add(V(1.8, 0, 1.6)), Math.PI);
+        this.load(Q);
+      },
+      load(Q) {
+        Q.cmds = [];
+        Q.walk = null;
+        Q.chat = true;
+        const T = W.town.tourist;
+        T.group.visible = true;
+        T.group.position.copy(nodeXZ(TOWN.start.i, TOWN.start.j));
+        T.M.root.rotation.y = Math.PI;
+        this.show(Q);
+        Q.ready = true;
+      },
+      show(Q, msg = '') {
+        const p = Q.list[Q.idx];
+        const route = Q.cmds.length ? Q.cmds.map((c) => `<b>${esc(CMD_TEXT[c].replace('.', ''))}</b>`).join(' → ') : '<i>tap the arrows</i>';
+        const btn = (k, t) => `<button class="opt qbtn" data-pick="${k}">${t}</button>`;
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · The tourist asks: "Where is the ${esc(p.name)}?"`,
+          `${msg ? `${msg}<br>` : ''}${route}`,
+          btn(0, '⬆ Go straight') + btn(1, '⬅ Turn left') + btn(2, '➡ Turn right') + btn(3, '↩ Undo') + btn(4, '▶ Go!'));
+      },
+      pick(Q, k) {
+        if (!Q.ready || Q.walk) return;
+        if (k <= 2) {
+          if (Q.cmds.length >= 4) return;
+          Q.cmds.push(['straight', 'left', 'right'][k]);
+          sfx.click();
+        } else if (k === 3) Q.cmds.pop();
+        else if (k === 4 && Q.cmds.length) return this.go(Q);
+        this.show(Q);
+      },
+      key(Q, e) {
+        const m = { ArrowUp: 0, KeyW: 0, ArrowLeft: 1, KeyA: 1, ArrowRight: 2, KeyD: 2, Backspace: 3, Enter: 4 }[e.code];
+        if (m === undefined) return false;
+        if (!e.repeat) this.pick(Q, m);
+        return true;
+      },
+      go(Q) {
+        const r = runRoute(Q.cmds);
+        Q.walk = { path: r.path, k: 0, t: 0, off: r.off, end: placeAt(r.i, r.j) };
+        Q.ready = false;
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max}`, `<span class="mic">🎤</span> Say it: "${Q.cmds.map((c) => CMD_TEXT[c]).join(' ')}"`);
+      },
+      update(Q, dt) {
+        const wk = Q.walk;
+        if (!wk) return;
+        const T = W.town.tourist;
+        if (wk.k < wk.path.length - 1) {
+          wk.t += dt / 1.1;
+          const a = nodeXZ(wk.path[wk.k].i, wk.path[wk.k].j), b = nodeXZ(wk.path[wk.k + 1].i, wk.path[wk.k + 1].j);
+          T.group.position.lerpVectors(a, b, Math.min(1, wk.t));
+          T.M.root.rotation.y = Math.atan2(b.x - a.x, b.z - a.z);
+          const sw = Math.sin(wk.t * 14) * 0.7;
+          T.M.legL.rotation.x = sw;
+          T.M.legR.rotation.x = -sw;
+          if (wk.t >= 1) {
+            wk.t = 0;
+            wk.k++;
+          }
+          return;
+        }
+        T.M.legL.rotation.x = T.M.legR.rotation.x = 0;
+        Q.walk = null;
+        Q.attempts++;
+        const p = Q.list[Q.idx];
+        const ok = !wk.off && wk.end === p;
+        logEvent(`${Q.def.name}: ${p.name} ← ${Q.cmds.map((c) => CMD_TEXT[c]).join(' ')}`, ok);
+        if (ok) {
+          if (Q.attempts === 1) Q.score++;
+          Q.details.push(`${p.name}: ${Q.cmds.map((c) => CMD_TEXT[c]).join(' ')}`);
+          sfx.good();
+          burst(T.group.position.clone().add(V(0, 2.5, 0)), ['#FDD835', '#FFFFFF', p.color], 30, { speed: 6, up: 9, geo: starGeo, size: 0.3 });
+          task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · The tourist says:`, `"Thank you! Here is the ${esc(p.name)}!"`);
+          setTimeout(() => {
+            if (S.Q !== Q) return;
+            Q.idx++;
+            Q.attempts = 0;
+            renderQuests();
+            if (Q.idx >= Q.max) {
+              W.town.tourist.group.visible = false;
+              Q.chat = false;
+              completeQuest();
+            } else this.load(Q);
+          }, 2600);
+        } else {
+          sfx.bad();
+          const where = wk.off ? 'There is no street there!' : wk.end ? `Oops! This is the ${wk.end.name}.` : 'Oops! This is the start.';
+          setTimeout(() => {
+            if (S.Q !== Q) return;
+            this.load(Q);
+            this.show(Q, `<span style="color:#C62828">${esc(where)} Try again!</span>`);
+          }, 1400);
+        }
+      },
+      skip(Q) {
+        Q.chat = false;
+        if (W.town) W.town.tourist.group.visible = false;
+        Q.details.push('skipped by teacher');
+        completeQuest();
+      },
+    },
+
+    // ---- B2 S9/S10: carry a thing and put it in the right place ----
+    carry: {
+      start(Q) {
+        Q.list = shuffle(Q.def.bank.slice()).slice(0, Q.def.count || 4);
+        Q.max = Q.list.length;
+        this.load(Q);
+      },
+      load(Q) {
+        const it = Q.list[Q.idx];
+        Q.phase = 'fetch';
+        Q.chat = false;
+        if (Q.item) W.group.remove(Q.item);
+        Q.item = ground(makeObject(it.thing, 1.1));
+        Q.spot = V(16, 0, -4.5);
+        Q.item.position.add(Q.spot);
+        W.group.add(Q.item);
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Take it and carry it!`, `Put the <u>${esc(it.thing)}</u> ${esc(it.prep)} the <u>${esc(it.ref)}</u>.`);
+        Q.ready = true;
+      },
+      count: (Q) => `${Q.idx}/${Q.max}`,
+      goal: (Q) => (Q.phase === 'fetch' ? Q.spot : null),
+      update(Q, dt, t) {
+        if (!Q.ready) return;
+        if (Q.phase === 'fetch') {
+          if (Math.hypot(AV.pos.x - Q.spot.x, AV.pos.z - Q.spot.z) < 2) {
+            Q.phase = 'carry';
+            sfx.pick();
+          }
+          return;
+        }
+        if (Q.phase === 'carry') {
+          // the thing floats over the traveler's head
+          Q.item.position.set(AV.pos.x, AV.pos.y + 3.4 + Math.sin(performance.now() / 200) * 0.1, AV.pos.z);
+          const f = W.room.find((x) => Math.hypot(AV.pos.x - x.x, AV.pos.z - x.z) < x.size * 0.42 + 1.6);
+          if (f) this.arrive(Q, f);
+        }
+      },
+      arrive(Q, f) {
+        const it = Q.list[Q.idx];
+        if (f.name !== it.ref) {
+          if (Q.lastWrong !== f.name) feedback(`That's the ${f.name}! Find the ${it.ref}.`, false);
+          Q.lastWrong = f.name;
+          return;
+        }
+        Q.lastWrong = null;
+        Q.phase = 'choose';
+        Q.chat = true;
+        Q.at = f;
+        Q.opts = shuffle([it.prep, ...shuffle((Q.def.preps || ['on', 'under', 'next to', 'in', 'behind']).filter((p) => p !== it.prep)).slice(0, 2)]);
+        const opts = Q.opts.map((p, k) => `<button class="opt qbtn" data-pick="${k}"><b>${k + 1}</b>${esc(p)}</button>`).join('');
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Where do you put it?`, `Put the ${esc(it.thing)} ___ the ${esc(it.ref)}.`, opts);
+      },
+      pick(Q, k) {
+        if (Q.phase !== 'choose' || !Q.opts[k]) return;
+        const it = Q.list[Q.idx];
+        const prep = Q.opts[k];
+        Q.attempts++;
+        logEvent(`${Q.def.name}: the ${it.thing} → ${prep} the ${it.ref}`, prep === it.prep);
+        if (prep !== it.prep) {
+          sfx.bad();
+          feedback('Try again!', false);
+          return;
+        }
+        if (Q.attempts === 1) Q.score++;
+        Q.details.push(`${it.thing} ${it.prep} the ${it.ref}`);
+        Q.phase = 'done';
+        // put it there for real
+        Q.item.position.set(0, 0, 0);
+        ground(Q.item);
+        placeRel(Q.item, Q.at.obj, prep);
+        Q.at.extras.push(Q.item);
+        Q.item = null;
+        sfx.good();
+        burst(V(Q.at.x, 2, Q.at.z), ['#FDD835', '#FFFFFF', '#7CB342'], 26, { speed: 6, up: 8, geo: starGeo, size: 0.3 });
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Yes!`, `<span class="mic">🎤</span> Say it: "The ${esc(it.thing)} is ${esc(it.prep)} the ${esc(it.ref)}."`);
+        setTimeout(() => {
+          if (S.Q !== Q) return;
+          Q.idx++;
+          Q.attempts = 0;
+          Q.chat = false;
+          renderQuests();
+          if (Q.idx >= Q.max) completeQuest();
+          else this.load(Q);
+        }, 3000);
+      },
+      skip(Q) {
+        Q.chat = false;
+        if (Q.item) W.group.remove(Q.item);
+        Q.details.push('skipped by teacher');
+        completeQuest();
+      },
+    },
+
     // ---- Stones: Word / Can / Advice / Ultimate ----
     stones: {
       start(Q) {
@@ -2332,7 +2873,12 @@ function start() {
         });
         if (W.showcase) {
           while (W.showcase.children.length) W.showcase.remove(W.showcase.children[0]);
-          if (it.obj) W.showcase.add(makeObject(it.obj, 3.2));
+          const wide = Q.def.showcase === 'wide';
+          const disp = makeDisplay(it, wide ? 3 : 3.2);
+          if (disp) {
+            if (wide && it.obj) ground(disp);
+            W.showcase.add(disp);
+          }
         }
         const lab = `${Q.def.title} ${Q.idx + 1} / ${Q.max} · Step on the right answer!`;
         const s = Q.def.advice ? `The patient says: <i>"${esc(it.p)}"</i>` : esc(it.s).replace('___', '<u>&nbsp;?&nbsp;</u>');
@@ -2437,7 +2983,11 @@ function start() {
         if (it.labels) this.signs(it.labels);
         const C = W.zones.center;
         while (C.children.length) C.remove(C.children[0]);
-        if (it.obj) C.add(makeObject(it.obj, 2.4));
+        const disp = makeDisplay(it, 2.4);
+        if (disp) {
+          if (it.cmp || it.scene) disp.position.y = -2.7; // stand on the ground
+          C.add(disp);
+        }
         const text = esc(it.s).replace('___', '<u>&nbsp;?&nbsp;</u>');
         task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Run to the right zone!`, it.obj ? text : `"${text}"`, optsHTML(labels).replace(/<b>[AB]<\/b>/g, ''));
         Q.ready = true;
@@ -3452,6 +4002,10 @@ function start() {
         else if (k === 'Escape' || k === 'Backspace') toTitle();
         break;
       case 'play':
+        if (S.Q && !S.Q.done && S.Q.chat && HANDLERS[S.Q.def.type].key && HANDLERS[S.Q.def.type].key(S.Q, e)) {
+          e.preventDefault();
+          break;
+        }
         if (MOVE[e.code]) keys.add(MOVE[e.code]);
         if (k === ' ') AV.jumpBuf = 0.15;
         if (e.code === 'KeyC' && !e.repeat) setCam(camIdx + 1);
@@ -4006,6 +4560,40 @@ function start() {
       if (T === 'collect') {
         const pk = W.pickups.find((p) => !p.taken);
         return pk ? { x: pk.x, z: pk.z, y: pk.top } : null;
+      }
+      if (T === 'places' || T === 'follow') {
+        const p = T === 'places' ? Q.list[Q.idx] : Q.target;
+        return p ? { x: TOWN.xs[p.i], z: TOWN.zs[p.j], y: 0 } : null;
+      }
+      if (T === 'carry') {
+        const it = Q.list[Q.idx];
+        if (Q.phase === 'fetch') return { x: Q.spot.x, z: Q.spot.z, y: 0 };
+        if (Q.phase === 'carry') {
+          const f = W.room.find((x) => x.name === it.ref);
+          return { x: f.x, z: f.z + f.size * 0.42 + 0.9, y: 0 };
+        }
+        if (Q.phase === 'choose') return { pick: Q.opts.indexOf(it.prep) };
+        return null;
+      }
+      if (T === 'guide') {
+        if (!Q.ready || Q.walk) return null;
+        const p = Q.list[Q.idx];
+        const C = ['straight', 'left', 'right'];
+        let best = null;
+        const walk = (cmds) => {
+          if (best) return;
+          if (cmds.length) {
+            const r = runRoute(cmds);
+            if (r.off) return;
+            if (placeAt(r.i, r.j) === p) {
+              best = cmds.slice();
+              return;
+            }
+          }
+          if (cmds.length < 4) for (const c of C) walk([...cmds, c]);
+        };
+        walk([]);
+        return { picks: [...best.map((c) => C.indexOf(c)), 4] };
       }
       if (T === 'talk') return { x: STAGE.x, z: STAGE.z, y: STAGE.top };
       if (T === 'portal') return { x: PORTAL.x, z: PORTAL.z + 1, y: 0.4 };

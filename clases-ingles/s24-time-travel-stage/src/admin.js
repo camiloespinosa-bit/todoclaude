@@ -7,6 +7,7 @@ import { joinRoom, newRoomCode, PUBLIC_BROKERS, SAGA_SUPABASE } from './net.js';
 
 const GAMES = [
   { id: 'b1', file: 'me-town.html', name: 'Me Town', sub: 'Bloque 1 · Me and My World' },
+  { id: 'b2', file: 'my-world.html', name: 'My World', sub: 'Bloque 2 · My World Around Me' },
   { id: 'b4', file: 'time-travel.html', name: 'The Time Travel Stage', sub: 'Bloque 4 · The World is Mine' },
 ];
 const DAYS = [
