@@ -835,7 +835,7 @@ function start() {
     pathTo(hub, V(STAGE.x, 0, STAGE.z));
     if (types.includes('zones')) pathTo(hub, ZONES.start);
     if (types.includes('opinion')) pathTo(hub, OPIN.start);
-    if (types.includes('ladder')) pathTo(hub, V(LADDER.xs[0] - 2, 0, LADDER.z));
+    if (types.includes('ladder') || types.includes('order')) pathTo(hub, V(LADDER.xs[0] - 2, 0, LADDER.z));
     for (let k = 0; k < 44; k++) {
       const a = (k / 44) * Math.PI * 2;
       g.add(at(mesh(new THREE.DodecahedronGeometry(0.7 + (k % 3) * 0.25, 0), w.rock), Math.cos(a) * 41.2, 0.3, Math.sin(a) * 41.2));
@@ -965,6 +965,7 @@ function start() {
       if (q.type === 'zones' && !B.zones) B.zones = buildTwoAreas(B, ZONES, q.labels, q.subs);
       if (q.type === 'opinion' && !B.opin) B.opin = buildTwoAreas(B, OPIN, ['', ''], ['', '']);
       if (q.type === 'ladder') buildLadder(B, q);
+      if (q.type === 'order' && !B.ladder.length) buildLadder(B, { steps: ['A', 'B', 'C', 'D', '', ''].map((l) => ({ label: l, say: '' })), sign: q.sign || 'STORY ORDER' });
       if (q.type === 'talk') buildStage(B);
       if (q.type === 'carry' && !B.room) buildRoom(B);
       if (['places', 'follow', 'guide'].includes(q.type) && !B.town) buildTown(B);
@@ -2261,8 +2262,10 @@ function start() {
         sfx.pick();
         burst(V(pk.x, pk.top + 1.7, pk.z), ['#FDD835', '#FFFFFF', WORLDS[S.wi].color], 22, { speed: 5, up: 7 });
         if (pk.say) {
+          const say = Q.def.seq ? `${['First', 'Then', 'Finally'][Q.score - 1] || 'Then'}, ${pk.say.charAt(0).toLowerCase()}${pk.say.slice(1)}` : pk.say;
+          if (Q.def.seq) Q.details[Q.details.length - 1] = say;
           feedback('Say it!', true);
-          task(`${Q.def.sayLab || 'Dream'} ${Q.score} / 3 · Say it out loud!`, esc(pk.say));
+          task(`${Q.def.sayLab || 'Dream'} ${Q.score} / 3 · Say it out loud!`, esc(say));
           clearTimeout(Q.tt);
           Q.tt = setTimeout(() => S.Q === Q && !Q.done && task(null), 3500);
         } else feedback(`${pk.label}!`, true);
@@ -2535,6 +2538,87 @@ function start() {
           (S.met[S.wi] ||= []).push(n.person);
         }
         Q.chat = false;
+        Q.details.push('skipped by teacher');
+        completeQuest();
+      },
+    },
+
+    // ---- B3 S9: step on the story in the right order (First, Then, After that, Finally) ----
+    order: {
+      start(Q) {
+        Q.list = shuffle(Q.def.bank.slice()).slice(0, Q.def.count || 2);
+        Q.max = Q.list.length;
+        this.load(Q);
+      },
+      load(Q) {
+        const st = Q.list[Q.idx];
+        Q.step = 0;
+        Q.attempts = 0;
+        Q.slots = shuffle([0, 1, 2, 3]); // tile k shows line Q.slots[k]
+        W.ladder.forEach((l, k) => {
+          l.done = false;
+          l.tile.material = mat(k < 4 ? '#E3EAF0' : '#CFD8DC');
+          l.sp.visible = k < 4;
+        });
+        this.show(Q);
+        Q.ready = true;
+      },
+      show(Q, msg = '') {
+        const st = Q.list[Q.idx];
+        const words = ['First', 'Then', 'After that', 'Finally'];
+        const told = st.lines.slice(0, Q.step).map((ln, k) => `<b>${words[k]}</b>, ${esc(ln.charAt(0).toLowerCase() + ln.slice(1))}`).join('<br>');
+        const cards = [0, 1, 2, 3].map((k) => (W.ladder[k].done ? '' : `<span class="opt"><b>${'ABCD'[k]}</b>${esc(st.lines[Q.slots[k]])}</span>`)).join('');
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · "${esc(st.title)}" · What happened ${['first', 'next', 'next', 'last'][Q.step]}? Step on it!`,
+          (msg ? `${msg}<br>` : '') + (told || '<i>Read the story and step on the first part.</i>'), cards);
+      },
+      count: (Q) => `${Q.idx}/${Q.max}`,
+      goal: () => V(LADDER.xs[0] - 2, 0, LADDER.z),
+      update(Q) {
+        if (!Q.ready || !AV.onGround) return;
+        for (let k = 0; k < 4; k++) {
+          const l = W.ladder[k];
+          if (l.done || Math.abs(AV.pos.x - l.x) > LADDER.half || Math.abs(AV.pos.z - LADDER.z) > LADDER.half) {
+            if (!l.done) l.on = false;
+            continue;
+          }
+          if (l.on) continue;
+          l.on = true;
+          this.step(Q, k);
+        }
+      },
+      step(Q, k) {
+        const st = Q.list[Q.idx];
+        const ok = Q.slots[k] === Q.step;
+        Q.attempts++;
+        logEvent(`${Q.def.name}: ${st.lines[Q.slots[k]]}`, ok);
+        if (!ok) {
+          sfx.bad();
+          W.ladder[k].tile.material = mat('#EF9A9A');
+          setTimeout(() => !W.ladder[k].done && (W.ladder[k].tile.material = mat('#E3EAF0')), 700);
+          this.show(Q, '<span style="color:#C62828">Not yet! What happened before that?</span>');
+          return;
+        }
+        W.ladder[k].done = true;
+        W.ladder[k].tile.material = mat('#7CB342');
+        sfx.step(Q.step);
+        burst(V(W.ladder[k].x, 0.6, LADDER.z), ['#FDD835', '#7CB342'], 12, { speed: 3, up: 6 });
+        Q.step++;
+        if (Q.step < 4) return this.show(Q);
+        // the whole story, in order: say it!
+        Q.ready = false;
+        if (Q.attempts === 4) Q.score++;
+        Q.details.push(st.title);
+        const words = ['First', 'Then', 'After that', 'Finally'];
+        task(`${Q.def.name} ${Q.idx + 1} / ${Q.max} · Great! Tell the story out loud!`, `<span class="mic">🎤</span> ` + st.lines.map((ln, i) => `<b>${words[i]}</b>, ${esc(ln.charAt(0).toLowerCase() + ln.slice(1))}`).join(' '));
+        setTimeout(() => {
+          if (S.Q !== Q) return;
+          Q.idx++;
+          renderQuests();
+          if (Q.idx >= Q.max) completeQuest();
+          else this.load(Q);
+        }, 6000);
+      },
+      skip(Q) {
         Q.details.push('skipped by teacher');
         completeQuest();
       },
@@ -4573,6 +4657,11 @@ function start() {
       if (T === 'collect') {
         const pk = W.pickups.find((p) => !p.taken);
         return pk ? { x: pk.x, z: pk.z, y: pk.top } : null;
+      }
+      if (T === 'order') {
+        if (!Q.ready) return null;
+        const k = Q.slots.indexOf(Q.step);
+        return { x: W.ladder[k].x, z: LADDER.z, y: 0.2 };
       }
       if (T === 'places' || T === 'follow') {
         const p = T === 'places' ? Q.list[Q.idx] : Q.target;
