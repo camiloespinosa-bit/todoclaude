@@ -2972,6 +2972,7 @@ function start() {
             W.showcase.add(disp);
           }
         }
+        Q.offFirst = W.pads.findIndex((p) => Math.abs(AV.pos.x - p.x) < PADS.half && Math.abs(AV.pos.z - p.z) < PADS.half);
         const lab = `${Q.def.title} ${Q.idx + 1} / ${Q.max} · Step on the right answer!`;
         const s = Q.def.advice ? `The patient says: <i>"${esc(it.p)}"</i>` : esc(it.s).replace('___', '<u>&nbsp;?&nbsp;</u>');
         task(lab, s, optsHTML(it.opts));
@@ -2981,9 +2982,13 @@ function start() {
       goal: () => PADS.start,
       update(Q) {
         if (!Q.ready || !AV.onGround) return;
-        W.pads.forEach((p, k) => {
-          if (Q.ready && Math.abs(AV.pos.x - p.x) < PADS.half && Math.abs(AV.pos.z - p.z) < PADS.half) this.step(Q, k);
-        });
+        const onPad = W.pads.findIndex((p) => Math.abs(AV.pos.x - p.x) < PADS.half && Math.abs(AV.pos.z - p.z) < PADS.half);
+        // a new question while still standing on a stone: step off first (no surprise answer)
+        if (Q.offFirst >= 0) {
+          if (onPad === Q.offFirst) return;
+          Q.offFirst = -1;
+        }
+        if (onPad >= 0) this.step(Q, onPad);
       },
       step(Q, k) {
         const it = Q.list[Q.idx];
