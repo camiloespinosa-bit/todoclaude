@@ -9,10 +9,10 @@ const pick = (arr, n) => arr.slice().sort(() => Math.random() - 0.5).slice(0, n)
 
 // ---------- S5 + S6 · Regular or Rebel? (run to the right zone) ----------
 const REG_REBEL = [
-  { s: 'PLAY → ___', z: 0 }, { s: 'WATCH → ___', z: 0 }, { s: 'COOK → ___', z: 0 }, { s: 'WALK → ___', z: 0 },
-  { s: 'CLEAN → ___', z: 0 }, { s: 'DANCE → ___', z: 0 }, { s: 'JUMP → ___', z: 0 }, { s: 'LISTEN → ___', z: 0 },
-  { s: 'GO → ___', z: 1 }, { s: 'EAT → ___', z: 1 }, { s: 'SEE → ___', z: 1 }, { s: 'HAVE → ___', z: 1 },
-  { s: 'IS → ___', z: 1 }, { s: 'RUN → ___', z: 1 }, { s: 'DRINK → ___', z: 1 }, { s: 'MAKE → ___', z: 1 },
+  { s: 'PLAY → ___', ans: 'played', z: 0 }, { s: 'WATCH → ___', ans: 'watched', z: 0 }, { s: 'COOK → ___', ans: 'cooked', z: 0 }, { s: 'WALK → ___', ans: 'walked', z: 0 },
+  { s: 'CLEAN → ___', ans: 'cleaned', z: 0 }, { s: 'DANCE → ___', ans: 'danced', z: 0 }, { s: 'JUMP → ___', ans: 'jumped', z: 0 }, { s: 'LISTEN → ___', ans: 'listened', z: 0 },
+  { s: 'GO → ___', ans: 'went', z: 1 }, { s: 'EAT → ___', ans: 'ate', z: 1 }, { s: 'SEE → ___', ans: 'saw', z: 1 }, { s: 'HAVE → ___', ans: 'had', z: 1 },
+  { s: 'IS → ___', ans: 'was', z: 1 }, { s: 'RUN → ___', ans: 'ran', z: 1 }, { s: 'DRINK → ___', ans: 'drank', z: 1 }, { s: 'MAKE → ___', ans: 'made', z: 1 },
 ];
 
 // ---------- S5 + S6 · Time Machine Track (say it on every step) ----------

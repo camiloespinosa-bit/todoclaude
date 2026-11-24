@@ -1833,7 +1833,7 @@ function start() {
       return;
     }
     // directions in the town: the card goes to the side so the map stays visible
-    const mapView = !!(S.Q && !S.Q.done && ['follow', 'guide'].includes(S.Q.def.type));
+    const mapView = !!(S.Q && !S.Q.done && ['follow', 'guide', 'order'].includes(S.Q.def.type));
     el.classList.toggle('side', mapView);
     document.body.classList.toggle('mapview', mapView);
     $('h-tlab').innerHTML = lab;
@@ -3101,6 +3101,7 @@ function start() {
         logEvent(`${Q.def.name}: "${it.s}" → ${labels[k]}`, k === it.z);
         if (k === it.z) {
           if (Q.attempts === 1) Q.score++;
+          if (it.ans) $('h-ts').innerHTML = esc(it.s).replace('___', `<u>${esc(it.ans)}</u>`);
           sfx.good();
           ar.flash = 1.2;
           burst(ar.c.clone().add(V(0, 1.5, 0)), ['#FDD835', '#FFFFFF', ar.col], 30, { speed: 7, up: 9, geo: starGeo, size: 0.3 });
