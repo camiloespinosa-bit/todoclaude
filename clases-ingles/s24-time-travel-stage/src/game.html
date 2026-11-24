@@ -224,6 +224,12 @@ body.has-save #b-go { display: none; }
 .big-gem { width: .6em; height: .6em; margin-right: .2em; }
 .slots { display: flex; gap: .8vw; }
 .task { position: absolute; left: 50%; bottom: 2vh; transform: translateX(-50%); padding: 1vh 2vw; border-left: 14px solid var(--world-ink, var(--world)); display: none; text-align: center; max-width: 90vw; min-width: min(46vw, 640px); }
+body.mapview .quests { display: none; }
+.task.side { left: auto; right: 2vw; transform: none; bottom: auto; top: 26vh; min-width: 0; max-width: min(34vw, 480px); }
+.task.side .opts { flex-direction: column; align-items: stretch; }
+@media (orientation: portrait) { .task.side { left: 50%; right: auto; transform: translateX(-50%); top: auto; bottom: 2vh; max-width: 94vw; } .task.side .opts { flex-direction: row; } }
+body.touch .task.side { bottom: auto; }
+@media (orientation: portrait) { body.touch .task.side { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 196px); } }
 .task.on { display: block; animation: fadeIn .4s both; }
 .task .lab { font-weight: 700; color: var(--dark); }
 .task .s { font-size: var(--fs-l); font-weight: 800; line-height: 1.2; margin-top: .15em; }

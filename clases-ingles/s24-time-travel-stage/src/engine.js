@@ -1381,9 +1381,12 @@ function start() {
         }
         B.colliders.push({ x: bx, z: bz, r: 3.3 });
       }
-      const lab = textSprite(pl.name.toUpperCase(), { bg: inkOf(w), font: 120, scale: 0.6 });
-      lab.position.set(bx, pl.park ? 5 : 7.4, bz);
+      // the name stands on the crossing itself: that circle IS the place
+      const lab = textSprite(pl.name.toUpperCase(), { bg: inkOf(w), font: 120, scale: 0.85 });
+      lab.position.set(c.x, 2.6, c.z);
       B.group.add(lab);
+      // a little path from the circle to the door
+      B.group.add(at(mesh(new THREE.BoxGeometry(1.2, 0.12, 4), pl.color), c.x + 2.2, 0.08, c.z + 3.2));
     }
     // the tourist who asks for directions
     const T = makeAvatar({ suit: '#F57C00', scarf: '#FFFFFF', hair: '#FBC02D', long: false, skin: '#F1C27D', pants: '#455A64', hat: 'sunhat', glasses: 'sunglasses', back: 'backpack' });
@@ -1825,8 +1828,13 @@ function start() {
     const el = $('h-task');
     if (lab === null) {
       el.classList.remove('on');
+      document.body.classList.remove('mapview');
       return;
     }
+    // directions in the town: the card goes to the side so the map stays visible
+    const mapView = !!(S.Q && !S.Q.done && ['follow', 'guide'].includes(S.Q.def.type));
+    el.classList.toggle('side', mapView);
+    document.body.classList.toggle('mapview', mapView);
     $('h-tlab').innerHTML = lab;
     $('h-ts').innerHTML = s;
     $('h-topts').innerHTML = opts;
@@ -4312,9 +4320,14 @@ function start() {
       wantT = V(0, 0, 0);
       k = 1;
     } else if (S.mode === 'play') {
-      const C = CAMS[camIdx];
-      wantP = AV.pos.clone().add(C.p(wideP));
-      wantT = AV.pos.clone().add(C.t);
+      // in the town, look from above (north up) so the kid sees the streets and the places
+      const townQ = S.Q && !S.Q.done && ['places', 'follow', 'guide'].includes(S.Q.def.type);
+      const C = townQ ? CAMS[1] : CAMS[camIdx];
+      // directions: show the whole town at once
+      const whole = townQ && S.Q.def.type !== 'places';
+      const focus = whole ? V(camera.aspect > 1 ? 19 : 10, 0, camera.aspect > 1 ? -13 : -9) : AV.pos;
+      wantP = focus.clone().add(whole ? V(0, 46, 13 * wideP) : townQ ? V(0, 30, 9 * wideP) : C.p(wideP));
+      wantT = focus.clone().add(C.t);
       if (C.id === 'follow') wantP.y = Math.max(wantP.y, 8.5);
     } else if (S.mode === 'look') {
       const portrait = camera.aspect < 1;
