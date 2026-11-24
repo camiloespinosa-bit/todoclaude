@@ -1,0 +1,1861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>English Lab · Gimnasio del Cerebro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+/* English Lab: clases 1 a 1 para adultos, en vivo. El profe juzga y marca; la página registra por estructura. */
+:root{
+  --bg:#F2F7F9; --surface:#FFFFFF; --surface-2:#E8F1F4; --ink:#12303F; --muted:#4E6B79; --line:#CFDFE5;
+  --brand:#2C5F7C; --on-brand:#FFFFFF; --focus:#F57C00;
+  --hdr-a:#1D3F54; --hdr-b:#2C5F7C; --hdr-soft:#BCD9E1;
+  --gold:#FDD835; --on-gold:#3B2F00; --orange:#F57C00; --turq:#57A6B5; --green:#7CB342;
+  --good:#2F7D32; --good-bg:#E3F2E1; --bad:#B3261E; --bad-bg:#FBE9E7; --mid:#8A5A00; --mid-bg:#FFF4D6;
+  --font:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --w1:#2C5F7C; --w2:#57A6B5; --w3:#7CB342; --w4:#F57C00; --w5:#1D3F54; --w6:#A3306B; --w7:#6B4BA3; --w8:#B85A00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+    --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+    --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+  --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+  --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:16px 60px}
+button,input,select,textarea{font-family:inherit; font-size:inherit; color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed; opacity:.45}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+h1,h2,h3,h4,p{margin:0}
+h1,h2,h3{text-wrap:balance; line-height:1.15}
+.wrap{max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:14px}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono)}
+.small{font-size:.86rem}
+.primary{background:var(--brand); color:var(--on-brand); border:none; border-radius:10px; padding:11px 20px; font-weight:700}
+.gold{background:var(--gold); color:var(--on-gold); border:none; border-radius:12px; padding:13px 24px; font-weight:800; font-size:1.1rem}
+.ghost{background:transparent; border:1px solid var(--line); border-radius:10px; padding:8px 14px; color:var(--ink); font-size:.95rem}
+.ghost:hover:not(:disabled){border-color:var(--brand)}
+.ghost.armed{border-color:var(--bad); color:var(--bad); background:var(--bad-bg)}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:clamp(14px,2.5vw,22px)}
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.spread{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+input[type=text],input[type=password],input[type=date],select,textarea{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 12px; max-width:100%}
+textarea{width:100%; min-height:64px; resize:vertical}
+
+.hero{background:linear-gradient(135deg,var(--hdr-a),var(--hdr-b)); color:#fff; border-radius:18px; padding:clamp(18px,3vw,28px)}
+.kick{font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.12em; color:var(--hdr-soft)}
+.hero h1{font-size:clamp(1.9rem,5vw,2.8rem); font-weight:800; letter-spacing:-.02em; margin:4px 0 2px}
+.hero p{color:var(--hdr-soft)}
+.hero .row{margin-top:12px}
+.who{display:flex; gap:8px; flex-wrap:wrap}
+.who button{border:2px solid rgba(255,255,255,.35); background:transparent; color:#fff; border-radius:12px; padding:8px 16px; font-weight:700; text-align:left}
+.who button small{display:block; font-family:var(--mono); font-weight:400; font-size:.7rem; letter-spacing:.08em; color:var(--hdr-soft)}
+.who button.on{background:#fff; color:var(--hdr-a); border-color:#fff}
+.who button.on small{color:var(--muted)}
+.hero select,.hero input{background:rgba(255,255,255,.12); color:#fff; border-color:rgba(255,255,255,.35)}
+.hero select option{color:#12303F}
+.dbs{font-family:var(--mono); font-size:.75rem; border-radius:999px; padding:3px 10px; background:rgba(255,255,255,.14)}
+.dbs.ok::before{content:"● "; color:#9BE29E} .dbs.warn::before{content:"● "; color:#FFCF66} .dbs.bad::before{content:"● "; color:#FF8A7A}
+
+.tabs{display:flex; gap:6px; flex-wrap:wrap; position:sticky; top:0; z-index:5; background:var(--bg); padding:8px 0}
+.tabs button{border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:8px 16px; font-weight:600; position:relative}
+.tabs button.on{background:var(--brand); color:var(--on-brand); border-color:var(--brand)}
+.tabs button.used::after{content:"last time"; position:absolute; top:-9px; right:-4px; font-family:var(--mono); font-size:.58rem; background:var(--orange); color:#fff; border-radius:999px; padding:0 6px; line-height:1.5}
+
+.card{border:1px solid var(--line); border-left:10px solid var(--turq); border-radius:14px; padding:16px 18px; background:var(--bg)}
+.card h3{font-size:clamp(1.3rem,3vw,1.75rem); font-weight:800; margin:4px 0 10px}
+.tag{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.targets{display:grid; gap:8px}
+.tg{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--surface)}
+.tg .tt{font-weight:600; font-size:1.05rem}
+.tg .ts{font-family:var(--mono); font-size:.72rem; color:var(--muted)}
+.tg.hidden .tt{filter:blur(7px); user-select:none}
+.yn{display:flex; gap:6px}
+.yn button{border:2px solid var(--line); background:var(--surface); border-radius:10px; padding:7px 14px; font-weight:800; min-width:48px}
+.yn .y.on{background:var(--good-bg); border-color:var(--good); color:var(--good)}
+.yn .n.on{background:var(--bad-bg); border-color:var(--bad); color:var(--bad)}
+.flash{font-size:.92rem; color:var(--good); min-height:1.4em}
+.flash.bad{color:var(--bad)}
+
+/* wheel */
+.spin{display:grid; grid-template-columns:minmax(260px,420px) minmax(0,1fr); gap:18px; align-items:start}
+.wheelbox{position:relative; width:100%; max-width:420px; aspect-ratio:1; margin:0 auto}
+.wheelbox svg{width:100%; height:100%; transition:transform 4.2s cubic-bezier(.17,.89,.22,1)}
+.pointer{position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:30px solid var(--orange); filter:drop-shadow(0 2px 2px rgba(0,0,0,.3)); z-index:2}
+.wheelbox .hub{position:absolute; inset:41%; border-radius:50%; background:var(--surface); border:4px solid var(--hdr-a); display:grid; place-items:center; font-weight:800; font-size:.9rem}
+
+/* jeopardy */
+.board{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px}
+.board .cat{background:var(--hdr-a); color:#fff; border-radius:10px; padding:10px 6px; text-align:center; font-weight:700; font-size:.9rem; display:grid; place-items:center; min-height:64px}
+.board .tile{background:var(--brand); color:var(--gold); border:none; border-radius:10px; font-weight:800; font-size:clamp(1rem,2.6vw,1.7rem); min-height:62px}
+.board .tile.done{background:var(--surface-2); color:var(--muted); font-size:.95rem}
+.score{font-family:var(--mono); font-weight:700; font-size:2rem}
+
+/* bingo */
+.bingo{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; max-width:720px}
+.bingo button{border:2px solid var(--line); background:var(--surface); border-radius:14px; padding:12px 8px; min-height:96px; font-weight:600; font-size:.98rem; line-height:1.25}
+.bingo button.on{background:var(--good-bg); border-color:var(--good); color:var(--good)}
+.bingo button.on::before{content:"✓ "; font-weight:800}
+.bingo button.line{box-shadow:0 0 0 3px var(--gold)}
+
+/* bug */
+.bug{font-size:clamp(1.3rem,3.4vw,2rem); font-weight:700; padding:16px 18px; border-radius:14px; background:var(--bad-bg); border:2px dashed var(--bad)}
+.fix{font-size:clamp(1.2rem,3vw,1.7rem); font-weight:700; padding:14px 18px; border-radius:14px; background:var(--good-bg); border-left:8px solid var(--good)}
+.fix p{font-size:1rem; font-weight:500; color:var(--ink); margin-top:4px}
+
+.timer{font-family:var(--mono); font-weight:700; font-size:3rem; font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+
+/* notebook drawer */
+.nbtn{position:fixed; right:max(16px,env(safe-area-inset-right,0px)); bottom:18px; z-index:20; background:var(--orange); color:#fff; border:none; border-radius:999px; padding:12px 20px; font-weight:800; box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.drawer{position:fixed; right:0; top:0; bottom:0; width:min(440px,100vw); background:var(--surface); border-left:1px solid var(--line); z-index:30; padding:18px; overflow:auto; box-shadow:-10px 0 30px rgba(0,0,0,.2); display:flex; flex-direction:column; gap:10px}
+.seg{display:flex; gap:6px}
+.seg button{flex:1; border:2px solid var(--line); background:var(--bg); border-radius:10px; padding:8px; font-weight:700}
+.seg button.on.fx{border-color:var(--bad); background:var(--bad-bg); color:var(--bad)}
+.seg button.on.gd{border-color:var(--good); background:var(--good-bg); color:var(--good)}
+.note{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--bg); display:grid; gap:2px}
+.note.fx{border-left:6px solid var(--bad)} .note.gd{border-left:6px solid var(--good)}
+.note .said{font-weight:600}
+.note .better{color:var(--good); font-weight:600}
+
+/* progress */
+.legend{display:flex; gap:8px; flex-wrap:wrap}
+.chip{border-radius:999px; padding:3px 12px; font-size:.82rem; font-weight:600; border:1px solid var(--line)}
+.chip.new{background:var(--surface-2); color:var(--muted)}
+.chip.prac{background:var(--mid-bg); color:var(--mid); border-color:var(--mid)}
+.chip.dom{background:var(--good-bg); color:var(--good); border-color:var(--good)}
+.prow{display:grid; grid-template-columns:minmax(0,1.6fr) auto minmax(110px,1fr) auto; gap:6px 14px; align-items:center; padding:10px 0; border-top:1px solid var(--line)}
+.prow .nm{font-weight:600}
+.prow .nm small{display:block; font-family:var(--mono); font-size:.7rem; color:var(--muted); font-weight:400}
+.spark{display:flex; gap:3px; align-items:flex-end; height:30px}
+.spark i{display:block; width:12px; border-radius:3px 3px 0 0; background:var(--brand); min-height:3px}
+.pct{font-family:var(--mono); font-weight:700; min-width:6ch; text-align:right}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px}
+.stat{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg)}
+.stat b{display:block; font-size:1.8rem; font-weight:800; line-height:1.1}
+.unit{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg); display:grid; gap:6px}
+.unit.cur{border:2px solid var(--orange); background:var(--surface)}
+.unit h4{font-size:1.05rem}
+.run{counter-reset:r; display:grid; gap:8px; padding:0; margin:0; list-style:none}
+.run li{counter-increment:r; display:grid; grid-template-columns:auto minmax(0,1fr); gap:10px; align-items:start}
+.run li::before{content:counter(r); width:28px; height:28px; border-radius:50%; background:var(--orange); color:#fff; display:grid; place-items:center; font-weight:800; font-size:.85rem}
+.run b{display:block}
+.honest{border-left:6px solid var(--turq); background:var(--surface-2); border-radius:10px; padding:10px 14px; font-size:.9rem}
+
+/* games menu */
+.menu{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px}
+.gcard{position:relative; text-align:left; border:1px solid var(--line); border-top:8px solid var(--turq); background:var(--bg); border-radius:14px; padding:14px 16px; display:grid; gap:4px; min-height:132px}
+.gcard.acc{border-top-color:var(--orange)} .gcard.mix{border-top-color:var(--w6)}
+.gcard:hover{border-color:var(--brand)}
+.gcard b{font-size:1.15rem}
+.gcard .gd{color:var(--muted); font-size:.9rem}
+.gcard .gm{font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-top:auto}
+.gcard .badge{justify-self:start; font-family:var(--mono); font-size:.62rem; border-radius:999px; padding:1px 8px}
+.badge.last{background:var(--orange); color:#fff} .badge.fresh{background:var(--good-bg); color:var(--good); border:1px solid var(--good)}
+.gamebar{display:flex; align-items:center; gap:10px; margin-bottom:10px}
+.cmd{display:inline-block; background:var(--orange); color:#fff; border-radius:999px; padding:4px 14px; font-weight:800; font-size:1.05rem}
+.big{font-size:clamp(1.4rem,3.6vw,2.2rem); font-weight:800; line-height:1.2}
+.es{font-size:clamp(1.4rem,3.6vw,2.1rem); font-weight:700; font-style:italic}
+.streak{font-family:var(--mono); font-weight:700}
+.dots{display:flex; gap:6px; flex-wrap:wrap}
+.dots i{width:16px; height:16px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line)}
+.dots i.ok{background:var(--good)} .dots i.no{background:var(--bad)} .dots i.cur{outline:3px solid var(--orange)}
+.lot{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--surface)}
+.lot .sent{font-weight:600; font-size:1.1rem}
+.lot.win{border-color:var(--good); background:var(--good-bg)} .lot.lose{border-color:var(--bad); background:var(--bad-bg)}
+.bet{display:flex; align-items:center; gap:6px}
+.bet b{font-family:var(--mono); min-width:5ch; text-align:center; font-size:1.1rem}
+.bet button{border:1px solid var(--line); background:var(--bg); border-radius:8px; width:40px; height:36px; font-weight:800}
+.money{font-family:var(--mono); font-weight:800; font-size:2rem}
+.roles{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:10px 0}
+.role{border-radius:12px; padding:12px 14px; border:1px solid var(--line); background:var(--surface)}
+.role .tag{display:block; margin-bottom:2px}
+.twist{border:2px dashed var(--orange); background:var(--mid-bg); border-radius:12px; padding:12px 14px; font-weight:700; margin:10px 0}
+.conn{display:inline-block; font-size:clamp(1.6rem,4.5vw,2.6rem); font-weight:800; color:var(--on-gold); background:var(--gold); border-radius:14px; padding:6px 20px}
+.turns{display:flex; gap:6px; flex-wrap:wrap}
+.turns span{border-radius:999px; padding:3px 12px; font-size:.85rem; border:1px solid var(--line)}
+.turns .ok{background:var(--good-bg); border-color:var(--good); color:var(--good)} .turns .no{background:var(--bad-bg); border-color:var(--bad); color:var(--bad)}
+.locks{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
+.lock{border:2px solid var(--line); background:var(--surface); border-radius:14px; padding:14px 8px; text-align:center; font-weight:700; display:grid; gap:4px; min-height:110px; place-items:center}
+.lock .ic{font-size:2rem; line-height:1}
+.lock.open{border-color:var(--good); background:var(--good-bg); color:var(--good)}
+.lock.sel{border-color:var(--orange)}
+.lock .dg{font-family:var(--mono); font-size:1.8rem}
+.codein{font-family:var(--mono); font-size:2rem; letter-spacing:.4em; width:8ch; text-align:center}
+@media (max-width:760px){
+  .roles{grid-template-columns:1fr}
+  .locks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .spin{grid-template-columns:1fr}
+  .board{grid-template-columns:repeat(5,minmax(58px,1fr)); overflow-x:auto}
+  .board .cat{font-size:.7rem}
+  .prow{grid-template-columns:minmax(0,1fr) auto}
+  .prow .spark{grid-column:1/-1}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- login -->
+  <section id="vLogin" class="panel" hidden>
+    <p class="kick" style="color:var(--muted)">Gimnasio del Cerebro · English Lab</p>
+    <h2 style="font-size:1.8rem; margin:6px 0 10px">Clave del profe</h2>
+    <p class="muted">Es la misma clave del Panel del profe. Si ya entraste allí en este dispositivo, entra sola.</p>
+    <div class="row" style="margin-top:12px">
+      <input id="lgKey" type="password" autocomplete="current-password" placeholder="Clave" aria-label="Clave del profe">
+      <label class="row small"><input id="lgRem" type="checkbox" checked> Recordar en este dispositivo</label>
+      <button class="primary" id="lgGo">Entrar</button>
+    </div>
+    <p class="flash bad" id="lgMsg"></p>
+  </section>
+
+  <!-- app -->
+  <section id="vApp" hidden>
+    <div class="wrap">
+      <header class="hero">
+        <div class="spread">
+          <p class="kick">Gimnasio del Cerebro · English Lab</p>
+          <span class="dbs" id="dbs">…</span>
+        </div>
+        <h1 id="hTitle">English Lab</h1>
+        <p id="hSub"></p>
+        <div class="row">
+          <div class="who" id="who"></div>
+        </div>
+        <div class="row">
+          <label class="small">Unit <select id="unitSel"></select></label>
+          <label class="small">Class day <input type="date" id="dateSel"></label>
+        </div>
+      </header>
+
+      <nav class="tabs" id="tabs" aria-label="Games"></nav>
+
+      <div class="gamebar" id="gameBar" hidden><button class="ghost" id="backMenu">← All games</button><b id="gameName"></b></div>
+
+      <!-- GAMES MENU -->
+      <section id="tMenu" class="panel" hidden>
+        <div class="spread"><h2>Games</h2><span class="muted small" id="menuNote"></span></div>
+        <h3 style="margin:14px 0 8px">Speak</h3>
+        <div class="menu" id="menuSpeak"></div>
+        <h3 style="margin:20px 0 8px">Accuracy</h3>
+        <div class="menu" id="menuAcc"></div>
+      </section>
+
+      <!-- RAPID TRANSFORM -->
+      <section id="tRapid" class="panel" hidden><div id="rapid"></div></section>
+      <!-- AUCTION -->
+      <section id="tAuction" class="panel" hidden><div id="auction"></div></section>
+      <!-- TRANSLATION DUEL -->
+      <section id="tDuel" class="panel" hidden><div id="duel"></div></section>
+      <!-- HIDDEN MISSION -->
+      <section id="tMission" class="panel" hidden><div id="mission"></div></section>
+      <!-- STORY CHAIN -->
+      <section id="tChain" class="panel" hidden><div id="chain"></div></section>
+      <!-- ESCAPE ROOM -->
+      <section id="tEscape" class="panel" hidden><div id="escape"></div></section>
+
+      <!-- PLAN -->
+      <section id="tPlan" class="panel" hidden>
+        <div class="spread"><h2>Plan</h2><span class="muted small" id="planLast"></span></div>
+        <div id="planRun" style="margin-top:12px"></div>
+        <h3 style="margin:22px 0 10px">Units</h3>
+        <div id="planUnits" style="display:grid; gap:10px"></div>
+      </section>
+
+      <!-- SPIN -->
+      <section id="tSpin" class="panel" hidden>
+        <div class="spread"><h2>Spin &amp; Speak</h2>
+          <label class="small row"><input type="checkbox" id="spinAll"> All units so far</label></div>
+        <div class="spin" style="margin-top:12px">
+          <div>
+            <div class="wheelbox"><div class="pointer"></div><svg id="wheel" viewBox="-110 -110 220 220" aria-hidden="true"></svg><div class="hub">SPIN</div></div>
+            <div class="row" style="justify-content:center; margin-top:12px"><button class="gold" id="spinGo">Spin!</button></div>
+          </div>
+          <div id="spinCard"><p class="muted">Spin the wheel. The card shows a situation and the targets. Targets stay hidden until the end (press "Reveal").</p></div>
+        </div>
+      </section>
+
+      <!-- JEOPARDY -->
+      <section id="tJeo" class="panel" hidden>
+        <div class="spread"><h2>Jeopardy</h2>
+          <div class="row"><span class="muted small">Today</span><span class="score" id="jeoScore">0</span><span class="muted small" id="jeoBest"></span>
+          <select id="jeoBoard" aria-label="Board"></select><button class="ghost" id="jeoReset">Clear board</button></div></div>
+        <div class="board" id="board" style="margin-top:12px"></div>
+        <div id="jeoCard" style="margin-top:14px"></div>
+      </section>
+
+      <!-- BINGO -->
+      <section id="tBingo" class="panel" hidden>
+        <div class="spread"><h2>Structure Bingo</h2><button class="ghost" id="bingoNew">New card</button></div>
+        <p class="muted" style="margin:6px 0 10px">Free conversation. Tap a square only when the structure comes out right. A line of 3 = BINGO.</p>
+        <div class="row" id="bingoTopics" style="margin-bottom:12px"></div>
+        <div class="bingo" id="bingo"></div>
+        <div class="row" style="margin-top:12px"><button class="primary" id="bingoSave">Save card</button><span class="flash" id="bingoMsg"></span></div>
+      </section>
+
+      <!-- SPOT THE BUG -->
+      <section id="tBug" class="panel" hidden>
+        <div class="spread"><h2>Spot the Bug</h2><span class="muted small" id="bugCount"></span></div>
+        <div id="bugBox" style="margin-top:12px"></div>
+      </section>
+
+      <!-- MYSTERY BOX -->
+      <section id="tBox" class="panel" hidden>
+        <div class="spread"><h2>Mystery Box</h2><button class="gold" id="boxOpen">Open the box</button></div>
+        <div id="boxCard" style="margin-top:12px"><p class="muted">A random challenge with rules. The clock runs while she speaks.</p></div>
+      </section>
+
+      <!-- ERROR COURT -->
+      <section id="tCourt" class="panel" hidden>
+        <div class="spread"><h2>Error Court</h2><span class="muted small" id="courtCount"></span></div>
+        <p class="muted" style="margin:6px 0 12px">Her own sentences from today's notebook. First the wins, then the cases. She finds the bug, then we reveal the better version.</p>
+        <div id="court"></div>
+      </section>
+
+      <!-- PROGRESS -->
+      <section id="tProg" class="panel" hidden>
+        <div class="spread"><h2 id="progTitle">Progress</h2>
+          <div class="row"><button class="ghost" id="exJson">Backup (JSON)</button><button class="ghost" id="exCsv">CSV</button></div></div>
+        <div class="stats" id="progStats" style="margin-top:12px"></div>
+        <div class="legend" style="margin:14px 0 6px"><span class="chip new">New</span><span class="chip prac">Practicing</span><span class="chip dom">Mastered</span></div>
+        <p class="muted small" id="progRule"></p>
+        <div id="progList" style="margin-top:8px"></div>
+        <h3 style="margin:22px 0 8px">Sessions</h3>
+        <div id="progSessions"></div>
+        <p class="honest" style="margin-top:16px">These are practice data from live classes, marked by the teacher. They show trends; they are not a validated level test.</p>
+      </section>
+    </div>
+  </section>
+</div>
+
+<button class="nbtn" id="nbOpen" hidden>Notebook</button>
+<aside class="drawer" id="nb" hidden aria-label="Notebook">
+  <div class="spread"><h2>Notebook</h2><button class="ghost" id="nbClose">Close</button></div>
+  <div class="seg"><button class="fx on" data-k="fix" id="nbFix">Fix</button><button class="gd" data-k="good" id="nbGood">Good</button></div>
+  <label class="small">What she said<textarea id="nbSaid" placeholder="I am agree with you"></textarea></label>
+  <label class="small" id="nbBetterL">Better version<textarea id="nbBetter" placeholder="I agree with you"></textarea></label>
+  <label class="small">Structure <select id="nbStruct" style="width:100%"></select></label>
+  <div class="row"><button class="primary" id="nbSave">Save note</button><span class="flash" id="nbMsg"></span></div>
+  <h3 style="margin-top:8px">Today</h3>
+  <div id="nbList" style="display:grid; gap:8px"></div>
+</aside>
+
+<script>
+(function () {
+  "use strict";
+  // ---------------------------------------------------------------- config
+  var SUPA = { url: "https://xpqjejiezbxaxsdodkyb.supabase.co", key: "sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd" };
+  var TOKEN_SHA = "27636e092d3ac7cf89eeb70e4ce5fc47e4669c34bb8c1b0669520a456ec3a805";
+  var Q = new URLSearchParams(location.search);
+  var DB_URL = (Q.get("db") || SUPA.url).replace(/\/$/, "");
+  var LOCALHOST = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+
+  // ---------------------------------------------------------------- structure map (structureId -> [name, level])
+  var ST = {
+    "a1.be": ["Verb to be (am / is / are)", "A1"],
+    "a1.poss": ["Possessives (my, your, his, her)", "A1"],
+    "a1.ps": ["Present simple (I / you / we)", "A1"],
+    "a1.ps3": ["Present simple he / she (-s)", "A1"],
+    "a1.psq": ["Questions with do / does", "A1"],
+    "a1.qw": ["Question words (what, where, how...)", "A1"],
+    "a1.there": ["There is / there are", "A1"],
+    "a1.prep": ["In / on / at / next to", "A1"],
+    "a1.like": ["Like / love / hate + noun or -ing", "A1"],
+    "a1.art": ["A / an / some", "A1"],
+    "a1.can": ["Can / can't", "A1"],
+    "a1.pc": ["Present continuous (right now)", "A1"],
+    "a1.was": ["Was / were", "A1"],
+    "a1.past": ["Past simple (worked, went)", "A2"],
+    "a1.going": ["Going to (plans)", "A2"],
+    "b1.base": ["Present simple vs continuous", "A2"],
+    "b1.state": ["State verbs (I know, not I'm knowing)", "B1"],
+    "b1.past": ["Past simple for stories", "A2"],
+    "b1.pastc": ["Past continuous (was doing... when)", "B1"],
+    "b1.usedto": ["Used to", "B1"],
+    "b1.fut": ["Future: will / going to / present continuous", "B1"],
+    "b1.ppexp": ["Present perfect: experiences (ever / never)", "B1"],
+    "b1.ppvs": ["Present perfect vs past simple", "B1"],
+    "b1.ppjust": ["Just / already / yet", "B1"],
+    "b1.since": ["Since / for", "B1"],
+    "b1.ppc": ["Present perfect continuous", "B1"],
+    "b1.pastp": ["Past perfect", "B1"],
+    "b1.contrast": ["Although / however / even though", "B1"],
+    "b1.cause": ["Because / so / that's why", "B1"],
+    "b1.hedge": ["Polite opinion and disagreement", "B1"],
+    "b1.compar": ["Comparatives and superlatives", "A2"],
+    "b1.advice": ["Should / have to / must", "B1"],
+    "b1.gerinf": ["Gerund vs infinitive", "B1"],
+    "b1.deduce": ["Must be / might be / can't be", "B1"],
+    "b1.rel": ["Relative clauses (who / which / that)", "B1"],
+    "b1.cond1": ["First conditional", "B1"],
+    "b1.cond2": ["Second conditional", "B1"],
+    "b1.passive": ["Passive voice", "B1"],
+    "b1.report": ["Reported speech", "B1"],
+    "b1.phrasal": ["Work phrasal verbs", "B1"],
+    "es.subj": ["Spanish trap: the subject is never missing (It is...)", "trap"],
+    "es.age": ["Spanish trap: I'm 30 (not I have 30)", "trap"],
+    "es.agree": ["Spanish trap: I agree (not I am agree)", "trap"],
+    "es.people": ["Spanish trap: people are (plural)", "trap"],
+    "es.adj": ["Spanish trap: adjective before noun", "trap"],
+    "es.art": ["Spanish trap: a / an / the", "trap"],
+    "es.dep": ["Spanish trap: depends on (not of)", "trap"],
+    "es.actually": ["Spanish trap: actually vs currently", "trap"],
+    "es.makedo": ["Spanish trap: make vs do", "trap"],
+    "es.false": ["Spanish trap: false friends (assist, realize...)", "trap"]
+  };
+
+  // ---------------------------------------------------------------- students, plans and content
+  // t: [structureId, target]
+  var STUDENTS = {
+    PA: {
+      name: "Paula", level: "B1", sub: "B1 → B2 · 3 classes a week · 60 min",
+      units: [
+        { n: "My story today", s: ["b1.base", "b1.state", "b1.past", "es.subj", "es.agree"], g: "Baseline: everything she already does well gets on the map." },
+        { n: "Stories from the past", s: ["b1.past", "b1.pastc", "b1.usedto", "es.actually"] },
+        { n: "Plans and predictions", s: ["b1.fut", "es.dep", "es.makedo"], g: "End of cycle 0: Boss round (Jeopardy with all units so far)." },
+        { n: "Have you ever...?", s: ["b1.ppexp", "b1.ppvs"] },
+        { n: "News and updates", s: ["b1.ppjust", "b1.ppvs"] },
+        { n: "How long?", s: ["b1.since", "b1.ppc"] },
+        { n: "Before that...", s: ["b1.pastp", "b1.pastc"], g: "End of cycle 1 (perfects): Boss round." },
+        { n: "My opinion", s: ["b1.contrast", "b1.cause", "b1.hedge"] },
+        { n: "Compare and advise", s: ["b1.compar", "b1.advice", "b1.gerinf"] },
+        { n: "Detective work", s: ["b1.deduce", "b1.rel"], g: "End of cycle 2: Boss round." },
+        { n: "What if...?", s: ["b1.cond1", "b1.cond2"] },
+        { n: "The project report", s: ["b1.passive", "b1.report", "b1.phrasal"], g: "Final Boss round." }
+      ],
+      run: [
+        ["0-5", "Welcome + the map", "Open Progress: every structure starts as New. Tell her: today we find out what you already master."],
+        ["5-15", "Spin & Speak", "2-3 spins. Play Two Truths and a Lie if it comes out (you guess the lie). Notebook open from minute 1."],
+        ["15-40", "Jeopardy (baseline board)", "She picks the tiles. The 'Have you ever?' column is the diagnostic for the perfect tenses."],
+        ["40-48", "Mystery Box", "1 or 2 boxes. The point is to laugh and break the routine."],
+        ["48-58", "Error Court", "Her wins first, then 3-5 cases from her notebook. She finds the bug before you reveal."],
+        ["58-60", "Progress", "Show the map again: what turned yellow or green today."]
+      ],
+      topics: ["Your career story", "Medellín then and now", "An innovation you admire", "Your perfect weekend", "A goal for 2027", "The best and worst of your job"],
+      spin: [
+        { u: 0, k: "Two truths, a lie", p: "Two truths and a lie: tell me 3 facts about your work week. I guess the lie.", t: [["b1.base", "A routine (I usually...)"], ["b1.base", "Something temporary (These days I'm...)"], ["es.subj", "Every sentence has a subject"]] },
+        { u: 0, k: "Monday", p: "Describe a typical Monday at your job, and then what is different this month.", t: [["b1.base", "I usually / I normally..."], ["b1.base", "This month I'm ...-ing"], ["b1.state", "A state verb (I know / I need / I prefer)"]] },
+        { u: 0, k: "Learned", p: "Tell me about the last time you learned something new.", t: [["b1.past", "Three verbs in past simple"], ["b1.past", "One irregular verb (went, took, met...)"], ["es.subj", "Every sentence has a subject"]] },
+        { u: 0, k: "Agree?", p: "Do you agree? \"Medellín is the best city in Colombia to start a business.\"", t: [["es.agree", "I agree / I don't agree"], ["b1.state", "I think / I believe"], ["b1.base", "A fact in present simple"]] },
+        { u: 1, k: "On the way", p: "Tell me a funny or strange thing that happened to you on the way to work.", t: [["b1.pastc", "I was ...-ing when..."], ["b1.past", "3+ verbs in past simple"], ["es.subj", "Every sentence has a subject"]] },
+        { u: 1, k: "Childhood", p: "Your childhood: what did you use to do on Saturdays?", t: [["b1.usedto", "I used to..."], ["b1.usedto", "I didn't use to..."], ["b1.past", "One specific memory (One day, I...)"]] },
+        { u: 1, k: "Actually", p: "What are you currently working on? And one thing people believe about your job that actually isn't true.", t: [["es.actually", "currently = actualmente"], ["es.actually", "actually = en realidad"], ["b1.base", "Present continuous for now"]] },
+        { u: 1, k: "Bad meeting", p: "Describe a time a meeting went wrong.", t: [["b1.pastc", "While we were ..., ..."], ["b1.past", "What happened next (then, after that)"], ["b1.past", "One irregular verb"]] },
+        { u: 2, k: "Weekend", p: "Your plans for next weekend.", t: [["b1.fut", "I'm going to... (intention)"], ["b1.fut", "I'm meeting... (fixed arrangement)"], ["b1.fut", "I think I'll... (not sure)"]] },
+        { u: 2, k: "2040", p: "Predict: what will Medellín look like in 2040?", t: [["b1.fut", "will / won't for predictions"], ["es.dep", "It depends on..."], ["b1.fut", "probably / definitely in the right place"]] },
+        { u: 2, k: "Make / do", p: "Tell me 3 things you have to make or do this week.", t: [["es.makedo", "make + a decision / a plan / a call"], ["es.makedo", "do + a task / research / homework"], ["b1.fut", "A future form"]] },
+        { u: 3, k: "Have you ever", p: "Ask me 3 \"Have you ever...?\" questions. Then I ask you 3.", t: [["b1.ppexp", "Have you ever...?"], ["b1.ppexp", "I have never..."], ["b1.ppvs", "Follow-up in past: When did you...?"]] },
+        { u: 3, k: "Best place", p: "The most interesting place you have ever visited.", t: [["b1.ppexp", "the most ... I've ever ..."], ["b1.ppvs", "I went there in... (past simple + time)"], ["b1.past", "Details in past simple"]] },
+        { u: 3, k: "Career", p: "Your career so far: 3 things you have done, and when.", t: [["b1.ppexp", "I have worked / have learned..."], ["b1.ppvs", "Past simple with a time (in 2019...)"], ["b1.ppvs", "No present perfect with a finished time"]] },
+        { u: 4, k: "Update", p: "Work update: what have you done this week, and what haven't you done yet?", t: [["b1.ppjust", "already"], ["b1.ppjust", "yet (negative or question)"], ["b1.ppjust", "just"]] },
+        { u: 4, k: "Headlines", p: "Breaking news! Invent 3 headlines about your city and give them like a news anchor.", t: [["b1.ppjust", "... has just ..."], ["b1.ppvs", "Details in past simple (It happened at...)"], ["b1.ppexp", "for the first time / never before"]] },
+        { u: 4, k: "To-do", p: "Your to-do list for this month: what's done, what's not.", t: [["b1.ppjust", "I've already..."], ["b1.ppjust", "I haven't ... yet"], ["b1.ppvs", "I finished it on Monday (past + time)"]] },
+        { u: 5, k: "How long", p: "Tell me about 3 things in your life and how long they have been part of it.", t: [["b1.since", "for + a period"], ["b1.since", "since + a point in time"], ["b1.ppc", "I've been ...-ing"]] },
+        { u: 5, k: "Tired?", p: "How do you feel today? Explain it with what you have been doing lately.", t: [["b1.ppc", "I've been ...-ing (recent activity)"], ["b1.since", "for / since"], ["b1.ppvs", "One finished thing in past simple"]] },
+        { u: 5, k: "Journalist", p: "I'm a journalist. Interview time: your work and your life in Medellín.", t: [["b1.since", "How long have you...? answered right"], ["b1.ppc", "I've been working..."], ["b1.ppexp", "An experience (I've never...)"]] },
+        { u: 6, k: "Too late", p: "Tell a story that starts: \"When I arrived, the meeting had already...\"", t: [["b1.pastp", "had + participle"], ["b1.pastc", "was / were ...-ing"], ["b1.past", "Sequence (then, after that, finally)"]] },
+        { u: 6, k: "Bad day", p: "A day when everything went wrong.", t: [["b1.pastp", "I had forgotten / I had left..."], ["b1.pastc", "I was ...-ing when..."], ["b1.past", "3+ past simple verbs"]] },
+        { u: 6, k: "Before", p: "Before you started your current job, what had you done?", t: [["b1.pastp", "I had worked / studied..."], ["b1.past", "Then I started..."], ["b1.ppvs", "Present perfect for now (I've been here...)"]] },
+        { u: 7, k: "Remote", p: "Opinion: remote work is better than office work.", t: [["b1.hedge", "I'd say / In my opinion"], ["b1.contrast", "although / however"], ["b1.cause", "that's why / so"]] },
+        { u: 7, k: "Coffee", p: "Disagree with me, politely: \"Coffee is overrated.\"", t: [["b1.hedge", "I see your point, but..."], ["b1.contrast", "even though / however"], ["es.agree", "I don't agree (not I'm not agree)"]] },
+        { u: 7, k: "Pros & cons", p: "Pros and cons of living in Medellín.", t: [["b1.contrast", "On the other hand / however"], ["b1.cause", "because of / that's why"], ["b1.hedge", "It seems that / I'd say"]] },
+        { u: 8, k: "Compare", p: "Compare two jobs you have had (or two cities you know).", t: [["b1.compar", "-er than / more ... than"], ["b1.compar", "the best / the most..."], ["b1.compar", "not as ... as"]] },
+        { u: 8, k: "Advice", p: "Give advice to a new person on your team.", t: [["b1.advice", "You should..."], ["b1.advice", "You have to..."], ["b1.advice", "You don't have to..."]] },
+        { u: 8, k: "Enjoy", p: "Things you enjoy, things you avoid, and things you want to do this year.", t: [["b1.gerinf", "enjoy / avoid + -ing"], ["b1.gerinf", "want / decide / plan + to"], ["b1.gerinf", "stop / remember with the right form"]] },
+        { u: 9, k: "Detective", p: "Be a detective: look at my background (or a photo) and deduce things about me.", t: [["b1.deduce", "must be"], ["b1.deduce", "can't be"], ["b1.deduce", "might / could be"]] },
+        { u: 9, k: "Team", p: "Describe 3 people on your team without saying their names.", t: [["b1.rel", "the person who..."], ["b1.rel", "the project which / that..."], ["b1.compar", "a comparison"]] },
+        { u: 9, k: "Mystery", p: "Mystery: your boss didn't come to work today. Why? Give 3 theories.", t: [["b1.deduce", "He / She must have... or must be..."], ["b1.deduce", "might be"], ["b1.deduce", "can't be"]] },
+        { u: 10, k: "If...", p: "Next year: what will you do if things go well? And if they don't?", t: [["b1.cond1", "If + present, will"], ["b1.cond1", "unless"], ["b1.fut", "a plan with going to"]] },
+        { u: 10, k: "Lottery", p: "If you won the lottery tomorrow...", t: [["b1.cond2", "If I won / had..., I would..."], ["b1.cond2", "If I were..."], ["b1.contrast", "but / although"]] },
+        { u: 10, k: "Mayor", p: "If you were the mayor of Medellín for one day.", t: [["b1.cond2", "If I were the mayor, I would..."], ["b1.cond2", "I wouldn't..."], ["b1.cause", "because / so"]] },
+        { u: 11, k: "Project", p: "Tell me about a project at work: how it is done, step by step.", t: [["b1.passive", "is / are + participle"], ["b1.passive", "was / were + participle"], ["b1.phrasal", "set up / carry out / follow up"]] },
+        { u: 11, k: "Report", p: "Report a conversation you had this week.", t: [["b1.report", "She said (that)..."], ["b1.report", "He asked me if..."], ["b1.report", "Tense change (is → was)"]] },
+        { u: 11, k: "Meetings", p: "Your best tips for a good meeting.", t: [["b1.phrasal", "follow up / set up"], ["b1.phrasal", "come up with / figure out"], ["b1.advice", "should / have to"]] }
+      ],
+      jeo: [{ n: "Baseline", u: 0,
+        cats: ["Now & usually", "Back then", "Have you ever?", "What's next?", "Spanglish fix"],
+        tiles: [
+          [
+            { p: "What do you usually do on Friday nights?", t: [["b1.base", "I usually..."], ["es.subj", "Subject in every sentence"]] },
+            { p: "What are you working on this month?", t: [["b1.base", "I'm working on..."], ["b1.state", "I need / I want / I know"]] },
+            { p: "Describe the place where you are right now.", t: [["b1.base", "Present continuous for now"], ["es.adj", "Adjective before noun"], ["b1.state", "It looks / It seems"]] },
+            { p: "Explain your job to a 7-year-old.", t: [["b1.base", "I help / I work with..."], ["b1.cause", "because / so"], ["es.subj", "Subject in every sentence"]] },
+            { p: "A day in your life in 60 seconds, no stopping.", t: [["b1.base", "Routine (present simple)"], ["b1.base", "Something temporary (these days...)"], ["b1.state", "A state verb right"], ["es.subj", "Subject in every sentence"]] }
+          ],
+          [
+            { p: "What did you do last weekend?", t: [["b1.past", "Regular verb in -ed"], ["b1.past", "Irregular verb"]] },
+            { p: "What did you use to love when you were a kid?", t: [["b1.usedto", "I used to..."], ["b1.past", "A specific memory"]] },
+            { p: "Tell me about your first job.", t: [["b1.past", "3+ past simple verbs"], ["b1.usedto", "I used to..."], ["b1.pastc", "I was ...-ing when..."]] },
+            { p: "The worst trip of your life.", t: [["b1.past", "Irregular verbs right"], ["b1.pastc", "I was ...-ing when..."], ["b1.past", "Sequence words (then, finally)"]] },
+            { p: "Tell me a story with: a phone, the rain, and a stranger.", t: [["b1.pastc", "Background in past continuous"], ["b1.past", "Action in past simple"], ["b1.past", "Sequence words"], ["es.subj", "Subject in every sentence"]] }
+          ],
+          [
+            { p: "Have you ever eaten something really strange?", t: [["b1.ppexp", "I have / I've never..."], ["b1.ppvs", "Details in past simple"]] },
+            { p: "Name 2 places you have visited and 1 you never have.", t: [["b1.ppexp", "I've visited / been to..."], ["b1.ppexp", "I've never been to..."]] },
+            { p: "How long have you lived in your home?", t: [["b1.since", "for / since"], ["b1.ppexp", "I have lived..."], ["b1.ppvs", "I moved there in... (past)"]] },
+            { p: "What have you achieved this year?", t: [["b1.ppexp", "I have + participle"], ["b1.ppjust", "already / yet"], ["b1.ppvs", "One thing in past simple + time"]] },
+            { p: "Interview me: 4 \"Have you ever...?\" questions with follow-ups.", t: [["b1.ppexp", "Have you ever...?"], ["b1.ppvs", "When / Where did you...?"], ["b1.ppexp", "Right participles (been, eaten, seen)"], ["b1.ppvs", "No 'ago' with present perfect"]] }
+          ],
+          [
+            { p: "What are you doing tomorrow?", t: [["b1.fut", "I'm ...-ing (arrangement)"], ["b1.fut", "I'm going to..."]] },
+            { p: "Predict the weather and the traffic tomorrow.", t: [["b1.fut", "will / won't"], ["es.dep", "It depends on..."]] },
+            { p: "Your plan for this English course.", t: [["b1.fut", "going to"], ["b1.fut", "will (decision now)"], ["b1.cond1", "If I..., I will..."]] },
+            { p: "What will happen if Medellín builds a second metro line?", t: [["b1.cond1", "If + present, will"], ["b1.fut", "will for prediction"], ["es.dep", "It depends on..."]] },
+            { p: "Your life 5 years from now: work, home, travel.", t: [["b1.fut", "going to"], ["b1.fut", "will / might"], ["b1.cond1", "If..., I will..."], ["es.subj", "Subject in every sentence"]] }
+          ],
+          [
+            { p: "Fix it: \"I have 34 years.\"", t: [["es.age", "I'm 34 (years old)"], ["es.age", "Explains: be, not have"]] },
+            { p: "Fix it: \"Is very important the meeting.\"", t: [["es.subj", "The meeting is very important."], ["es.subj", "Explains: subject first"]] },
+            { p: "Fix it: \"Actually I work in a innovation center.\"", t: [["es.actually", "Currently..."], ["es.art", "an innovation center"], ["es.actually", "Explains actually vs currently"]] },
+            { p: "Fix it: \"The people is very friendly but depends of the day.\"", t: [["es.people", "People are..."], ["es.dep", "depends on"], ["es.subj", "it depends on..."]] },
+            { p: "Fix it: \"I am agree, we need to do a decision since two weeks.\"", t: [["es.agree", "I agree"], ["es.makedo", "make a decision"], ["b1.since", "for two weeks"], ["b1.ppvs", "We have needed / We've been trying..."]] }
+          ]
+        ]
+      }, { n: "Perfect tenses", u: 3,
+        cats: ["Ever & never", "Just / yet", "How long?", "Before that", "Perfect fix"],
+        tiles: [
+          [
+            { p: "Have you ever met a famous person?", t: [["b1.ppexp", "Yes, I have / No, I haven't"], ["b1.ppvs", "Details in past simple"]] },
+            { p: "Something you have never done but want to do.", t: [["b1.ppexp", "I've never..."], ["b1.fut", "I'd like to / I'm going to..."]] },
+            { p: "The best food you have ever tried in Colombia.", t: [["b1.ppexp", "the best ... I've ever ..."], ["b1.ppvs", "When / where you tried it (past)"], ["b1.compar", "better than / the best"]] },
+            { p: "Three things you have done that your family doesn't know.", t: [["b1.ppexp", "I have + participle"], ["b1.ppvs", "Past simple for the story"], ["b1.ppexp", "Right participles (been, done, seen)"]] },
+            { p: "Interview me about my travels: 4 questions, then a summary.", t: [["b1.ppexp", "Have you ever...?"], ["b1.ppvs", "When did you...?"], ["b1.ppexp", "Summary: He has been to..."], ["es.subj", "Subject in every sentence"]] }
+          ],
+          [
+            { p: "What have you just done before this class?", t: [["b1.ppjust", "I've just..."], ["es.subj", "Subject in every sentence"]] },
+            { p: "What haven't you done yet this week?", t: [["b1.ppjust", "haven't ... yet"], ["b1.ppjust", "already"]] },
+            { p: "Give me a project update in 30 seconds.", t: [["b1.ppjust", "already"], ["b1.ppjust", "yet"], ["b1.ppjust", "just"]] },
+            { p: "Your team chat: what has happened today?", t: [["b1.ppjust", "X has just..."], ["b1.ppvs", "At 9 this morning, X said... (past + time)"], ["b1.ppjust", "yet in a question"]] },
+            { p: "Good news, bad news: two of each about your week.", t: [["b1.ppjust", "just"], ["b1.ppjust", "yet"], ["b1.ppvs", "Past simple + time"], ["b1.contrast", "however / but"]] }
+          ],
+          [
+            { p: "How long have you had your phone?", t: [["b1.since", "for / since"], ["b1.ppexp", "I have had..."]] },
+            { p: "How long have you known your best friend?", t: [["b1.since", "for / since"], ["b1.state", "known (not been knowing)"]] },
+            { p: "What have you been doing lately?", t: [["b1.ppc", "I've been ...-ing"], ["b1.since", "for / since"], ["b1.ppc", "lately / recently"]] },
+            { p: "How long have you been working on your current project?", t: [["b1.ppc", "I've been working..."], ["b1.since", "for / since"], ["b1.ppvs", "It started in... (past)"]] },
+            { p: "Your life in 'how long': home, job, a hobby, a friendship.", t: [["b1.since", "for + period"], ["b1.since", "since + point"], ["b1.ppc", "have been ...-ing"], ["b1.state", "known / had (state verbs)"]] }
+          ],
+          [
+            { p: "What had you done before 8 a.m. today?", t: [["b1.pastp", "I had already..."], ["b1.past", "Then I..."]] },
+            { p: "The last time you arrived late: what had happened?", t: [["b1.pastp", "had + participle"], ["b1.past", "past simple for the main story"]] },
+            { p: "Before you started your current job, had you ever...?", t: [["b1.pastp", "I had never / I had ever..."], ["b1.past", "Then I started..."], ["b1.ppvs", "Now: I've been here for..."]] },
+            { p: "A movie or series where someone discovered a secret.", t: [["b1.pastp", "had hidden / had lied"], ["b1.pastc", "was ...-ing when"], ["b1.past", "discovered / found out"]] },
+            { p: "How you got your job: tell it from the end to the beginning.", t: [["b1.pastp", "Before that, I had..."], ["b1.past", "past simple"], ["b1.pastc", "I was ...-ing when"], ["b1.cause", "that's why / so"]] }
+          ],
+          [
+            { p: "Fix it: \"I have seen her yesterday.\"", t: [["b1.ppvs", "I saw her yesterday."], ["b1.ppvs", "Explains: finished time = past simple"]] },
+            { p: "Fix it: \"I live here since 2015.\"", t: [["b1.since", "I've lived here since 2015."], ["b1.since", "Explains: from the past until now"]] },
+            { p: "Fix it: \"I am waiting for you since one hour.\"", t: [["b1.ppc", "I've been waiting"], ["b1.since", "for an hour"], ["b1.ppc", "Explains: started in the past, still now"]] },
+            { p: "Fix it: \"When I arrived the train left, so I took a taxi.\" (it left before)", t: [["b1.pastp", "the train had left"], ["b1.past", "I took a taxi"], ["b1.pastp", "Explains: which action came first"]] },
+            { p: "Fix it: \"I know him since we were kids and we are friends during 20 years.\"", t: [["b1.since", "I've known him since..."], ["b1.state", "known (state verb)"], ["b1.since", "for 20 years (not during)"], ["b1.ppvs", "We've been friends (present perfect)"]] }
+          ]
+        ]
+      }, { n: "Opinions & ideas", u: 7,
+        cats: ["Hot takes", "Compare it", "Advice desk", "Detective", "Who or which?"],
+        tiles: [
+          [
+            { p: "Pineapple on pizza: yes or no?", t: [["b1.hedge", "In my opinion / I'd say"], ["b1.cause", "because"]] },
+            { p: "Is social media good for business?", t: [["b1.hedge", "I think / It seems to me"], ["b1.contrast", "however"]] },
+            { p: "Should companies have a 4-day week?", t: [["b1.hedge", "I'd say / I'm not sure, but"], ["b1.contrast", "although"], ["b1.cause", "that's why"]] },
+            { p: "Disagree with me: \"Medellín has the best weather in the world.\"", t: [["b1.hedge", "I see your point, but..."], ["b1.contrast", "although / even though"], ["es.agree", "I don't agree (not I'm not agree)"]] },
+            { p: "60-second speech: the biggest problem in your city and one solution.", t: [["b1.hedge", "In my view"], ["b1.contrast", "however"], ["b1.cause", "so / that's why"], ["b1.advice", "we should..."]] }
+          ],
+          [
+            { p: "Coffee or tea?", t: [["b1.compar", "-er / more ... than"], ["b1.cause", "because"]] },
+            { p: "Your city vs another city you know.", t: [["b1.compar", "comparative"], ["b1.compar", "superlative"]] },
+            { p: "Your first job vs your job now.", t: [["b1.compar", "comparative"], ["b1.compar", "not as ... as"], ["b1.past", "past simple for the first job"]] },
+            { p: "Three apps you use: the best, the worst, the most useful.", t: [["b1.compar", "the best / the worst"], ["b1.compar", "the most useful"], ["b1.cause", "because"]] },
+            { p: "Rank 4 Colombian foods and defend your ranking.", t: [["b1.compar", "superlative"], ["b1.compar", "comparative"], ["b1.compar", "much / a bit + comparative"], ["b1.hedge", "I'd say"]] }
+          ],
+          [
+            { p: "Your friend can't sleep. Advice?", t: [["b1.advice", "You should..."], ["b1.advice", "You shouldn't..."]] },
+            { p: "A new employee asks about the dress code.", t: [["b1.advice", "have to / don't have to"], ["b1.advice", "should"]] },
+            { p: "Someone is moving to Medellín. Rules and tips.", t: [["b1.advice", "must / have to"], ["b1.advice", "don't have to"], ["b1.advice", "should"]] },
+            { p: "Your boss wants to quit sugar. Help him.", t: [["b1.advice", "should / ought to"], ["b1.gerinf", "stop eating / try to"], ["b1.cause", "because / so"]] },
+            { p: "Advice for someone who wants to start a business, from your experience.", t: [["b1.advice", "should"], ["b1.advice", "have to"], ["b1.ppexp", "I've learned that..."], ["b1.gerinf", "avoid / consider + -ing"]] }
+          ],
+          [
+            { p: "Someone is knocking at your door at 2 a.m. Who is it?", t: [["b1.deduce", "It must be / might be"], ["b1.deduce", "It can't be"]] },
+            { p: "Your colleague is smiling a lot today. Why?", t: [["b1.deduce", "She must be..."], ["b1.deduce", "She might..."]] },
+            { p: "Look at my face: how am I feeling? Why?", t: [["b1.deduce", "You must be..."], ["b1.deduce", "You might be..."], ["b1.deduce", "You can't be..."]] },
+            { p: "The office is empty at 10 a.m. on a Tuesday. What's going on?", t: [["b1.deduce", "They must be..."], ["b1.deduce", "It can't be..."], ["b1.cause", "because"]] },
+            { p: "On a desk: a phone, a cold coffee and a ticket to Bogotá. Tell the story.", t: [["b1.deduce", "must"], ["b1.deduce", "might"], ["b1.deduce", "can't"], ["b1.past", "past simple story"]] }
+          ],
+          [
+            { p: "Describe your best friend in one sentence with 'who'.", t: [["b1.rel", "a person who..."], ["es.subj", "Subject in every sentence"]] },
+            { p: "Describe an app with 'which' or 'that'.", t: [["b1.rel", "an app which / that..."], ["b1.base", "present simple"]] },
+            { p: "Define 3 objects. I guess what they are.", t: [["b1.rel", "It's something that..."], ["b1.rel", "It's a thing which..."], ["b1.rel", "a place where..."]] },
+            { p: "Describe 3 people at work without names.", t: [["b1.rel", "the person who..."], ["b1.rel", "the one that..."], ["b1.compar", "a comparison"]] },
+            { p: "Riddle: describe a Colombian city with 3 relative clauses. I guess.", t: [["b1.rel", "who"], ["b1.rel", "which / that"], ["b1.rel", "where"], ["es.adj", "adjective before noun"]] }
+          ]
+        ]
+      }, { n: "What if", u: 10,
+        cats: ["If...", "Dreams", "How it's made", "They said...", "Office talk"],
+        tiles: [
+          [
+            { p: "What will you do if it rains this weekend?", t: [["b1.cond1", "If it rains, I'll..."], ["es.subj", "it rains (subject)"]] },
+            { p: "What happens if you don't sleep enough?", t: [["b1.cond1", "If I don't..., I..."], ["b1.cause", "so / that's why"]] },
+            { p: "Your plan if the internet goes down tomorrow at work.", t: [["b1.cond1", "If..., we'll..."], ["b1.cond1", "a second if"], ["b1.cond1", "unless / as soon as"]] },
+            { p: "Negotiate with me: \"If you give me X, I'll give you Y.\"", t: [["b1.cond1", "If you..., I'll..."], ["b1.cond1", "unless"], ["b1.hedge", "polite language"]] },
+            { p: "Plan B, C and D for your next holiday.", t: [["b1.cond1", "If..., we'll..."], ["b1.cond1", "unless"], ["b1.fut", "going to"], ["b1.contrast", "although / however"]] }
+          ],
+          [
+            { p: "If you could live anywhere, where?", t: [["b1.cond2", "If I could..., I would..."], ["b1.cause", "because"]] },
+            { p: "If you were an animal, what would you be?", t: [["b1.cond2", "If I were..."], ["b1.cond2", "I would... because"]] },
+            { p: "If you had one more hour every day...", t: [["b1.cond2", "If I had..., I'd..."], ["b1.cond2", "I wouldn't..."], ["b1.gerinf", "spend time + -ing"]] },
+            { p: "If you were the CEO of your company for a week.", t: [["b1.cond2", "If I were the CEO, I'd..."], ["b1.cond2", "I wouldn't..."], ["b1.cause", "so that / because"]] },
+            { p: "Interview me: 4 \"What would you do if...?\" questions.", t: [["b1.cond2", "What would you do if...?"], ["b1.cond2", "Follow-up with would"], ["b1.cond2", "If I were you, I'd..."], ["es.subj", "Subject in every sentence"]] }
+          ],
+          [
+            { p: "Where is coffee grown in Colombia?", t: [["b1.passive", "It's grown in..."], ["es.subj", "It is (subject)"]] },
+            { p: "How is an arepa made?", t: [["b1.passive", "is mixed / is cooked"], ["b1.passive", "a second passive"]] },
+            { p: "Your company: what is done there every day?", t: [["b1.passive", "is done / is checked"], ["b1.passive", "are + participle"], ["b1.phrasal", "a work phrasal verb"]] },
+            { p: "A famous building: when was it built, by whom, why?", t: [["b1.passive", "was built"], ["b1.passive", "by + person"], ["b1.cause", "because / so that"]] },
+            { p: "Explain a process at your job, step by step, in passive.", t: [["b1.passive", "present passive"], ["b1.passive", "past passive"], ["b1.phrasal", "set up / carry out"], ["es.subj", "Subject in every sentence"]] }
+          ],
+          [
+            { p: "What did your boss say this week?", t: [["b1.report", "He said (that)..."], ["b1.report", "Tense change"]] },
+            { p: "Report a question someone asked you today.", t: [["b1.report", "She asked me if / what..."], ["b1.report", "Word order: what I wanted (not what did I want)"]] },
+            { p: "Report a funny conversation with a family member.", t: [["b1.report", "said"], ["b1.report", "told me"], ["b1.report", "asked"]] },
+            { p: "Report a news story you read this week.", t: [["b1.report", "They said that..."], ["b1.passive", "It was reported that..."], ["b1.report", "Tense change"]] },
+            { p: "Gossip time: report 3 things 3 different people said (invented).", t: [["b1.report", "said"], ["b1.report", "told"], ["b1.report", "asked"], ["b1.report", "explained / suggested"]] }
+          ],
+          [
+            { p: "What do you need to follow up on this week?", t: [["b1.phrasal", "follow up on"], ["b1.fut", "I'm going to..."]] },
+            { p: "Who came up with the best idea on your team?", t: [["b1.phrasal", "came up with"], ["b1.past", "past simple"]] },
+            { p: "A problem you had to figure out.", t: [["b1.phrasal", "figure out"], ["b1.past", "past simple"], ["b1.cause", "so / that's why"]] },
+            { p: "Set up a meeting with me now: day, time, topic.", t: [["b1.phrasal", "set up"], ["b1.fut", "Are you free on...? / I'm meeting..."], ["b1.hedge", "Would it be possible...?"]] },
+            { p: "Run a 1-minute meeting: open, agenda, close.", t: [["b1.phrasal", "go over"], ["b1.phrasal", "wrap up"], ["b1.hedge", "polite language"], ["b1.fut", "will / going to"]] }
+          ]
+        ]
+      }],
+      bugs: [
+        ["I am agree with you.", "I agree with you.", "es.agree", "'Agree' is a verb. No 'am'."],
+        ["It depends of the budget.", "It depends on the budget.", "es.dep", "depend + on."],
+        ["Actually I am working in a new project.", "Currently, I'm working on a new project.", "es.actually", "Actualmente = currently. Actually = en realidad. And: work ON a project."],
+        ["Is very difficult to find parking.", "It is very difficult to find parking.", "es.subj", "English needs a subject: It is..."],
+        ["The people in my team is very creative.", "The people on my team are very creative.", "es.people", "People is plural: people are."],
+        ["We have a office very big.", "We have a very big office.", "es.adj", "Adjective before the noun, and 'a very' (a + consonant sound)."],
+        ["We need to do a decision today.", "We need to make a decision today.", "es.makedo", "make a decision / make a plan / make a call."],
+        ["I am knowing the answer.", "I know the answer.", "b1.state", "Know is a state verb: no -ing."],
+        ["I was cooking when my phone was ringing.", "I was cooking when my phone rang.", "b1.pastc", "Long action: past continuous. The interruption: past simple."],
+        ["I use to go to the gym when I was in college.", "I used to go to the gym when I was in college.", "b1.usedto", "Affirmative: used to."],
+        ["Tomorrow I go to Bogotá for a meeting.", "Tomorrow I'm going to Bogotá for a meeting.", "b1.fut", "A fixed plan with a time: present continuous."],
+        ["I have visited Cartagena in 2022.", "I visited Cartagena in 2022.", "b1.ppvs", "Finished time (in 2022) = past simple."],
+        ["Did you ever been to Bogotá?", "Have you ever been to Bogotá?", "b1.ppexp", "Experience question: Have you ever + participle."],
+        ["I didn't finish the report already.", "I haven't finished the report yet.", "b1.ppjust", "Negative: haven't ... yet."],
+        ["I have worked there since three years.", "I have worked there for three years.", "b1.since", "for + a period, since + a point in time."],
+        ["I'm working here since 2020.", "I've been working here since 2020.", "b1.ppc", "From the past until now: have been + -ing."],
+        ["When I arrived, the meeting already started.", "When I arrived, the meeting had already started.", "b1.pastp", "The earlier action: had + participle."],
+        ["Although it was raining, but we went out.", "Although it was raining, we went out.", "b1.contrast", "Although and but don't go together."],
+        ["This project is more easy than the last one.", "This project is easier than the last one.", "b1.compar", "Short adjectives: -er than."],
+        ["You must to send the email today.", "You must send the email today.", "b1.advice", "Modals take the verb without 'to'."],
+        ["I enjoy to work with startups.", "I enjoy working with startups.", "b1.gerinf", "enjoy + -ing."],
+        ["He can be at the office, his lights are on.", "He must be at the office, his lights are on.", "b1.deduce", "Strong evidence = must be."],
+        ["The person which leads the team is my friend.", "The person who leads the team is my friend.", "b1.rel", "People: who. Things: which / that."],
+        ["If it will rain, we will stay home.", "If it rains, we will stay home.", "b1.cond1", "After 'if': present simple."],
+        ["If I would have more time, I would travel.", "If I had more time, I would travel.", "b1.cond2", "If + past, would + verb."],
+        ["The report was write by my team.", "The report was written by my team.", "b1.passive", "Passive: be + participle (written)."],
+        ["She said me that she was tired.", "She told me that she was tired.", "b1.report", "say something / tell someone."]
+      ],
+      box: [
+        { p: "Talk for 45 seconds about your job. Forbidden words: \"very\" and \"good\".", sec: 45, t: [["b1.base", "Present simple + continuous"], ["es.subj", "No missing subject"]] },
+        { p: "Your week in 40 seconds: 2 sentences in present perfect and 1 in past simple with a time.", sec: 40, t: [["b1.ppexp", "Two present perfect sentences"], ["b1.ppvs", "Past simple + a time"]] },
+        { p: "Convince me to visit your city. You must use \"although\" and \"that's why\".", sec: 45, t: [["b1.contrast", "although"], ["b1.cause", "that's why"]] },
+        { p: "A 30-second story that starts with \"I had never...\"", sec: 30, t: [["b1.pastp", "I had never..."], ["b1.past", "Past simple for the action"]] },
+        { p: "Talk about your hobbies. Forbidden: \"like\" and \"love\".", sec: 40, t: [["b1.gerinf", "enjoy / be into + -ing"], ["b1.base", "Routine (I usually...)"]] },
+        { p: "Describe your boss (real or imaginary) with 2 deductions.", sec: 40, t: [["b1.deduce", "must be"], ["b1.deduce", "might / can't be"]] },
+        { p: "A problem at work + 3 pieces of advice: should, have to, don't have to.", sec: 50, t: [["b1.advice", "should"], ["b1.advice", "have to / don't have to"]] },
+        { p: "3 things you have been doing lately, with 3 different verbs.", sec: 30, t: [["b1.ppc", "I've been ...-ing"], ["b1.since", "for / since"]] },
+        { p: "If you could change one thing at your job... 40 seconds, 2 second conditionals.", sec: 40, t: [["b1.cond2", "If I could..., I would..."], ["b1.cond2", "a second one"]] },
+        { p: "Report a conversation without using \"said\" (use told, asked, explained).", sec: 45, t: [["b1.report", "told me / asked me if"], ["b1.report", "Tense change"]] },
+        { p: "Explain how coffee is produced in Colombia with 3 passives.", sec: 45, t: [["b1.passive", "is grown / is picked"], ["b1.passive", "is exported / is sold"]] },
+        { p: "Talk for 45 seconds and use \"used to\" twice and \"since\" once.", sec: 45, t: [["b1.usedto", "used to"], ["b1.since", "since"]] }
+      ],
+      // Rapid Transform: [unit, sentence, order, answer, structureId]
+      rapid: [
+        [0, "She works from home.", "→ negative", "She doesn't work from home.", "b1.base"],
+        [0, "They are in a meeting.", "→ question", "Are they in a meeting?", "b1.base"],
+        [0, "I usually drink coffee at 10.", "→ right now", "I'm drinking coffee right now.", "b1.base"],
+        [0, "I go to the gym.", "→ yesterday", "I went to the gym yesterday.", "b1.past"],
+        [0, "We take the metro.", "→ last week", "We took the metro last week.", "b1.past"],
+        [0, "It is very important.", "→ fix the Spanglish: 'Is very important.'", "It is very important.", "es.subj"],
+        [1, "I played tennis every Sunday as a kid.", "→ used to", "I used to play tennis every Sunday.", "b1.usedto"],
+        [1, "I cooked dinner. The phone rang.", "→ one sentence with 'when'", "I was cooking dinner when the phone rang.", "b1.pastc"],
+        [1, "We walked home. It started to rain.", "→ one sentence with 'while'", "While we were walking home, it started to rain.", "b1.pastc"],
+        [2, "I plan to call him tomorrow.", "→ going to", "I'm going to call him tomorrow.", "b1.fut"],
+        [2, "Meeting with Ana tomorrow at 3 (it's in the calendar).", "→ present continuous", "I'm meeting Ana tomorrow at 3.", "b1.fut"],
+        [2, "It depends of the client.", "→ fix it", "It depends on the client.", "es.dep"],
+        [3, "You visited Japan.", "→ 'ever' question", "Have you ever visited Japan?", "b1.ppexp"],
+        [3, "I don't eat sushi (never in my life).", "→ present perfect", "I've never eaten sushi.", "b1.ppexp"],
+        [3, "I've been to Cali.", "→ add 'last year'", "I went to Cali last year.", "b1.ppvs"],
+        [4, "I finished the report (a moment ago).", "→ just", "I've just finished the report.", "b1.ppjust"],
+        [4, "I didn't send the email (but I will).", "→ yet", "I haven't sent the email yet.", "b1.ppjust"],
+        [4, "Did you call the client?", "→ already, present perfect", "Have you already called the client?", "b1.ppjust"],
+        [5, "I live here. I started in 2018.", "→ since", "I've lived here since 2018.", "b1.since"],
+        [5, "I know her. 10 years.", "→ for", "I've known her for 10 years.", "b1.since"],
+        [5, "I'm studying English. I started two months ago.", "→ perfect continuous", "I've been studying English for two months.", "b1.ppc"],
+        [5, "It rained all morning. The street is wet.", "→ perfect continuous", "It's been raining all morning.", "b1.ppc"],
+        [6, "The movie started. Then we arrived.", "→ past perfect with 'when'", "When we arrived, the movie had already started.", "b1.pastp"],
+        [6, "I didn't see snow before that trip.", "→ past perfect", "I had never seen snow before that trip.", "b1.pastp"],
+        [7, "It was expensive. We bought it.", "→ although", "Although it was expensive, we bought it.", "b1.contrast"],
+        [7, "The plan is good. It's risky.", "→ however", "The plan is good. However, it's risky.", "b1.contrast"],
+        [7, "I was tired. I went to bed early.", "→ so", "I was tired, so I went to bed early.", "b1.cause"],
+        [7, "You're wrong.", "→ make it polite", "I see your point, but I'm not sure I agree.", "b1.hedge"],
+        [8, "Bogotá is cold. Medellín is warm.", "→ comparative", "Bogotá is colder than Medellín.", "b1.compar"],
+        [8, "No restaurant in town is better than this one.", "→ superlative", "This is the best restaurant in town.", "b1.compar"],
+        [8, "It's a good idea to rest.", "→ should", "You should rest.", "b1.advice"],
+        [8, "It's not necessary to wear a suit.", "→ don't have to", "You don't have to wear a suit.", "b1.advice"],
+        [8, "I like to work with startups.", "→ enjoy", "I enjoy working with startups.", "b1.gerinf"],
+        [9, "I'm sure he is at home.", "→ must", "He must be at home.", "b1.deduce"],
+        [9, "I'm sure it isn't true.", "→ can't", "It can't be true.", "b1.deduce"],
+        [9, "This is the woman. She speaks 4 languages.", "→ who", "This is the woman who speaks 4 languages.", "b1.rel"],
+        [10, "Maybe it will rain. Then we'll stay home.", "→ first conditional", "If it rains, we'll stay home.", "b1.cond1"],
+        [10, "We won't finish if we don't start now.", "→ unless", "We won't finish unless we start now.", "b1.cond1"],
+        [10, "I don't have money, so I don't travel.", "→ second conditional", "If I had money, I would travel.", "b1.cond2"],
+        [10, "My advice: call her.", "→ If I were you...", "If I were you, I'd call her.", "b1.cond2"],
+        [11, "They build houses here.", "→ passive", "Houses are built here.", "b1.passive"],
+        [11, "Someone stole my bike.", "→ passive", "My bike was stolen.", "b1.passive"],
+        [11, "\"I'm tired,\" she said.", "→ reported speech", "She said (that) she was tired.", "b1.report"],
+        [11, "\"Do you like coffee?\" he asked me.", "→ reported speech", "He asked me if I liked coffee.", "b1.report"],
+        [11, "I'll contact the client again tomorrow.", "→ follow up", "I'll follow up with the client tomorrow.", "b1.phrasal"]
+      ],
+      // Translation Duel: [unit, Spanish, English, structureId, the trap]
+      duel: [
+        [0, "Estoy de acuerdo contigo.", "I agree with you.", "es.agree", "'Estar' does not become 'be' here."],
+        [0, "Es importante llegar temprano.", "It's important to arrive early.", "es.subj", "English needs 'It'."],
+        [0, "La gente aquí es muy amable.", "People here are very friendly.", "es.people", "People = plural: are."],
+        [0, "Tenemos una oficina muy moderna.", "We have a very modern office.", "es.adj", "Adjective before the noun."],
+        [0, "Sé la respuesta.", "I know the answer.", "b1.state", "Know: no -ing."],
+        [1, "Actualmente trabajo en un proyecto de innovación.", "I'm currently working on an innovation project.", "es.actually", "Actualmente = currently. And 'work ON'."],
+        [1, "Solía vivir en Bogotá.", "I used to live in Bogotá.", "b1.usedto", "Solía = used to."],
+        [1, "Estaba manejando cuando me llamaste.", "I was driving when you called me.", "b1.pastc", "Long action + interruption."],
+        [1, "Asistí a una conferencia en Bogotá.", "I attended a conference in Bogotá.", "es.false", "Asistir = attend. Assist = ayudar."],
+        [1, "Me di cuenta de que era tarde.", "I realized (that) it was late.", "es.false", "Darse cuenta = realize."],
+        [2, "Depende del clima.", "It depends on the weather.", "es.dep", "depends ON, and 'It'."],
+        [2, "Tengo que tomar una decisión.", "I have to make a decision.", "es.makedo", "Tomar una decisión = make a decision."],
+        [2, "Te voy a hacer una pregunta.", "I'm going to ask you a question.", "es.makedo", "Hacer una pregunta = ask a question."],
+        [3, "¿Alguna vez has estado en Europa?", "Have you ever been to Europe?", "b1.ppexp", "been TO a place."],
+        [3, "Nunca he visto la nieve.", "I've never seen snow.", "b1.ppexp", "No 'the' for snow in general."],
+        [4, "Ya terminé el informe.", "I've already finished the report. (US also: I already finished the report.)", "b1.ppjust", "already goes before the participle."],
+        [4, "Todavía no he enviado el correo.", "I haven't sent the email yet.", "b1.ppjust", "Todavía no = not ... yet (at the end)."],
+        [5, "Trabajo aquí hace tres años.", "I've worked here for three years.", "b1.since", "Hace + present = present perfect + for."],
+        [5, "Llevo dos horas esperando.", "I've been waiting for two hours.", "b1.ppc", "Llevar + gerundio = have been + -ing."],
+        [6, "Cuando llegué, la reunión ya había empezado.", "When I arrived, the meeting had already started.", "b1.pastp", "Había empezado = had started."],
+        [7, "Aunque estaba cansada, terminé el trabajo.", "Although I was tired, I finished the work.", "b1.contrast", "Although: no 'but' after it."],
+        [7, "Por eso decidimos cambiar el plan.", "That's why we decided to change the plan.", "b1.cause", "Por eso = that's why."],
+        [8, "Disfruto trabajar con equipos internacionales.", "I enjoy working with international teams.", "b1.gerinf", "enjoy + -ing."],
+        [8, "Es más fácil de lo que pensaba.", "It's easier than I thought.", "b1.compar", "de lo que = than."],
+        [9, "Debe estar en una reunión.", "She must be in a meeting.", "b1.deduce", "Debe estar (deduction) = must be."],
+        [9, "La persona que me ayudó es de Cali.", "The person who helped me is from Cali.", "b1.rel", "People: who."],
+        [10, "Si tuviera más tiempo, viajaría más.", "If I had more time, I'd travel more.", "b1.cond2", "Tuviera = had (not would have)."],
+        [10, "Si llueve, nos quedamos en casa.", "If it rains, we'll stay home. (also: we stay home)", "b1.cond1", "After 'if': present."],
+        [11, "El evento fue organizado por mi equipo.", "The event was organized by my team.", "b1.passive", "fue organizado = was organized."],
+        [11, "Me dijo que estaba ocupado.", "He told me (that) he was busy.", "b1.report", "Me dijo = told me (said to me)."]
+      ],
+      // Hidden Mission: role-play, secret targets, a twist halfway
+      mission: [
+        { u: 0, n: "The delegation", you: "You host a team from Germany that is visiting Medellín's innovation scene. Show them the city and your work.", me: "I'm the German visitor: curious, a bit tired, full of questions.", twist: "My flight changed. I only have 2 hours left. What do we do?", t: [["b1.base", "Describe what you do (present simple)"], ["b1.fut", "We're going to / We'll..."], ["b1.compar", "the most interesting / better than"]] },
+        { u: 1, n: "The reunion", you: "You meet an old colleague you haven't seen in years.", me: "I'm your old colleague. I want to know everything.", twist: "I tell you I work for your company's competitor now.", t: [["b1.usedto", "We used to..."], ["b1.past", "Remember when we...?"], ["b1.hedge", "React politely to the twist"]] },
+        { u: 2, n: "The team party", you: "You organize the end-of-year party for your team. Plan it with me.", me: "I'm your co-organizer. I have very different ideas.", twist: "The budget is cut by half.", t: [["b1.fut", "We're going to / I'll..."], ["es.makedo", "make a plan / do the shopping"], ["es.dep", "It depends on..."]] },
+        { u: 3, n: "The interview", you: "You apply for an international innovation project.", me: "I'm the interviewer. Friendly, but I ask hard questions.", twist: "Tell me about a time you failed.", t: [["b1.ppexp", "I have worked / I've led..."], ["b1.ppvs", "Details in past simple"], ["b1.since", "for X years"]] },
+        { u: 4, n: "The angry client", you: "You work with a client who is not happy: the platform failed during their event.", me: "I'm the client. I'm angry and I want answers.", twist: "I want my money back. Today.", t: [["b1.ppjust", "We've already... / We haven't ... yet"], ["b1.hedge", "I understand, but..."], ["b1.cond1", "If..., we'll..."]] },
+        { u: 5, n: "The podcast", you: "You are a guest on a podcast about innovation in Medellín.", me: "I'm the host. I want stories and numbers.", twist: "A listener calls in and disagrees with you.", t: [["b1.since", "for / since"], ["b1.ppc", "We've been working on..."], ["b1.hedge", "Polite disagreement"]] },
+        { u: 6, n: "Lost luggage", you: "You land in New York. Your suitcase didn't arrive.", me: "I'm the airline agent. Very calm, very slow.", twist: "The system says your bag never left Bogotá.", t: [["b1.pastp", "I had packed / had checked..."], ["b1.pastc", "While I was waiting..."], ["b1.hedge", "Would it be possible...?"]] },
+        { u: 7, n: "The supplier deal", you: "You buy software for your company. Your budget is limited.", me: "I'm the supplier. My price is high and I'm proud of it.", twist: "I offer a discount, but only if you sign today.", t: [["b1.hedge", "Polite disagreement"], ["b1.contrast", "although / however"], ["b1.cause", "that's why / so"]] },
+        { u: 8, n: "The new hire", you: "You train a new person on your team on their first day.", me: "I'm the new hire. Nervous, and I ask a lot.", twist: "I tell you I'm thinking of leaving after one day.", t: [["b1.advice", "You should / You have to..."], ["b1.advice", "You don't have to..."], ["b1.gerinf", "avoid / try + right form"]] },
+        { u: 9, n: "The hotel mystery", you: "Your hotel room in Miami is not the one you booked.", me: "I'm the receptionist. I don't understand the problem.", twist: "The hotel is full tonight.", t: [["b1.deduce", "There must be a mistake"], ["b1.rel", "the room which / that I booked"], ["b1.hedge", "Would it be possible...?"]] },
+        { u: 10, n: "The investor pitch", you: "Pitch a startup idea to me in 60 seconds, then answer questions.", me: "I'm an investor. I've seen 100 pitches this year.", twist: "\"Why would I invest in you and not in the others?\"", t: [["b1.cond2", "If we had..., we would..."], ["b1.cond1", "If you invest, we'll..."], ["b1.compar", "faster / cheaper than"]] },
+        { u: 11, n: "The board report", you: "Report to the board what happened in a project this year.", me: "I'm the board president. I want facts, and I interrupt.", twist: "\"Who made that decision, and why wasn't I told?\"", t: [["b1.passive", "It was decided / was done..."], ["b1.report", "The team said / told us..."], ["b1.phrasal", "carry out / follow up"]] }
+      ],
+      // Story Chain: [unit, connector, structureId]
+      chain: {
+        seeds: ["It was a normal Monday at the office, until...", "The CEO walked into the meeting with a strange box.", "My phone started ringing at 3 a.m.", "Nobody knew why the elevator stopped.", "The email said: \"Don't open the attachment.\"", "We landed in Tokyo, but our bags didn't.", "The new intern found a key under the desk."],
+        conn: [[0, "and then", "b1.past"], [0, "suddenly", "b1.past"], [1, "while", "b1.pastc"], [1, "when", "b1.pastc"], [1, "used to", "b1.usedto"], [2, "is going to", "b1.fut"],
+          [3, "has never", "b1.ppexp"], [4, "had just", "b1.pastp"], [6, "had already", "b1.pastp"], [7, "although", "b1.contrast"], [7, "however", "b1.contrast"], [7, "even though", "b1.contrast"],
+          [7, "so", "b1.cause"], [7, "that's why", "b1.cause"], [9, "who", "b1.rel"], [9, "which", "b1.rel"], [9, "must have been", "b1.deduce"], [10, "unless", "b1.cond1"], [10, "if only... would", "b1.cond2"], [11, "was told", "b1.passive"]]
+      },
+      // Escape Room: 4 locks, 4 digits
+      rooms: [
+        { u: 0, n: "The Midnight Train", intro: "You fell asleep on the night train. It stopped in the middle of nowhere and the door has a 4-digit code.", code: "5280",
+          locks: [["Tell what you were doing when the lights went off.", "I was ...-ing when the lights went off.", "b1.pastc"],
+            ["Fix the ticket: \"I use to take this train every Friday.\"", "I used to take this train every Friday.", "b1.usedto"],
+            ["A mini story about the train with 3 irregular past verbs.", "e.g. I got on, I fell asleep, I woke up...", "b1.past"],
+            ["Predict what will happen next: use 'will' and 'going to'.", "I think we'll... / We're going to...", "b1.fut"]] },
+        { u: 3, n: "The Locked Office", intro: "You stayed late. The office door is locked and the code is on 4 sticky notes. Each note opens with the right English.", code: "7391",
+          locks: [["Say 3 things you have done this week.", "I've finished / I've met / I've sent...", "b1.ppexp"],
+            ["Fix the note: \"I work here since 2019.\"", "I've worked here since 2019.", "b1.since"],
+            ["Transform: \"The guard left. Then I arrived.\" (past perfect)", "When I arrived, the guard had already left.", "b1.pastp"],
+            ["The guard calls: \"Why are you still here?\" Answer with 'I've been ...-ing for...'", "I've been working on a report for 3 hours.", "b1.ppc"]] },
+        { u: 7, n: "The Investor's Safe", intro: "An investor left the safe open for 12 minutes. Your startup's contract is inside. 4 locks.", code: "4608",
+          locks: [["Convince the safe with one sentence: \"Although..., ...\"", "Although we're small, we're fast.", "b1.contrast"],
+            ["Deduce: the safe is warm and smells of coffee. Who was here?", "Someone must have been here. It can't be...", "b1.deduce"],
+            ["Transform: \"I don't have the code, so I can't open it.\" (second conditional)", "If I had the code, I could open it.", "b1.cond2"],
+            ["Passive: \"Someone changed the code last night.\"", "The code was changed last night.", "b1.passive"]] }
+      ]
+    },
+
+    LU: {
+      name: "Luisa", level: "A1", sub: "A1 → A2 · 1 class a week (then 2) · 60 min",
+      units: [
+        { n: "Hello, it's me", s: ["a1.be", "a1.poss", "es.age", "es.subj"], g: "Low pressure: you model every answer first." },
+        { n: "My day", s: ["a1.ps", "a1.prep"] },
+        { n: "People I love", s: ["a1.ps3", "a1.poss"] },
+        { n: "Ask me!", s: ["a1.psq", "a1.qw"] },
+        { n: "My place", s: ["a1.there", "a1.prep", "es.adj"] },
+        { n: "Food and likes", s: ["a1.like", "a1.art"] },
+        { n: "I can!", s: ["a1.can", "a1.ps3"] },
+        { n: "Right now", s: ["a1.pc"] },
+        { n: "Yesterday (1)", s: ["a1.was"] },
+        { n: "Yesterday (2)", s: ["a1.past"] },
+        { n: "My plans", s: ["a1.going"] },
+        { n: "My life in English", s: ["a1.be", "a1.ps", "a1.past", "a1.going", "es.people", "es.agree"], g: "Boss round: a 3-minute talk about her life." }
+      ],
+      run: [
+        ["0-5", "Welcome, calm and clear", "In Spanish: mistakes are welcome here, and today we count first what you do well. Show the map: everything is New."],
+        ["5-20", "Spin & Speak (unit 1)", "You answer the card first as a model, then she does it. Short answers count."],
+        ["20-35", "Structure Bingo", "Free chat about her family or her favorite things. Every square that lights up is a win she sees."],
+        ["35-45", "Jeopardy (only $100-$300)", "She chooses. Rows $400-$500 stay for another day."],
+        ["45-55", "Error Court, gentle", "Wins first (all of them). Then 2 or 3 cases at most."],
+        ["55-60", "Progress", "Show what she already did today. End with something she said well."]
+      ],
+      topics: ["Your family", "Your favorite food", "Your city", "Your weekend", "Animals you like", "Your favorite music"],
+      spin: [
+        { u: 0, k: "Hello!", p: "Hello! Say your name, your age and where you are from.", t: [["a1.be", "I'm ..."], ["es.age", "I'm ... years old"], ["a1.be", "I'm from ..."]] },
+        { u: 0, k: "Photo", p: "Show me a photo of a person you love. Who is it?", t: [["a1.be", "He is / She is ..."], ["a1.poss", "my / his / her"], ["es.subj", "Every sentence has a subject"]] },
+        { u: 0, k: "Favorites", p: "Your favorite things: color, food, place.", t: [["a1.poss", "My favorite ... is ..."], ["a1.be", "It is ..."], ["es.subj", "Every sentence has a subject"]] },
+        { u: 1, k: "Morning", p: "Tell me about your morning.", t: [["a1.ps", "I wake up / I have breakfast"], ["a1.prep", "at + time"], ["a1.ps", "then / after that"]] },
+        { u: 1, k: "Mon / Sun", p: "Monday or Sunday: what do you do?", t: [["a1.ps", "On Monday I ..."], ["a1.ps", "On Sunday I ..."], ["a1.prep", "on + day"]] },
+        { u: 1, k: "What time?", p: "What time do you...? Answer 3 questions.", t: [["a1.prep", "at 7 o'clock"], ["a1.ps", "I + verb"], ["es.subj", "Every sentence has a subject"]] },
+        { u: 2, k: "Family", p: "One person in your family: what does he or she do?", t: [["a1.ps3", "He works / She lives"], ["a1.poss", "his / her"], ["a1.ps3", "He doesn't ..."]] },
+        { u: 2, k: "Best friend", p: "Your best friend.", t: [["a1.ps3", "She likes / He plays"], ["a1.be", "She is ..."], ["a1.poss", "Her name is ..."]] },
+        { u: 2, k: "Famous", p: "A famous person you like.", t: [["a1.ps3", "He sings / She acts"], ["a1.be", "He is from ..."], ["a1.poss", "his / her"]] },
+        { u: 3, k: "Ask me", p: "Ask me 3 questions about my day.", t: [["a1.psq", "Do you ...?"], ["a1.qw", "What / Where / When ...?"], ["a1.psq", "What time do you ...?"]] },
+        { u: 3, k: "Interview", p: "Interview me! 4 questions.", t: [["a1.qw", "Where do you live?"], ["a1.qw", "How ...?"], ["a1.psq", "Does your ... ?"]] },
+        { u: 3, k: "Yes / No", p: "Short answers game: answer only with \"Yes, I do\" or \"No, I don't\".", t: [["a1.psq", "Yes, I do / No, I don't"], ["a1.psq", "Yes, she does / No, he doesn't"]] },
+        { u: 4, k: "House", p: "Describe your house.", t: [["a1.there", "There is a ..."], ["a1.there", "There are two ..."], ["es.adj", "a big kitchen (adjective first)"]] },
+        { u: 4, k: "Neighborhood", p: "Your neighborhood: what is there?", t: [["a1.there", "There is / there are"], ["a1.prep", "next to / near"], ["es.adj", "a small park"]] },
+        { u: 4, k: "Where is it?", p: "Your room: where are your things?", t: [["a1.prep", "on the table / in the box"], ["a1.there", "There is ..."], ["a1.be", "It is / They are"]] },
+        { u: 5, k: "Food", p: "Food you love and food you hate.", t: [["a1.like", "I love / I like"], ["a1.like", "I don't like"], ["a1.art", "a / an / some"]] },
+        { u: 5, k: "Breakfast", p: "Your perfect breakfast.", t: [["a1.art", "an egg / some coffee"], ["a1.like", "I like ..."], ["a1.ps", "I eat / I drink"]] },
+        { u: 5, k: "Hobbies", p: "Hobbies: what do you like doing?", t: [["a1.like", "I like + -ing"], ["a1.ps", "I ... on weekends"], ["a1.prep", "on Saturdays"]] },
+        { u: 6, k: "Can / can't", p: "Things you can and can't do.", t: [["a1.can", "I can ..."], ["a1.can", "I can't ..."], ["a1.can", "Can you ...?"]] },
+        { u: 6, k: "Superpowers", p: "What can people in your family do well?", t: [["a1.can", "He can / She can"], ["a1.ps3", "She cooks / He plays"], ["a1.poss", "my / his / her"]] },
+        { u: 7, k: "Window", p: "Look out the window: what are people doing right now?", t: [["a1.pc", "He is ...-ing"], ["a1.pc", "They are ...-ing"], ["a1.there", "There is / there are"]] },
+        { u: 7, k: "Guess", p: "Guess: what is your family doing right now?", t: [["a1.pc", "My mom is ...-ing"], ["a1.pc", "They are ...-ing"], ["a1.poss", "my / his / her"]] },
+        { u: 8, k: "Last night", p: "Where were you yesterday at 8 p.m.?", t: [["a1.was", "I was at ..."], ["a1.was", "It was (fun / quiet)"], ["a1.was", "Were you ...?"]] },
+        { u: 8, k: "Birthday", p: "Your last birthday.", t: [["a1.was", "It was ..."], ["a1.was", "There were ... people"], ["a1.past", "One verb in past"]] },
+        { u: 9, k: "Yesterday", p: "Yesterday: tell me 4 things you did.", t: [["a1.past", "Regular -ed (worked, cooked)"], ["a1.past", "Irregular (went, had, ate)"], ["a1.past", "I didn't ..."]] },
+        { u: 9, k: "Weekend", p: "Your last weekend.", t: [["a1.past", "I went / I visited"], ["a1.was", "It was ..."], ["a1.past", "I didn't ..."]] },
+        { u: 10, k: "Next weekend", p: "Plans for next weekend.", t: [["a1.going", "I'm going to ..."], ["a1.going", "I'm not going to ..."], ["a1.going", "Are you going to ...?"]] },
+        { u: 10, k: "December", p: "Plans for December.", t: [["a1.going", "I'm going to ..."], ["a1.prep", "in December"], ["a1.going", "My family is going to ..."]] },
+        { u: 11, k: "My life", p: "One-minute show: my life in English.", t: [["a1.be", "I'm ..."], ["a1.ps", "Every day I ..."], ["a1.past", "Last year I ..."], ["a1.going", "Next year I'm going to ..."]] },
+        { u: 11, k: "People", p: "People in Medellín: describe them.", t: [["es.people", "People are ... / People like ..."], ["a1.ps", "They + verb"], ["es.adj", "friendly people (adjective first)"]] },
+        { u: 11, k: "Agree?", p: "Do you agree? \"Mondays are terrible.\"", t: [["es.agree", "I agree / I don't agree"], ["a1.like", "I like / I don't like"], ["es.subj", "Every sentence has a subject"]] }
+      ],
+      jeo: [{ n: "All about me", u: 0,
+        cats: ["All about me", "My day", "Other people", "Where is it?", "Questions"],
+        tiles: [
+          [
+            { p: "What's your name? Spell it.", t: [["a1.be", "My name is / I'm ..."], ["a1.be", "Spells the letters"]] },
+            { p: "How old are you? Where are you from?", t: [["es.age", "I'm ... years old"], ["a1.be", "I'm from ..."]] },
+            { p: "Describe yourself in 3 words.", t: [["a1.be", "I'm ..."], ["es.adj", "a happy person (adjective first)"], ["es.subj", "Every sentence has a subject"]] },
+            { p: "Your family: names and ages.", t: [["a1.poss", "my / his / her"], ["a1.be", "He is / She is"], ["es.age", "He is ... years old"]] },
+            { p: "Present yourself for 1 minute.", t: [["a1.be", "I'm ..."], ["a1.poss", "my ..."], ["a1.ps", "I live / I work"], ["es.subj", "Every sentence has a subject"]] }
+          ],
+          [
+            { p: "What time do you wake up?", t: [["a1.ps", "I wake up ..."], ["a1.prep", "at + time"]] },
+            { p: "What do you eat for breakfast?", t: [["a1.ps", "I eat / I drink"], ["a1.art", "a / an / some"]] },
+            { p: "What do you do on Sundays?", t: [["a1.ps", "Activity 1"], ["a1.ps", "Activity 2"], ["a1.prep", "on Sundays"]] },
+            { p: "Your work or study day.", t: [["a1.ps", "I + verb"], ["a1.ps", "I don't ..."], ["a1.prep", "in the morning / at night"]] },
+            { p: "Morning, afternoon and night: your day in 1 minute.", t: [["a1.ps", "I + verb"], ["a1.prep", "in the morning"], ["a1.ps", "then / after that"], ["es.subj", "Every sentence has a subject"]] }
+          ],
+          [
+            { p: "Your mom: where does she live?", t: [["a1.ps3", "She lives ..."], ["a1.prep", "in ..."]] },
+            { p: "What does your best friend do?", t: [["a1.ps3", "He / She works ..."], ["a1.poss", "his / her"]] },
+            { p: "A person you admire.", t: [["a1.ps3", "She helps / He works"], ["a1.be", "He is / She is"], ["a1.poss", "his / her"]] },
+            { p: "Someone in your family who doesn't like mornings.", t: [["a1.ps3", "doesn't like"], ["a1.ps3", "-s / -es (gets up, watches)"], ["a1.like", "likes / loves"]] },
+            { p: "A neighbor: name, job, routine and likes.", t: [["a1.ps3", "He works / She lives"], ["a1.ps3", "doesn't ..."], ["a1.like", "likes ..."], ["a1.poss", "his / her"]] }
+          ],
+          [
+            { p: "Is there a park near your house?", t: [["a1.there", "Yes, there is / No, there isn't"], ["a1.prep", "near / next to"]] },
+            { p: "What is there in your kitchen?", t: [["a1.there", "There is ..."], ["a1.there", "There are ..."]] },
+            { p: "Where is your phone right now?", t: [["a1.prep", "on / in / next to"], ["a1.be", "It is ..."], ["es.subj", "It is (subject)"]] },
+            { p: "Your favorite place in Medellín.", t: [["a1.there", "There is / there are"], ["es.adj", "a beautiful park"], ["a1.like", "I like ..."]] },
+            { p: "Describe your house, room by room.", t: [["a1.there", "There is ..."], ["a1.there", "There are ..."], ["a1.prep", "next to / in"], ["es.adj", "adjective first"]] }
+          ],
+          [
+            { p: "Ask me: where do I live?", t: [["a1.psq", "Where do you live?"], ["a1.qw", "Right question word"]] },
+            { p: "Ask me about my job.", t: [["a1.psq", "What do you do?"], ["a1.qw", "Where / What ...?"]] },
+            { p: "Ask me 3 questions about my family.", t: [["a1.psq", "Do you have ...?"], ["a1.qw", "How many ...?"], ["a1.psq", "Does he / she ...?"]] },
+            { p: "Ask me about my weekend.", t: [["a1.psq", "Do you ...?"], ["a1.qw", "What / Where ...?"], ["a1.qw", "When / Who ...?"]] },
+            { p: "Interview me for 1 minute.", t: [["a1.psq", "Do you ...?"], ["a1.psq", "Does ...?"], ["a1.qw", "3 different question words"], ["a1.be", "Are you ...?"]] }
+          ]
+        ]
+      }, { n: "My world", u: 5,
+        cats: ["Food & likes", "I can", "Right now", "Yesterday", "My plans"],
+        tiles: [
+          [
+            { p: "Do you like coffee?", t: [["a1.like", "I like / I don't like"], ["a1.psq", "Yes, I do / No, I don't"]] },
+            { p: "Your favorite fruit and a fruit you don't like.", t: [["a1.like", "I love / I don't like"], ["a1.art", "an apple / a banana"]] },
+            { p: "What is in your fridge?", t: [["a1.there", "There is / there are"], ["a1.art", "some / a / an"], ["a1.like", "I like..."]] },
+            { p: "Your favorite restaurant.", t: [["a1.there", "There is..."], ["a1.like", "I like / I love"], ["es.adj", "a nice place (adjective first)"]] },
+            { p: "Plan lunch for 4 people: what do you buy?", t: [["a1.art", "some"], ["a1.art", "a / an"], ["a1.like", "they like..."], ["a1.going", "I'm going to buy..."]] }
+          ],
+          [
+            { p: "Can you cook?", t: [["a1.can", "Yes, I can / No, I can't"], ["a1.can", "I can cook..."]] },
+            { p: "Two things you can do well.", t: [["a1.can", "I can..."], ["a1.can", "I can... very well"]] },
+            { p: "What can you do in Medellín on a Sunday?", t: [["a1.can", "You can..."], ["a1.there", "There is..."], ["a1.prep", "on Sunday / in the park"]] },
+            { p: "Your family: who can do what?", t: [["a1.can", "He can / She can"], ["a1.ps3", "She cooks / He plays"], ["a1.poss", "my / his / her"]] },
+            { p: "Teach me something you can do, in 4 steps.", t: [["a1.can", "I can..."], ["a1.ps", "First you... then you..."], ["a1.prep", "in / on / at"], ["es.subj", "Every sentence has a subject"]] }
+          ],
+          [
+            { p: "What are you doing right now?", t: [["a1.pc", "I'm ...-ing"], ["a1.pc", "I'm not ...-ing"]] },
+            { p: "What is your mom doing right now? Guess.", t: [["a1.pc", "She is ...-ing"], ["a1.poss", "my / her"]] },
+            { p: "Look around: what are 2 people doing?", t: [["a1.pc", "He / She is ...-ing"], ["a1.pc", "They are ...-ing"], ["a1.there", "There is / are"]] },
+            { p: "Every day or right now? Tell me 2 of each.", t: [["a1.ps", "Every day I..."], ["a1.pc", "Right now I'm..."], ["a1.prep", "in the morning / at night"]] },
+            { p: "Describe a photo on your phone.", t: [["a1.pc", "They are ...-ing"], ["a1.there", "There is / are"], ["es.adj", "adjective first"], ["a1.poss", "my / his / her"]] }
+          ],
+          [
+            { p: "Where were you yesterday at 10 a.m.?", t: [["a1.was", "I was at..."], ["a1.prep", "at / in"]] },
+            { p: "What did you eat yesterday?", t: [["a1.past", "I ate / I had"], ["a1.art", "a / an / some"]] },
+            { p: "Three things you did last weekend.", t: [["a1.past", "regular -ed"], ["a1.past", "irregular (went, had)"], ["a1.was", "It was..."]] },
+            { p: "Your last trip.", t: [["a1.past", "I went / I visited"], ["a1.was", "It was..."], ["a1.past", "I didn't..."]] },
+            { p: "Your best day this year.", t: [["a1.past", "past verbs"], ["a1.was", "It was..."], ["a1.past", "I didn't..."], ["a1.like", "I loved / I liked"]] }
+          ],
+          [
+            { p: "What are you going to do tonight?", t: [["a1.going", "I'm going to..."], ["a1.going", "I'm not going to..."]] },
+            { p: "Plans for Saturday.", t: [["a1.going", "I'm going to..."], ["a1.prep", "on Saturday / in the morning"]] },
+            { p: "Your next trip: where, when, with who?", t: [["a1.going", "I'm going to..."], ["a1.prep", "in / on"], ["a1.going", "We're going to..."]] },
+            { p: "Your plans for December.", t: [["a1.going", "I'm going to..."], ["a1.going", "I'm not going to..."], ["a1.prep", "in December"]] },
+            { p: "Ask me 3 questions about my plans.", t: [["a1.going", "Are you going to...?"], ["a1.qw", "What...?"], ["a1.qw", "Where / When...?"], ["es.subj", "Every sentence has a subject"]] }
+          ]
+        ]
+      }],
+      bugs: [
+        ["I have 30 years.", "I'm 30 years old.", "es.age", "Age uses 'be': I'm 30."],
+        ["Is my sister.", "She is my sister.", "es.subj", "English always has a subject."],
+        ["I am live in Medellín.", "I live in Medellín.", "a1.ps", "Present simple: I live (no 'am')."],
+        ["She work in a bank.", "She works in a bank.", "a1.ps3", "He / she / it: verb + s."],
+        ["Her name is Juan, he is my brother.", "His name is Juan. He is my brother.", "a1.poss", "Man: his. Woman: her."],
+        ["Do she like coffee?", "Does she like coffee?", "a1.psq", "He / she: does."],
+        ["Where you live?", "Where do you live?", "a1.qw", "Question word + do + you."],
+        ["There is two parks near my house.", "There are two parks near my house.", "a1.there", "Plural: there are."],
+        ["I wake up in 6 o'clock.", "I wake up at 6 o'clock.", "a1.prep", "Time: at 6."],
+        ["I have a car red.", "I have a red car.", "es.adj", "Adjective before the noun."],
+        ["I like play soccer.", "I like playing soccer.", "a1.like", "like + -ing."],
+        ["I want a apple.", "I want an apple.", "a1.art", "an + vowel sound."],
+        ["I can to swim.", "I can swim.", "a1.can", "can + verb (no 'to')."],
+        ["She is cook now.", "She is cooking now.", "a1.pc", "Now: is + -ing."],
+        ["I were at home last night.", "I was at home last night.", "a1.was", "I / he / she: was."],
+        ["Yesterday I go to the park.", "Yesterday I went to the park.", "a1.past", "Yesterday = past: went."],
+        ["I going to travel in December.", "I'm going to travel in December.", "a1.going", "I'm going to + verb."],
+        ["The people is nice here.", "People are nice here.", "es.people", "People is plural: people are."]
+      ],
+      box: [
+        { p: "Say 5 things about you. Every sentence starts with \"I\".", sec: 60, t: [["a1.be", "I'm ..."], ["es.subj", "Every sentence has a subject"]] },
+        { p: "Talk about your family. Forbidden: \"mother\" and \"father\".", sec: 60, t: [["a1.poss", "my / his / her"], ["a1.ps3", "She works / He lives"]] },
+        { p: "Describe your street with \"there is\" and \"there are\".", sec: 50, t: [["a1.there", "There is ..."], ["a1.there", "There are ..."]] },
+        { p: "3 things you can do and 2 things you can't.", sec: 50, t: [["a1.can", "I can ..."], ["a1.can", "I can't ..."]] },
+        { p: "Talk about food: use \"I love\", \"I like\" and \"I don't like\".", sec: 50, t: [["a1.like", "I love / I like"], ["a1.like", "I don't like"]] },
+        { p: "Say what 3 people are doing right now.", sec: 45, t: [["a1.pc", "He / She is ...-ing"], ["a1.pc", "They are ...-ing"]] },
+        { p: "Tell me 3 things you did yesterday.", sec: 50, t: [["a1.past", "Past verb 1"], ["a1.past", "Past verb 2"]] },
+        { p: "Ask me 3 questions with 3 different question words.", sec: 50, t: [["a1.qw", "3 question words"], ["a1.psq", "do / does"]] },
+        { p: "What is in your bag? Tell me.", sec: 45, t: [["a1.there", "There is / there are"], ["a1.art", "a / an / some"]] },
+        { p: "Plans for this weekend: 2 sentences with \"going to\".", sec: 45, t: [["a1.going", "I'm going to ..."], ["a1.going", "a second plan"]] }
+      ],
+      rapid: [
+        [0, "I am a teacher.", "→ he", "He is a teacher.", "a1.be"],
+        [0, "You are from Cali.", "→ question", "Are you from Cali?", "a1.be"],
+        [0, "I am tired.", "→ negative", "I'm not tired.", "a1.be"],
+        [0, "I have 30 years.", "→ fix it", "I'm 30 (years old).", "es.age"],
+        [1, "I like coffee.", "→ negative", "I don't like coffee.", "a1.ps"],
+        [1, "I get up. 6 o'clock.", "→ one sentence", "I get up at 6 o'clock.", "a1.prep"],
+        [2, "I work in a bank.", "→ she", "She works in a bank.", "a1.ps3"],
+        [2, "She plays tennis.", "→ negative", "She doesn't play tennis.", "a1.ps3"],
+        [2, "This is the book of Ana.", "→ Ana's", "This is Ana's book.", "a1.poss"],
+        [3, "You live here.", "→ question", "Do you live here?", "a1.psq"],
+        [3, "He watches TV.", "→ question", "Does he watch TV?", "a1.psq"],
+        [3, "You live in Envigado.", "→ question with 'where'", "Where do you live?", "a1.qw"],
+        [4, "There is one park.", "→ three parks", "There are three parks.", "a1.there"],
+        [4, "I have a car. It's red.", "→ one sentence", "I have a red car.", "es.adj"],
+        [5, "I eat (apple).", "→ add a / an", "I eat an apple.", "a1.art"],
+        [5, "I like music.", "→ like + dancing", "I like dancing.", "a1.like"],
+        [6, "I swim.", "→ can", "I can swim.", "a1.can"],
+        [6, "I can drive.", "→ negative", "I can't drive.", "a1.can"],
+        [7, "I cook every day.", "→ right now", "I'm cooking right now.", "a1.pc"],
+        [7, "They watch TV.", "→ right now", "They're watching TV right now.", "a1.pc"],
+        [8, "I am at home.", "→ yesterday", "I was at home yesterday.", "a1.was"],
+        [8, "They are happy.", "→ yesterday", "They were happy yesterday.", "a1.was"],
+        [9, "I work.", "→ yesterday", "I worked yesterday.", "a1.past"],
+        [9, "I go to the park.", "→ yesterday", "I went to the park yesterday.", "a1.past"],
+        [10, "I travel.", "→ tomorrow (going to)", "I'm going to travel tomorrow.", "a1.going"]
+      ],
+      duel: [
+        [0, "Tengo 30 años.", "I'm 30 (years old).", "es.age", "Age uses 'be'."],
+        [0, "Es mi hermana.", "She's my sister.", "es.subj", "English needs a subject: she."],
+        [0, "Soy de Medellín.", "I'm from Medellín.", "a1.be", "from = de (origin)."],
+        [1, "Vivo en Medellín.", "I live in Medellín.", "a1.ps", "No 'am' before live."],
+        [1, "Me levanto a las seis.", "I get up at six.", "a1.prep", "Time: at."],
+        [2, "Mi hermano trabaja en un banco.", "My brother works in a bank.", "a1.ps3", "He: works (+s)."],
+        [3, "¿Dónde vives?", "Where do you live?", "a1.qw", "Where + do + you."],
+        [3, "¿Te gusta el café?", "Do you like coffee?", "a1.psq", "No 'the' for coffee in general."],
+        [4, "Hay dos parques cerca de mi casa.", "There are two parks near my house.", "a1.there", "Hay (plural) = there are."],
+        [4, "Tengo un carro rojo.", "I have a red car.", "es.adj", "Adjective first."],
+        [5, "Me gusta bailar.", "I like dancing. / I like to dance.", "a1.like", "like + -ing (or to + verb)."],
+        [5, "Quiero una manzana.", "I want an apple.", "a1.art", "an + vowel sound."],
+        [6, "Puedo nadar.", "I can swim.", "a1.can", "can + verb (no 'to')."],
+        [7, "Estoy cocinando.", "I'm cooking.", "a1.pc", "be + -ing."],
+        [8, "Ayer estuve en casa.", "I was at home yesterday.", "a1.was", "at home."],
+        [9, "Ayer fui al parque.", "I went to the park yesterday.", "a1.past", "go → went."],
+        [10, "Voy a viajar en diciembre.", "I'm going to travel in December.", "a1.going", "Months: in."],
+        [11, "La gente es amable.", "People are friendly.", "es.people", "People = plural."]
+      ],
+      mission: [
+        { u: 0, n: "New neighbor", you: "You meet your new neighbor in the elevator.", me: "I'm your new neighbor. I'm from another country.", twist: "I have 3 big dogs!", t: [["a1.be", "I'm... / Are you...?"], ["a1.poss", "my / your"], ["es.subj", "Every sentence has a subject"]] },
+        { u: 3, n: "At the café", you: "You order breakfast in a café in Miami.", me: "I'm the waiter. I speak a little fast.", twist: "We don't have coffee today!", t: [["a1.psq", "Do you have...?"], ["a1.art", "a / an / some"], ["a1.qw", "How much...?"]] },
+        { u: 4, n: "Hotel check-in", you: "You arrive at a hotel in New York.", me: "I'm the receptionist.", twist: "Your room is not ready. Wait 2 hours.", t: [["a1.be", "My name is..."], ["a1.there", "Is there a...?"], ["a1.prep", "at / on / next to"]] },
+        { u: 6, n: "At the store", you: "You buy clothes for a party.", me: "I'm the sales person. I love everything.", twist: "The shirt you like is very expensive.", t: [["a1.like", "I like / I don't like"], ["es.adj", "a blue shirt"], ["a1.can", "Can I...?"]] },
+        { u: 7, n: "Video call", you: "You talk on a video call with a cousin in Miami.", me: "I'm your cousin. I want news.", twist: "My camera stops working. Describe your room to me.", t: [["a1.pc", "I'm ...-ing"], ["a1.ps3", "My mom works / lives..."], ["a1.there", "There is / are..."]] },
+        { u: 10, n: "Weekend plans", you: "Plan a weekend with a friend from another city.", me: "I'm your friend. I'm coming to Medellín.", twist: "It's going to rain all weekend.", t: [["a1.going", "We're going to..."], ["a1.can", "We can..."], ["a1.qw", "What / Where...?"]] }
+      ],
+      chain: {
+        seeds: ["Ana lives in a small house.", "My cat is very funny.", "Today is my birthday.", "It is Saturday morning.", "There is a new café near my house."],
+        conn: [[0, "and", "a1.be"], [0, "but", "a1.be"], [1, "every day", "a1.ps"], [1, "then", "a1.ps"], [2, "she", "a1.ps3"], [3, "because", "a1.ps"], [4, "there is", "a1.there"],
+          [5, "likes", "a1.like"], [6, "can", "a1.can"], [7, "right now", "a1.pc"], [8, "was", "a1.was"], [9, "yesterday", "a1.past"], [10, "is going to", "a1.going"]]
+      },
+      rooms: [
+        { u: 0, n: "The Locked House", intro: "You are inside a house and the door has a 4-digit code. Every lock opens with English.", code: "2468",
+          locks: [["Say your name, your age and your city.", "I'm... I'm ... years old. I'm from...", "a1.be"],
+            ["Fix it: \"She work in a hospital.\"", "She works in a hospital.", "a1.ps3"],
+            ["Ask me 2 questions with do / does.", "Do you...? Does your...?", "a1.psq"],
+            ["Describe this room: there is / there are.", "There is a... There are two...", "a1.there"]] },
+        { u: 5, n: "The Magic Kitchen", intro: "A magic kitchen! The fridge is locked. 4 locks, 4 numbers.", code: "1357",
+          locks: [["Say 2 foods you like and 1 you don't.", "I like... I don't like...", "a1.like"],
+            ["Fix it: \"I want a egg.\"", "I want an egg.", "a1.art"],
+            ["Look at me and guess: what is the chef doing?", "The chef is ...-ing.", "a1.pc"],
+            ["What did you eat yesterday?", "I ate / I had...", "a1.past"]] }
+      ]
+    }
+  };
+
+  // [game key, section, name, description, type: sp speak | acc accuracy | mix, content field needed]
+  var GAMES = [
+    ["spin", "tSpin", "Spin & Speak", "Wheel of real situations. Hidden targets.", "sp", "spin"],
+    ["jeopardy", "tJeo", "Jeopardy", "Pick a tile. More money, more targets.", "sp", "jeo"],
+    ["mission", "tMission", "Hidden Mission", "Role-play with a twist halfway. Secret targets.", "sp", "mission"],
+    ["chain", "tChain", "Story Chain", "Build a crazy story together. The connector decides.", "sp", "chain"],
+    ["box", "tBox", "Mystery Box", "Talk with strange rules against the clock.", "sp", "box"],
+    ["bingo", "tBingo", "Structure Bingo", "Free talk. Squares light up when she nails a structure.", "sp", "units"],
+    ["escape", "tEscape", "Escape Room", "4 locks, 4 digits, 12 minutes.", "mix", "rooms"],
+    ["rapid", "tRapid", "Rapid Transform", "8 sentences, 10 seconds each. Streaks count.", "acc", "rapid"],
+    ["duel", "tDuel", "Translation Duel", "Spanish traps into natural English.", "acc", "duel"],
+    ["auction", "tAuction", "Grammar Auction", "$1000 to bet on the sentences she trusts.", "acc", "bugs"],
+    ["bug", "tBug", "Spot the Bug", "Find it, fix it, explain it.", "acc", "bugs"]
+  ];
+  var TABS = [["Plan", "tPlan", null], ["Games", "tMenu", null], ["Error Court", "tCourt", "court"], ["Progress", "tProg", null]];
+  var SECTIONS = ["tPlan", "tMenu", "tCourt", "tProg"].concat(GAMES.map(function (g) { return g[1]; }));
+  var GAMEN = { court: "Error Court", note: "Notebook" };
+  GAMES.forEach(function (g) { GAMEN[g[0]] = g[2]; });
+  function gameOf(sec) { for (var i = 0; i < GAMES.length; i++) if (GAMES[i][1] === sec) return GAMES[i]; return null; }
+  var VALUES = [100, 200, 300, 400, 500];
+  var MASTER = { pct: 0.8, sessions: 3 };
+
+  // ---------------------------------------------------------------- helpers
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]; }); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function uid() { return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9); }
+  function todayStr() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function fmtDay(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }
+  var LS = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} },
+    json: function (k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  };
+  function armed(btn, fn) { // double click to confirm, 4 s
+    if (btn.dataset.armed) { delete btn.dataset.armed; btn.classList.remove("armed"); btn.textContent = btn.dataset.label; fn(); return; }
+    btn.dataset.armed = "1"; btn.dataset.label = btn.textContent; btn.textContent = "Sure? Click again"; btn.classList.add("armed");
+    setTimeout(function () { if (btn.dataset.armed) { delete btn.dataset.armed; btn.classList.remove("armed"); btn.textContent = btn.dataset.label; } }, 4000);
+  }
+
+  // ---------------------------------------------------------------- teacher key -> token (same derivation as Panel del profe)
+  var enc = new TextEncoder();
+  function cleanKey(k) { return (k || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+  async function sha256Hex(t) { var b = await crypto.subtle.digest("SHA-256", enc.encode(t)); return Array.prototype.map.call(new Uint8Array(b), function (x) { return x.toString(16).padStart(2, "0"); }).join(""); }
+  async function teacherToken(key) {
+    var base = await crypto.subtle.importKey("raw", enc.encode("cca-profe|" + cleanKey(key)), "PBKDF2", false, ["deriveBits"]);
+    var bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: enc.encode("cca-db-token"), iterations: 250000, hash: "SHA-256" }, base, 256);
+    return Array.prototype.map.call(new Uint8Array(bits), function (x) { return x.toString(16).padStart(2, "0"); }).join("");
+  }
+
+  // ---------------------------------------------------------------- database (Supabase RPC), with a local queue when offline
+  var TOKEN = null;
+  var DBOK = null; // null unknown, true, false
+  async function rpc(fn, args, timeout) {
+    var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, timeout || 9000);
+    try {
+      var res = await fetch(DB_URL + "/rest/v1/rpc/" + fn, { method: "POST", headers: { apikey: SUPA.key, "content-type": "application/json" }, body: JSON.stringify(args), signal: ctl.signal });
+      if (!res.ok) return { ok: false, status: res.status };
+      var tx = await res.text(); return { ok: true, data: tx ? JSON.parse(tx) : null };
+    } catch (e) { return { ok: false, status: 0 }; } finally { clearTimeout(t); }
+  }
+  function pending() { return LS.json("labPending", []); }
+  function setPending(a) { LS.set("labPending", JSON.stringify(a)); }
+  function setDbs(state, txt) { var e = $("dbs"); e.className = "dbs " + state; e.textContent = txt; }
+  function paintDbs() {
+    var n = pending().length;
+    if (DBOK === true && !n) setDbs("ok", "Saved online");
+    else if (DBOK === true) setDbs("warn", n + " waiting to sync");
+    else if (DBOK === false) setDbs("bad", n ? n + " saved only on this device" : "Database off");
+    else setDbs("warn", "Connecting…");
+  }
+  async function flush() {
+    var q = pending(); if (!q.length || !TOKEN) { paintDbs(); return; }
+    var left = [];
+    for (var i = 0; i < q.length; i++) {
+      var e = q[i];
+      var r = await rpc("lab_add", { p_token: TOKEN, p_id: e.id, p_student: e.student, p_session: e.session, p_kind: e.kind, p_data: e.data });
+      if (r.ok) DBOK = true; else { left.push(e); if (r.status !== 0) DBOK = false; }
+    }
+    setPending(left); paintDbs();
+  }
+
+  // ---------------------------------------------------------------- state
+  var S = { who: "PA", unit: 0, day: todayStr(), events: [], tab: "tPlan" };
+  function stu() { return STUDENTS[S.who]; }
+  function cacheKey() { return "labCache_" + S.who; }
+
+  async function loadEvents() {
+    var cached = LS.json(cacheKey(), []);
+    var r = TOKEN ? await rpc("lab_list", { p_token: TOKEN, p_student: S.who }, 15000) : { ok: false, status: 0 };
+    var server;
+    if (r.ok) { DBOK = true; server = (r.data || []).map(function (e) { return { id: e.id, student: e.student, session: String(e.session).slice(0, 10), kind: e.kind, data: e.data }; }); LS.set(cacheKey(), JSON.stringify(server)); }
+    else { if (r.status === 404 || r.status === 400 || r.status === 401) DBOK = false; else if (DBOK === null) DBOK = false; server = cached; }
+    var ids = {}; server.forEach(function (e) { ids[e.id] = 1; });
+    var mine = pending().filter(function (e) { return e.student === S.who && !ids[e.id]; });
+    S.events = server.concat(mine);
+    paintDbs();
+  }
+  async function addEvent(kind, data) {
+    var e = { id: uid(), student: S.who, session: S.day, kind: kind, data: data };
+    S.events.push(e);
+    var q = pending(); q.push(e); setPending(q);
+    await flush();
+    if (pending().some(function (p) { return p.id === e.id; })) return false;
+    var c = LS.json(cacheKey(), []); c.push(e); LS.set(cacheKey(), JSON.stringify(c));
+    return true;
+  }
+  async function delEvent(id) {
+    S.events = S.events.filter(function (e) { return e.id !== id; });
+    setPending(pending().filter(function (e) { return e.id !== id; }));
+    LS.set(cacheKey(), JSON.stringify(LS.json(cacheKey(), []).filter(function (e) { return e.id !== id; })));
+    if (TOKEN) await rpc("lab_del", { p_token: TOKEN, p_id: id });
+    paintDbs();
+  }
+  function savedMsg(el, ok) { el.className = "flash" + (ok ? "" : " bad"); el.textContent = ok ? "Saved ✓" : "Saved on this device (will sync when the database answers)"; setTimeout(function () { el.textContent = ""; }, 3500); }
+
+  // a round: targets [{s, t, ok}]
+  function saveRound(game, prompt, targets, extra) {
+    var d = { game: game, unit: S.unit, prompt: prompt, targets: targets.map(function (x) { return { s: x.s, t: x.t, ok: !!x.ok }; }) };
+    if (extra) Object.keys(extra).forEach(function (k) { d[k] = extra[k]; });
+    return addEvent("round", d);
+  }
+
+  // ---------------------------------------------------------------- unit helpers
+  function unitStructs(upTo) { var u = stu().units, out = []; for (var i = 0; i <= upTo; i++) u[i].s.forEach(function (s) { if (out.indexOf(s) < 0) out.push(s); }); return out; }
+  function levelStructs() { var all = []; stu().units.forEach(function (u) { u.s.forEach(function (s) { if (all.indexOf(s) < 0) all.push(s); }); });
+    // add the traps that appear in her content
+    [].concat(stu().spin, stu().box).forEach(function (c) { c.t.forEach(function (t) { if (all.indexOf(t[0]) < 0) all.push(t[0]); }); });
+    function add(id) { if (id && ST[id] && all.indexOf(id) < 0) all.push(id); }
+    var s = stu();
+    s.jeo.forEach(function (bd) { bd.tiles.forEach(function (col) { col.forEach(function (c) { c.t.forEach(function (t) { add(t[0]); }); }); }); });
+    (s.mission || []).forEach(function (m) { m.t.forEach(function (t) { add(t[0]); }); });
+    s.bugs.forEach(function (b) { add(b[2]); });
+    (s.rapid || []).forEach(function (r) { add(r[4]); });
+    (s.duel || []).forEach(function (r) { add(r[3]); });
+    if (s.chain) s.chain.conn.forEach(function (c) { add(c[2]); });
+    (s.rooms || []).forEach(function (r) { r.locks.forEach(function (l) { add(l[2]); }); });
+    return all; }
+
+  // ---------------------------------------------------------------- shell
+  function renderShell() {
+    var s = stu();
+    $("hTitle").textContent = "English Lab · " + s.name;
+    $("hSub").textContent = s.sub;
+    $("who").innerHTML = Object.keys(STUDENTS).map(function (k) { var x = STUDENTS[k]; return "<button data-who='" + k + "' class='" + (k === S.who ? "on" : "") + "'>" + esc(x.name) + "<small>" + x.level + "</small></button>"; }).join("");
+    $("unitSel").innerHTML = s.units.map(function (u, i) { return "<option value='" + i + "'" + (i === S.unit ? " selected" : "") + ">" + (i + 1) + ". " + esc(u.n) + "</option>"; }).join("");
+    $("dateSel").value = S.day;
+    var used = lastSessionGames();
+    var g = gameOf(S.tab);
+    $("tabs").innerHTML = TABS.map(function (t) { var on = S.tab === t[1] || (t[1] === "tMenu" && g); return "<button data-tab='" + t[1] + "' class='" + (on ? "on " : "") + (t[2] && used.games.indexOf(t[2]) >= 0 ? "used" : "") + "'>" + t[0] + "</button>"; }).join("");
+    $("gameBar").hidden = !g; if (g) $("gameName").textContent = g[2];
+    $("nbStruct").innerHTML = "<option value=''>(not sure)</option>" + levelStructs().map(function (id) { return "<option value='" + id + "'>" + esc(ST[id][0]) + "</option>"; }).join("");
+    SECTIONS.forEach(function (id) { $(id).hidden = id !== S.tab; });
+  }
+  function lastSessionGames() {
+    var days = sessionDays().filter(function (d) { return d < S.day; });
+    var last = days[days.length - 1];
+    if (!last) return { day: null, games: [] };
+    var g = []; S.events.forEach(function (e) { if (e.session === last && e.kind === "round" && g.indexOf(e.data.game) < 0) g.push(e.data.game); });
+    return { day: last, games: g };
+  }
+  function sessionDays() { var d = []; S.events.forEach(function (e) { if (d.indexOf(e.session) < 0) d.push(e.session); }); return d.sort(); }
+  function renderTab() {
+    renderShell();
+    ({ tPlan: renderPlan, tMenu: renderMenu, tSpin: renderSpin, tJeo: renderJeo, tBingo: renderBingo, tBug: renderBug, tBox: renderBox, tCourt: renderCourt, tProg: renderProg,
+       tRapid: renderRapid, tAuction: renderAuction, tDuel: renderDuel, tMission: renderMission, tChain: renderChain, tEscape: renderEscape })[S.tab]();
+  }
+
+  // ---------------------------------------------------------------- targets UI (shared by spin, jeopardy, box)
+  // T = {items:[{s,t,ok}], hidden:bool}
+  function targetsHtml(T, prefix) {
+    return "<div class='targets'>" + T.items.map(function (x, i) {
+      return "<div class='tg" + (T.hidden ? " hidden" : "") + "'><div><div class='tt'>" + esc(x.t) + "</div><div class='ts'>" + esc(ST[x.s] ? ST[x.s][0] : x.s) + "</div></div>" +
+        "<div class='yn'><button class='y" + (x.ok === true ? " on" : "") + "' data-" + prefix + "='" + i + "' data-v='1' aria-label='Hit'>✓</button><button class='n" + (x.ok === false ? " on" : "") + "' data-" + prefix + "='" + i + "' data-v='0' aria-label='Not yet'>✗</button></div></div>";
+    }).join("") + "</div>";
+  }
+  function mkTargets(t) { return { items: t.map(function (x) { return { s: x[0], t: x[1], ok: null }; }), hidden: true }; }
+  function allMarked(T) { return T.items.every(function (x) { return x.ok !== null; }); }
+
+  // ---------------------------------------------------------------- PLAN
+  function renderPlan() {
+    var s = stu(), last = lastSessionGames();
+    $("planLast").textContent = last.day ? "Last class (" + fmtDay(last.day) + "): " + (last.games.map(function (g) { return GAMEN[g]; }).join(", ") || "notes only") + ". Try other games today." : "No classes saved yet.";
+    var first = !sessionDays().length || (sessionDays().length === 1 && sessionDays()[0] === S.day);
+    $("planRun").innerHTML = "<div class='card' style='border-left-color:var(--orange)'><p class='tag'>" + (first ? "First class · run sheet" : "Suggested run for a class") + " · 60 min</p>" +
+      "<h3>" + (first ? "Fall in love with the method" : "Warm-up, main game, Error Court") + "</h3><ol class='run'>" +
+      s.run.map(function (r) { return "<li><div><b>" + esc(r[0]) + " min · " + esc(r[1]) + "</b><span class='muted'>" + esc(r[2]) + "</span></div></li>"; }).join("") +
+      "</ol><p class='muted small' style='margin-top:10px'>All games live in the Games tab; it marks in orange what you used last class. The Notebook button (bottom right) stays open all class: write what she says, fix or good.</p></div>";
+    $("planUnits").innerHTML = s.units.map(function (u, i) {
+      return "<div class='unit" + (i === S.unit ? " cur" : "") + "'><div class='spread'><h4>" + (i + 1) + ". " + esc(u.n) + "</h4>" +
+        (i === S.unit ? "<span class='chip prac'>current</span>" : "<button class='ghost small' data-unit='" + i + "'>Make current</button>") + "</div>" +
+        "<div class='row'>" + u.s.map(function (id) { return "<span class='chip new'>" + esc(ST[id][0]) + "</span>"; }).join("") + "</div>" +
+        (u.g ? "<p class='muted small'>" + esc(u.g) + "</p>" : "") + "</div>";
+    }).join("");
+  }
+
+  // ---------------------------------------------------------------- SPIN
+  var SP = { deck: [], cur: null, T: null, rot: 0 };
+  var WCOL = ["--w1", "--w2", "--w3", "--w4", "--w5", "--w6", "--w7", "--w8"];
+  function spinDeck() {
+    var s = stu(), all = $("spinAll").checked;
+    var cards = s.spin.filter(function (c) { return all ? c.u <= S.unit : c.u === S.unit; });
+    if (cards.length < 8) { var extra = shuffle(s.spin.filter(function (c) { return cards.indexOf(c) < 0 && c.u <= S.unit; })); cards = cards.concat(extra).slice(0, 8); }
+    if (cards.length < 8) { var more = s.spin.filter(function (c) { return cards.indexOf(c) < 0; }); cards = cards.concat(more.slice(0, 8 - cards.length)); }
+    return shuffle(cards).slice(0, 8);
+  }
+  function drawWheel() {
+    var n = SP.deck.length, svg = "", cs = getComputedStyle(document.documentElement);
+    for (var i = 0; i < n; i++) {
+      var a0 = (i / n) * 2 * Math.PI - Math.PI / 2, a1 = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2;
+      var x0 = 100 * Math.cos(a0), y0 = 100 * Math.sin(a0), x1 = 100 * Math.cos(a1), y1 = 100 * Math.sin(a1);
+      var col = cs.getPropertyValue(WCOL[i % 8]).trim() || "#2C5F7C";
+      var mid = (a0 + a1) / 2, deg = mid * 180 / Math.PI;
+      svg += "<path d='M0 0 L" + x0.toFixed(2) + " " + y0.toFixed(2) + " A100 100 0 0 1 " + x1.toFixed(2) + " " + y1.toFixed(2) + " Z' fill='" + col + "' stroke='#fff' stroke-width='1.5'/>";
+      svg += "<text transform='rotate(" + deg.toFixed(2) + ") translate(62 0)' text-anchor='middle' dominant-baseline='middle' fill='#fff' font-size='9' font-weight='700' font-family='Poppins, sans-serif'>" + esc(SP.deck[i].k) + "</text>";
+    }
+    svg += "<circle r='100' fill='none' stroke='#1D3F54' stroke-width='4'/>";
+    $("wheel").innerHTML = svg;
+  }
+  function renderSpin() {
+    if (!SP.deck.length || SP.who !== S.who || SP.unit !== S.unit) { SP.deck = spinDeck(); SP.who = S.who; SP.unit = S.unit; SP.cur = null; drawWheel(); paintSpinCard(); }
+  }
+  function doSpin() {
+    var n = SP.deck.length, i = Math.floor(Math.random() * n);
+    var seg = 360 / n, target = 360 - (i * seg + seg / 2); // segment i under the pointer (top)
+    var jitter = (Math.random() - .5) * seg * .6;
+    SP.rot = SP.rot - (SP.rot % 360) + 360 * 5 + target + jitter;
+    $("wheel").style.transform = "rotate(" + SP.rot + "deg)";
+    $("spinGo").disabled = true;
+    var wait = matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 4300;
+    setTimeout(function () { SP.cur = SP.deck[i]; SP.T = mkTargets(SP.cur.t); $("spinGo").disabled = false; paintSpinCard(); }, wait);
+  }
+  function paintSpinCard() {
+    var el = $("spinCard");
+    if (!SP.cur) { el.innerHTML = "<p class='muted'>Spin the wheel. The card shows a situation; the targets stay hidden until you press Reveal.</p>"; return; }
+    el.innerHTML = "<div class='card'><p class='tag'>Unit " + (SP.cur.u + 1) + " · " + esc(stu().units[SP.cur.u].n) + "</p><h3>" + esc(SP.cur.p) + "</h3>" +
+      targetsHtml(SP.T, "sp") + "<div class='row' style='margin-top:12px'><button class='ghost' id='spReveal'>" + (SP.T.hidden ? "Reveal targets" : "Hide targets") + "</button>" +
+      "<button class='primary' id='spSave'" + (allMarked(SP.T) ? "" : " disabled") + ">Save round</button><span class='flash' id='spMsg'></span></div></div>";
+  }
+
+  // ---------------------------------------------------------------- JEOPARDY
+  var JE = { done: {}, cur: null, T: null, score: 0 };
+  function boardIdx() { var k = S.who + "|" + S.unit; if (JE.bk !== k) { JE.bk = k; var b = 0; stu().jeo.forEach(function (x, i) { if (x.u <= S.unit) b = i; }); JE.b = b; } return JE.b; }
+  function board() { return stu().jeo[boardIdx()]; }
+  function jeoKey() { return "labJeo_" + S.who + "_" + boardIdx() + "_" + S.day; }
+  function renderJeo() {
+    var s = stu(), bd = board(), saved = LS.json(jeoKey(), null);
+    if (JE.key !== jeoKey()) { JE.key = jeoKey(); JE.done = saved ? saved.done : {}; JE.score = saved ? saved.score : 0; JE.cur = null; }
+    var played = {}; S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "jeopardy") played[e.data.board || 0] = (played[e.data.board || 0] || 0) + 1; });
+    $("jeoBoard").innerHTML = s.jeo.map(function (x, i) { return "<option value='" + i + "'" + (i === boardIdx() ? " selected" : "") + ">Board: " + esc(x.n) + (played[i] ? " · " + played[i] + " tiles played" : " · new") + "</option>"; }).join("");
+    var h = bd.cats.map(function (c) { return "<div class='cat'>" + esc(c) + "</div>"; }).join("");
+    for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) {
+      var k = c + "-" + r, d = JE.done[k];
+      h += "<button class='tile" + (d != null ? " done" : "") + "' data-jt='" + k + "'" + (d != null ? " disabled" : "") + ">" + (d != null ? "+" + d : "$" + VALUES[r]) + "</button>";
+    }
+    $("board").innerHTML = h;
+    $("jeoScore").textContent = Math.round(JE.score);
+    var best = 0; var per = {};
+    S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "jeopardy" && e.session !== S.day) per[e.session] = (per[e.session] || 0) + (e.data.points || 0); });
+    Object.keys(per).forEach(function (d) { best = Math.max(best, per[d]); });
+    $("jeoBest").textContent = best ? "· best before: " + Math.round(best) : "";
+    paintJeoCard();
+  }
+  function paintJeoCard() {
+    var el = $("jeoCard");
+    if (!JE.cur) { el.innerHTML = "<p class='muted'>She picks a category and a value. More money = more targets. Points = value × targets hit ÷ targets.</p>"; return; }
+    var bd = board(), c = JE.cur.c, r = JE.cur.r;
+    el.innerHTML = "<div class='card' style='border-left-color:var(--gold)'><p class='tag'>" + esc(bd.cats[c]) + " · $" + VALUES[r] + " · " + JE.T.items.length + " targets</p><h3>" + esc(bd.tiles[c][r].p) + "</h3>" +
+      targetsHtml(JE.T, "jt2") + "<div class='row' style='margin-top:12px'><button class='ghost' id='jeReveal'>" + (JE.T.hidden ? "Reveal targets" : "Hide targets") + "</button>" +
+      "<button class='primary' id='jeSave'" + (allMarked(JE.T) ? "" : " disabled") + ">Save and close tile</button><button class='ghost' id='jeCancel'>Back to board</button><span class='flash' id='jeMsg'></span></div></div>";
+  }
+
+  // ---------------------------------------------------------------- BINGO
+  var BG = { cells: [], on: [], key: null };
+  function newBingo() {
+    var pool = shuffle(unitStructs(S.unit));
+    var cur = stu().units[S.unit].s;
+    // current unit first, then earlier ones, then traps
+    pool.sort(function (a, b) { return (cur.indexOf(b) >= 0) - (cur.indexOf(a) >= 0); });
+    var cells = pool.slice(0, 9);
+    var fill = shuffle(levelStructs().filter(function (x) { return cells.indexOf(x) < 0 && (ST[x][1] === "trap" || unitStructs(Math.min(S.unit + 1, stu().units.length - 1)).indexOf(x) >= 0); }));
+    while (cells.length < 9 && fill.length) cells.push(fill.shift());
+    BG.cells = shuffle(cells); BG.on = BG.cells.map(function () { return 0; });
+  }
+  var LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+  function renderBingo() {
+    var k = S.who + "|" + S.unit; if (BG.key !== k) { BG.key = k; newBingo(); }
+    $("bingoTopics").innerHTML = "<span class='muted small'>Topics:</span>" + stu().topics.map(function (t) { return "<span class='chip new'>" + esc(t) + "</span>"; }).join("");
+    var lineCells = {};
+    LINES.forEach(function (L) { if (L.every(function (i) { return BG.on[i]; })) L.forEach(function (i) { lineCells[i] = 1; }); });
+    $("bingo").innerHTML = BG.cells.map(function (id, i) { return "<button data-bg='" + i + "' class='" + (BG.on[i] ? "on" : "") + (lineCells[i] ? " line" : "") + "'>" + esc(ST[id][0].replace(/^Spanish trap: /, "")) + "</button>"; }).join("");
+    var lines = LINES.filter(function (L) { return L.every(function (i) { return BG.on[i]; }); }).length;
+    $("bingoMsg").className = "flash"; $("bingoMsg").textContent = lines ? "BINGO! " + (lines > 1 ? lines + " lines" : "") : "";
+  }
+
+  // ---------------------------------------------------------------- SPOT THE BUG
+  var BU = { order: [], i: 0, shown: false, key: null };
+  function seenBugs() { var s = {}; S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "bug" && e.data.targets[0] && e.data.targets[0].ok) s[e.data.prompt] = 1; }); return s; }
+  function renderBug() {
+    var k = S.who + "|" + S.unit;
+    if (BU.key !== k) {
+      BU.key = k; var seen = seenBugs(), sofar = unitStructs(S.unit), bugs = stu().bugs;
+      var cur = bugs.filter(function (b) { return sofar.indexOf(b[2]) >= 0 || ST[b[2]][1] === "trap"; });
+      var fresh = shuffle(cur.filter(function (b) { return !seen[b[0]]; })), old = shuffle(cur.filter(function (b) { return seen[b[0]]; }));
+      BU.order = fresh.concat(old); BU.i = 0; BU.shown = false;
+    }
+    var b = BU.order[BU.i];
+    $("bugCount").textContent = BU.order.length ? (BU.i + 1) + " / " + BU.order.length : "";
+    if (!b) { $("bugBox").innerHTML = "<p class='muted'>No more bugs for this unit. Change unit or come back next class.</p>"; return; }
+    $("bugBox").innerHTML = "<p class='tag'>Find the bug, fix it and say why</p><div class='bug' style='margin-top:8px'>" + esc(b[0]) + "</div>" +
+      (BU.shown ? "<div class='fix' style='margin-top:12px'>" + esc(b[1]) + "<p>" + esc(b[3]) + "</p><p class='mono small muted'>" + esc(ST[b[2]][0]) + "</p></div>" : "") +
+      "<div class='row' style='margin-top:14px'>" + (BU.shown ? "" : "<button class='ghost' id='buShow'>Reveal</button>") +
+      "<span class='muted small'>Did she fix it?</span><div class='yn'><button class='y' id='buY'>✓ Fixed</button><button class='n' id='buN'>✗ Not yet</button></div><button class='ghost' id='buSkip'>Skip</button><span class='flash' id='buMsg'></span></div>";
+  }
+
+  // ---------------------------------------------------------------- MYSTERY BOX
+  var BX = { cur: null, T: null, left: 0, timer: null };
+  function stopBox() { if (BX.timer) { clearInterval(BX.timer); BX.timer = null; } }
+  function renderBox() { if (BX.who !== S.who) { BX.who = S.who; BX.cur = null; stopBox(); } paintBox(); }
+  function paintBox() {
+    var el = $("boxCard");
+    if (!BX.cur) { el.innerHTML = "<p class='muted'>A random challenge with rules. The clock runs while she speaks.</p>"; return; }
+    el.innerHTML = "<div class='card' style='border-left-color:var(--w6)'><p class='tag'>Mystery Box</p><h3>" + esc(BX.cur.p) + "</h3>" +
+      "<div class='row' style='margin:6px 0 12px'><span class='timer" + (BX.left <= 10 ? " low" : "") + "' id='bxTime'>" + BX.left + "</span>" +
+      "<button class='primary' id='bxStart'>" + (BX.timer ? "Pause" : "Start clock") + "</button><button class='ghost' id='bxReset'>Reset</button></div>" +
+      targetsHtml(BX.T, "bx") + "<div class='row' style='margin-top:12px'><button class='ghost' id='bxReveal'>" + (BX.T.hidden ? "Reveal targets" : "Hide targets") + "</button>" +
+      "<button class='primary' id='bxSave'" + (allMarked(BX.T) ? "" : " disabled") + ">Save round</button><span class='flash' id='bxMsg'></span></div></div>";
+  }
+
+  // ---------------------------------------------------------------- ERROR COURT
+  var CO = { i: 0, shown: false, key: null };
+  function todayNotes(kind) { return S.events.filter(function (e) { return e.kind === "note" && e.session === S.day && (!kind || e.data.type === kind); }); }
+  function judged() { var j = {}; S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "court" && e.data.noteId) j[e.data.noteId] = e.data.targets[0] && e.data.targets[0].ok; }); return j; }
+  function renderCourt() {
+    var goods = todayNotes("good"), fixes = todayNotes("fix"), j = judged();
+    var open = fixes.filter(function (n) { return !(n.id in j); });
+    $("courtCount").textContent = fixes.length ? (fixes.length - open.length) + " / " + fixes.length + " cases judged" : "";
+    var h = "<h3 style='margin-bottom:8px'>Wins today</h3>";
+    h += goods.length ? "<div style='display:grid; gap:8px'>" + goods.map(function (n) { return "<div class='note gd'><span class='said'>“" + esc(n.data.said) + "”</span>" + (n.data.s ? "<span class='mono small muted'>" + esc(ST[n.data.s] ? ST[n.data.s][0] : "") + "</span>" : "") + "</div>"; }).join("") + "</div>"
+      : "<p class='muted'>No wins in the notebook yet. Add some with the Notebook button: what she said well also counts.</p>";
+    h += "<h3 style='margin:20px 0 8px'>The cases</h3>";
+    if (!fixes.length) h += "<p class='muted'>No cases yet. Write her sentences in the Notebook during class (type: Fix).</p>";
+    else if (!open.length) h += "<p class='muted'>Every case is judged. Court is closed. ⚖️</p>";
+    else {
+      if (CO.i >= open.length) CO.i = 0;
+      var n = open[CO.i];
+      h += "<p class='tag'>Case " + (fixes.length - open.length + 1) + " of " + fixes.length + " · She finds the bug first</p><div class='bug' style='margin-top:8px'>“" + esc(n.data.said) + "”</div>" +
+        (CO.shown ? "<div class='fix' style='margin-top:12px'>" + esc(n.data.better || "(no better version written)") + (n.data.s ? "<p class='mono small muted'>" + esc(ST[n.data.s] ? ST[n.data.s][0] : "") + "</p>" : "") + "</div>" : "") +
+        "<div class='row' style='margin-top:14px'>" + (CO.shown ? "" : "<button class='ghost' id='coShow'>Reveal the better version</button>") +
+        "<span class='muted small'>Did she fix it?</span><div class='yn'><button class='y' id='coY'>✓ Fixed</button><button class='n' id='coN'>✗ Not yet</button></div>" +
+        (open.length > 1 ? "<button class='ghost' id='coNext'>Next case</button>" : "") + "<span class='flash' id='coMsg'></span></div>";
+    }
+    $("court").innerHTML = h;
+  }
+
+  // ---------------------------------------------------------------- PROGRESS
+  function attempts() { // [{s, ok, session}]
+    var out = [];
+    S.events.forEach(function (e) {
+      if (e.kind === "round") (e.data.targets || []).forEach(function (t) { if (t.s) out.push({ s: t.s, ok: !!t.ok, session: e.session }); });
+      else if (e.kind === "note" && e.data.s) out.push({ s: e.data.s, ok: e.data.type === "good", session: e.session });
+    });
+    return out;
+  }
+  function statusOf(list) {
+    if (!list.length) return "new";
+    var per = {}; list.forEach(function (a) { var p = per[a.session] || (per[a.session] = { ok: 0, n: 0 }); p.n++; if (a.ok) p.ok++; });
+    var good = Object.keys(per).filter(function (d) { return per[d].ok / per[d].n >= MASTER.pct; }).length;
+    return good >= MASTER.sessions ? "dom" : "prac";
+  }
+  function renderProg() {
+    var s = stu(), at = attempts(), days = sessionDays();
+    $("progTitle").textContent = "Progress · " + s.name;
+    $("progRule").textContent = "Mastered = " + Math.round(MASTER.pct * 100) + "% or more in " + MASTER.sessions + " different classes. Practicing = it has come up at least once.";
+    var ids = levelStructs(), counts = { new: 0, prac: 0, dom: 0 };
+    var rows = ids.map(function (id) {
+      var L = at.filter(function (a) { return a.s === id; }), st = statusOf(L); counts[st]++;
+      var ok = L.filter(function (a) { return a.ok; }).length;
+      var per = {}; L.forEach(function (a) { var p = per[a.session] || (per[a.session] = { ok: 0, n: 0 }); p.n++; if (a.ok) p.ok++; });
+      var last = Object.keys(per).sort().slice(-6);
+      var spark = last.map(function (d) { var p = per[d]; return "<i title='" + fmtDay(d) + ": " + p.ok + "/" + p.n + "' style='height:" + Math.max(10, Math.round(p.ok / p.n * 100)) + "%'></i>"; }).join("");
+      var trend = "";
+      if (last.length >= 2) { var a = per[last[last.length - 2]], b = per[last[last.length - 1]]; var d = b.ok / b.n - a.ok / a.n; trend = d > 0.05 ? " ↑" : d < -0.05 ? " ↓" : " →"; }
+      return { st: st, h: "<div class='prow'><div class='nm'>" + esc(ST[id][0]) + "<small>" + ST[id][1] + " · " + id + "</small></div><span class='chip " + st + "'>" + { new: "New", prac: "Practicing", dom: "Mastered" }[st] + "</span>" +
+        "<div class='spark'>" + spark + "</div><span class='pct'>" + (L.length ? ok + "/" + L.length + trend : "–") + "</span></div>" };
+    });
+    var orderSt = { dom: 0, prac: 1, new: 2 };
+    rows.sort(function (a, b) { return orderSt[a.st] - orderSt[b.st]; });
+    $("progList").innerHTML = rows.map(function (r) { return r.h; }).join("");
+    var allOk = at.filter(function (a) { return a.ok; }).length;
+    $("progStats").innerHTML = [["Classes", days.length], ["Mastered", counts.dom], ["Practicing", counts.prac], ["Targets hit", at.length ? allOk + "/" + at.length : "–"]]
+      .map(function (x) { return "<div class='stat'><b>" + x[1] + "</b><span class='muted small'>" + x[0] + "</span></div>"; }).join("");
+    $("progSessions").innerHTML = days.length ? days.slice().reverse().map(function (d) {
+      var ev = S.events.filter(function (e) { return e.session === d; }), A = at.filter(function (a) { return a.session === d; });
+      var games = []; ev.forEach(function (e) { var g = e.kind === "note" ? "note" : e.data.game; if (games.indexOf(g) < 0) games.push(g); });
+      var ok = A.filter(function (a) { return a.ok; }).length;
+      return "<div class='prow'><div class='nm'>" + fmtDay(d) + "<small>" + games.map(function (g) { return GAMEN[g] || g; }).join(" · ") + "</small></div><span></span><div class='bar'></div><span class='pct'>" + (A.length ? ok + "/" + A.length : "–") + "</span></div>";
+    }).join("") : "<p class='muted'>No classes saved yet.</p>";
+  }
+  function download(name, text, type) {
+    try { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000); } catch (e) {}
+  }
+  function csv() {
+    var rows = [["date", "student", "game", "unit", "prompt", "structure", "target", "result"]];
+    S.events.forEach(function (e) {
+      if (e.kind === "round") (e.data.targets || []).forEach(function (t) { rows.push([e.session, stu().name, GAMEN[e.data.game] || e.data.game, (e.data.unit || 0) + 1, e.data.prompt, t.s, t.t, t.ok ? "hit" : "not yet"]); });
+      else rows.push([e.session, stu().name, "Notebook", "", e.data.said + (e.data.better ? " → " + e.data.better : ""), e.data.s || "", e.data.type, e.data.type === "good" ? "hit" : "not yet"]);
+    });
+    return rows.map(function (r) { return r.map(function (v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? "\"" + v.replace(/"/g, "\"\"") + "\"" : v; }).join(","); }).join("\n");
+  }
+
+  // ---------------------------------------------------------------- GAMES MENU
+  function renderMenu() {
+    var s = stu(), last = lastSessionGames(), count = {};
+    S.events.forEach(function (e) { if (e.kind === "round") count[e.data.game] = (count[e.data.game] || 0) + 1; });
+    var have = GAMES.filter(function (g) { return g[5] === "units" || (s[g[5]] && (!Array.isArray(s[g[5]]) || s[g[5]].length)); });
+    function card(g) {
+      var badge = last.games.indexOf(g[0]) >= 0 ? "<span class='badge last'>last time</span>" : !count[g[0]] ? "<span class='badge fresh'>new for " + esc(s.name) + "</span>" : "";
+      return "<button class='gcard " + (g[4] === "acc" ? "acc" : g[4] === "mix" ? "mix" : "") + "' data-tab='" + g[1] + "'>" + badge + "<b>" + esc(g[2]) + "</b><span class='gd'>" + esc(g[3]) + "</span><span class='gm'>" + (count[g[0]] ? "played " + count[g[0]] + (count[g[0]] === 1 ? " round" : " rounds") : "not played yet") + "</span></button>";
+    }
+    $("menuSpeak").innerHTML = have.filter(function (g) { return g[4] !== "acc"; }).map(card).join("");
+    $("menuAcc").innerHTML = have.filter(function (g) { return g[4] === "acc"; }).map(card).join("");
+    $("menuNote").textContent = last.day ? "Orange = used last class. Pick a different one to open." : "Tip: one speaking game + one accuracy game + Error Court.";
+  }
+  function inUnit(list, uIdx) { // items tagged with a unit index: current unit first, then earlier ones
+    var cur = shuffle(list.filter(function (x) { return uIdx(x) === S.unit; })), old = shuffle(list.filter(function (x) { return uIdx(x) < S.unit; }));
+    return cur.concat(old);
+  }
+  function flashIn(id, ok) { var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = ok ? "Saved ✓" : "Saved on this device (will sync later)"; $(id).appendChild(m); }
+
+  // ---------------------------------------------------------------- RAPID TRANSFORM
+  var RP = { items: [], i: 0, res: [], sec: 10, left: 0, timer: null, state: "intro", streak: 0, best: 0 };
+  function stopRapid() { if (RP.timer) { clearInterval(RP.timer); RP.timer = null; } }
+  function rapidTick() { RP.left = Math.max(0, RP.left - 1); var e = $("rpTime"); if (e) { e.textContent = RP.left; e.className = "timer" + (RP.left <= 3 ? " low" : ""); } if (!RP.left) stopRapid(); }
+  function renderRapid() {
+    if (RP.who !== S.who) { RP.who = S.who; RP.state = "intro"; stopRapid(); }
+    var el = $("rapid");
+    if (RP.state === "intro") {
+      el.innerHTML = "<h2>Rapid Transform</h2><p class='muted' style='margin:6px 0 12px'>You read the sentence and the order. She transforms it before the clock ends. Streaks count.</p>" +
+        "<div class='row'><label class='small'>Seconds <select id='rpSec'>" + [6, 8, 10, 15, 20].map(function (n) { return "<option" + (n === RP.sec ? " selected" : "") + ">" + n + "</option>"; }).join("") + "</select></label>" +
+        "<button class='gold' id='rpStart'>Start 8 sentences</button></div>";
+      return;
+    }
+    var dots = "<div class='dots'>" + RP.items.map(function (x, i) { return "<i class='" + (RP.res[i] === true ? "ok" : RP.res[i] === false ? "no" : "") + (i === RP.i && RP.state === "play" ? " cur" : "") + "'></i>"; }).join("") + "</div>";
+    if (RP.state === "done") {
+      var ok = RP.res.filter(Boolean).length;
+      el.innerHTML = "<h2>Rapid Transform</h2>" + dots + "<p class='big' style='margin:14px 0'>" + ok + " / " + RP.items.length + " · best streak " + RP.best + "</p>" +
+        "<div style='display:grid; gap:6px'>" + RP.items.map(function (x, i) { return "<div class='note " + (RP.res[i] ? "gd" : "fx") + "'><span class='muted small'>" + esc(x[1]) + " " + esc(x[2]) + "</span><span class='said'>" + esc(x[3]) + "</span></div>"; }).join("") + "</div>" +
+        "<div class='row' style='margin-top:12px'><button class='gold' id='rpAgain'>Again</button><span id='rpSaved'></span></div>";
+      return;
+    }
+    var it = RP.items[RP.i];
+    el.innerHTML = "<div class='spread'><h2>Rapid Transform</h2><span class='streak'>Streak " + RP.streak + " 🔥</span></div>" + dots +
+      "<div class='card' style='margin-top:12px; border-left-color:var(--orange)'><p class='tag'>" + (RP.i + 1) + " / " + RP.items.length + " · " + esc(ST[it[4]][0]) + "</p>" +
+      "<p class='big' style='margin:8px 0'>" + esc(it[1]) + "</p><span class='cmd'>" + esc(it[2]) + "</span>" +
+      "<div class='row' style='margin-top:14px'><span class='timer" + (RP.left <= 3 ? " low" : "") + "' id='rpTime'>" + RP.left + "</span>" +
+      "<div class='yn'><button class='y' id='rpY'>✓ Right</button><button class='n' id='rpN'>✗ Not yet</button></div></div>" +
+      (RP.prev ? "<p class='muted small' style='margin-top:10px'>Last one: <b>" + esc(RP.prev) + "</b></p>" : "") + "</div>";
+  }
+  function startRapid() {
+    var pool = inUnit(stu().rapid || [], function (x) { return x[0]; });
+    RP.items = pool.slice(0, 8); RP.i = 0; RP.res = []; RP.streak = 0; RP.best = 0; RP.prev = null; RP.state = "play"; RP.left = RP.sec;
+    stopRapid(); RP.timer = setInterval(rapidTick, 1000); renderRapid();
+  }
+  function markRapid(ok) {
+    RP.res[RP.i] = ok; RP.streak = ok ? RP.streak + 1 : 0; RP.best = Math.max(RP.best, RP.streak); RP.prev = RP.items[RP.i][3];
+    RP.i++; stopRapid();
+    if (RP.i >= RP.items.length) {
+      RP.state = "done"; renderRapid();
+      saveRound("rapid", "Rapid Transform x" + RP.items.length, RP.items.map(function (x, i) { return { s: x[4], t: x[3], ok: RP.res[i] }; }), { streak: RP.best }).then(function (o) { flashIn("rpSaved", o); });
+      return;
+    }
+    RP.left = RP.sec; RP.timer = setInterval(rapidTick, 1000); renderRapid();
+  }
+
+  // ---------------------------------------------------------------- GRAMMAR AUCTION
+  var AU = { lots: [], revealed: false, budget: 1000 };
+  function newAuction() {
+    var sofar = unitStructs(S.unit);
+    var pool = shuffle(stu().bugs.filter(function (b) { return sofar.indexOf(b[2]) >= 0 || ST[b[2]][1] === "trap"; })).slice(0, 6);
+    var nRight = 2 + Math.floor(Math.random() * 3), flags = shuffle(pool.map(function (b, i) { return i < nRight; }));
+    AU.lots = pool.map(function (b, i) { return { b: b, correct: flags[i], bet: 0 }; }); AU.revealed = false;
+  }
+  function renderAuction() {
+    var k = S.who + "|" + S.unit; if (AU.key !== k) { AU.key = k; newAuction(); }
+    var spent = AU.lots.reduce(function (a, l) { return a + l.bet; }, 0), net = 0;
+    if (AU.revealed) AU.lots.forEach(function (l) { net += l.correct ? l.bet : -l.bet; });
+    var h = "<div class='spread'><h2>Grammar Auction</h2><div class='row'><span class='muted small'>" + (AU.revealed ? "Final" : "Left to bet") + "</span><span class='money'>$" + (AU.revealed ? AU.budget + net : AU.budget - spent) + "</span></div></div>" +
+      "<p class='muted' style='margin:6px 0 12px'>She has $1000. She bets on the sentences she thinks are 100% correct (max $500 each). Correct sentence: she wins the bet. Wrong: she loses it.</p><div style='display:grid; gap:8px'>";
+    AU.lots.forEach(function (l, i) {
+      var txt = l.correct ? l.b[1] : l.b[0], cls = AU.revealed ? (l.correct === (l.bet > 0) ? "win" : "lose") : "";
+      h += "<div class='lot " + cls + "'><div><div class='sent'>" + esc(txt) + "</div>" +
+        (AU.revealed ? "<div class='small'>" + (l.correct === (l.bet > 0) ? "<b>Good call.</b> " : "<b>Missed.</b> ") + (l.correct ? "✓ Correct sentence" : "✗ Wrong. Better: <b>" + esc(l.b[1]) + "</b> · " + esc(l.b[3])) + "</div>" : "") + "</div>" +
+        (AU.revealed ? "<b class='mono'>" + (l.bet ? (l.correct ? "+" : "−") + "$" + l.bet : "$0") + "</b>" :
+          "<div class='bet'><button data-au='" + i + "' data-d='-100' aria-label='Less'>−</button><b>$" + l.bet + "</b><button data-au='" + i + "' data-d='100' aria-label='More'>+</button></div>") + "</div>";
+    });
+    h += "</div><div class='row' style='margin-top:12px'>" + (AU.revealed ? "<button class='gold' id='auNew'>New auction</button>" : "<button class='gold' id='auReveal'>Close the bets and reveal</button>") + "<span id='auMsg'></span></div>";
+    $("auction").innerHTML = h;
+  }
+
+  // ---------------------------------------------------------------- TRANSLATION DUEL
+  var DU = { order: [], i: 0, hint: false, shown: false, pts: 0 };
+  function renderDuel() {
+    var k = S.who + "|" + S.unit;
+    if (DU.key !== k) { DU.key = k; DU.order = inUnit(stu().duel || [], function (x) { return x[0]; }); DU.i = 0; DU.hint = false; DU.shown = false; DU.pts = 0; }
+    var d = DU.order[DU.i], el = $("duel");
+    var head = "<div class='spread'><h2>Translation Duel</h2><span class='muted small'>" + (DU.order.length ? Math.min(DU.i + 1, DU.order.length) + " / " + DU.order.length + " · " : "") + "<b class='mono'>" + DU.pts + " pts</b></span></div>";
+    if (!d) { el.innerHTML = head + "<p class='muted' style='margin-top:10px'>Duel finished for this unit. Change unit or come back next class.</p>"; return; }
+    el.innerHTML = head + "<p class='muted' style='margin:6px 0 10px'>Say it in natural English. First try = 2 points. With the hint = 1 point.</p>" +
+      "<div class='card' style='border-left-color:var(--w7)'><p class='tag'>Español</p><p class='es'>" + esc(d[1]) + "</p>" +
+      (DU.hint ? "<div class='twist'>Trap: " + esc(d[4]) + "</div>" : "") +
+      (DU.shown ? "<div class='fix' style='margin-top:10px'>" + esc(d[2]) + "<p class='mono small muted'>" + esc(ST[d[3]][0]) + "</p></div>" : "") +
+      "<div class='row' style='margin-top:12px'>" + (DU.hint ? "" : "<button class='ghost' id='duHint'>Show the trap (hint)</button>") + (DU.shown ? "" : "<button class='ghost' id='duShow'>Reveal</button>") +
+      "<div class='yn'><button class='y' id='duY'>✓ " + (DU.hint ? "Right (1 pt)" : "Right (2 pts)") + "</button><button class='n' id='duN'>✗ Not yet</button></div><span class='flash' id='duMsg'></span></div></div>";
+  }
+
+  // ---------------------------------------------------------------- HIDDEN MISSION
+  var MI = { cur: null, T: null, left: 240, timer: null, twist: false };
+  function stopMission() { if (MI.timer) { clearInterval(MI.timer); MI.timer = null; } }
+  function pickMission() {
+    var done = {}; S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "mission") done[e.data.prompt] = 1; });
+    var list = (stu().mission || []).filter(function (m) { return m.u <= S.unit; });
+    var fresh = list.filter(function (m) { return !done[m.n]; });
+    var pool = fresh.length ? fresh : list;
+    var cur = pool.filter(function (m) { return m.u === S.unit; });
+    var m = (cur.length ? cur : pool)[Math.floor(Math.random() * (cur.length ? cur.length : pool.length))];
+    stopMission(); MI.cur = m; MI.T = m ? mkTargets(m.t) : null; MI.left = 240; MI.twist = false;
+  }
+  function fmtClock(n) { return Math.floor(n / 60) + ":" + String(n % 60).padStart(2, "0"); }
+  function renderMission() {
+    if (MI.who !== S.who || MI.unit !== S.unit) { MI.who = S.who; MI.unit = S.unit; pickMission(); }
+    var el = $("mission"), m = MI.cur;
+    if (!m) { el.innerHTML = "<h2>Hidden Mission</h2><p class='muted'>No missions for this unit yet.</p>"; return; }
+    el.innerHTML = "<div class='spread'><h2>Hidden Mission</h2><button class='ghost' id='miNew'>Another mission</button></div>" +
+      "<div class='card' style='margin-top:10px; border-left-color:var(--w6)'><p class='tag'>Mission · Unit " + (m.u + 1) + "</p><h3>" + esc(m.n) + "</h3>" +
+      "<div class='roles'><div class='role'><span class='tag'>Your role · " + esc(stu().name) + "</span>" + esc(m.you) + "</div><div class='role'><span class='tag'>My role · Teacher</span>" + esc(m.me) + "</div></div>" +
+      "<div class='row'><span class='timer" + (MI.left <= 30 ? " low" : "") + "' id='miTime'>" + fmtClock(MI.left) + "</span><button class='primary' id='miStart'>" + (MI.timer ? "Pause" : "Start") + "</button>" +
+      (MI.twist ? "" : "<button class='gold' id='miTwist'>Twist!</button>") + "</div>" +
+      (MI.twist ? "<div class='twist'>⚡ Twist: " + esc(m.twist) + "</div>" : "") +
+      "<p class='tag' style='margin:12px 0 6px'>Secret targets (she sees them at the end)</p>" + targetsHtml(MI.T, "mi") +
+      "<div class='row' style='margin-top:12px'><button class='ghost' id='miReveal'>" + (MI.T.hidden ? "Reveal targets" : "Hide targets") + "</button><button class='primary' id='miSave'" + (allMarked(MI.T) ? "" : " disabled") + ">Save mission</button><span id='miMsg'></span></div></div>";
+  }
+
+  // ---------------------------------------------------------------- STORY CHAIN
+  var CH = { seed: null, turns: [], cur: null, who: null };
+  function newChain() {
+    var c = stu().chain; if (!c) { CH.seed = null; return; }
+    CH.seed = c.seeds[Math.floor(Math.random() * c.seeds.length)]; CH.turns = []; CH.cur = null; CH.next = "S";
+  }
+  function drawConn() {
+    var c = stu().chain, pool = c.conn.filter(function (x) { return x[0] <= S.unit; });
+    var cur = pool.filter(function (x) { return x[0] === S.unit; });
+    var src = cur.length && Math.random() < .5 ? cur : pool;
+    var used = CH.turns.map(function (t) { return t.c[1]; }), fresh = src.filter(function (x) { return used.indexOf(x[1]) < 0; });
+    src = fresh.length ? fresh : src;
+    return src[Math.floor(Math.random() * src.length)];
+  }
+  function renderChain() {
+    if (CH.who !== S.who) { CH.who = S.who; newChain(); }
+    var el = $("chain");
+    if (!CH.seed) { el.innerHTML = "<h2>Story Chain</h2><p class='muted'>No Story Chain content for this student yet.</p>"; return; }
+    var name = stu().name, mine = CH.next === "S";
+    var h = "<div class='spread'><h2>Story Chain</h2><button class='ghost' id='chNew'>New story</button></div>" +
+      "<p class='muted' style='margin:6px 0 10px'>You take turns. Each turn draws a word that MUST appear in the next sentence of the story.</p>" +
+      "<div class='card' style='border-left-color:var(--w3)'><p class='tag'>The story starts</p><p class='big'>" + esc(CH.seed) + "</p></div>" +
+      "<div class='turns' style='margin:12px 0'>" + CH.turns.map(function (t) { return "<span class='" + (t.who === "T" ? "" : t.ok ? "ok" : "no") + "'>" + (t.who === "T" ? "You" : name) + ": " + esc(t.c[1]) + "</span>"; }).join("") + "</div>" +
+      "<p class='tag'>Turn: " + (mine ? esc(name) : "Teacher") + "</p>";
+    if (!CH.cur) h += "<div class='row' style='margin-top:8px'><button class='gold' id='chDraw'>Draw a word</button>" + (CH.turns.some(function (t) { return t.who === "S"; }) ? "<button class='primary' id='chSave'>The end · save story</button>" : "") + "<span id='chMsg'></span></div>";
+    else h += "<div class='row' style='margin-top:8px'><span class='conn'>" + esc(CH.cur[1]) + "</span></div>" +
+      "<div class='row' style='margin-top:12px'>" + (mine ? "<span class='muted small'>Did she use it right?</span><div class='yn'><button class='y' id='chY'>✓</button><button class='n' id='chN'>✗</button></div>" : "<button class='primary' id='chDone'>My sentence is done</button>") + "</div>";
+    el.innerHTML = h;
+  }
+  function chainTurn(ok) { CH.turns.push({ who: CH.next, c: CH.cur, ok: ok }); CH.cur = null; CH.next = CH.next === "S" ? "T" : "S"; renderChain(); }
+
+  // ---------------------------------------------------------------- ESCAPE ROOM
+  var ER = { room: null, open: -1, first: [], solved: [], left: 720, timer: null, escaped: false, shown: false };
+  function stopEscape() { if (ER.timer) { clearInterval(ER.timer); ER.timer = null; } }
+  function loadRoom(i) {
+    stopEscape(); var r = (stu().rooms || [])[i]; ER.ri = i; ER.room = r; ER.open = -1; ER.first = [null, null, null, null]; ER.solved = [false, false, false, false]; ER.left = 720; ER.escaped = false; ER.started = false; ER.shown = false;
+  }
+  function renderEscape() {
+    var rooms = stu().rooms || [];
+    if (ER.who !== S.who || ER.unit !== S.unit) { ER.who = S.who; ER.unit = S.unit; var b = 0; rooms.forEach(function (r, i) { if (r.u <= S.unit) b = i; }); loadRoom(b); }
+    var el = $("escape"), r = ER.room;
+    if (!r) { el.innerHTML = "<h2>Escape Room</h2><p class='muted'>No rooms for this student yet.</p>"; return; }
+    var h = "<div class='spread'><h2>Escape Room</h2><select id='erRoom' aria-label='Room'>" + rooms.map(function (x, i) { return "<option value='" + i + "'" + (i === ER.ri ? " selected" : "") + ">" + esc(x.n) + "</option>"; }).join("") + "</select></div>" +
+      "<div class='card' style='margin-top:10px; border-left-color:var(--w6)'><h3>" + esc(r.n) + "</h3><p>" + esc(r.intro) + "</p>" +
+      "<div class='row' style='margin:10px 0'><span class='timer" + (ER.left <= 60 ? " low" : "") + "' id='erTime'>" + fmtClock(ER.left) + "</span>" +
+      (ER.escaped ? "" : "<button class='primary' id='erStart'>" + (ER.timer ? "Pause" : ER.started ? "Continue" : "Start the clock") + "</button>") + "</div>" +
+      "<div class='locks'>" + r.locks.map(function (l, i) {
+        return "<button class='lock" + (ER.solved[i] ? " open" : "") + (ER.open === i ? " sel" : "") + "' data-lock='" + i + "'><span class='ic'>" + (ER.solved[i] ? "🔓" : "🔒") + "</span>" +
+          (ER.solved[i] ? "<span class='dg'>" + r.code[i] + "</span>" : "<span>Lock " + (i + 1) + "</span>") + "</button>";
+      }).join("") + "</div>";
+    if (ER.open >= 0 && !ER.solved[ER.open]) {
+      var L = r.locks[ER.open];
+      h += "<div class='card' style='margin-top:12px; background:var(--surface)'><p class='tag'>Lock " + (ER.open + 1) + " · " + esc(ST[L[2]][0]) + (ER.first[ER.open] === false ? " · second try" : "") + "</p><p class='big' style='margin:6px 0'>" + esc(L[0]) + "</p>" +
+        (ER.shown ? "<div class='fix'>" + esc(L[1]) + "</div>" : "") +
+        "<div class='row' style='margin-top:10px'>" + (ER.shown ? "" : "<button class='ghost' id='erShow'>Show a model answer</button>") +
+        "<div class='yn'><button class='y' id='erY'>✓ Unlocked</button><button class='n' id='erN'>✗ Try again</button></div></div></div>";
+    }
+    if (ER.solved.every(Boolean) && !ER.escaped) h += "<div class='row' style='margin-top:14px'><span class='muted'>Type the code to escape:</span><input class='codein' id='erCode' inputmode='numeric' maxlength='4' aria-label='Code'><button class='gold' id='erGo'>Escape!</button><span class='flash bad' id='erBad'></span></div>";
+    if (ER.escaped) h += "<div class='fix' style='margin-top:14px'>🎉 ESCAPED with " + fmtClock(ER.left) + " left!<p>First-try locks: " + ER.first.filter(function (x) { return x === true; }).length + " / 4</p></div><span id='erMsg'></span>";
+    h += "</div>";
+    el.innerHTML = h;
+  }
+
+  // ---------------------------------------------------------------- notebook
+  var NB = { kind: "fix" };
+  function paintNb() {
+    $("nbFix").classList.toggle("on", NB.kind === "fix"); $("nbGood").classList.toggle("on", NB.kind === "good");
+    $("nbBetterL").hidden = NB.kind !== "fix";
+    var list = todayNotes().slice().reverse();
+    $("nbList").innerHTML = list.length ? list.map(function (n) {
+      return "<div class='note " + (n.data.type === "fix" ? "fx" : "gd") + "'><span class='said'>“" + esc(n.data.said) + "”</span>" + (n.data.better ? "<span class='better'>→ " + esc(n.data.better) + "</span>" : "") +
+        "<div class='spread'><span class='mono small muted'>" + esc(n.data.s && ST[n.data.s] ? ST[n.data.s][0] : "") + "</span><button class='ghost small' data-del='" + n.id + "'>Delete</button></div></div>";
+    }).join("") : "<p class='muted small'>Nothing yet today.</p>";
+  }
+
+  // ---------------------------------------------------------------- events
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest("button"); if (!b) return;
+    if (b.dataset.who) { S.who = b.dataset.who; S.unit = +(LS.get("labUnit_" + S.who) || 0); LS.set("labWho", S.who); SP.deck = []; loadEvents().then(renderTab); renderTab(); return; }
+    if (b.dataset.tab) { S.tab = b.dataset.tab; LS.set("labTab", S.tab); renderTab(); return; }
+    if (b.dataset.unit) { setUnit(+b.dataset.unit); return; }
+    // spin
+    if (b.id === "spinGo") { doSpin(); return; }
+    if (b.dataset.sp != null) { SP.T.items[+b.dataset.sp].ok = b.dataset.v === "1"; paintSpinCard(); return; }
+    if (b.id === "spReveal") { SP.T.hidden = !SP.T.hidden; paintSpinCard(); return; }
+    if (b.id === "spSave") { var c = SP.cur, T = SP.T; b.disabled = true; saveRound("spin", c.p, T.items).then(function (ok) { SP.cur = null; paintSpinCard(); var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = ok ? "Saved ✓ Spin again!" : "Saved on this device (will sync later)"; $("spinCard").appendChild(m); }); return; }
+    // jeopardy
+    if (b.dataset.jt) { var p = b.dataset.jt.split("-"); JE.cur = { c: +p[0], r: +p[1] }; JE.T = mkTargets(board().tiles[JE.cur.c][JE.cur.r].t); paintJeoCard(); $("jeoCard").scrollIntoView({ behavior: "smooth", block: "nearest" }); return; }
+    if (b.dataset.jt2 != null) { JE.T.items[+b.dataset.jt2].ok = b.dataset.v === "1"; paintJeoCard(); return; }
+    if (b.id === "jeReveal") { JE.T.hidden = !JE.T.hidden; paintJeoCard(); return; }
+    if (b.id === "jeCancel") { JE.cur = null; paintJeoCard(); return; }
+    if (b.id === "jeSave") {
+      var tile = board().tiles[JE.cur.c][JE.cur.r], val = VALUES[JE.cur.r], hit = JE.T.items.filter(function (x) { return x.ok; }).length;
+      var pts = Math.round(val * hit / JE.T.items.length);
+      JE.done[JE.cur.c + "-" + JE.cur.r] = pts; JE.score += pts; LS.set(jeoKey(), JSON.stringify({ done: JE.done, score: JE.score }));
+      var items = JE.T.items; JE.cur = null; renderJeo();
+      saveRound("jeopardy", tile.p, items, { tileValue: val, points: pts, board: boardIdx() }).then(function (ok) { var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = (ok ? "Saved ✓ " : "Saved on this device · ") + "+" + pts + " points"; $("jeoCard").appendChild(m); });
+      return;
+    }
+    if (b.id === "jeoReset") { armed(b, function () { JE.done = {}; JE.score = 0; LS.set(jeoKey(), null); JE.cur = null; renderJeo(); }); return; }
+    // bingo
+    if (b.dataset.bg != null) { var i = +b.dataset.bg; BG.on[i] = BG.on[i] ? 0 : 1; renderBingo(); return; }
+    if (b.id === "bingoNew") { newBingo(); renderBingo(); return; }
+    if (b.id === "bingoSave") {
+      var hits = BG.cells.map(function (id, i) { return { s: id, t: ST[id][0], ok: !!BG.on[i] }; }).filter(function (x) { return x.ok; });
+      if (!hits.length) { $("bingoMsg").className = "flash bad"; $("bingoMsg").textContent = "Nothing marked yet."; return; }
+      var lines = LINES.filter(function (L) { return L.every(function (i) { return BG.on[i]; }); }).length;
+      // only the squares she produced are saved (a square nobody tried is not a miss)
+      saveRound("bingo", "Free conversation", hits, { lines: lines }).then(function (ok) { savedMsg($("bingoMsg"), ok); newBingo(); setTimeout(renderBingo, 1600); });
+      return;
+    }
+    // bug
+    if (b.id === "buShow") { BU.shown = true; renderBug(); return; }
+    if (b.id === "buY" || b.id === "buN") {
+      var bg = BU.order[BU.i]; var okb = b.id === "buY";
+      saveRound("bug", bg[0], [{ s: bg[2], t: bg[1], ok: okb }]).then(function (ok) { BU.i++; BU.shown = false; renderBug(); savedMsg($("buMsg"), ok); });
+      return;
+    }
+    if (b.id === "buSkip") { BU.i++; BU.shown = false; renderBug(); return; }
+    // box
+    if (b.id === "boxOpen") { stopBox(); var pool = stu().box, pick = pool[Math.floor(Math.random() * pool.length)]; if (BX.cur && pool.length > 1) while (pick === BX.cur) pick = pool[Math.floor(Math.random() * pool.length)]; BX.cur = pick; BX.T = mkTargets(pick.t); BX.left = pick.sec; paintBox(); return; }
+    if (b.id === "bxStart") {
+      if (BX.timer) { stopBox(); paintBox(); return; }
+      BX.timer = setInterval(function () { BX.left = Math.max(0, BX.left - 1); var e = $("bxTime"); if (e) { e.textContent = BX.left; e.className = "timer" + (BX.left <= 10 ? " low" : ""); } if (!BX.left) { stopBox(); paintBox(); } }, 1000);
+      paintBox(); return;
+    }
+    if (b.id === "bxReset") { stopBox(); BX.left = BX.cur.sec; paintBox(); return; }
+    if (b.dataset.bx != null) { BX.T.items[+b.dataset.bx].ok = b.dataset.v === "1"; paintBox(); return; }
+    if (b.id === "bxReveal") { BX.T.hidden = !BX.T.hidden; paintBox(); return; }
+    if (b.id === "bxSave") { stopBox(); saveRound("box", BX.cur.p, BX.T.items).then(function (ok) { BX.cur = null; paintBox(); var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = ok ? "Saved ✓" : "Saved on this device (will sync later)"; $("boxCard").appendChild(m); }); return; }
+    // court
+    if (b.id === "coShow") { CO.shown = true; renderCourt(); return; }
+    if (b.id === "coNext") { CO.i++; CO.shown = false; renderCourt(); return; }
+    if (b.id === "coY" || b.id === "coN") {
+      var j = judged(), open = todayNotes("fix").filter(function (n) { return !(n.id in j); }), n = open[CO.i] || open[0];
+      saveRound("court", n.data.said, [{ s: n.data.s || "", t: n.data.better || "", ok: b.id === "coY" }], { noteId: n.id }).then(function () { CO.shown = false; renderCourt(); });
+      return;
+    }
+    // rapid
+    if (b.id === "rpStart" || b.id === "rpAgain") { if (b.id === "rpStart") RP.sec = +$("rpSec").value; startRapid(); return; }
+    if (b.id === "rpY" || b.id === "rpN") { markRapid(b.id === "rpY"); return; }
+    // auction
+    if (b.dataset.au != null) { var lot = AU.lots[+b.dataset.au], spent = AU.lots.reduce(function (a, l) { return a + l.bet; }, 0), d = +b.dataset.d; if (d > 0 && (lot.bet >= 500 || spent + d > AU.budget)) return; lot.bet = Math.max(0, lot.bet + d); renderAuction(); return; }
+    if (b.id === "auReveal") {
+      AU.revealed = true; renderAuction();
+      saveRound("auction", "Grammar Auction", AU.lots.map(function (l) { return { s: l.b[2], t: l.correct ? l.b[1] : l.b[0], ok: l.correct === (l.bet > 0) }; }),
+        { money: AU.budget + AU.lots.reduce(function (a, l) { return a + (l.correct ? l.bet : -l.bet); }, 0) }).then(function (o) { flashIn("auMsg", o); });
+      return;
+    }
+    if (b.id === "auNew") { newAuction(); renderAuction(); return; }
+    // duel
+    if (b.id === "duHint") { DU.hint = true; renderDuel(); return; }
+    if (b.id === "duShow") { DU.shown = true; renderDuel(); return; }
+    if (b.id === "duY" || b.id === "duN") {
+      var dd = DU.order[DU.i], okd = b.id === "duY", hint = DU.hint;
+      if (okd) DU.pts += hint ? 1 : 2;
+      DU.i++; DU.hint = false; DU.shown = false; renderDuel();
+      saveRound("duel", dd[1], [{ s: dd[3], t: dd[2], ok: okd }], { hint: hint }).then(function (o) { var m = $("duMsg"); if (m) savedMsg(m, o); });
+      return;
+    }
+    // mission
+    if (b.id === "miNew") { pickMission(); renderMission(); return; }
+    if (b.id === "miStart") {
+      if (MI.timer) stopMission();
+      else MI.timer = setInterval(function () { MI.left = Math.max(0, MI.left - 1); var e = $("miTime"); if (e) { e.textContent = fmtClock(MI.left); e.className = "timer" + (MI.left <= 30 ? " low" : ""); } if (!MI.left) { stopMission(); renderMission(); } }, 1000);
+      renderMission(); return;
+    }
+    if (b.id === "miTwist") { MI.twist = true; renderMission(); return; }
+    if (b.dataset.mi != null) { MI.T.items[+b.dataset.mi].ok = b.dataset.v === "1"; renderMission(); return; }
+    if (b.id === "miReveal") { MI.T.hidden = !MI.T.hidden; renderMission(); return; }
+    if (b.id === "miSave") { stopMission(); var mm = MI.cur, mt = MI.T.items; saveRound("mission", mm.n, mt).then(function (o) { pickMission(); renderMission(); flashIn("miMsg", o); }); return; }
+    // chain
+    if (b.id === "chNew") { newChain(); renderChain(); return; }
+    if (b.id === "chDraw") { CH.cur = drawConn(); renderChain(); return; }
+    if (b.id === "chY" || b.id === "chN") { chainTurn(b.id === "chY"); return; }
+    if (b.id === "chDone") { chainTurn(null); return; }
+    if (b.id === "chSave") {
+      var st = CH.turns.filter(function (t) { return t.who === "S"; }), seed = CH.seed;
+      saveRound("chain", seed, st.map(function (t) { return { s: t.c[2], t: t.c[1], ok: !!t.ok }; })).then(function (o) { newChain(); renderChain(); flashIn("chMsg", o); });
+      return;
+    }
+    // escape
+    if (b.dataset.lock != null) { var li = +b.dataset.lock; if (!ER.solved[li]) { ER.open = li; ER.shown = false; } renderEscape(); return; }
+    if (b.id === "erStart") {
+      if (ER.timer) stopEscape();
+      else { ER.started = true; ER.timer = setInterval(function () { ER.left = Math.max(0, ER.left - 1); var e = $("erTime"); if (e) { e.textContent = fmtClock(ER.left); e.className = "timer" + (ER.left <= 60 ? " low" : ""); } if (!ER.left) { stopEscape(); renderEscape(); } }, 1000); }
+      renderEscape(); return;
+    }
+    if (b.id === "erShow") { ER.shown = true; renderEscape(); return; }
+    if (b.id === "erY" || b.id === "erN") {
+      var lk = ER.open, oky = b.id === "erY";
+      if (ER.first[lk] === null) ER.first[lk] = oky;
+      if (oky) { ER.solved[lk] = true; ER.open = -1; }
+      ER.shown = false; renderEscape(); return;
+    }
+    if (b.id === "erGo") {
+      if ($("erCode").value.trim() !== ER.room.code) { $("erBad").textContent = "Wrong code. Look at the locks."; return; }
+      stopEscape(); ER.escaped = true; renderEscape();
+      saveRound("escape", ER.room.n, ER.room.locks.map(function (l, i) { return { s: l[2], t: l[0], ok: ER.first[i] === true }; }), { secondsLeft: ER.left }).then(function (o) { flashIn("erMsg", o); });
+      return;
+    }
+    if (b.id === "backMenu") { S.tab = "tMenu"; LS.set("labTab", S.tab); renderTab(); return; }
+    // progress
+    if (b.id === "exJson") { download("english-lab-" + stu().name.toLowerCase() + "-" + todayStr() + ".json", JSON.stringify(S.events, null, 1), "application/json"); return; }
+    if (b.id === "exCsv") { download("english-lab-" + stu().name.toLowerCase() + "-" + todayStr() + ".csv", csv(), "text/csv"); return; }
+    // notebook
+    if (b.id === "nbOpen") { $("nb").hidden = false; paintNb(); $("nbSaid").focus(); return; }
+    if (b.id === "nbClose") { $("nb").hidden = true; return; }
+    if (b.id === "nbFix" || b.id === "nbGood") { NB.kind = b.dataset.k; paintNb(); return; }
+    if (b.id === "nbSave") {
+      var said = $("nbSaid").value.trim(); if (!said) { $("nbSaid").focus(); return; }
+      var d = { type: NB.kind, said: said, s: $("nbStruct").value || "" };
+      if (NB.kind === "fix") d.better = $("nbBetter").value.trim();
+      addEvent("note", d).then(function (ok) { $("nbSaid").value = ""; $("nbBetter").value = ""; paintNb(); savedMsg($("nbMsg"), ok); if (S.tab === "tCourt") renderCourt(); });
+      return;
+    }
+    if (b.dataset.del) { armed(b, function () { delEvent(b.dataset.del).then(function () { paintNb(); if (S.tab === "tCourt") renderCourt(); }); }); return; }
+  });
+  function setUnit(i) { S.unit = i; LS.set("labUnit_" + S.who, String(i)); SP.deck = []; renderTab(); }
+  $("unitSel").addEventListener("change", function () { setUnit(+this.value); });
+  $("dateSel").addEventListener("change", function () { S.day = this.value || todayStr(); JE.key = null; renderTab(); });
+  $("jeoBoard").addEventListener("change", function () { JE.b = +this.value; JE.bk = S.who + "|" + S.unit; JE.key = null; renderJeo(); });
+  $("spinAll").addEventListener("change", function () { SP.deck = []; renderSpin(); });
+  document.addEventListener("change", function (e) { if (e.target && e.target.id === "erRoom") { loadRoom(+e.target.value); renderEscape(); } });
+  document.addEventListener("keydown", function (e) { if (e.target && e.target.id === "erCode" && e.key === "Enter") $("erGo").click(); });
+  $("nbSaid").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("nbSave").click(); });
+  $("nbBetter").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("nbSave").click(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("nb").hidden) $("nb").hidden = true; });
+
+  // ---------------------------------------------------------------- start
+  async function enter(key, remember) {
+    $("lgMsg").textContent = "Comprobando...";
+    if (!(window.crypto && crypto.subtle)) { $("lgMsg").textContent = "Abre esta página con https:// para poder entrar."; return false; }
+    var tk = await teacherToken(key);
+    if ((await sha256Hex(tk)) !== TOKEN_SHA) { $("lgMsg").textContent = "Esa clave no es correcta."; return false; }
+    if (remember) LS.set("ccaProfe", cleanKey(key));
+    TOKEN = tk; await start(); return true;
+  }
+  async function start() {
+    $("vLogin").hidden = true; $("vApp").hidden = false; $("nbOpen").hidden = false;
+    S.who = STUDENTS[LS.get("labWho")] ? LS.get("labWho") : "PA";
+    S.unit = +(LS.get("labUnit_" + S.who) || 0);
+    var t = LS.get("labTab"); if (t && SECTIONS.indexOf(t) >= 0) S.tab = t;
+    paintDbs(); renderTab();
+    await flush(); await loadEvents(); renderTab();
+    setInterval(function () { if (pending().length) flush(); }, 30000);
+  }
+  $("lgGo").addEventListener("click", function () { enter($("lgKey").value, $("lgRem").checked); });
+  $("lgKey").addEventListener("keydown", function (e) { if (e.key === "Enter") $("lgGo").click(); });
+
+  (async function boot() {
+    if (LOCALHOST && window.__LAB_TEST_TOKEN) { TOKEN = window.__LAB_TEST_TOKEN; await start(); return; } // automated tests only
+    var saved = LS.get("ccaProfe");
+    if (saved && window.crypto && crypto.subtle) {
+      var tk = await teacherToken(saved);
+      if ((await sha256Hex(tk)) === TOKEN_SHA) { TOKEN = tk; await start(); return; }
+    }
+    $("vLogin").hidden = false;
+  })();
+})();
+</script>
+</body>
+</html>
