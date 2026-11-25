@@ -24,3 +24,9 @@ Las mismas 8 poses convertidas a JPG para programas que no abren SVG (WhatsApp, 
 apps de diseño). Son una conversión directa de los SVG oficiales, sin cambios en el dibujo:
 2000 px de ancho, fondo blanco (el JPG no admite transparencia), calidad 95, marcadas a 300 ppp.
 Para diseño o impresión grande sigue siendo mejor el SVG.
+
+## Versiones PNG con fondo transparente (`png/`)
+
+Las mismas 8 poses en PNG con transparencia, para ponerlas sobre fondos de color (azul oscuro,
+fotos, Adobe Express, Canva) sin el recuadro blanco del JPG. Conversión directa de los SVG
+oficiales: 2000 px de ancho, marcadas a 300 ppp.
