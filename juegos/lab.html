@@ -68,6 +68,9 @@ textarea{width:100%; min-height:64px; resize:vertical}
 .hero select,.hero input{background:rgba(255,255,255,.12); color:#fff; border-color:rgba(255,255,255,.35)}
 .hero select option{color:#12303F}
 .dbs{font-family:var(--mono); font-size:.75rem; border-radius:999px; padding:3px 10px; background:rgba(255,255,255,.14)}
+.nbs{font-family:var(--mono); font-size:.75rem; border-radius:999px; padding:3px 10px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink)}
+.nbs.ok{border-color:var(--good); background:var(--good-bg); color:var(--good)} .nbs.warn{border-color:var(--mid); background:var(--mid-bg); color:var(--mid)} .nbs.bad{border-color:var(--bad); background:var(--bad-bg); color:var(--bad)}
+.nbs::before{content:"● "}
 .dbs.ok::before{content:"● "; color:#9BE29E} .dbs.warn::before{content:"● "; color:#FFCF66} .dbs.bad::before{content:"● "; color:#FF8A7A}
 
 .tabs{display:flex; gap:6px; flex-wrap:wrap; position:sticky; top:0; z-index:5; background:var(--bg); padding:8px 0}
@@ -344,7 +347,7 @@ textarea{width:100%; min-height:64px; resize:vertical}
 
 <button class="nbtn" id="nbOpen" hidden>Notebook</button>
 <aside class="drawer" id="nb" hidden aria-label="Notebook">
-  <div class="spread"><h2>Notebook</h2><button class="ghost" id="nbClose">Close</button></div>
+  <div class="spread"><h2>Notebook</h2><div class="row"><span class="nbs" id="nbDbs" role="status" aria-live="polite">…</span><button class="ghost" id="nbClose">Close</button></div></div>
   <div class="seg"><button class="fx on" data-k="fix" id="nbFix">Fix</button><button class="gd" data-k="good" id="nbGood">Good</button></div>
   <label class="small">What she said<textarea id="nbSaid" placeholder="I am agree with you"></textarea></label>
   <label class="small" id="nbBetterL">Better version<textarea id="nbBetter" placeholder="I agree with you"></textarea></label>
@@ -1116,7 +1119,7 @@ textarea{width:100%; min-height:64px; resize:vertical}
   }
   function pending() { return LS.json("labPending", []); }
   function setPending(a) { LS.set("labPending", JSON.stringify(a)); }
-  function setDbs(state, txt) { var e = $("dbs"); e.className = "dbs " + state; e.textContent = txt; }
+  function setDbs(state, txt) { var e = $("dbs"); e.className = "dbs " + state; e.textContent = txt; var n = $("nbDbs"); n.className = "nbs " + state; n.textContent = txt; }
   function paintDbs() {
     var n = pending().length;
     if (DBOK === true && !n) setDbs("ok", "Saved online");
