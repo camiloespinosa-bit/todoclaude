@@ -17,3 +17,10 @@ conectados en el sitio así:
 **Regla de marca (skill `cca-marca`): nunca generar ni recrear a Oki con herramientas de IA de
 generación de imagen.** Si en algún momento se necesita una pose nueva que no está en esta lista,
 pedirla al equipo (Sebastián) en vez de improvisarla.
+
+## Versiones JPG (`jpg/`)
+
+Las mismas 8 poses convertidas a JPG para programas que no abren SVG (WhatsApp, Word, algunas
+apps de diseño). Son una conversión directa de los SVG oficiales, sin cambios en el dibujo:
+2000 px de ancho, fondo blanco (el JPG no admite transparencia), calidad 95, marcadas a 300 ppp.
+Para diseño o impresión grande sigue siendo mejor el SVG.
