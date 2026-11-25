@@ -14,15 +14,15 @@ const TIPOS = {
 
 // Franjas de atención por día de la semana (0 = domingo), solo para el modo prototipo:
 // conectada, la página usa el horario guardado en la base de datos. Minutos desde medianoche.
-// Lunes 6–8 p.m.; martes y jueves 6–12, 1–4 y 7–8 p.m.; miércoles 6–12 y 1–8 p.m.;
-// viernes 6–3:30 y 4:30–8 p.m.; sábado 8–12 y 1–5.
+// De 12 m. a 2 p.m. no hay clases. Lunes y miércoles 6–12 y 2–8 p.m.; martes y jueves 6–12,
+// 2–4 y 7–8 p.m.; viernes 6–12, 2–3:30 y 4:30–8 p.m.; sábado 8–12 y 2–5.
 const HORARIO = {
-  1: [[360, 1200]],
-  2: [[360, 720], [780, 960], [1140, 1200]],
-  3: [[360, 720], [780, 1200]],
-  4: [[360, 720], [780, 960], [1140, 1200]],
-  5: [[360, 930], [990, 1200]],
-  6: [[480, 720], [780, 1020]],
+  1: [[360, 720], [840, 1200]],
+  2: [[360, 720], [840, 960], [1140, 1200]],
+  3: [[360, 720], [840, 1200]],
+  4: [[360, 720], [840, 960], [1140, 1200]],
+  5: [[360, 720], [840, 930], [990, 1200]],
+  6: [[480, 720], [840, 1020]],
 };
 
 const CUPO_MAXIMO = 5; // estudiantes al mismo tiempo
@@ -93,6 +93,14 @@ const NOMBRE_MODALIDAD = { presencial: "presencial", virtual: "virtual" };
 
 // Devuelve las horas de inicio para el tipo, la modalidad y la fase elegidos.
 // Cada opción: { minutos, disponible, detalle }.
+// Las clases presenciales se reservan con 24 horas de anticipación (la base de datos también
+// lo revisa); las virtuales, hasta que empiecen.
+function antesDe24Horas(fecha, minutos) {
+  const { fecha: hoy, minutos: ahora } = hoyEnBogota();
+  const manana = sumarDias(hoy, 1);
+  return fecha < manana || (fecha === manana && minutos < ahora);
+}
+
 function horasDisponibles(fecha, tipo, modalidad, fase, { grupos, pruebas }) {
   const franjas = franjasDe(fecha);
   const ahora = hoyEnBogota();
@@ -105,6 +113,10 @@ function horasDisponibles(fecha, tipo, modalidad, fase, { grupos, pruebas }) {
     // empiece a las y media (por ejemplo, el viernes desde las 4:30 p.m.).
     for (let m = Math.ceil(inicio / paso) * paso; m + minutosClase <= fin; m += paso) {
       if (fecha === ahora.fecha && m <= ahora.minutos) continue;
+      if (modalidad === "presencial" && antesDe24Horas(fecha, m)) {
+        opciones.push({ minutos: m, disponible: false, detalle: "Con 24 h de anticipación" });
+        continue;
+      }
 
       if (tipo === "prueba") {
         const hora = m - (m % 60);
@@ -496,13 +508,17 @@ function pintarHorasFijas() {
 
 // La primera clase de cada día elegido: la próxima fecha con ese día de la semana, desde
 // hoy si la hora todavía no ha pasado.
+// La primera clase de cada día elegido: la próxima fecha con ese día de la semana que todavía
+// se puede reservar (presencial: con 24 horas de anticipación).
 function primerasClases() {
   const { fecha: hoy, minutos } = hoyEnBogota();
+  const muyPronto = (fecha) => (estado.modalidad === "presencial"
+    ? antesDe24Horas(fecha, estado.horaFija)
+    : fecha === hoy && estado.horaFija <= minutos);
   return [...estado.dias].map((dia) => {
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 14; i++) {
       const fecha = sumarDias(hoy, i);
-      if (diaSemana(fecha) !== dia || (i === 0 && estado.horaFija <= minutos)) continue;
-      return { fecha, hora: estado.horaFija };
+      if (diaSemana(fecha) === dia && !muyPronto(fecha)) return { fecha, hora: estado.horaFija };
     }
     return { fecha: sumarDias(hoy, 7), hora: estado.horaFija };
   });
@@ -646,12 +662,13 @@ const ERRORES = {
   SIN_CUPO: "Ese grupo se acaba de llenar. Elige otra hora.",
   YA_RESERVADO: "Ya tienes una reserva en esa hora con este correo.",
   HORA_PASADA: "Esa hora ya pasó. Elige otra.",
+  ANTICIPACION_24H: "Las clases presenciales se reservan con 24 horas de anticipación. Elige otra hora o una clase virtual.",
   FUERA_DE_HORARIO: "Esa hora está fuera del horario de atención.",
   PERSONAS_INVALIDAS: "Revisa el número de personas (de 1 a 5).",
   AUTORIZACION_REQUERIDA: "Para reservar debes autorizar el tratamiento de tus datos.",
   DEMASIADAS_CLASES: "Son demasiadas clases de una vez. Quita algunas e intenta de nuevo.",
 };
-const ERRORES_DE_AGENDA = ["HORA_OCUPADA", "OTRA_MODALIDAD", "OTRA_FASE", "SIN_CUPO", "HORA_PASADA", "FUERA_DE_HORARIO"];
+const ERRORES_DE_AGENDA = ["HORA_OCUPADA", "OTRA_MODALIDAD", "OTRA_FASE", "SIN_CUPO", "HORA_PASADA", "FUERA_DE_HORARIO", "ANTICIPACION_24H"];
 
 // Motivo corto para la lista de clases que no se pudieron reservar.
 const MOTIVOS = {
@@ -661,6 +678,7 @@ const MOTIVOS = {
   SIN_CUPO: "el grupo está lleno",
   YA_RESERVADO: "ya tenías esa reserva",
   HORA_PASADA: "esa hora ya pasó",
+  ANTICIPACION_24H: "falta menos de 24 horas (clase presencial)",
   FUERA_DE_HORARIO: "día cerrado o fuera del horario",
 };
 

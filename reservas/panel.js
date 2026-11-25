@@ -498,6 +498,12 @@ async function horasParaMover(fecha, tipo, modalidad, fase) {
   for (const { inicio, fin } of franjas) {
     for (let m = Math.ceil(inicio / paso) * paso; m + minutos <= fin; m += paso) {
       if (m <= ahora) continue;
+      // Como en la página: presencial, con 24 horas de anticipación (la base de datos también lo revisa).
+      const manana = sumarDias(hoyEnBogota(), 1);
+      if (modalidad === "presencial" && (fecha < manana || (fecha === manana && m < minutosAhoraEnBogota()))) {
+        opciones.push({ minutos: m, disponible: false, detalle: "menos de 24 h" });
+        continue;
+      }
       if (tipo === "prueba") {
         const libre = !grupos.has(m - (m % 60)) && !pruebas.has(m);
         opciones.push({ minutos: m, disponible: libre, detalle: libre ? "libre" : "ocupada" });
@@ -658,6 +664,7 @@ const MENSAJES_ERROR = {
   HORA_OCUPADA: "Esa hora está ocupada por una clase de prueba.",
   FUERA_DE_HORARIO: "Ese día está cerrado o la hora está fuera del horario.",
   HORA_PASADA: "Esa hora ya pasó.",
+  ANTICIPACION_24H: "Las clases presenciales se mueven con 24 horas de anticipación.",
   YA_RESERVADO: "Ya tiene otra reserva en esa hora.",
 };
 
