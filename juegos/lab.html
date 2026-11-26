@@ -1270,15 +1270,20 @@ textarea{width:100%; min-height:64px; resize:vertical}
       var col = cs.getPropertyValue(WCOL[i % 8]).trim() || "#2C5F7C";
       var mid = (a0 + a1) / 2, deg = mid * 180 / Math.PI;
       svg += "<path d='M0 0 L" + x0.toFixed(2) + " " + y0.toFixed(2) + " A100 100 0 0 1 " + x1.toFixed(2) + " " + y1.toFixed(2) + " Z' fill='" + col + "' stroke='#fff' stroke-width='1.5'/>";
-      svg += "<text transform='rotate(" + deg.toFixed(2) + ") translate(62 0)' text-anchor='middle' dominant-baseline='middle' fill='#fff' font-size='9' font-weight='700' font-family='Poppins, sans-serif'>" + esc(SP.deck[i].k) + "</text>";
+      svg += "<text transform='rotate(" + deg.toFixed(2) + ") translate(62 0)" + (Math.cos(mid) < 0 ? " rotate(180)" : "") + "' text-anchor='middle' dominant-baseline='middle' fill='#fff' font-size='9' font-weight='700' font-family='Poppins, sans-serif'>" + esc(SP.deck[i].k) + "</text>";
     }
+    if (n === 1) svg = "<circle r='100' fill='" + (cs.getPropertyValue(WCOL[0]).trim() || "#2C5F7C") + "'/><text x='0' y='-62' text-anchor='middle' dominant-baseline='middle' fill='#fff' font-size='9' font-weight='700' font-family='Poppins, sans-serif'>" + esc(SP.deck[0].k) + "</text>";
     svg += "<circle r='100' fill='none' stroke='#1D3F54' stroke-width='4'/>";
-    $("wheel").innerHTML = svg;
+    // a new wheel starts straight, without the spin animation
+    var w = $("wheel"); w.style.transition = "none"; SP.rot = 0; w.style.transform = "rotate(0deg)"; void w.getBoundingClientRect(); w.style.transition = "";
+    w.innerHTML = svg;
+    $("spinGo").disabled = !n;
   }
   function renderSpin() {
     if (!SP.deck.length || SP.who !== S.who || SP.unit !== S.unit) { SP.deck = spinDeck(); SP.who = S.who; SP.unit = S.unit; SP.cur = null; drawWheel(); paintSpinCard(); }
   }
   function doSpin() {
+    if (!SP.deck.length) return;
     var n = SP.deck.length, i = Math.floor(Math.random() * n);
     var seg = 360 / n, target = 360 - (i * seg + seg / 2); // segment i under the pointer (top)
     var jitter = (Math.random() - .5) * seg * .6;
@@ -1290,7 +1295,8 @@ textarea{width:100%; min-height:64px; resize:vertical}
   }
   function paintSpinCard() {
     var el = $("spinCard");
-    if (!SP.cur) { el.innerHTML = "<p class='muted'>Spin the wheel. The card shows a situation; the targets stay hidden until you press Reveal.</p>"; return; }
+    if (!SP.cur && !SP.deck.length) { el.innerHTML = "<p class='big'>All done! 🎉</p><p class='muted' style='margin:6px 0 12px'>Every situation on the wheel was played.</p><button class='gold' id='spRefill'>Fill the wheel again</button>"; return; }
+    if (!SP.cur) { el.innerHTML = "<p class='muted'>Spin the wheel. The card shows a situation; the targets stay hidden until you press Reveal. A situation leaves the wheel when you save its round.</p>"; return; }
     el.innerHTML = "<div class='card'><p class='tag'>Unit " + (SP.cur.u + 1) + " · " + esc(stu().units[SP.cur.u].n) + "</p><h3>" + esc(SP.cur.p) + "</h3>" +
       targetsHtml(SP.T, "sp") + "<div class='row' style='margin-top:12px'><button class='ghost' id='spReveal'>" + (SP.T.hidden ? "Reveal targets" : "Hide targets") + "</button>" +
       "<button class='primary' id='spSave'" + (allMarked(SP.T) ? "" : " disabled") + ">Save round</button><span class='flash' id='spMsg'></span></div></div>";
@@ -1684,7 +1690,8 @@ textarea{width:100%; min-height:64px; resize:vertical}
     if (b.id === "spinGo") { doSpin(); return; }
     if (b.dataset.sp != null) { SP.T.items[+b.dataset.sp].ok = b.dataset.v === "1"; paintSpinCard(); return; }
     if (b.id === "spReveal") { SP.T.hidden = !SP.T.hidden; paintSpinCard(); return; }
-    if (b.id === "spSave") { var c = SP.cur, T = SP.T; b.disabled = true; saveRound("spin", c.p, T.items).then(function (ok) { SP.cur = null; paintSpinCard(); var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = ok ? "Saved ✓ Spin again!" : "Saved on this device (will sync later)"; $("spinCard").appendChild(m); }); return; }
+    if (b.id === "spRefill") { SP.deck = spinDeck(); SP.cur = null; drawWheel(); paintSpinCard(); return; }
+    if (b.id === "spSave") { var c = SP.cur, T = SP.T; b.disabled = true; SP.deck = SP.deck.filter(function (x) { return x !== c; }); drawWheel(); saveRound("spin", c.p, T.items).then(function (ok) { SP.cur = null; paintSpinCard(); var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = ok ? "Saved ✓ Spin again!" : "Saved on this device (will sync later)"; $("spinCard").appendChild(m); }); return; }
     // jeopardy
     if (b.dataset.jt) { var p = b.dataset.jt.split("-"); JE.cur = { c: +p[0], r: +p[1] }; JE.T = mkTargets(board().tiles[JE.cur.c][JE.cur.r].t); paintJeoCard(); $("jeoCard").scrollIntoView({ behavior: "smooth", block: "nearest" }); return; }
     if (b.dataset.jt2 != null) { JE.T.items[+b.dataset.jt2].ok = b.dataset.v === "1"; paintJeoCard(); return; }
