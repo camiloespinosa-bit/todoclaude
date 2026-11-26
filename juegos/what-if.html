@@ -182,7 +182,36 @@ textarea{width:100%; min-height:90px; resize:vertical}
 .trap .v{color:var(--good); font-weight:700}
 .honest{border-left:6px solid var(--turq); background:var(--surface-2); border-radius:10px; padding:10px 14px; font-size:.9rem}
 
+/* notebook */
+.nbtn{position:fixed; right:max(16px,env(safe-area-inset-right,0px)); bottom:18px; z-index:20; background:var(--orange); color:#fff; border:none; border-radius:999px; padding:12px 20px; font-weight:800; box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.drawer{position:fixed; right:0; top:0; bottom:0; width:min(440px,100vw); background:var(--surface); border-left:1px solid var(--line); z-index:30; padding:18px; overflow:auto; box-shadow:-10px 0 30px rgba(0,0,0,.2); display:flex; flex-direction:column; gap:10px}
+.drawer label{display:grid; gap:4px}
+.drawer select,.drawer textarea{width:100%}
+.drawer textarea{min-height:64px}
+.seg{display:flex; gap:6px}
+.seg button{flex:1; border:2px solid var(--line); background:var(--bg); border-radius:10px; padding:8px; font-weight:700}
+.seg button.on.fx{border-color:var(--bad); background:var(--bad-bg); color:var(--bad)}
+.seg button.on.gd{border-color:var(--good); background:var(--good-bg); color:var(--good)}
+.note{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--bg); display:grid; gap:2px}
+.note.fx{border-left:6px solid var(--bad)} .note.gd{border-left:6px solid var(--good)}
+.note .said{font-weight:600}
+.note .better{color:var(--good); font-weight:600}
+.note .meta{font-family:var(--mono); font-size:.7rem; color:var(--muted)}
+.note .del{justify-self:end; border:none; background:none; color:var(--muted); font-size:.8rem; text-decoration:underline}
+.nbs{font-family:var(--mono); font-size:.75rem; border-radius:999px; padding:3px 10px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink)}
+.nbs.ok{border-color:var(--good); background:var(--good-bg); color:var(--good)} .nbs.warn{border-color:var(--mid); background:var(--mid-bg); color:var(--mid)} .nbs.bad{border-color:var(--bad); background:var(--bad-bg); color:var(--bad)}
+.nbs::before{content:"● "}
+.bug{font-size:clamp(1.3rem,3.4vw,2rem); font-weight:700; padding:16px 18px; border-radius:14px; background:var(--bad-bg); border:2px dashed var(--bad)}
+.win{font-size:clamp(1.1rem,2.6vw,1.5rem); font-weight:700; padding:12px 16px; border-radius:14px; background:var(--good-bg); border-left:8px solid var(--good)}
+.prow{display:grid; grid-template-columns:minmax(0,1.6fr) repeat(3,auto); gap:6px 16px; align-items:center; padding:10px 0; border-top:1px solid var(--line)}
+.prow .pct{font-family:var(--mono); font-weight:700; min-width:6ch; text-align:right}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px}
+.stat{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg)}
+.stat b{display:block; font-size:1.8rem; font-weight:800; line-height:1.1}
+.code{font-family:var(--mono); font-size:.72rem; border:1px solid var(--line); border-radius:6px; padding:0 6px; color:var(--muted)}
+
 @media (max-width:760px){
+  .prow{grid-template-columns:minmax(0,1fr) auto auto auto}
   .spin,.roles,.rules{grid-template-columns:1fr}
   .board{grid-template-columns:repeat(5,minmax(58px,1fr)); overflow-x:auto}
   .board .cat{font-size:.68rem}
@@ -225,6 +254,7 @@ textarea{width:100%; min-height:90px; resize:vertical}
       <button class="ghost" id="scoreReset">Reset scores</button>
       <span class="flash" id="setupMsg"></span>
     </div>
+    <p class="muted small" style="margin-top:10px" id="codes"></p>
   </section>
 
   <div class="scores" id="scores" aria-live="polite"></div>
@@ -232,6 +262,8 @@ textarea{width:100%; min-height:90px; resize:vertical}
   <nav class="tabs" id="tabs" aria-label="Sections">
     <button data-t="menu" class="on">Games</button>
     <button data-t="rules">Rules (cheat sheet)</button>
+    <button data-t="court">Error Court</button>
+    <button data-t="prog">Progress</button>
     <button data-t="setup">Teams</button>
   </nav>
 
@@ -288,7 +320,32 @@ textarea{width:100%; min-height:90px; resize:vertical}
   <section id="tAuction" class="panel" hidden><div id="auction"></div></section>
   <section id="tDeal" class="panel" hidden><div id="deal"></div></section>
   <section id="tChain" class="panel" hidden><div id="chain"></div></section>
+
+  <section id="tCourt" class="panel" hidden>
+    <div class="spread"><h2>Error Court</h2><span class="muted small" id="courtCount"></span></div>
+    <p class="muted" style="margin:6px 0 12px">Today's sentences from the Notebook, with no names on screen. First the wins, then the cases: the group finds the bug before you reveal the better version.</p>
+    <div id="court"></div>
+  </section>
+
+  <section id="tProg" class="panel" hidden>
+    <div class="spread"><h2>Progress</h2><label class="small">Student <select id="progWho"></select></label></div>
+    <div id="prog" style="margin-top:12px"></div>
+    <p class="honest" style="margin-top:16px">These are notes the teacher took in live classes. They show trends; they are not a validated level test.</p>
+  </section>
   </div>
+
+<button class="nbtn" id="nbOpen" hidden>Notebook</button>
+<aside class="drawer" id="nb" hidden aria-label="Notebook">
+  <div class="spread"><h2>Notebook</h2><div class="row"><span class="nbs" id="nbDbs" role="status" aria-live="polite">…</span><button class="ghost" id="nbClose">Close</button></div></div>
+  <label class="small">Who said it <select id="nbWho"></select></label>
+  <div class="seg"><button class="fx on" data-k="fix" id="nbFix">Fix</button><button class="gd" data-k="good" id="nbGood">Good</button></div>
+  <label class="small">What they said<textarea id="nbSaid" placeholder="If I would have more time, I would travel"></textarea></label>
+  <label class="small" id="nbBetterL">Better version<textarea id="nbBetter" placeholder="If I had more time, I would travel"></textarea></label>
+  <label class="small">Structure <select id="nbStruct"></select></label>
+  <div class="row"><button class="primary" id="nbSave">Save note</button><span class="flash" id="nbMsg"></span></div>
+  <h3 style="margin-top:8px">Today</h3>
+  <div id="nbList" style="display:grid; gap:8px"></div>
+</aside>
 </div>
 
 <script>
@@ -495,7 +552,7 @@ textarea{width:100%; min-height:90px; resize:vertical}
     if (names.length < 2) { $("setupMsg").className = "flash bad"; $("setupMsg").textContent = "Write at least 2 teams or players."; return; }
     S.teams = names.map(function (n, i) { return { n: n, s: S.teams[i] ? S.teams[i].s : 0 }; });
     if (S.cur >= S.teams.length) S.cur = 0;
-    save(); renderScores(); onTurn();
+    save(); renderScores(); onTurn(); paintWho();
     $("setupMsg").className = "flash"; $("setupMsg").textContent = "Saved: " + names.length + " teams.";
   };
   var resetArmed = false;
@@ -515,11 +572,11 @@ textarea{width:100%; min-height:90px; resize:vertical}
     { id: "Auction", sec: "tAuction", g: "acc", n: "Grammar Auction", d: "Each team has $1,000. Bet only on the sentences you think are correct.", m: "0 · 1 · 2 · 10 min" },
     { id: "Jeo", sec: "tJeo", g: "acc", n: "Jeopardy", d: "5 categories, 25 tiles. Perfect for review or a final boss round.", m: "0 · 1 · 2 · 20-30 min", c: "mix" }
   ];
-  var SECS = ["tMenu", "tRules", "tSpin", "tJeo", "tWhich", "tRapid", "tAuction", "tDeal", "tChain"];
+  var SECS = ["tMenu", "tRules", "tSpin", "tJeo", "tWhich", "tRapid", "tAuction", "tDeal", "tChain", "tCourt", "tProg"];
   function show(sec, label) {
     SECS.forEach(function (s) { $(s).hidden = s !== sec; });
     $("gameBar").hidden = !label; $("gameName").textContent = label || "";
-    Array.prototype.forEach.call($("tabs").children, function (b) { b.classList.toggle("on", (b.dataset.t === "menu" && sec === "tMenu") || (b.dataset.t === "rules" && sec === "tRules")); });
+    Array.prototype.forEach.call($("tabs").children, function (b) { b.classList.toggle("on", (b.dataset.t === "menu" && sec === "tMenu") || (b.dataset.t === "rules" && sec === "tRules") || (b.dataset.t === "court" && sec === "tCourt") || (b.dataset.t === "prog" && sec === "tProg")); });
     stopTimers();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -541,6 +598,8 @@ textarea{width:100%; min-height:90px; resize:vertical}
     var b = e.target.closest("button"); if (!b) return;
     if (b.dataset.t === "menu") show("tMenu");
     if (b.dataset.t === "rules") show("tRules");
+    if (b.dataset.t === "court") { show("tCourt"); renderCourt(); }
+    if (b.dataset.t === "prog") { show("tProg"); renderProg(); }
     if (b.dataset.t === "setup") { $("setup").hidden = false; $("setup").scrollIntoView({ behavior: "smooth" }); }
   };
   $("backMenu").onclick = function () { show("tMenu"); };
@@ -846,6 +905,181 @@ textarea{width:100%; min-height:90px; resize:vertical}
   // ================================================================ START
   window.addEventListener("beforeunload", save);
 
+
+  // ================================================================ NOTEBOOK, ERROR COURT, PROGRESS (same Supabase table as English Lab: lab_events)
+  // No names in the database: each player gets a short code made from a hash of the name. The group itself is WGRP.
+  var SUPA = { url: "https://xpqjejiezbxaxsdodkyb.supabase.co", key: "sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd" };
+  var CST = {
+    c0: "Zero conditional (If + present, present)",
+    c1: "First conditional (If + present, will)",
+    c2: "Second conditional (If + past, would)",
+    "t.will": "Trap: no will after if",
+    "t.would": "Trap: no would after if",
+    "t.were": "Trap: If I were (not If I am)",
+    "t.unless": "Trap: unless, no double negative",
+    "t.tense": "Trap: second conditional question (if you lost...)",
+    other: "Other (not conditionals)"
+  };
+  var LSX = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    json: function (k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  };
+  function todayStr() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function uid() { return "wi-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); }
+  function codeFor(name) { // W + 5 characters from a hash of the name: stable, and the name is not stored
+    var l = name.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    var h = 2166136261;
+    for (var i = 0; i < l.length; i++) { h ^= l.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return "W" + (h % 60466176).toString(36).toUpperCase().padStart(5, "0");
+  }
+  function players() { // [{n, c}], plus the whole group
+    var used = {}, out = [];
+    S.teams.forEach(function (t) {
+      var c = codeFor(t.n);
+      if (used[c] || c === "WGRP") return; // same name twice: one entry
+      used[c] = 1; out.push({ n: t.n, c: c });
+    });
+    out.push({ n: "Whole group", c: "WGRP" });
+    return out;
+  }
+  function nameOf(c) { var p = players().filter(function (x) { return x.c === c; })[0]; return p ? p.n : c; }
+
+  async function rpc(fn, args, timeout) {
+    var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, timeout || 9000);
+    try {
+      var res = await fetch(SUPA.url + "/rest/v1/rpc/" + fn, { method: "POST", headers: { apikey: SUPA.key, "content-type": "application/json" }, body: JSON.stringify(args), signal: ctl.signal });
+      if (!res.ok) return { ok: false, status: res.status };
+      var tx = await res.text(); return { ok: true, data: tx ? JSON.parse(tx) : null };
+    } catch (e) { return { ok: false, status: 0 }; } finally { clearTimeout(t); }
+  }
+  var DBOK = null;
+  function pending() { return LSX.json("wiPending", []); }
+  function setPending(a) { LSX.set("wiPending", JSON.stringify(a)); }
+  function paintDbs() {
+    var n = pending().length, e = $("nbDbs"), st, tx;
+    if (DBOK === true && !n) { st = "ok"; tx = "Saved online"; }
+    else if (DBOK === true) { st = "warn"; tx = n + " waiting to sync"; }
+    else if (DBOK === false) { st = "bad"; tx = n ? n + " saved only on this device" : "Database off"; }
+    else { st = "warn"; tx = "Connecting…"; }
+    e.className = "nbs " + st; e.textContent = tx;
+  }
+  async function flush() {
+    var q = pending(); if (!TOKEN) { paintDbs(); return; }
+    if (!q.length) { if (DBOK === null) { var r0 = await rpc("lab_list", { p_token: TOKEN, p_student: "WGRP" }, 9000); DBOK = r0.ok ? true : (r0.status === 0 ? null : false); } paintDbs(); return; }
+    var left = [];
+    for (var i = 0; i < q.length; i++) {
+      var e = q[i];
+      var r = await rpc("lab_add", { p_token: TOKEN, p_id: e.id, p_student: e.student, p_session: e.session, p_kind: e.kind, p_data: e.data });
+      if (r.ok) DBOK = true; else { left.push(e); if (r.status !== 0) DBOK = false; }
+    }
+    setPending(left); paintDbs();
+  }
+  // today's notes live on this device too, so the Error Court works even offline
+  function todayNotes() { return LSX.json("wiNotes_" + todayStr(), []); }
+  function setTodayNotes(a) { LSX.set("wiNotes_" + todayStr(), JSON.stringify(a)); }
+
+  var nbKind = "fix";
+  function paintWho() {
+    var ps = players(), prev = $("nbWho").value;
+    var opts = ps.map(function (p) { return '<option value="' + p.c + '">' + esc(p.n) + "</option>"; }).join("");
+    $("nbWho").innerHTML = opts; if (prev && ps.some(function (p) { return p.c === prev; })) $("nbWho").value = prev;
+    var pv = $("progWho").value; $("progWho").innerHTML = opts; if (pv && ps.some(function (p) { return p.c === pv; })) $("progWho").value = pv;
+    $("codes").innerHTML = "Codes saved in the database instead of names: " + ps.map(function (p) { return esc(p.n) + ' <span class="code">' + p.c + "</span>"; }).join(" · ") +
+      ". Write each name the same way every class (accents and capitals do not matter) so the progress adds up.";
+  }
+  $("nbStruct").innerHTML = Object.keys(CST).map(function (k) { return '<option value="' + k + '">' + esc(CST[k]) + "</option>"; }).join("");
+  function setKind(k) { nbKind = k; $("nbFix").classList.toggle("on", k === "fix"); $("nbGood").classList.toggle("on", k === "good"); $("nbBetterL").hidden = k === "good"; }
+  $("nbFix").onclick = function () { setKind("fix"); };
+  $("nbGood").onclick = function () { setKind("good"); };
+  $("nbOpen").onclick = function () { $("nb").hidden = false; paintWho(); renderNb(); $("nbSaid").focus(); };
+  $("nbClose").onclick = function () { $("nb").hidden = true; };
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("nb").hidden) $("nb").hidden = true; });
+  $("nbSave").onclick = async function () {
+    var said = $("nbSaid").value.trim(), better = $("nbBetter").value.trim();
+    if (!said) { $("nbMsg").className = "flash bad"; $("nbMsg").textContent = "Write what they said."; return; }
+    var e = { id: uid(), student: $("nbWho").value, session: todayStr(), kind: "note",
+      data: { app: "whatif", kind: nbKind, said: said, better: nbKind === "fix" ? better : "", s: $("nbStruct").value } };
+    var t = todayNotes(); t.push(e); setTodayNotes(t);
+    var q = pending(); q.push(e); setPending(q);
+    $("nbSaid").value = ""; $("nbBetter").value = ""; renderNb();
+    await flush();
+    var ok = !pending().some(function (p) { return p.id === e.id; });
+    $("nbMsg").className = "flash" + (ok ? "" : " bad"); $("nbMsg").textContent = ok ? "Saved ✓" : "Saved on this device (it syncs when the database answers)";
+    setTimeout(function () { $("nbMsg").textContent = ""; }, 3500);
+    $("nbSaid").focus();
+  };
+  $("nbSaid").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("nbSave").click(); });
+  $("nbBetter").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("nbSave").click(); });
+  function noteHtml(e, withDel) {
+    var d = e.data;
+    return '<div class="note ' + (d.kind === "good" ? "gd" : "fx") + '"><span class="meta">' + esc(nameOf(e.student)) + " · " + esc(CST[d.s] || d.s) + "</span>" +
+      '<span class="said">' + esc(d.said) + "</span>" + (d.better ? '<span class="better">→ ' + esc(d.better) + "</span>" : "") +
+      (withDel ? '<button class="del" data-del="' + e.id + '">Delete</button>' : "") + "</div>";
+  }
+  function renderNb() {
+    var t = todayNotes().slice().reverse();
+    $("nbList").innerHTML = t.length ? t.map(function (e) { return noteHtml(e, true); }).join("") : '<p class="muted small">Nothing yet today.</p>';
+    paintDbs();
+  }
+  $("nbList").addEventListener("click", async function (e) {
+    var b = e.target.closest("[data-del]"); if (!b) return;
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Sure? Click again"; return; }
+    var id = b.dataset.del;
+    setTodayNotes(todayNotes().filter(function (x) { return x.id !== id; }));
+    setPending(pending().filter(function (x) { return x.id !== id; }));
+    renderNb();
+    if (TOKEN) await rpc("lab_del", { p_token: TOKEN, p_id: id });
+  });
+
+  function renderCourt() {
+    var t = todayNotes(), wins = t.filter(function (e) { return e.data.kind === "good"; }), cases = shuffle(t.filter(function (e) { return e.data.kind !== "good"; }));
+    $("courtCount").textContent = wins.length + " wins · " + cases.length + " cases";
+    if (!t.length) { $("court").innerHTML = '<p class="muted">The Notebook is empty today. Open it (orange button) and take notes while they play.</p>'; return; }
+    var h = "";
+    if (wins.length) h += '<h3 style="margin-bottom:8px">Wins</h3><div style="display:grid; gap:8px; margin-bottom:18px">' + wins.map(function (e) { return '<div class="win">' + esc(e.data.said) + "</div>"; }).join("") + "</div>";
+    if (cases.length) h += '<h3 style="margin-bottom:8px">Cases</h3><div style="display:grid; gap:14px">' + cases.map(function (e, i) {
+      return '<div class="card"><span class="tag">Case ' + (i + 1) + " · " + esc(CST[e.data.s] || "") + '</span><div class="bug" style="margin-top:8px">' + esc(e.data.said) + "</div>" +
+        '<div class="row" style="margin-top:10px"><button class="ghost" data-rev="' + i + '">Reveal the better version</button></div><div id="cv' + i + '" style="margin-top:8px"></div></div>';
+    }).join("") + "</div>";
+    $("court").innerHTML = h;
+    $("court").querySelectorAll("[data-rev]").forEach(function (b) {
+      b.onclick = function () { var e = cases[+b.dataset.rev]; $("cv" + b.dataset.rev).innerHTML = '<div class="model"><small>Better</small>' + esc(e.data.better || "(no better version written)") + "</div>"; };
+    });
+  }
+
+  $("progWho").onchange = renderProg;
+  async function renderProg() {
+    var c = $("progWho").value || "WGRP", box = $("prog");
+    box.innerHTML = '<p class="muted">Loading…</p>';
+    var r = TOKEN ? await rpc("lab_list", { p_token: TOKEN, p_student: c }, 15000) : { ok: false, status: 0 };
+    var ev;
+    if (r.ok) { DBOK = true; ev = (r.data || []).map(function (e) { return { id: e.id, student: e.student, session: String(e.session).slice(0, 10), kind: e.kind, data: e.data }; }); }
+    else { DBOK = r.status === 0 ? DBOK : false; ev = []; }
+    var ids = {}; ev.forEach(function (e) { ids[e.id] = 1; });
+    pending().forEach(function (e) { if (e.student === c && !ids[e.id]) ev.push(e); });
+    paintDbs();
+    ev = ev.filter(function (e) { return e.kind === "note" && e.data && e.data.app === "whatif"; });
+    if (!ev.length) { box.innerHTML = '<p class="muted">' + (r.ok ? "No notes for " + esc(nameOf(c)) + " yet." : "The database did not answer. Notes saved on this device appear here when it does.") + "</p>"; return; }
+    var by = {}, sess = {};
+    ev.forEach(function (e) {
+      var k = e.data.s || "other"; by[k] = by[k] || { g: 0, f: 0 }; by[k][e.data.kind === "good" ? "g" : "f"]++;
+      sess[e.session] = sess[e.session] || { g: 0, f: 0 }; sess[e.session][e.data.kind === "good" ? "g" : "f"]++;
+    });
+    var g = ev.filter(function (e) { return e.data.kind === "good"; }).length;
+    var h = '<div class="stats"><div class="stat"><b>' + Object.keys(sess).length + '</b><span class="muted small">classes with notes</span></div>' +
+      '<div class="stat"><b>' + g + '</b><span class="muted small">good</span></div><div class="stat"><b>' + (ev.length - g) + '</b><span class="muted small">to fix</span></div></div>';
+    h += '<h3 style="margin:18px 0 4px">By structure</h3><div class="prow muted small"><span>Structure</span><span>Good</span><span>Fix</span><span class="pct">% good</span></div>';
+    Object.keys(CST).forEach(function (k) {
+      var x = by[k]; if (!x) return;
+      h += '<div class="prow"><span>' + esc(CST[k]) + "</span><span>" + x.g + "</span><span>" + x.f + '</span><span class="pct">' + Math.round(100 * x.g / (x.g + x.f)) + "%</span></div>";
+    });
+    h += '<h3 style="margin:18px 0 4px">By class</h3>';
+    Object.keys(sess).sort().reverse().forEach(function (d) { var x = sess[d]; h += '<div class="prow"><span>' + d + "</span><span>" + x.g + "</span><span>" + x.f + '</span><span class="pct">' + Math.round(100 * x.g / (x.g + x.f)) + "%</span></div>"; });
+    h += '<h3 style="margin:18px 0 8px">Latest notes</h3><div style="display:grid; gap:8px">' + ev.slice(-12).reverse().map(function (e) { return noteHtml(e, false); }).join("") + "</div>";
+    box.innerHTML = h;
+  }
+
   // ================================================================ TEACHER KEY (same check as lab.html and the Panel del profe)
   var TOKEN_SHA = "27636e092d3ac7cf89eeb70e4ce5fc47e4669c34bb8c1b0669520a456ec3a805";
   var enc = new TextEncoder();
@@ -856,25 +1090,27 @@ textarea{width:100%; min-height:90px; resize:vertical}
     var base = await crypto.subtle.importKey("raw", enc.encode("cca-profe|" + cleanKey(key)), "PBKDF2", false, ["deriveBits"]);
     return hex(await crypto.subtle.deriveBits({ name: "PBKDF2", salt: enc.encode("cca-db-token"), iterations: 250000, hash: "SHA-256" }, base, 256));
   }
-  var started = false;
-  function start() {
-    if (started) return; started = true;
-    $("vLogin").hidden = true; $("vApp").hidden = false;
-    menu(); renderScores(); show("tMenu");
+  var started = false, TOKEN = null;
+  function start(tk) {
+    if (started) return; started = true; TOKEN = tk;
+    $("vLogin").hidden = true; $("vApp").hidden = false; $("nbOpen").hidden = false;
+    menu(); renderScores(); show("tMenu"); paintWho(); renderNb(); flush();
+    setInterval(function () { if (pending().length) flush(); }, 30000);
   }
   async function enter(key, remember) {
     $("lgMsg").textContent = "Comprobando...";
     if (!(window.crypto && crypto.subtle)) { $("lgMsg").textContent = "Abre esta página con https:// para poder entrar."; return; }
-    if ((await sha256Hex(await teacherToken(key))) !== TOKEN_SHA) { $("lgMsg").textContent = "Esa clave no es correcta."; return; }
+    var tk = await teacherToken(key);
+    if ((await sha256Hex(tk)) !== TOKEN_SHA) { $("lgMsg").textContent = "Esa clave no es correcta."; return; }
     if (remember) { try { localStorage.setItem("ccaProfe", cleanKey(key)); } catch (e) {} }
-    start();
+    start(tk);
   }
   $("lgGo").addEventListener("click", function () { enter($("lgKey").value, $("lgRem").checked); });
   $("lgKey").addEventListener("keydown", function (e) { if (e.key === "Enter") $("lgGo").click(); });
   (async function boot() {
     var saved = null; try { saved = localStorage.getItem("ccaProfe"); } catch (e) {}
     if (saved && window.crypto && crypto.subtle) {
-      try { if ((await sha256Hex(await teacherToken(saved))) === TOKEN_SHA) { start(); return; } } catch (e) {}
+      try { var tk = await teacherToken(saved); if ((await sha256Hex(tk)) === TOKEN_SHA) { start(tk); return; } } catch (e) {}
     }
     $("vLogin").hidden = false; $("lgKey").focus();
   })();
