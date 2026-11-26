@@ -3031,7 +3031,8 @@ function start() {
             W.showcase.add(disp);
           }
         }
-        Q.offFirst = W.pads.findIndex((p) => Math.abs(AV.pos.x - p.x) < PADS.half && Math.abs(AV.pos.z - p.z) < PADS.half);
+        // a new challenge while still standing on a stone: back to the start circle (no surprise answer)
+        if (W.pads.some((p) => Math.abs(AV.pos.x - p.x) < PADS.half && Math.abs(AV.pos.z - p.z) < PADS.half)) backToStart(PADS.start);
         const lab = `${Q.def.title} ${Q.idx + 1} / ${Q.max} · Step on the right answer!`;
         const s = Q.def.advice ? `The patient says: <i>"${esc(it.p)}"</i>` : esc(it.s).replace('___', '<u>&nbsp;?&nbsp;</u>');
         task(lab, s, optsHTML(it.opts));
@@ -3042,11 +3043,6 @@ function start() {
       update(Q) {
         if (!Q.ready || !AV.onGround) return;
         const onPad = W.pads.findIndex((p) => Math.abs(AV.pos.x - p.x) < PADS.half && Math.abs(AV.pos.z - p.z) < PADS.half);
-        // a new question while still standing on a stone: step off first (no surprise answer)
-        if (Q.offFirst >= 0) {
-          if (onPad === Q.offFirst) return;
-          Q.offFirst = -1;
-        }
         if (onPad >= 0) this.step(Q, onPad);
       },
       step(Q, k) {
@@ -4729,6 +4725,7 @@ function start() {
       if (!Q) return null;
       const T = Q.def.type;
       if (T === 'stones') {
+        if (!Q.list || !Q.list[Q.idx]) return null;
         const k = W.pads.findIndex((p) => p.answer === Q.list[Q.idx].a[0]);
         return { x: W.pads[k].x, z: PADS.z, y: 0.3 };
       }
