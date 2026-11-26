@@ -798,6 +798,21 @@ function start() {
   let W = null;
 
   // ---------- World builder ----------
+  let haloTexture = null;
+  function haloTex() {
+    if (haloTexture) return haloTexture;
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 64;
+    const x = cv.getContext('2d');
+    const gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)');
+    gr.addColorStop(0.35, 'rgba(255,255,255,0.45)');
+    gr.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = gr;
+    x.fillRect(0, 0, 64, 64);
+    haloTexture = new THREE.CanvasTexture(cv);
+    return haloTexture;
+  }
   function buildWorld(wi) {
     const w = WORLDS[wi];
     const g = new THREE.Group();
@@ -958,7 +973,11 @@ function start() {
       c.position.copy(p);
       c.scale.set(1, 1.5, 1);
       g.add(c);
-      B.crystals.push({ mesh: c, pos: p.clone(), taken: false });
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex(), color: '#64FFDA', transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
+      halo.scale.set(3.2, 3.2, 1);
+      halo.position.copy(p);
+      g.add(halo);
+      B.crystals.push({ mesh: c, halo, pos: p.clone(), taken: false });
     }
 
     // quest stations
@@ -1786,6 +1805,23 @@ function start() {
     const w = WALLETS[S.player];
     const n = w ? w.crystals : 0;
     for (const id of ['b-crys', 'lk-crys', 'h-wallet']) if ($(id)) $(id).textContent = n;
+    // the next thing to buy: what every crystal is for
+    const el = $('h-goal');
+    if (!el || !w) return;
+    const shop = [...ITEMS.filter((i) => i.price > 0).map((i) => ({ key: i.id, name: i.name, price: i.price })),
+      ...Object.entries(PAID_COLORS).map(([k, price]) => ({ key: k, name: `gold ${k.startsWith('shirt') ? 'T-shirt' : 'pants'}`, price }))]
+      .filter((x) => !w.has(x.key))
+      .sort((a, b) => a.price - b.price);
+    const affordable = shop.filter((x) => x.price <= n).pop();
+    const next = shop.find((x) => x.price > n);
+    if (affordable) {
+      el.innerHTML = `You can buy the <b>${esc(affordable.name)}</b>! 👕`;
+      el.classList.add('on', 'ready');
+    } else if (next) {
+      el.innerHTML = `<b>${esc(next.name)}</b>: ${next.price - n} more 💎`;
+      el.classList.add('on');
+      el.classList.remove('ready');
+    } else el.classList.remove('on', 'ready');
   }
   // rewards for using English (and a little for exploring)
   function earn(n, why = '') {
@@ -1996,12 +2032,18 @@ function start() {
   }
   const owns = (o) => !o.price || walletFor(S.player).has(o.key);
   function openLook() {
-    if (S.mode !== 'brief') return;
+    if (!['brief', 'play', 'finale'].includes(S.mode)) return;
+    LK.back = S.mode;
+    LK.yaw = AV.yaw;
+    keys.clear();
     S.mode = 'look';
     LK.edit = lookOf(S.player);
     LK.pending = null;
-    AV.wear = [];
-    placeAvatar(SPAWN.clone(), 0);
+    if (LK.back === 'brief') {
+      AV.wear = [];
+      placeAvatar(SPAWN.clone(), 0);
+    }
+    AV.vel.set(0, 0, 0);
     setAvatar(S.player, LK.edit);
     avatarHolder.visible = true;
     showLayer('look');
@@ -2063,12 +2105,22 @@ function start() {
     } catch (e) {
       /* no voice */
     }
-    S.mode = 'brief';
-    avatarHolder.visible = false;
+    const back = LK.back || 'brief';
+    S.mode = back;
+    AV.yaw = LK.yaw || 0;
     setAvatar(S.player);
-    showLayer('brief');
+    if (back === 'brief') {
+      avatarHolder.visible = false;
+      showLayer('brief');
+    } else {
+      showLayer(back === 'finale' ? 'final' : 'play');
+      renderWallet();
+      if (back === 'play') schedulePush();
+    }
   }
   $('b-look').addEventListener('click', openLook);
+  $('btn-look-hud').addEventListener('click', () => S.mode === 'play' && openLook());
+  $('btn-look-end').addEventListener('click', () => S.mode === 'finale' && openLook());
   $('lk-done').addEventListener('click', closeLook);
   $('lk-tabs').addEventListener('click', (e) => {
     const b = e.target.closest('[data-slot]');
@@ -2086,7 +2138,7 @@ function start() {
     if (e.target.id === 'lk-buy') buyLook();
     else if (e.target.id === 'lk-speak') speak($('lk-say').textContent.replace(/^New: |!$/g, ''));
   });
-  for (const id of ['b-look', 'lk-done']) {
+  for (const id of ['b-look', 'lk-done', 'btn-look-hud', 'btn-look-end']) {
     $(id).tabIndex = -1;
     $(id).addEventListener('mousedown', (e) => e.preventDefault());
   }
@@ -3622,7 +3674,7 @@ function start() {
     }
     setTimeout(() => ($('td-copy').textContent = 'Copiar enlace'), 1500);
   });
-  const MODE_ES = { play: 'Jugando', talk: 'En el escenario', warp: 'Viajando por el portal', finale: 'Terminó', title: 'En el menú', brief: 'En el menú' };
+  const MODE_ES = { look: 'En My Look', play: 'Jugando', talk: 'En el escenario', warp: 'Viajando por el portal', finale: 'Terminó', title: 'En el menú', brief: 'En el menú' };
   function renderTeacher() {
     if (S.mode !== 'teacher') return;
     const box = $('td-cards');
@@ -4114,6 +4166,7 @@ function start() {
         if (MOVE[e.code]) keys.add(MOVE[e.code]);
         if (k === ' ') AV.jumpBuf = 0.15;
         if (e.code === 'KeyC' && !e.repeat) nextCam();
+        if (e.code === 'KeyL' && !e.repeat && !(S.Q && S.Q.chat)) openLook();
         if ((k === 'k' || k === 'K') && !e.repeat) skip();
         if (k === 'Enter' && !e.repeat && S.Q && !S.Q.done && HANDLERS[S.Q.def.type].next) HANDLERS[S.Q.def.type].next(S.Q);
         {
@@ -4539,9 +4592,22 @@ function start() {
         if (c.taken) continue;
         c.mesh.rotation.y += dt * 2;
         c.mesh.position.y = c.pos.y + Math.sin(t * 2.5 + c.pos.x) * 0.2;
+        const pulse = 1 + Math.sin(t * 4 + c.pos.z) * 0.12;
+        c.mesh.scale.set(pulse, 1.5 * pulse, pulse);
+        if (c.halo) {
+          c.halo.position.copy(c.mesh.position);
+          c.halo.material.opacity = 0.55 + Math.sin(t * 4 + c.pos.z) * 0.2;
+        }
+        // a soft "ding" when the traveler gets close: look, a crystal!
+        if (S.mode === 'play') {
+          const near = Math.hypot(AV.pos.x - c.pos.x, AV.pos.z - c.pos.z) < 7;
+          if (near && !c.near) tone(1568, 0, 0.12, 'sine', 0.05);
+          c.near = near;
+        }
         if (S.mode === 'play' && Math.hypot(AV.pos.x - c.pos.x, AV.pos.y + 1 - c.pos.y, AV.pos.z - c.pos.z) < 1.6) {
           c.taken = true;
           c.mesh.visible = false;
+          if (c.halo) c.halo.visible = false;
           S.crystals[S.wi]++;
           earn(1);
           schedulePush();

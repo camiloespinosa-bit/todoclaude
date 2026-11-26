@@ -175,6 +175,11 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 /* ---------- v3 HUD ---------- */
 .pack { flex-direction: row; }
 .cambtn { position: absolute; top: calc(2.6vh + 2.6em); right: 2.4vw; display: flex; align-items: center; gap: .4em; padding: .35em .8em; font-weight: 700; color: var(--deep); font-size: var(--fs); }
+.lookhud { top: calc(2.6vh + 7.8em); color: #8E24AA; }
+.goalchip { position: absolute; top: calc(2.6vh + 10.6em); right: 2.4vw; padding: .3em .8em; font-weight: 700; color: var(--deep); font-size: var(--fs); display: none; max-width: 40vw; text-align: right; }
+.goalchip.on { display: block; }
+.goalchip b { color: #00897B; }
+.goalchip.ready { background: #FFF8E1; outline: 3px solid #FDD835; animation: stagePulse 1.6s ease-in-out infinite; }
 .exitbtn { top: calc(2.6vh + 5.2em); color: #C62828; }
 #exit-no { background: var(--blue); }
 #O-exit .btns { flex-direction: row; justify-content: center; gap: 1vw; }
@@ -412,6 +417,8 @@ body.is-profe #btn-teacher { display: inline-flex; }
     <div class="card pack"><div class="crys"><span class="gem"></span><span id="h-crys">0/0</span></div><div class="wal" title="My crystals">💎 <span id="h-wallet">0</span><span class="earn" id="h-earn"></span></div><div class="slots" id="h-slots"><div class="slot"></div><div class="slot"></div><div class="slot"></div></div></div>
     <button class="card cambtn" id="btn-cam" type="button" title="Camera (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg><span id="cam-name">Normal</span><span class="key">C</span></button>
     <button class="card cambtn exitbtn" id="btn-exit" type="button" title="Exit (Esc)">Exit</button>
+    <button class="card cambtn lookhud" id="btn-look-hud" type="button" title="My Look (L)">👕 <span>My Look</span></button>
+    <div class="card goalchip" id="h-goal"></div>
     <div class="hint" id="h-hint"></div>
     <div class="card task" id="h-task">
       <div class="lab" id="h-tlab"></div>
@@ -477,6 +484,7 @@ body.is-profe #btn-teacher { display: inline-flex; }
       <div id="f-rows" style="display:flex;flex-direction:column;gap:1vh"></div>
       <div class="btns">
         <button class="btn csv" id="btn-csv"><span class="key">D</span>Download CSV</button>
+        <button class="btn lookbtn" id="btn-look-end" type="button">👕 My Look</button>
         <button class="btn nextp" id="btn-next"><span class="key">N</span>Next player</button>
       </div>
       <div class="saved" id="f-saved"></div>
