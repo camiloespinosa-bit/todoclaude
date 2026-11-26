@@ -201,6 +201,20 @@ textarea{width:100%; min-height:90px; resize:vertical}
     <div class="types"><span class="tp">0 · Facts &amp; rules</span><span class="tp">1 · Real deals &amp; plans</span><span class="tp">2 · Imagined scenarios</span></div>
   </header>
 
+  <!-- login: same teacher key as the Panel del profe -->
+  <section id="vLogin" class="panel" hidden>
+    <h2 style="font-size:1.6rem; margin-bottom:8px">Clave del profe</h2>
+    <p class="muted">Es la misma clave del Panel del profe y del English Lab. Si ya entraste allí en este dispositivo, entra sola.</p>
+    <div class="row" style="margin-top:12px">
+      <input id="lgKey" type="password" autocomplete="current-password" placeholder="Clave" aria-label="Clave del profe" style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 12px">
+      <label class="row small"><input id="lgRem" type="checkbox" checked> Recordar en este dispositivo</label>
+      <button class="primary" id="lgGo">Entrar</button>
+    </div>
+    <p class="flash bad" id="lgMsg"></p>
+  </section>
+
+  <div id="vApp" class="wrap" hidden style="max-width:none; width:100%">
+
   <!-- setup -->
   <section class="panel" id="setup">
     <div class="spread"><h2>Teams</h2><button class="ghost" id="setupHide">Hide</button></div>
@@ -274,6 +288,7 @@ textarea{width:100%; min-height:90px; resize:vertical}
   <section id="tAuction" class="panel" hidden><div id="auction"></div></section>
   <section id="tDeal" class="panel" hidden><div id="deal"></div></section>
   <section id="tChain" class="panel" hidden><div id="chain"></div></section>
+  </div>
 </div>
 
 <script>
@@ -829,8 +844,40 @@ textarea{width:100%; min-height:90px; resize:vertical}
   }
 
   // ================================================================ START
-  menu(); renderScores(); show("tMenu");
   window.addEventListener("beforeunload", save);
+
+  // ================================================================ TEACHER KEY (same check as lab.html and the Panel del profe)
+  var TOKEN_SHA = "27636e092d3ac7cf89eeb70e4ce5fc47e4669c34bb8c1b0669520a456ec3a805";
+  var enc = new TextEncoder();
+  function cleanKey(k) { return (k || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+  function hex(b) { return Array.prototype.map.call(new Uint8Array(b), function (x) { return x.toString(16).padStart(2, "0"); }).join(""); }
+  async function sha256Hex(t) { return hex(await crypto.subtle.digest("SHA-256", enc.encode(t))); }
+  async function teacherToken(key) {
+    var base = await crypto.subtle.importKey("raw", enc.encode("cca-profe|" + cleanKey(key)), "PBKDF2", false, ["deriveBits"]);
+    return hex(await crypto.subtle.deriveBits({ name: "PBKDF2", salt: enc.encode("cca-db-token"), iterations: 250000, hash: "SHA-256" }, base, 256));
+  }
+  var started = false;
+  function start() {
+    if (started) return; started = true;
+    $("vLogin").hidden = true; $("vApp").hidden = false;
+    menu(); renderScores(); show("tMenu");
+  }
+  async function enter(key, remember) {
+    $("lgMsg").textContent = "Comprobando...";
+    if (!(window.crypto && crypto.subtle)) { $("lgMsg").textContent = "Abre esta página con https:// para poder entrar."; return; }
+    if ((await sha256Hex(await teacherToken(key))) !== TOKEN_SHA) { $("lgMsg").textContent = "Esa clave no es correcta."; return; }
+    if (remember) { try { localStorage.setItem("ccaProfe", cleanKey(key)); } catch (e) {} }
+    start();
+  }
+  $("lgGo").addEventListener("click", function () { enter($("lgKey").value, $("lgRem").checked); });
+  $("lgKey").addEventListener("keydown", function (e) { if (e.key === "Enter") $("lgGo").click(); });
+  (async function boot() {
+    var saved = null; try { saved = localStorage.getItem("ccaProfe"); } catch (e) {}
+    if (saved && window.crypto && crypto.subtle) {
+      try { if ((await sha256Hex(await teacherToken(saved))) === TOKEN_SHA) { start(); return; } } catch (e) {}
+    }
+    $("vLogin").hidden = false; $("lgKey").focus();
+  })();
 })();
 </script>
 </body>
