@@ -302,9 +302,9 @@ textarea{width:100%; min-height:90px; resize:vertical}
     <div class="spin" style="margin-top:12px">
       <div>
         <div class="wheelbox"><div class="pointer"></div><svg id="wheel" viewBox="-110 -110 220 220" aria-hidden="true"></svg><div class="hub">SPIN</div></div>
-        <div class="row" style="justify-content:center; margin-top:12px"><button class="gold" id="spinGo">Spin!</button></div>
+        <div class="row" style="justify-content:center; margin-top:12px"><button class="gold" id="spinGo">Spin!</button><span class="muted small" id="spinLeft"></span></div>
       </div>
-      <div id="spinCard"><p class="muted">Spin the wheel. You get a business situation and 2 or 3 targets. Targets stay blurred until you press Reveal, so the team speaks freely first.</p></div>
+      <div id="spinCard"><p class="muted">A situation leaves the wheel after you give its points. Spin the wheel. You get a business situation and 2 or 3 targets. Targets stay blurred until you press Reveal, so the team speaks freely first.</p></div>
     </div>
   </section>
 
@@ -644,28 +644,33 @@ textarea{width:100%; min-height:90px; resize:vertical}
   }
 
   // ================================================================ SPIN & SPEAK
-  var rot = 0, wheelDrawn = false;
+  var rot = 0, wheelDrawn = false, avail = null; // avail: situations still on the wheel
   function drawWheel() {
-    var n = WHEEL.length, seg = 360 / n, h = "", cols = ["--w1", "--w2", "--w3", "--w4", "--w5", "--w6", "--w7", "--w8"];
+    if (!avail) avail = WHEEL.slice();
+    var n = avail.length, seg = 360 / n, h = "", cols = ["--w1", "--w2", "--w3", "--w4", "--w5", "--w6", "--w7", "--w8"];
     var cs = getComputedStyle(document.documentElement);
     function pt(a, r) { var rad = a * Math.PI / 180; return [(r * Math.sin(rad)).toFixed(2), (-r * Math.cos(rad)).toFixed(2)]; }
-    WHEEL.forEach(function (w, i) {
-      var s = i * seg - seg / 2, e = s + seg, p1 = pt(s, 100), p2 = pt(e, 100);
-      h += '<path d="M0 0 L' + p1[0] + " " + p1[1] + " A100 100 0 0 1 " + p2[0] + " " + p2[1] + ' Z" fill="' + cs.getPropertyValue(cols[i % 8]).trim() + '" stroke="#fff" stroke-width="1"/>';
-      h += '<text transform="rotate(' + (i * seg) + ') translate(0,-62) rotate(-90)" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="8.5" font-weight="700" font-family="Poppins,sans-serif">' + esc(w.n) + "</text>";
-      h += '<text transform="rotate(' + (i * seg) + ') translate(0,-91)" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="9" font-weight="800" font-family="IBM Plex Mono,monospace">' + (w.k === "m" ? "1+2" : w.k) + "</text>";
+    avail.forEach(function (w, i) {
+      var s = i * seg - seg / 2, e = s + seg, p1 = pt(s, 100), p2 = pt(e, 100), col = cs.getPropertyValue(cols[WHEEL.indexOf(w) % 8]).trim();
+      h += n === 1 ? '<circle r="100" fill="' + col + '"/>' : '<path d="M0 0 L' + p1[0] + " " + p1[1] + " A100 100 0 0 1 " + p2[0] + " " + p2[1] + ' Z" fill="' + col + '" stroke="#fff" stroke-width="1"/>';
+      var flip = i * seg > 180 ? 90 : -90; // keep the words readable on the left half
+      h += '<text transform="rotate(' + (i * seg) + ') translate(0,-62) rotate(' + flip + ')" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="8.5" font-weight="700" font-family="Poppins,sans-serif">' + esc(w.n) + "</text>";
     });
-    $("wheel").innerHTML = h; wheelDrawn = true;
+    var wEl = $("wheel"); wEl.style.transition = "none"; rot = 0; wEl.style.transform = "rotate(0deg)"; void wEl.getBoundingClientRect(); wEl.style.transition = "";
+    wEl.innerHTML = h; wheelDrawn = true;
+    $("spinGo").disabled = !n;
+    $("spinLeft").textContent = n + " of " + WHEEL.length + " left";
   }
   function initSpin() {
     drawWheel();
     $("spinGo").onclick = function () {
-      var n = WHEEL.length, seg = 360 / n, k = Math.floor(Math.random() * n);
+      if (!avail.length) return;
+      var n = avail.length, seg = 360 / n, k = Math.floor(Math.random() * n);
       var want = ((-k * seg - rot) % 360 + 360) % 360;
       rot += 360 * 5 + want;
       $("wheel").style.transform = "rotate(" + rot + "deg)";
       $("spinGo").disabled = true;
-      setTimeout(function () { $("spinGo").disabled = false; spinCard(WHEEL[k]); }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 4300);
+      setTimeout(function () { $("spinGo").disabled = false; spinCard(avail[k]); }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 4300);
     };
   }
   function spinCard(w) {
@@ -683,7 +688,13 @@ textarea{width:100%; min-height:90px; resize:vertical}
       award(who, ok * 100);
       $("spMsg").textContent = S.teams[who].n + " +" + ok * 100;
       $("spPts").disabled = true;
-      setTimeout(nextTurn, 700);
+      avail = avail.filter(function (x) { return x !== w; }); drawWheel();
+      setTimeout(function () {
+        nextTurn();
+        $("spinCard").innerHTML = avail.length ? '<p class="muted">' + esc(curName()) + ', spin the wheel!</p>'
+          : '<p class="big">All done! 🎉</p><p class="muted" style="margin:6px 0 12px">Every situation was played.</p><button class="gold" id="spRefill">Fill the wheel again</button>';
+        if ($("spRefill")) $("spRefill").onclick = function () { avail = null; drawWheel(); $("spinCard").innerHTML = '<p class="muted">New wheel. Spin!</p>'; };
+      }, 700);
     };
   }
 
