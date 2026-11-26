@@ -853,7 +853,12 @@ function start() {
     const keyPts = [SPAWN, hub, LANDMARK, PADS.start, V(STAGE.x, 0, STAGE.z), V(STAGE.x, 0, STAGE.z - 7), V(STAGE.x - 6, 0, STAGE.z - 8), V(STAGE.x + 7, 0, STAGE.z - 5), V(PORTAL.x, 0, PORTAL.z),
       ...PADS.xs.map((x) => V(x, 0, PADS.z)), V(PADS.xs[1], 0, PADS.z - 5.5), ZONES.start, ZONES.a, ZONES.b, OPIN.start, OPIN.a, OPIN.b, ...LADDER.xs.map((x) => V(x, 0, LADDER.z)),
       ...COLLECT_SPOTS.map((p) => V(p.x, 0, p.z)), ...ACTION_SPOTS, ...TRAMPOLINES];
-    const free = (x, z, d) => keyPts.every((p) => Math.hypot(p.x - x, p.z - z) > d);
+    // areas that are built later (the house room, the town): nothing else may stand there
+    const reserved = [];
+    if (types.includes('carry')) reserved.push({ x0: 3, x1: 29.5, z0: -27, z1: -7 });
+    if (types.some((t) => ['places', 'follow', 'guide'].includes(t))) reserved.push({ x0: -7.5, x1: 33, z0: -30, z1: 8.5 });
+    const inReserved = (x, z, m = 0) => reserved.some((r) => x > r.x0 - m && x < r.x1 + m && z > r.z0 - m && z < r.z1 + m);
+    const free = (x, z, d) => !inReserved(x, z, 2) && keyPts.every((p) => Math.hypot(p.x - x, p.z - z) > d);
     let n = 0;
     for (let ring = 0; ring < 2; ring++) {
       const R = ring === 0 ? 36 : 30;
@@ -872,14 +877,14 @@ function start() {
         B.colliders.push({ x, z, r: big ? 2.6 : 1.1 });
       }
     }
-    if (w.theme === 'past') {
+    if (w.theme === 'past' && !inReserved(33, 20, 3)) {
       const wm = windmill();
       wm.position.set(33, 0, 20);
       g.add(wm);
       B.colliders.push({ x: 33, z: 20, r: 2.2 });
       B.updaters.push((t) => (wm.userData.blades.rotation.z = t * 0.8));
     }
-    if (w.theme === 'present') {
+    if (w.theme === 'present' && !inReserved(-33, -2, 3)) {
       const ft = fountain();
       ft.position.set(-33, 0, -2);
       g.add(ft);
@@ -916,8 +921,9 @@ function start() {
       }
     }
 
-    // trampolines
-    for (const tp of TRAMPOLINES) {
+    // trampolines (not inside the house or the town)
+    const tramps = TRAMPOLINES.filter((tp) => !inReserved(tp.x, tp.z, 2.5));
+    for (const tp of tramps) {
       const tg = new THREE.Group();
       tg.position.copy(tp);
       tg.add(at(mesh(new THREE.CylinderGeometry(1.8, 1.9, 0.25, 16), '#1D3F54'), 0, 0.12, 0));
@@ -935,7 +941,7 @@ function start() {
     // time crystals (bonus)
     const crystalGeo = new THREE.OctahedronGeometry(0.5, 0);
     const crystalMat = mat('#64FFDA', { emissive: '#00BFA5', emissiveIntensity: 0.8, roughness: 0.3 });
-    const cryPos = TRAMPOLINES.map((tp) => V(tp.x, 6.5, tp.z));
+    const cryPos = tramps.map((tp) => V(tp.x, 6.5, tp.z));
     if (types.includes('collect')) cryPos.push(V(-8, 4.4, 9));
     let tries = 0;
     while (cryPos.length < 15 && tries < 500) {
