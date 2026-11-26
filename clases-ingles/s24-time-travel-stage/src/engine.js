@@ -2155,6 +2155,7 @@ function start() {
 
   function enterWorld(wi, firstQuest = 0) {
     S.wi = wi;
+    mapOn = true;
     if (AV.wear && AV.wear.length) {
       AV.wear = [];
       setAvatar(S.player);
@@ -4106,7 +4107,7 @@ function start() {
         }
         if (MOVE[e.code]) keys.add(MOVE[e.code]);
         if (k === ' ') AV.jumpBuf = 0.15;
-        if (e.code === 'KeyC' && !e.repeat) setCam(camIdx + 1);
+        if (e.code === 'KeyC' && !e.repeat) nextCam();
         if ((k === 'k' || k === 'K') && !e.repeat) skip();
         if (k === 'Enter' && !e.repeat && S.Q && !S.Q.done && HANDLERS[S.Q.def.type].next) HANDLERS[S.Q.def.type].next(S.Q);
         {
@@ -4273,7 +4274,7 @@ function start() {
     }
     {
       // arrows follow the screen, whatever camera is chosen
-      const [fx, fz] = CAMS[camIdx].f;
+      const [fx, fz] = activeCam().f;
       const mx = -fz * ix - fx * iz, mz = fx * ix - fz * iz;
       ix = mx;
       iz = mz;
@@ -4394,10 +4395,27 @@ function start() {
     lsSet('ccaCam', CAMS[camIdx].id);
   }
   setCam(camIdx);
+  // In the town (MY NEIGHBORHOOD) the camera starts as a map seen from above;
+  // the camera button / C switches between the map and the kid's own camera.
+  let mapOn = true;
+  const inTown = () => S.mode === 'play' && !!S.Q && !S.Q.done && ['places', 'follow', 'guide'].includes(S.Q.def.type);
+  const mapView = () => inTown() && mapOn;
+  const activeCam = () => (mapView() ? CAMS[1] : CAMS[camIdx]);
+  let camLabel = '';
+  function syncCamLabel() {
+    const l = mapView() ? 'Map' : CAMS[camIdx].name;
+    if (l !== camLabel) $('cam-name').textContent = camLabel = l;
+  }
+  function nextCam() {
+    if (inTown()) mapOn = !mapOn;
+    else setCam(camIdx + 1);
+    camLabel = '';
+    syncCamLabel();
+  }
   $('btn-cam').tabIndex = -1;
   $('btn-cam').addEventListener('mousedown', (e) => e.preventDefault());
   $('btn-cam').addEventListener('click', () => {
-    setCam(camIdx + 1);
+    nextCam();
     sfx.click();
   });
   function updateCamera(dt, t) {
@@ -4411,8 +4429,8 @@ function start() {
       k = 1;
     } else if (S.mode === 'play') {
       // in the town, look from above (north up) so the kid sees the streets and the places
-      const townQ = S.Q && !S.Q.done && ['places', 'follow', 'guide'].includes(S.Q.def.type);
-      const C = townQ ? CAMS[1] : CAMS[camIdx];
+      const townQ = mapView();
+      const C = activeCam();
       // directions: show the whole town at once
       const whole = townQ && S.Q.def.type !== 'places';
       const focus = whole ? V(camera.aspect > 1 ? 19 : 10, 0, camera.aspect > 1 ? -13 : -9) : AV.pos;
@@ -4446,6 +4464,7 @@ function start() {
     if (W) for (const u of W.updaters) u(t, dt);
     if (W) for (const c of W.group.children) if (c.userData.spin) c.rotation.y += dt * c.userData.spin;
     syncTouchClasses();
+    syncCamLabel();
     if (S.mode === 'look') AV.yaw = Math.sin(t * 0.7) * 0.7;
     if (S.mode === 'play' || S.mode === 'talk' || S.mode === 'finale') updateAvatar(dt);
     if (S.mode !== 'title' && S.mode !== 'brief' && S.mode !== 'teacher') animateAvatar(dt, t);
