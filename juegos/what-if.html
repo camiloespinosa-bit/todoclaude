@@ -626,10 +626,20 @@ textarea{width:100%; min-height:90px; resize:vertical}
       return '<div class="tg hid" data-tg="' + pre + i + '"><span class="tt">' + esc(t) + '</span><span class="yn"><button class="y" aria-label="Done">✓</button><button class="n" aria-label="Not yet">✗</button></span></div>';
     }).join("") + "</div>";
   }
+  function wireToggle(btn, root) { // show / hide all targets in root
+    function paint() { var hid = root.querySelector(".tg.hid"); btn.textContent = hid ? "Show targets" : "Hide targets"; }
+    btn.onclick = function () {
+      var hid = root.querySelector(".tg.hid");
+      root.querySelectorAll(".tg").forEach(function (t) { t.classList.toggle("hid", !hid); });
+      paint();
+    };
+    root.addEventListener("click", function (e) { if (e.target.closest(".yn")) setTimeout(paint, 0); });
+    paint();
+  }
   function wireTargets(root) {
     root.querySelectorAll(".tg").forEach(function (tg) {
-      tg.querySelector(".y").onclick = function () { tg.querySelector(".y").classList.toggle("on"); tg.querySelector(".n").classList.remove("on"); tg.classList.remove("hid"); };
-      tg.querySelector(".n").onclick = function () { tg.querySelector(".n").classList.toggle("on"); tg.querySelector(".y").classList.remove("on"); tg.classList.remove("hid"); };
+      tg.querySelector(".y").onclick = function () { tg.querySelector(".y").classList.toggle("on"); tg.querySelector(".n").classList.remove("on"); };
+      tg.querySelector(".n").onclick = function () { tg.querySelector(".n").classList.toggle("on"); tg.querySelector(".y").classList.remove("on"); };
     });
   }
 
@@ -662,11 +672,11 @@ textarea{width:100%; min-height:90px; resize:vertical}
     var c = $("spinCard");
     c.innerHTML = '<div class="card k' + (w.k === "m" ? "1" : w.k) + '">' + tp(w.k) + ' <span class="tag">' + esc(curName()) + " speaks</span>" +
       "<h3>" + esc(w.p) + "</h3>" + targetsHtml(w.t, "s") +
-      '<div class="row" style="margin-top:12px"><button class="ghost" id="spRev">Reveal targets</button><button class="ghost" id="spModel">Model answer</button></div>' +
+      '<div class="row" style="margin-top:12px"><button class="ghost" id="spRev">Show targets</button><button class="ghost" id="spModel">Model answer</button></div>' +
       '<div id="spM" style="margin-top:10px"></div>' +
       '<div class="row" style="margin-top:12px"><button class="primary" id="spPts">Give points &amp; next turn</button><span class="flash" id="spMsg"></span></div></div>';
     wireTargets(c);
-    $("spRev").onclick = function () { c.querySelectorAll(".tg").forEach(function (t) { t.classList.remove("hid"); }); };
+    wireToggle($("spRev"), c.querySelector(".targets"));
     $("spModel").onclick = function () { $("spM").innerHTML = '<div class="model"><small>Model</small>' + esc(w.m) + "</div>"; };
     $("spPts").onclick = function () {
       var ok = c.querySelectorAll(".y.on").length, who = S.cur;
@@ -851,17 +861,18 @@ textarea{width:100%; min-height:90px; resize:vertical}
     var d = DEALS[+$("dlSc").value], A = +$("dlA").value, B = +$("dlB").value;
     function side(s, ti, pre) {
       return '<div class="role"><span class="tag">' + esc(S.teams[ti].n) + "</span><h4>" + esc(s.r) + '</h4><ul style="margin:0; padding-left:20px">' + s.g.map(function (g) { return "<li>" + esc(g) + "</li>"; }).join("") + "</ul>" +
-        targetsHtml(DEAL_TARGETS, pre) + '<button class="primary" data-dp="' + pre + '" data-ti="' + ti + '">Give points</button></div>';
+        targetsHtml(DEAL_TARGETS, pre) + '<div class="row"><button class="ghost" data-tog="1">Show targets</button><button class="primary" data-dp="' + pre + '" data-ti="' + ti + '">Give points</button></div></div>';
     }
     $("dlBox").innerHTML = '<p class="big" style="font-size:1.3rem">' + esc(d.ctx) + "</p>" +
       '<div class="roles">' + side(d.a, A, "a") + side(d.b, B, "b") + "</div>" +
       '<div class="twist" id="dlTw" hidden>' + esc(d.tw) + '</div><div class="row"><button class="ghost" id="dlTwB">Show the twist now</button><span class="flash" id="dlMsg"></span></div>' +
       '<p class="muted small" style="margin-top:10px">The twist appears by itself at 2:30. Each ✓ target = 100 points.</p>';
     wireTargets($("dlBox"));
+    $("dlBox").querySelectorAll("[data-tog]").forEach(function (b) { wireToggle(b, b.closest(".role").querySelector(".targets")); });
     $("dlTwB").onclick = function () { $("dlTw").hidden = false; };
     $("dlBox").querySelectorAll("[data-dp]").forEach(function (b) {
       b.onclick = function () {
-        var ok = b.parentNode.querySelectorAll(".y.on").length, ti = +b.dataset.ti;
+        var ok = b.closest(".role").querySelectorAll(".y.on").length, ti = +b.dataset.ti;
         award(ti, ok * 100); b.disabled = true; $("dlMsg").textContent = S.teams[ti].n + " +" + ok * 100;
       };
     });
