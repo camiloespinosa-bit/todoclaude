@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>The What-If Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+/* The What-If Room: Business Fluency Lab en grupo, pantalla compartida. Condicionales 0, 1 y 2. El profe juzga y marca. */
+:root{
+  --bg:#F2F7F9; --surface:#FFFFFF; --surface-2:#E8F1F4; --ink:#12303F; --muted:#4E6B79; --line:#CFDFE5;
+  --brand:#2C5F7C; --on-brand:#FFFFFF; --focus:#F57C00;
+  --hdr-a:#1D3F54; --hdr-b:#2C5F7C; --hdr-soft:#BCD9E1;
+  --gold:#FDD835; --on-gold:#3B2F00; --orange:#F57C00; --turq:#57A6B5; --green:#7CB342;
+  --good:#2F7D32; --good-bg:#E3F2E1; --bad:#B3261E; --bad-bg:#FBE9E7; --mid:#8A5A00; --mid-bg:#FFF4D6;
+  --c0:#1B6F80; --c0-bg:#DDF0F3; --c1:#4E8A1F; --c1-bg:#EAF4DC; --c2:#6B4BA3; --c2-bg:#EDE6F7;
+  --font:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --w1:#2C5F7C; --w2:#57A6B5; --w3:#7CB342; --w4:#F57C00; --w5:#1D3F54; --w6:#A3306B; --w7:#6B4BA3; --w8:#B85A00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+    --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+    --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10;
+    --c0:#9AD3DE; --c0-bg:#17414B; --c1:#B5DD8A; --c1-bg:#1F3320; --c2:#CDB9EE; --c2-bg:#2E2447; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+  --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+  --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10;
+  --c0:#9AD3DE; --c0-bg:#17414B; --c1:#B5DD8A; --c1-bg:#1F3320; --c2:#CDB9EE; --c2-bg:#2E2447; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:16px 60px}
+button,input,select,textarea{font-family:inherit; font-size:inherit; color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed; opacity:.45}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+h1,h2,h3,h4,p{margin:0}
+h1,h2,h3{text-wrap:balance; line-height:1.15}
+.wrap{max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:14px}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.primary{background:var(--brand); color:var(--on-brand); border:none; border-radius:10px; padding:11px 20px; font-weight:700}
+.gold{background:var(--gold); color:var(--on-gold); border:none; border-radius:12px; padding:13px 24px; font-weight:800; font-size:1.1rem}
+.ghost{background:transparent; border:1px solid var(--line); border-radius:10px; padding:8px 14px; color:var(--ink); font-size:.95rem}
+.ghost:hover:not(:disabled){border-color:var(--brand)}
+.okb{background:var(--good-bg); border:2px solid var(--good); color:var(--good); border-radius:10px; padding:9px 16px; font-weight:800}
+.nob{background:var(--bad-bg); border:2px solid var(--bad); color:var(--bad); border-radius:10px; padding:9px 16px; font-weight:800}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:clamp(14px,2.5vw,22px)}
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.spread{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+input[type=text],select,textarea{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 12px; max-width:100%}
+textarea{width:100%; min-height:90px; resize:vertical}
+
+.hero{background:linear-gradient(135deg,var(--hdr-a),var(--hdr-b)); color:#fff; border-radius:18px; padding:clamp(18px,3vw,28px)}
+.kick{font-family:var(--mono); font-size:.74rem; text-transform:uppercase; letter-spacing:.12em; color:var(--hdr-soft)}
+.hero h1{font-size:clamp(1.9rem,5vw,2.8rem); font-weight:800; letter-spacing:-.02em; margin:4px 0 2px}
+.hero p{color:var(--hdr-soft); max-width:62ch}
+.types{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+.tp{border-radius:999px; padding:3px 12px; font-size:.82rem; font-weight:700; font-family:var(--mono)}
+.tp.t0{background:var(--c0-bg); color:var(--c0)} .tp.t1{background:var(--c1-bg); color:var(--c1)} .tp.t2{background:var(--c2-bg); color:var(--c2)}
+.hero .tp{background:rgba(255,255,255,.14); color:#fff}
+
+/* scoreboard */
+.scores{position:sticky; top:0; z-index:6; background:var(--bg); padding:8px 0; display:flex; gap:8px; flex-wrap:wrap; align-items:stretch}
+.team{flex:1 1 150px; border:2px solid var(--line); background:var(--surface); border-radius:14px; padding:8px 12px; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:2px 8px}
+.team.cur{border-color:var(--orange); box-shadow:0 0 0 3px rgba(245,124,0,.25)}
+.team .tn{font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.team .ts{font-family:var(--mono); font-weight:800; font-size:1.6rem; font-variant-numeric:tabular-nums; grid-row:span 2}
+.team .tb{display:flex; gap:4px}
+.team .tb button{border:1px solid var(--line); background:var(--bg); border-radius:8px; padding:0 8px; font-weight:700; font-size:.8rem; line-height:1.8}
+.team .turn{font-family:var(--mono); font-size:.62rem; color:var(--orange); text-transform:uppercase; letter-spacing:.08em}
+.scores .next{border:none; background:var(--orange); color:#fff; border-radius:14px; padding:8px 16px; font-weight:800}
+.bump{animation:bump .5s ease}
+@keyframes bump{40%{transform:scale(1.06)}}
+
+.tabs{display:flex; gap:6px; flex-wrap:wrap}
+.tabs button{border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:8px 16px; font-weight:600}
+.tabs button.on{background:var(--brand); color:var(--on-brand); border-color:var(--brand)}
+
+.card{border:1px solid var(--line); border-left:10px solid var(--turq); border-radius:14px; padding:16px 18px; background:var(--bg)}
+.card.k0{border-left-color:var(--c0)} .card.k1{border-left-color:var(--c1)} .card.k2{border-left-color:var(--c2)}
+.card h3{font-size:clamp(1.3rem,3vw,1.8rem); font-weight:800; margin:6px 0 10px}
+.tag{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.targets{display:grid; gap:8px}
+.tg{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--surface)}
+.tg .tt{font-weight:600; font-size:1.05rem}
+.tg.hid .tt{filter:blur(7px); user-select:none}
+.yn{display:flex; gap:6px}
+.yn button{border:2px solid var(--line); background:var(--surface); border-radius:10px; padding:7px 14px; font-weight:800; min-width:48px}
+.yn .y.on{background:var(--good-bg); border-color:var(--good); color:var(--good)}
+.yn .n.on{background:var(--bad-bg); border-color:var(--bad); color:var(--bad)}
+.model{border-left:6px solid var(--good); background:var(--good-bg); border-radius:10px; padding:10px 14px; font-weight:600}
+.model small{display:block; font-family:var(--mono); font-size:.7rem; color:var(--good); text-transform:uppercase; letter-spacing:.08em; font-weight:400}
+.flash{font-size:.95rem; color:var(--good); min-height:1.4em; font-weight:600}
+.flash.bad{color:var(--bad)}
+.big{font-size:clamp(1.5rem,4vw,2.4rem); font-weight:800; line-height:1.2}
+
+/* menu */
+.menu{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+.gcard{text-align:left; border:1px solid var(--line); border-top:8px solid var(--turq); background:var(--bg); border-radius:14px; padding:14px 16px; display:grid; gap:4px; min-height:140px}
+.gcard.acc{border-top-color:var(--orange)} .gcard.mix{border-top-color:var(--w6)}
+.gcard:hover{border-color:var(--brand)}
+.gcard b{font-size:1.15rem}
+.gcard .gd{color:var(--muted); font-size:.9rem}
+.gcard .gm{font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-top:auto}
+.gamebar{display:flex; align-items:center; gap:10px}
+
+/* wheel */
+.spin{display:grid; grid-template-columns:minmax(260px,400px) minmax(0,1fr); gap:18px; align-items:start}
+.wheelbox{position:relative; width:100%; max-width:400px; aspect-ratio:1; margin:0 auto}
+.wheelbox svg{width:100%; height:100%; transition:transform 4.2s cubic-bezier(.17,.89,.22,1)}
+.pointer{position:absolute; top:-6px; left:50%; transform:translateX(-50%); border-left:16px solid transparent; border-right:16px solid transparent; border-top:30px solid var(--orange); z-index:2}
+.wheelbox .hub{position:absolute; inset:41%; border-radius:50%; background:var(--surface); border:4px solid var(--hdr-a); display:grid; place-items:center; font-weight:800; font-size:.85rem}
+
+/* jeopardy */
+.board{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px}
+.board .cat{background:var(--hdr-a); color:#fff; border-radius:10px; padding:10px 6px; text-align:center; font-weight:700; font-size:.88rem; display:grid; place-items:center; min-height:64px; line-height:1.2}
+.board .tile{background:var(--brand); color:var(--gold); border:none; border-radius:10px; font-weight:800; font-size:clamp(1rem,2.6vw,1.7rem); min-height:62px}
+.board .tile.done{background:var(--surface-2); color:var(--muted); font-size:.9rem}
+
+/* which if */
+.choice{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+.choice button{border:3px solid var(--line); border-radius:14px; padding:16px 8px; font-weight:800; font-size:1.2rem; background:var(--surface)}
+.choice .b0{color:var(--c0); border-color:var(--c0)} .choice .b1{color:var(--c1); border-color:var(--c1)} .choice .b2{color:var(--c2); border-color:var(--c2)}
+.choice button.right{background:var(--good-bg); border-color:var(--good); color:var(--good)}
+.choice button.wrong{background:var(--bad-bg); border-color:var(--bad); color:var(--bad)}
+.choice small{display:block; font-weight:500; font-size:.78rem; color:var(--muted)}
+.dots{display:flex; gap:6px; flex-wrap:wrap}
+.dots i{width:16px; height:16px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line)}
+.dots i.ok{background:var(--good)} .dots i.no{background:var(--bad)} .dots i.cur{outline:3px solid var(--orange)}
+
+.timer{font-family:var(--mono); font-weight:700; font-size:3rem; font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+
+/* auction */
+.auct{overflow-x:auto}
+.auct table{border-collapse:separate; border-spacing:0 8px; width:100%; min-width:560px}
+.auct td,.auct th{padding:8px 10px; text-align:left; vertical-align:middle}
+.auct th{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600}
+.auct td{background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.auct td:first-child{border-left:1px solid var(--line); border-radius:12px 0 0 12px; font-weight:600; font-size:1.05rem}
+.auct td:last-child{border-right:1px solid var(--line); border-radius:0 12px 12px 0}
+.auct tr.win td{background:var(--good-bg)} .auct tr.lose td{background:var(--bad-bg)}
+.bet{display:flex; align-items:center; gap:4px}
+.bet b{font-family:var(--mono); min-width:4.5ch; text-align:center}
+.bet button{border:1px solid var(--line); background:var(--bg); border-radius:8px; width:32px; height:32px; font-weight:800}
+.money{font-family:var(--mono); font-weight:800; font-size:1.4rem}
+.fixline{display:block; font-size:.9rem; color:var(--good); font-weight:600; margin-top:2px}
+
+/* deal room */
+.roles{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:10px 0}
+.role{border-radius:12px; padding:12px 14px; border:1px solid var(--line); background:var(--surface); display:grid; gap:8px}
+.role h4{font-size:1.1rem}
+.twist{border:2px dashed var(--orange); background:var(--mid-bg); border-radius:12px; padding:12px 14px; font-weight:700; margin:10px 0}
+
+/* chain */
+.links{display:grid; gap:6px; counter-reset:l}
+.links div{counter-increment:l; border:1px solid var(--line); border-radius:10px; padding:8px 12px; background:var(--surface); display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:center}
+.links div::before{content:counter(l); width:26px; height:26px; border-radius:50%; background:var(--green); color:#fff; display:grid; place-items:center; font-weight:800; font-size:.8rem}
+.links div.brk::before{background:var(--bad); content:"✗"}
+.links span.who{font-family:var(--mono); font-size:.72rem; color:var(--muted)}
+.starter{display:inline-block; font-size:clamp(1.3rem,3.4vw,2rem); font-weight:800; color:var(--on-gold); background:var(--gold); border-radius:14px; padding:8px 18px}
+
+/* rules */
+.rules{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.rule{border-radius:14px; padding:14px 16px; display:grid; gap:8px; align-content:start}
+.rule.r0{background:var(--c0-bg)} .rule.r1{background:var(--c1-bg)} .rule.r2{background:var(--c2-bg)}
+.rule h3{font-size:1.25rem}
+.rule.r0 h3{color:var(--c0)} .rule.r1 h3{color:var(--c1)} .rule.r2 h3{color:var(--c2)}
+.form{font-family:var(--mono); font-size:.9rem; font-weight:600; background:var(--surface); border-radius:8px; padding:6px 10px}
+.ex{font-weight:600}
+.traps{display:grid; gap:8px; margin-top:14px}
+.trap{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; border:1px solid var(--line); border-radius:12px; padding:10px 14px; background:var(--bg)}
+.trap .x{color:var(--bad); text-decoration:line-through; font-weight:600}
+.trap .v{color:var(--good); font-weight:700}
+.honest{border-left:6px solid var(--turq); background:var(--surface-2); border-radius:10px; padding:10px 14px; font-size:.9rem}
+
+/* notebook */
+.nbtn{position:fixed; right:max(16px,env(safe-area-inset-right,0px)); bottom:18px; z-index:20; background:var(--orange); color:#fff; border:none; border-radius:999px; padding:12px 20px; font-weight:800; box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.drawer{position:fixed; right:0; top:0; bottom:0; width:min(440px,100vw); background:var(--surface); border-left:1px solid var(--line); z-index:30; padding:18px; overflow:auto; box-shadow:-10px 0 30px rgba(0,0,0,.2); display:flex; flex-direction:column; gap:10px}
+.drawer label{display:grid; gap:4px}
+.drawer select,.drawer textarea{width:100%}
+.drawer textarea{min-height:64px}
+.seg{display:flex; gap:6px}
+.seg button{flex:1; border:2px solid var(--line); background:var(--bg); border-radius:10px; padding:8px; font-weight:700}
+.seg button.on.fx{border-color:var(--bad); background:var(--bad-bg); color:var(--bad)}
+.seg button.on.gd{border-color:var(--good); background:var(--good-bg); color:var(--good)}
+.note{border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--bg); display:grid; gap:2px}
+.note.fx{border-left:6px solid var(--bad)} .note.gd{border-left:6px solid var(--good)}
+.note .said{font-weight:600}
+.note .better{color:var(--good); font-weight:600}
+.note .meta{font-family:var(--mono); font-size:.7rem; color:var(--muted)}
+.note .del{justify-self:end; border:none; background:none; color:var(--muted); font-size:.8rem; text-decoration:underline}
+.nbs{font-family:var(--mono); font-size:.75rem; border-radius:999px; padding:3px 10px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink)}
+.nbs.ok{border-color:var(--good); background:var(--good-bg); color:var(--good)} .nbs.warn{border-color:var(--mid); background:var(--mid-bg); color:var(--mid)} .nbs.bad{border-color:var(--bad); background:var(--bad-bg); color:var(--bad)}
+.nbs::before{content:"● "}
+.bug{font-size:clamp(1.3rem,3.4vw,2rem); font-weight:700; padding:16px 18px; border-radius:14px; background:var(--bad-bg); border:2px dashed var(--bad)}
+.win{font-size:clamp(1.1rem,2.6vw,1.5rem); font-weight:700; padding:12px 16px; border-radius:14px; background:var(--good-bg); border-left:8px solid var(--good)}
+.prow{display:grid; grid-template-columns:minmax(0,1.6fr) repeat(3,auto); gap:6px 16px; align-items:center; padding:10px 0; border-top:1px solid var(--line)}
+.prow .pct{font-family:var(--mono); font-weight:700; min-width:6ch; text-align:right}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px}
+.stat{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg)}
+.stat b{display:block; font-size:1.8rem; font-weight:800; line-height:1.1}
+.code{font-family:var(--mono); font-size:.72rem; border:1px solid var(--line); border-radius:6px; padding:0 6px; color:var(--muted)}
+
+@media (max-width:760px){
+  .prow{grid-template-columns:minmax(0,1fr) auto auto auto}
+  .spin,.roles,.rules{grid-template-columns:1fr}
+  .board{grid-template-columns:repeat(5,minmax(58px,1fr)); overflow-x:auto}
+  .board .cat{font-size:.68rem}
+  .trap{grid-template-columns:1fr}
+  .choice button{font-size:1rem}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <p class="kick">Gimnasio del Cerebro · Business Fluency Lab · Group</p>
+    <h1>The What-If Room</h1>
+    <p>Conditionals for business, played as a team on one shared screen. The teacher judges and marks; the page keeps the score.</p>
+    <div class="types"><span class="tp">0 · Facts &amp; rules</span><span class="tp">1 · Real deals &amp; plans</span><span class="tp">2 · Imagined scenarios</span></div>
+  </header>
+
+  <!-- login: same teacher key as the Panel del profe -->
+  <section id="vLogin" class="panel" hidden>
+    <h2 style="font-size:1.6rem; margin-bottom:8px">Clave del profe</h2>
+    <p class="muted">Es la misma clave del Panel del profe y del English Lab. Si ya entraste allí en este dispositivo, entra sola.</p>
+    <div class="row" style="margin-top:12px">
+      <input id="lgKey" type="password" autocomplete="current-password" placeholder="Clave" aria-label="Clave del profe" style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 12px">
+      <label class="row small"><input id="lgRem" type="checkbox" checked> Recordar en este dispositivo</label>
+      <button class="primary" id="lgGo">Entrar</button>
+    </div>
+    <p class="flash bad" id="lgMsg"></p>
+  </section>
+
+  <div id="vApp" class="wrap" hidden style="max-width:none; width:100%">
+
+  <!-- setup -->
+  <section class="panel" id="setup">
+    <div class="spread"><h2>Teams</h2><button class="ghost" id="setupHide">Hide</button></div>
+    <p class="muted small" style="margin:6px 0 10px">One team or player per line (2 to 8). Change names any time; scores stay with the position.</p>
+    <textarea id="teamsIn" aria-label="Teams" placeholder="Team A&#10;Team B"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="primary" id="teamsGo">Save teams</button>
+      <button class="ghost" id="scoreReset">Reset scores</button>
+      <span class="flash" id="setupMsg"></span>
+    </div>
+    <p class="muted small" style="margin-top:10px" id="codes"></p>
+  </section>
+
+  <div class="scores" id="scores" aria-live="polite"></div>
+
+  <nav class="tabs" id="tabs" aria-label="Sections">
+    <button data-t="menu" class="on">Games</button>
+    <button data-t="rules">Rules (cheat sheet)</button>
+    <button data-t="court">Error Court</button>
+    <button data-t="prog">Progress</button>
+    <button data-t="setup">Teams</button>
+  </nav>
+
+  <div class="gamebar" id="gameBar" hidden><button class="ghost" id="backMenu">← All games</button><b id="gameName"></b></div>
+
+  <!-- MENU -->
+  <section id="tMenu" class="panel">
+    <h2>Games</h2>
+    <h3 style="margin:14px 0 8px">Speak</h3>
+    <div class="menu" id="menuSpeak"></div>
+    <h3 style="margin:20px 0 8px">Accuracy</h3>
+    <div class="menu" id="menuAcc"></div>
+    <p class="honest" style="margin-top:18px">Suggested 60-minute class: Rules (5) · Which If? (8) · Spin &amp; Speak (12) · Rapid Transform (10) · Deal Room (15) · Grammar Auction (10). Jeopardy works as a full review class.</p>
+  </section>
+
+  <section id="tRules" class="panel" hidden>
+    <h2 style="margin-bottom:12px">Cheat sheet</h2>
+    <div class="rules">
+      <div class="rule r0"><h3>Zero · always true</h3><div class="form">If + present, present</div><p>Facts, rules, policies, how a system works. <b>If</b> = <b>when</b>.</p><p class="ex">If a client pays late, we charge a 2% fee.</p><p class="ex">If demand goes up, prices rise.</p></div>
+      <div class="rule r1"><h3>First · real possibility</h3><div class="form">If + present, will / can / may + verb</div><p>Real plans, offers, warnings, promises about a specific future. <b>Unless</b> = if ... not.</p><p class="ex">If you sign today, we'll give you free delivery.</p><p class="ex">Unless we hire two people, we won't hit the target.</p></div>
+      <div class="rule r2"><h3>Second · imagined</h3><div class="form">If + past, would / could + verb</div><p>Hypothetical or unlikely situations, advice, dreams. The past form does <b>not</b> mean past time.</p><p class="ex">If I were the CEO, I would cut useless meetings.</p><p class="ex">If we had more budget, we could open in Miami.</p></div>
+    </div>
+    <h3 style="margin-top:20px">Spanish speaker traps</h3>
+    <div class="traps">
+      <div class="trap"><span class="x">If you will send it, I'll check it.</span><span class="v">If you send it, I'll check it. (no will after if)</span></div>
+      <div class="trap"><span class="x">If I would have time, I would help.</span><span class="v">If I had time, I would help. (no would after if)</span></div>
+      <div class="trap"><span class="x">If I am the manager, I would...</span><span class="v">If I were the manager, I would... (second = past form)</span></div>
+      <div class="trap"><span class="x">Unless you don't pay, we'll cancel.</span><span class="v">Unless you pay, we'll cancel. (unless already means "if not")</span></div>
+      <div class="trap"><span class="x">What would you do if you lose your job?</span><span class="v">What would you do if you lost your job?</span></div>
+    </div>
+    <p class="muted small" style="margin-top:12px">Comma: use one when the if-clause goes first (If you sign today, we'll...). No comma when it goes second (We'll ... if you sign today). "If I was" is common in speech; "If I were" is the safe choice in formal business English.</p>
+  </section>
+
+  <section id="tSpin" class="panel" hidden>
+    <div class="spread"><h2>Spin &amp; Speak</h2><span class="muted small">The team on turn spins and speaks. Mark each target.</span></div>
+    <div class="spin" style="margin-top:12px">
+      <div>
+        <div class="wheelbox"><div class="pointer"></div><svg id="wheel" viewBox="-110 -110 220 220" aria-hidden="true"></svg><div class="hub">SPIN</div></div>
+        <div class="row" style="justify-content:center; margin-top:12px"><button class="gold" id="spinGo">Spin!</button><span class="muted small" id="spinLeft"></span></div>
+      </div>
+      <div id="spinCard"><p class="muted">A situation leaves the wheel after you give its points. Spin the wheel. You get a business situation and 2 or 3 targets. Targets stay blurred until you press Reveal, so the team speaks freely first.</p></div>
+    </div>
+  </section>
+
+  <section id="tJeo" class="panel" hidden>
+    <div class="spread"><h2>Jeopardy</h2><button class="ghost" id="jeoReset">Clear board</button></div>
+    <p class="muted small" style="margin:6px 0 10px">The team on turn picks a tile. If they fail, any other team can steal.</p>
+    <div class="board" id="board"></div>
+    <div id="jeoCard" style="margin-top:14px"></div>
+  </section>
+
+  <section id="tWhich" class="panel" hidden><div id="which"></div></section>
+  <section id="tRapid" class="panel" hidden><div id="rapid"></div></section>
+  <section id="tAuction" class="panel" hidden><div id="auction"></div></section>
+  <section id="tDeal" class="panel" hidden><div id="deal"></div></section>
+  <section id="tChain" class="panel" hidden><div id="chain"></div></section>
+
+  <section id="tCourt" class="panel" hidden>
+    <div class="spread"><h2>Error Court</h2><span class="muted small" id="courtCount"></span></div>
+    <p class="muted" style="margin:6px 0 12px">Today's sentences from the Notebook, with no names on screen. First the wins, then the cases: the group finds the bug before you reveal the better version.</p>
+    <div id="court"></div>
+  </section>
+
+  <section id="tProg" class="panel" hidden>
+    <div class="spread"><h2>Progress</h2><label class="small">Student <select id="progWho"></select></label></div>
+    <div id="prog" style="margin-top:12px"></div>
+    <p class="honest" style="margin-top:16px">These are notes the teacher took in live classes. They show trends; they are not a validated level test.</p>
+  </section>
+  </div>
+
+<button class="nbtn" id="nbOpen" hidden>Notebook</button>
+<aside class="drawer" id="nb" hidden aria-label="Notebook">
+  <div class="spread"><h2>Notebook</h2><div class="row"><span class="nbs" id="nbDbs" role="status" aria-live="polite">…</span><button class="ghost" id="nbClose">Close</button></div></div>
+  <label class="small">Who said it <select id="nbWho"></select></label>
+  <div class="seg"><button class="fx on" data-k="fix" id="nbFix">Fix</button><button class="gd" data-k="good" id="nbGood">Good</button></div>
+  <label class="small">What they said<textarea id="nbSaid" placeholder="If I would have more time, I would travel"></textarea></label>
+  <label class="small" id="nbBetterL">Better version<textarea id="nbBetter" placeholder="If I had more time, I would travel"></textarea></label>
+  <label class="small">Structure <select id="nbStruct"></select></label>
+  <div class="row"><button class="primary" id="nbSave">Save note</button><span class="flash" id="nbMsg"></span></div>
+  <h3 style="margin-top:8px">Today</h3>
+  <div id="nbList" style="display:grid; gap:8px"></div>
+</aside>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  var TYPE = { 0: "Zero", 1: "First", 2: "Second", m: "Mixed" };
+  function tp(k) { return '<span class="tp t' + (k === "m" ? "1" : k) + '">' + (k === "m" ? "1 + 2" : k) + " · " + TYPE[k] + "</span>"; }
+
+  // ================================================================ CONTENT
+  // Spin & Speak. k: type (0, 1, 2, m). t: targets. m: model answer.
+  var WHEEL = [
+    { k: 0, n: "Company rules", p: "Explain two rules at your company. What happens if someone is late for a meeting? What happens if an invoice arrives late?", t: ["Two rules with If + present, present", "One rule with when instead of if"], m: "If an invoice arrives after the 25th, finance pays it the next month." },
+    { k: 0, n: "Your market", p: "How does your industry work? What happens if the dollar goes up? What happens if it rains a lot?", t: ["Two facts: If + present, present", "No will in either part"], m: "If the dollar goes up, imported materials get more expensive." },
+    { k: 1, n: "Angry client", p: "A client is angry: the order is three days late. Calm them down with three promises.", t: ["Three promises: If + present, will", "One sentence with I'll make sure..."], m: "If you give us until Friday, we'll deliver it with free shipping." },
+    { k: 1, n: "Close the deal", p: "Offer a new client a deal with conditions. Price, time, volume: you choose.", t: ["Two offers: If you..., we'll...", "One offer with can (If you..., we can...)"], m: "If you sign a 12-month contract, we'll give you a 10% discount." },
+    { k: 1, n: "Unless...", p: "Your team is behind schedule. Warn them about the deadline and the consequences.", t: ["One warning with unless", "One warning with If ... don't ..., ... won't ..."], m: "Unless we finish the report today, we won't get the bonus." },
+    { k: 1, n: "Next quarter", p: "Next quarter: what will you do if sales go up? And if they go down?", t: ["If sales go up, we'll...", "If sales go down, we'll...", "One with might or may"], m: "If sales go down, we might cut the marketing budget." },
+    { k: 2, n: "CEO for a day", p: "If you were the CEO of your company, what three things would you change?", t: ["If I were the CEO, I would...", "Three changes with would"], m: "If I were the CEO, I would cut useless meetings." },
+    { k: 2, n: "One million", p: "Your company gets one million dollars extra. How would you invest it, and why?", t: ["If we had one million dollars, we would...", "One reason with because"], m: "If we had an extra million, we would open a sales office in Miami." },
+    { k: 2, n: "Anywhere", p: "If you could work anywhere in the world, where would you work and what would you do?", t: ["If I could work anywhere, I would...", "One more detail with would"], m: "If I could work anywhere, I would work in Lisbon for a tech startup." },
+    { k: 2, n: "Dilemma", p: "A supplier offers you a gift worth $2,000. Would you accept it? What would you do?", t: ["If a supplier offered me..., I would...", "One sentence with I wouldn't..."], m: "If a supplier offered me an expensive gift, I wouldn't accept it." },
+    { k: "m", n: "Real or dream?", p: "Talk about two projects: one that is realistic this year and one that is only a dream for now.", t: ["Realistic: If + present, will", "Dream: If + past, would", "Explain why one is real and one is not"], m: "If we get the loan, we'll buy a new machine. If we had a bigger plant, we would export to Europe." },
+    { k: 0, n: "Refund policy", p: "Explain your customer policy: refunds, late payments, discounts. You are the manager.", t: ["Two policies with If + present, present", "Use you or customers as the subject"], m: "If customers pay in cash, they get a 5% discount." }
+  ];
+
+  // Jeopardy: 5 categories, 5 tiles. q: clue, a: answer. open: the teacher judges any good answer.
+  var JEO = {
+    cats: ["Zero: rules & facts", "First: deals & plans", "Second: what if...?", "Fix the bug", "Which one?"],
+    tiles: [
+      [
+        { q: "Complete: If the client ___ (pay) late, the system ___ (send) a reminder.", a: "pays / sends" },
+        { q: "Complete: If demand ___ (go) up, prices ___ (rise).", a: "goes / rise" },
+        { q: "Say a zero conditional about your company's vacation policy.", a: "Open answer. Example: If you work for 12 months, you get 15 days off.", open: true },
+        { q: "Which word can replace if in a zero conditional without changing the meaning?", a: "When. When demand goes up, prices rise." },
+        { q: "Correct the rule: \"If you will press this button, the machine stops.\"", a: "If you press this button, the machine stops." }
+      ],
+      [
+        { q: "Complete: If you ___ (sign) today, we ___ (give) you free delivery.", a: "sign / will give ('ll give)" },
+        { q: "Complete with one word: We won't hit the target ___ we hire two more people.", a: "unless" },
+        { q: "Make an offer to a client with two first conditionals in a row.", a: "Open answer. Example: If you order 500 units, we'll give you 8%. If you pay in advance, we'll add free shipping.", open: true },
+        { q: "Complete: If it ___ (rain) tomorrow, we ___ (move) the event indoors.", a: "rains / will move ('ll move)" },
+        { q: "Join in one sentence: \"Maybe you send me the data by noon. Then I can finish the report today.\"", a: "If you send me the data by noon, I can (I'll be able to) finish the report today." }
+      ],
+      [
+        { q: "Complete: If I ___ (be) you, I ___ (ask) for a raise.", a: "were / would ask ('d ask)" },
+        { q: "Complete: If we ___ (have) a bigger budget, we ___ (open) an office in Miami.", a: "had / would open" },
+        { q: "Answer with a full sentence: What would you do if your boss asked you to work every Saturday?", a: "Open answer. Example: If my boss asked me to work every Saturday, I would ask for extra pay.", open: true },
+        { q: "Which is safer in formal business English: \"If I was the manager\" or \"If I were the manager\"?", a: "If I were the manager. (If I was is common in informal speech.)" },
+        { q: "Make it hypothetical: \"We don't have enough staff, so we can't open on Sundays.\"", a: "If we had enough staff, we could (would) open on Sundays." }
+      ],
+      [
+        { q: "If you will call me, I answer.", a: "If you call me, I'll answer." },
+        { q: "If I would have time, I would help you.", a: "If I had time, I would help you." },
+        { q: "If we don't reduce costs next month, we lose the contract.", a: "If we don't reduce costs next month, we'll lose the contract." },
+        { q: "Unless you don't pay, we will cancel the order.", a: "Unless you pay, we will cancel the order. (or: If you don't pay, ...)" },
+        { q: "If I am the CEO, I would close this office.", a: "If I were the CEO, I would close this office." }
+      ],
+      [
+        { q: "Which type? \"If you mix blue and yellow, you get green.\"", a: "Zero: always true." },
+        { q: "Which type? \"If the client accepts, we'll start on Monday.\"", a: "First: a real possibility." },
+        { q: "Which type? \"If the client accepted, we'd start on Monday.\"", a: "Second: the speaker sees it as unlikely or imaginary." },
+        { q: "Explain the difference: \"If I get the promotion, I'll buy a car.\" vs \"If I got the promotion, I'd buy a car.\"", a: "First: the speaker thinks the promotion is possible. Second: the speaker thinks it is unlikely, or is only imagining." },
+        { q: "Complete and name the type: \"I don't have his number. If I ___ (know) it, I ___ (call) him.\"", a: "knew / would call. Second: an unreal present situation." }
+      ]
+    ]
+  };
+
+  // Which If? a: correct type, w: why
+  var WHICH = [
+    { s: "If you miss the deadline, the system blocks your access.", a: 0, w: "A system rule. It always happens." },
+    { s: "When stock is low, the warehouse orders more automatically.", a: 0, w: "A process that always works this way. When = if." },
+    { s: "If employees work overtime, they get paid extra.", a: 0, w: "A company policy: present + present." },
+    { s: "If prices go up, customers buy less.", a: 0, w: "A general market fact." },
+    { s: "If you pay in cash, you get a 5% discount.", a: 0, w: "A standing policy for every customer." },
+    { s: "If you send the proposal today, I'll review it tomorrow.", a: 1, w: "A real plan for a specific future: present + will." },
+    { s: "We'll lose the client if we don't answer this email.", a: 1, w: "A real warning. The if-clause can go second, with no comma." },
+    { s: "If the shipment arrives on time, we can launch on Monday.", a: 1, w: "A real possibility: present + can." },
+    { s: "Unless sales improve, we'll cut the budget.", a: 1, w: "Unless = if not. A real consequence in the future." },
+    { s: "If I see her at the meeting, I'll tell her.", a: 1, w: "A real situation that may happen." },
+    { s: "If I were the manager, I'd change the schedule.", a: 2, w: "Imagined: I am not the manager." },
+    { s: "If we had more space, we would hire ten more people.", a: 2, w: "Unreal now: we don't have more space." },
+    { s: "If the dollar fell to 2,000 pesos, we'd import much more.", a: 2, w: "The speaker sees it as very unlikely." },
+    { s: "What would you do if you lost your biggest client?", a: 2, w: "A hypothetical question: past + would." },
+    { s: "I would call him if I knew his number.", a: 2, w: "Unreal present: I don't know his number." },
+    { s: "If we could choose, we'd work from home on Fridays.", a: 2, w: "Imagined: we can't choose. Could + would." }
+  ];
+
+  // Rapid Transform sets. p: prompt, m: model
+  var RAPID = {
+    "1": { n: "Make it real (First)", k: 1, h: "Turn the two ideas into one first conditional.", items: [
+      { p: "Maybe you finish early. → Go home.", m: "If you finish early, you can go home." },
+      { p: "Maybe the client calls. → I'll tell you.", m: "If the client calls, I'll tell you." },
+      { p: "Maybe it rains. → We'll cancel the visit.", m: "If it rains, we'll cancel the visit." },
+      { p: "Maybe we lower the price. → Sales will go up.", m: "If we lower the price, sales will go up." },
+      { p: "Maybe they don't pay. → We'll stop the service.", m: "If they don't pay, we'll stop the service. / Unless they pay, we'll stop the service." },
+      { p: "Maybe the meeting ends early. → I'll call you.", m: "If the meeting ends early, I'll call you." },
+      { p: "Maybe you need help. → Send me a message.", m: "If you need help, send me a message." },
+      { p: "Maybe the boss approves it. → We'll start in May.", m: "If the boss approves it, we'll start in May." }
+    ] },
+    "2": { n: "Imagine it (Second)", k: 2, h: "This is the reality. Say what would be different.", items: [
+      { p: "We don't have a budget, so we can't hire.", m: "If we had a budget, we could hire." },
+      { p: "I'm not the CEO, so I can't change the rules.", m: "If I were the CEO, I could change the rules." },
+      { p: "She doesn't speak German, so she can't manage the Berlin account.", m: "If she spoke German, she could manage the Berlin account." },
+      { p: "Our website is slow, so we lose customers.", m: "If our website weren't slow, we wouldn't lose customers. (wasn't is fine in speech)" },
+      { p: "I live far from the office, so I arrive late.", m: "If I lived closer to the office, I wouldn't arrive late." },
+      { p: "They don't trust us, so they don't sign.", m: "If they trusted us, they would sign." },
+      { p: "We don't export, so we depend on the local market.", m: "If we exported, we wouldn't depend on the local market." },
+      { p: "I have too many meetings, so I can't focus.", m: "If I had fewer meetings, I could focus." }
+    ] },
+    "0": { n: "State the rule (Zero)", k: 0, h: "Say the company rule as a zero conditional.", items: [
+      { p: "Customer pays late → 2% fee.", m: "If a customer pays late, we charge a 2% fee." },
+      { p: "Temperature above 30° → the machines stop.", m: "If the temperature goes above 30 degrees, the machines stop." },
+      { p: "New employee → two weeks of training.", m: "If you are a new employee, you get two weeks of training." },
+      { p: "Order over $500 → free shipping.", m: "If you order more than $500, shipping is free." },
+      { p: "Wrong password three times → the account locks.", m: "If you enter the wrong password three times, the account locks." },
+      { p: "Demand rises → prices rise.", m: "If demand rises, prices rise." },
+      { p: "Project is late → the client gets a discount.", m: "If a project is late, the client gets a discount." },
+      { p: "Work on a holiday → double pay.", m: "If you work on a holiday, you get double pay." }
+    ] }
+  };
+
+  // Grammar Auction. c: correct? f: fix
+  var AUCTION = [
+    { s: "If I were you, I would accept the offer.", c: true },
+    { s: "If you will send me the file, I'll check it.", c: false, f: "If you send me the file, I'll check it." },
+    { s: "If we had more time, we would finish the report.", c: true },
+    { s: "If the client pays late, we charge a fee.", c: true },
+    { s: "If I would know the answer, I would tell you.", c: false, f: "If I knew the answer, I would tell you." },
+    { s: "Unless you sign today, the price will go up.", c: true },
+    { s: "If she gets the job, she would move to Bogotá.", c: false, f: "If she gets the job, she'll move to Bogotá. (or: If she got the job, she would move...)" },
+    { s: "What would you do if you lose your job?", c: false, f: "What would you do if you lost your job?" },
+    { s: "If prices go up, customers buy less.", c: true },
+    { s: "We won't meet the deadline if we don't start now.", c: true }
+  ];
+
+  // Deal Room scenarios
+  var DEALS = [
+    { n: "Coffee export", ctx: "A US café chain wants to buy Colombian specialty coffee.",
+      a: { r: "Buyer · US café chain", g: ["You want a 20% discount.", "You need delivery in 30 days.", "You want to pay 30 days after delivery."] },
+      b: { r: "Seller · Colombian exporter", g: ["You can give 8% maximum.", "You need 50% payment in advance.", "Delivery takes 45 days by sea."] },
+      tw: "Twist: the buyer's CEO calls. They need the first shipment in 15 days, by air. Air freight costs 3 times more." },
+    { n: "Software contract", ctx: "A logistics company is buying project-management software.",
+      a: { r: "Client · logistics company", g: ["You want a lower monthly price.", "You want a 3-month trial.", "You want training for 40 people."] },
+      b: { r: "Vendor · software company", g: ["You want a 2-year contract.", "The trial can be 1 month maximum.", "Training costs extra, but you can include it in a long contract."] },
+      tw: "Twist: a competitor offers the client the same software 25% cheaper. The vendor must react." },
+    { n: "Office rent", ctx: "A growing startup needs a new office in El Poblado.",
+      a: { r: "Tenant · startup", g: ["You want a lower rent for the first 6 months.", "You want parking for 10 cars.", "You may need to leave after 1 year."] },
+      b: { r: "Owner · building", g: ["You want a 3-year contract.", "You have parking for 5 cars only.", "You want 3 months of deposit."] },
+      tw: "Twist: the startup just got new investment. They want to double the space next year." },
+    { n: "The job offer", ctx: "A company wants to hire a senior sales manager.",
+      a: { r: "Candidate · sales manager", g: ["You want 20% more salary than your current job.", "You want 2 remote days a week.", "You want to start in 2 months."] },
+      b: { r: "HR · hiring company", g: ["Your budget is 10% more than the candidate's current salary.", "The policy is 1 remote day a week.", "You need someone in 2 weeks."] },
+      tw: "Twist: the candidate has another offer and must answer by tomorrow." }
+  ];
+  var DEAL_TARGETS = ["Three offers with If + present, will (If you..., we'll...)", "One condition with unless", "One second conditional (If we had..., we would... / What would you do if...?)", "A deal or a polite no: We'll sign if... / I'm afraid we can't..."];
+
+  // Consequence Chain starters
+  var CHAIN = [
+    "Our company starts working 4 days a week.",
+    "We lose our biggest client.",
+    "We open an office in Miami.",
+    "The dollar goes up 20%.",
+    "Our CEO quits tomorrow.",
+    "We launch a mobile app.",
+    "We double the price of our product.",
+    "All meetings are cancelled for a month."
+  ];
+
+  // ================================================================ TEAMS & SCORE
+  var KEY = "whatif.room.v1";
+  var S = { teams: [{ n: "Team A", s: 0 }, { n: "Team B", s: 0 }], cur: 0 };
+  try { var raw = localStorage.getItem(KEY); if (raw) { var o = JSON.parse(raw); if (o && o.teams && o.teams.length) S = o; } } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function curName() { return S.teams[S.cur] ? S.teams[S.cur].n : ""; }
+
+  function renderScores(bumpI) {
+    var h = "";
+    S.teams.forEach(function (t, i) {
+      h += '<div class="team' + (i === S.cur ? " cur" : "") + (i === bumpI ? " bump" : "") + '">' +
+        '<div><div class="turn">' + (i === S.cur ? "on turn" : "&nbsp;") + '</div><div class="tn">' + esc(t.n) + "</div></div>" +
+        '<div class="ts">' + t.s + "</div>" +
+        '<div class="tb"><button data-sc="' + i + '" data-v="100" aria-label="Add 100 to ' + esc(t.n) + '">+100</button><button data-sc="' + i + '" data-v="-100" aria-label="Take 100 from ' + esc(t.n) + '">−100</button><button data-turn="' + i + '" aria-label="Give the turn to ' + esc(t.n) + '">turn</button></div></div>';
+    });
+    h += '<button class="next" id="nextTurn">Next turn →</button>';
+    $("scores").innerHTML = h;
+    $("nextTurn").onclick = nextTurn;
+  }
+  $("scores").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.sc != null) award(+b.dataset.sc, +b.dataset.v);
+    if (b.dataset.turn != null) { S.cur = +b.dataset.turn; save(); renderScores(); onTurn(); }
+  });
+  function award(i, v) { if (!S.teams[i]) return; S.teams[i].s += v; save(); renderScores(i); }
+  function nextTurn() { S.cur = (S.cur + 1) % S.teams.length; save(); renderScores(); onTurn(); }
+  var turnHooks = [];
+  function onTurn() { turnHooks.forEach(function (f) { f(); }); }
+
+  $("teamsIn").value = S.teams.map(function (t) { return t.n; }).join("\n");
+  $("teamsGo").onclick = function () {
+    var names = $("teamsIn").value.split("\n").map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8);
+    if (names.length < 2) { $("setupMsg").className = "flash bad"; $("setupMsg").textContent = "Write at least 2 teams or players."; return; }
+    S.teams = names.map(function (n, i) { return { n: n, s: S.teams[i] ? S.teams[i].s : 0 }; });
+    if (S.cur >= S.teams.length) S.cur = 0;
+    save(); renderScores(); onTurn(); paintWho();
+    $("setupMsg").className = "flash"; $("setupMsg").textContent = "Saved: " + names.length + " teams.";
+  };
+  var resetArmed = false;
+  $("scoreReset").onclick = function () {
+    if (!resetArmed) { resetArmed = true; $("scoreReset").textContent = "Sure? Click again"; setTimeout(function () { resetArmed = false; $("scoreReset").textContent = "Reset scores"; }, 3000); return; }
+    S.teams.forEach(function (t) { t.s = 0; }); S.cur = 0; save(); renderScores(); resetArmed = false; $("scoreReset").textContent = "Reset scores";
+  };
+  $("setupHide").onclick = function () { $("setup").hidden = true; };
+
+  // ================================================================ NAV
+  var GAMES = [
+    { id: "Spin", sec: "tSpin", g: "speak", n: "Spin & Speak", d: "Business situations on a wheel. The team speaks; you mark the targets.", m: "0 · 1 · 2 · 10-15 min" },
+    { id: "Deal", sec: "tDeal", g: "speak", n: "Deal Room", d: "Two teams negotiate a real deal with offers, conditions and a twist.", m: "1 · 2 · 15 min", c: "mix" },
+    { id: "Chain", sec: "tChain", g: "speak", n: "Consequence Chain", d: "One decision, many consequences. Each team adds a link: If that happens...", m: "1 or 2 · 8-10 min" },
+    { id: "Which", sec: "tWhich", g: "acc", n: "Which If?", d: "Read the sentence: zero, first or second? Fast points, clear reasons.", m: "0 · 1 · 2 · 5-8 min" },
+    { id: "Rapid", sec: "tRapid", g: "acc", n: "Rapid Transform", d: "8 sentences in 90 seconds. Turn ideas into conditionals against the clock.", m: "0 · 1 · 2 · 10 min" },
+    { id: "Auction", sec: "tAuction", g: "acc", n: "Grammar Auction", d: "Each team has $1,000. Bet only on the sentences you think are correct.", m: "0 · 1 · 2 · 10 min" },
+    { id: "Jeo", sec: "tJeo", g: "acc", n: "Jeopardy", d: "5 categories, 25 tiles. Perfect for review or a final boss round.", m: "0 · 1 · 2 · 20-30 min", c: "mix" }
+  ];
+  var SECS = ["tMenu", "tRules", "tSpin", "tJeo", "tWhich", "tRapid", "tAuction", "tDeal", "tChain", "tCourt", "tProg"];
+  function show(sec, label) {
+    SECS.forEach(function (s) { $(s).hidden = s !== sec; });
+    $("gameBar").hidden = !label; $("gameName").textContent = label || "";
+    Array.prototype.forEach.call($("tabs").children, function (b) { b.classList.toggle("on", (b.dataset.t === "menu" && sec === "tMenu") || (b.dataset.t === "rules" && sec === "tRules") || (b.dataset.t === "court" && sec === "tCourt") || (b.dataset.t === "prog" && sec === "tProg")); });
+    stopTimers();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function menu() {
+    var sp = "", ac = "";
+    GAMES.forEach(function (g) {
+      var h = '<button class="gcard ' + (g.g === "acc" ? "acc" : "") + (g.c ? " " + g.c : "") + '" data-g="' + g.id + '"><b>' + g.n + '</b><span class="gd">' + g.d + '</span><span class="gm">' + g.m + "</span></button>";
+      if (g.g === "speak") sp += h; else ac += h;
+    });
+    $("menuSpeak").innerHTML = sp; $("menuAcc").innerHTML = ac;
+  }
+  function openGame(id) {
+    var g = GAMES.filter(function (x) { return x.id === id; })[0];
+    show(g.sec, g.n);
+    ({ Spin: initSpin, Jeo: initJeo, Which: initWhich, Rapid: initRapid, Auction: initAuction, Deal: initDeal, Chain: initChain })[id]();
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-g]"); if (b) openGame(b.dataset.g); });
+  $("tabs").onclick = function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.t === "menu") show("tMenu");
+    if (b.dataset.t === "rules") show("tRules");
+    if (b.dataset.t === "court") { show("tCourt"); renderCourt(); }
+    if (b.dataset.t === "prog") { show("tProg"); renderProg(); }
+    if (b.dataset.t === "setup") { $("setup").hidden = false; $("setup").scrollIntoView({ behavior: "smooth" }); }
+  };
+  $("backMenu").onclick = function () { show("tMenu"); };
+
+  // shared timer
+  var timers = [];
+  function stopTimers() { timers.forEach(clearInterval); timers = []; turnHooks = []; }
+  function countdown(el, secs, onEnd) {
+    var end = Date.now() + secs * 1000;
+    function tick() {
+      var left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+      if (!el.isConnected) { clearInterval(id); return; }
+      el.textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0");
+      el.classList.toggle("low", left <= 10);
+      if (left <= 0) { clearInterval(id); if (onEnd) onEnd(); }
+    }
+    var id = setInterval(tick, 250); timers.push(id); tick();
+    return function () { clearInterval(id); };
+  }
+
+  // targets block (shared by Spin and Deal)
+  function targetsHtml(list, pre) {
+    return '<div class="targets">' + list.map(function (t, i) {
+      return '<div class="tg hid" data-tg="' + pre + i + '"><span class="tt">' + esc(t) + '</span><span class="yn"><button class="y" aria-label="Done">✓</button><button class="n" aria-label="Not yet">✗</button></span></div>';
+    }).join("") + "</div>";
+  }
+  function wireToggle(btn, root) { // show / hide all targets in root
+    function paint() { var hid = root.querySelector(".tg.hid"); btn.textContent = hid ? "Show targets" : "Hide targets"; }
+    btn.onclick = function () {
+      var hid = root.querySelector(".tg.hid");
+      root.querySelectorAll(".tg").forEach(function (t) { t.classList.toggle("hid", !hid); });
+      paint();
+    };
+    root.addEventListener("click", function (e) { if (e.target.closest(".yn")) setTimeout(paint, 0); });
+    paint();
+  }
+  function wireTargets(root) {
+    root.querySelectorAll(".tg").forEach(function (tg) {
+      tg.querySelector(".y").onclick = function () { tg.querySelector(".y").classList.toggle("on"); tg.querySelector(".n").classList.remove("on"); };
+      tg.querySelector(".n").onclick = function () { tg.querySelector(".n").classList.toggle("on"); tg.querySelector(".y").classList.remove("on"); };
+    });
+  }
+
+  // ================================================================ SPIN & SPEAK
+  var rot = 0, wheelDrawn = false, avail = null; // avail: situations still on the wheel
+  function drawWheel() {
+    if (!avail) avail = WHEEL.slice();
+    var n = avail.length, seg = 360 / n, h = "", cols = ["--w1", "--w2", "--w3", "--w4", "--w5", "--w6", "--w7", "--w8"];
+    var cs = getComputedStyle(document.documentElement);
+    function pt(a, r) { var rad = a * Math.PI / 180; return [(r * Math.sin(rad)).toFixed(2), (-r * Math.cos(rad)).toFixed(2)]; }
+    avail.forEach(function (w, i) {
+      var s = i * seg - seg / 2, e = s + seg, p1 = pt(s, 100), p2 = pt(e, 100), col = cs.getPropertyValue(cols[WHEEL.indexOf(w) % 8]).trim();
+      h += n === 1 ? '<circle r="100" fill="' + col + '"/>' : '<path d="M0 0 L' + p1[0] + " " + p1[1] + " A100 100 0 0 1 " + p2[0] + " " + p2[1] + ' Z" fill="' + col + '" stroke="#fff" stroke-width="1"/>';
+      var flip = i * seg > 180 ? 90 : -90; // keep the words readable on the left half
+      h += '<text transform="rotate(' + (i * seg) + ') translate(0,-62) rotate(' + flip + ')" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="8.5" font-weight="700" font-family="Poppins,sans-serif">' + esc(w.n) + "</text>";
+    });
+    var wEl = $("wheel"); wEl.style.transition = "none"; rot = 0; wEl.style.transform = "rotate(0deg)"; void wEl.getBoundingClientRect(); wEl.style.transition = "";
+    wEl.innerHTML = h; wheelDrawn = true;
+    $("spinGo").disabled = !n;
+    $("spinLeft").textContent = n + " of " + WHEEL.length + " left";
+  }
+  function initSpin() {
+    drawWheel();
+    $("spinGo").onclick = function () {
+      if (!avail.length) return;
+      var n = avail.length, seg = 360 / n, k = Math.floor(Math.random() * n);
+      var want = ((-k * seg - rot) % 360 + 360) % 360;
+      rot += 360 * 5 + want;
+      $("wheel").style.transform = "rotate(" + rot + "deg)";
+      $("spinGo").disabled = true;
+      setTimeout(function () { $("spinGo").disabled = false; spinCard(avail[k]); }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 4300);
+    };
+  }
+  function spinCard(w) {
+    var c = $("spinCard");
+    c.innerHTML = '<div class="card k' + (w.k === "m" ? "1" : w.k) + '">' + tp(w.k) + ' <span class="tag">' + esc(curName()) + " speaks</span>" +
+      "<h3>" + esc(w.p) + "</h3>" + targetsHtml(w.t, "s") +
+      '<div class="row" style="margin-top:12px"><button class="ghost" id="spRev">Show targets</button><button class="ghost" id="spModel">Model answer</button></div>' +
+      '<div id="spM" style="margin-top:10px"></div>' +
+      '<div class="row" style="margin-top:12px"><button class="primary" id="spPts">Give points &amp; next turn</button><span class="flash" id="spMsg"></span></div></div>';
+    wireTargets(c);
+    wireToggle($("spRev"), c.querySelector(".targets"));
+    $("spModel").onclick = function () { $("spM").innerHTML = '<div class="model"><small>Model</small>' + esc(w.m) + "</div>"; };
+    $("spPts").onclick = function () {
+      var ok = c.querySelectorAll(".y.on").length, who = S.cur;
+      award(who, ok * 100);
+      $("spMsg").textContent = S.teams[who].n + " +" + ok * 100;
+      $("spPts").disabled = true;
+      avail = avail.filter(function (x) { return x !== w; }); drawWheel();
+      setTimeout(function () {
+        nextTurn();
+        $("spinCard").innerHTML = avail.length ? '<p class="muted">' + esc(curName()) + ', spin the wheel!</p>'
+          : '<p class="big">All done! 🎉</p><p class="muted" style="margin:6px 0 12px">Every situation was played.</p><button class="gold" id="spRefill">Fill the wheel again</button>';
+        if ($("spRefill")) $("spRefill").onclick = function () { avail = null; drawWheel(); $("spinCard").innerHTML = '<p class="muted">New wheel. Spin!</p>'; };
+      }, 700);
+    };
+  }
+
+  // ================================================================ JEOPARDY
+  var jeoDone = {};
+  function initJeo() {
+    var h = "";
+    JEO.cats.forEach(function (c) { h += '<div class="cat">' + esc(c) + "</div>"; });
+    for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) {
+      var k = c + "-" + r, done = jeoDone[k];
+      h += '<button class="tile' + (done ? " done" : "") + '" data-k="' + k + '"' + (done ? " disabled" : "") + ">" + (done ? esc(done) : (r + 1) * 100) + "</button>";
+    }
+    $("board").innerHTML = h;
+    $("board").onclick = function (e) { var b = e.target.closest(".tile"); if (b && !b.disabled) jeoOpen(b.dataset.k); };
+    $("jeoReset").onclick = function () { jeoDone = {}; $("jeoCard").innerHTML = ""; initJeo(); };
+  }
+  function jeoOpen(k) {
+    var p = k.split("-"), c = +p[0], r = +p[1], t = JEO.tiles[c][r], v = (r + 1) * 100;
+    var btns = S.teams.map(function (tm, i) { return '<button class="okb" data-aw="' + i + '">' + esc(tm.n) + " +" + v + "</button>"; }).join("");
+    $("jeoCard").innerHTML = '<div class="card"><span class="tag">' + esc(JEO.cats[c]) + " · " + v + " · " + esc(curName()) + " picks</span><h3>" + esc(t.q) + "</h3>" +
+      '<div class="row"><button class="ghost" id="jeoRev">Reveal answer</button></div><div id="jeoA" style="margin-top:10px"></div>' +
+      '<div class="row" style="margin-top:12px">' + btns + '<button class="nob" id="jeoNone">Nobody</button></div></div>';
+    $("jeoRev").onclick = function () { $("jeoA").innerHTML = '<div class="model"><small>' + (t.open ? "Teacher judges · example" : "Answer") + "</small>" + esc(t.a) + "</div>"; };
+    function close(label) { jeoDone[k] = label; $("jeoCard").innerHTML = ""; initJeo(); nextTurn(); }
+    $("jeoCard").querySelectorAll("[data-aw]").forEach(function (b) { b.onclick = function () { var i = +b.dataset.aw; award(i, v); close(S.teams[i].n); }; });
+    $("jeoNone").onclick = function () { close("—"); };
+    $("jeoCard").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ================================================================ WHICH IF?
+  var wh = null;
+  function initWhich() { wh = { deck: shuffle(WHICH).slice(0, 12), i: 0, res: [] }; whichDraw(); }
+  function whichDraw() {
+    var box = $("which");
+    var dots = '<div class="dots">' + wh.deck.map(function (_, i) { return '<i class="' + (wh.res[i] === true ? "ok" : wh.res[i] === false ? "no" : "") + (i === wh.i ? " cur" : "") + '"></i>'; }).join("") + "</div>";
+    if (wh.i >= wh.deck.length) {
+      var ok = wh.res.filter(Boolean).length;
+      box.innerHTML = '<div class="spread"><h2>Which If?</h2>' + dots + '</div><p class="big" style="margin:18px 0">' + ok + " / " + wh.deck.length + ' right</p><button class="primary" id="whAgain">New round</button>';
+      $("whAgain").onclick = initWhich; return;
+    }
+    var it = wh.deck[wh.i];
+    box.innerHTML = '<div class="spread"><h2>Which If?</h2>' + dots + "</div>" +
+      '<p class="tag" style="margin-top:14px">' + esc(curName()) + " answers · " + (wh.i + 1) + " of " + wh.deck.length + "</p>" +
+      '<p class="big" style="margin:8px 0 16px">' + esc(it.s) + "</p>" +
+      '<div class="choice"><button class="b0" data-c="0">Zero<small>always true</small></button><button class="b1" data-c="1">First<small>real possibility</small></button><button class="b2" data-c="2">Second<small>imagined</small></button></div>' +
+      '<div id="whWhy" style="margin-top:12px"></div>';
+    box.querySelectorAll("[data-c]").forEach(function (b) {
+      b.onclick = function () {
+        var c = +b.dataset.c, right = c === it.a, who = S.cur;
+        box.querySelectorAll("[data-c]").forEach(function (x) { x.disabled = true; if (+x.dataset.c === it.a) x.classList.add("right"); });
+        if (!right) b.classList.add("wrong");
+        wh.res[wh.i] = right;
+        if (right) award(who, 100);
+        $("whWhy").innerHTML = '<p class="flash' + (right ? "" : " bad") + '">' + (right ? S.teams[who].n + " +100. " : "Not this time. ") + "</p>" +
+          '<div class="model"><small>' + TYPE[it.a] + "</small>" + esc(it.w) + "</div>" +
+          '<div class="row" style="margin-top:12px"><button class="primary" id="whNext">Next sentence →</button></div>';
+        $("whNext").onclick = function () { wh.i++; nextTurn(); };
+      };
+    });
+  }
+
+  // ================================================================ RAPID TRANSFORM
+  var rp = null;
+  function initRapid() {
+    var opts = Object.keys(RAPID).sort().map(function (k) { return '<option value="' + k + '">' + RAPID[k].n + "</option>"; }).join("");
+    $("rapid").innerHTML = '<div class="spread"><h2>Rapid Transform</h2><label class="small">Set <select id="rpSet">' + opts + "</select></label></div>" +
+      '<p class="muted" style="margin:8px 0 14px">The team on turn has 90 seconds for 8 sentences. Any team member can answer. Mark ✓ or ✗; models appear at the end.</p>' +
+      '<p class="big">' + esc(curName()) + ', ready?</p><div class="row" style="margin-top:14px"><button class="gold" id="rpGo">Start 90 seconds</button></div>';
+    $("rpSet").value = "1";
+    turnHooks = [function () { if (!rp || rp.done) initRapid(); }];
+    $("rpGo").onclick = function () {
+      var k = $("rpSet").value;
+      rp = { set: RAPID[k], items: shuffle(RAPID[k].items), i: 0, res: [], who: S.cur, done: false, end: Date.now() + 90000 };
+      timers.push(setInterval(rapidTick, 250));
+      rapidDraw();
+    };
+  }
+  function rapidTick() {
+    if (!rp || rp.done) return;
+    var left = Math.max(0, Math.ceil((rp.end - Date.now()) / 1000)), el = $("rpT");
+    if (el) { el.textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0"); el.classList.toggle("low", left <= 10); }
+    if (left <= 0) { rp.timeUp = true; rapidEnd(); }
+  }
+  function rapidDraw() {
+    var set = rp.set, box = $("rapid");
+    if (rp.i >= rp.items.length || rp.timeUp) return rapidEnd();
+    var it = rp.items[rp.i];
+    var dots = '<div class="dots">' + rp.items.map(function (_, i) { return '<i class="' + (rp.res[i] === true ? "ok" : rp.res[i] === false ? "no" : "") + (i === rp.i ? " cur" : "") + '"></i>'; }).join("") + "</div>";
+    box.innerHTML = '<div class="spread"><h2>' + esc(set.n) + '</h2><span class="timer" id="rpT"></span></div>' + dots +
+      '<p class="muted" style="margin:10px 0 4px">' + esc(set.h) + "</p>" +
+      '<div class="card k' + set.k + '" style="margin-top:8px"><span class="tag">' + esc(S.teams[rp.who].n) + " · " + (rp.i + 1) + ' of 8</span><h3>' + esc(it.p) + "</h3>" +
+      '<div class="row"><button class="okb" id="rpY">✓ Correct</button><button class="nob" id="rpN">✗ Wrong</button><button class="ghost" id="rpStop">End round</button></div></div>';
+    rapidTick();
+    $("rpY").onclick = function () { rp.res[rp.i] = true; rp.i++; rapidDraw(); };
+    $("rpN").onclick = function () { rp.res[rp.i] = false; rp.i++; rapidDraw(); };
+    $("rpStop").onclick = rapidEnd;
+  }
+  function rapidEnd() {
+    if (rp.done) return; rp.done = true; stopTimersOnly();
+    var ok = rp.res.filter(Boolean).length;
+    award(rp.who, ok * 100);
+    var list = rp.items.map(function (it, i) {
+      var r = rp.res[i];
+      return '<div class="tg"><span><span class="tt">' + esc(it.p) + '</span><span class="fixline">' + esc(it.m) + '</span></span><span class="tp ' + (r === true ? "t1" : "") + '">' + (r === true ? "✓" : r === false ? "✗" : "—") + "</span></div>";
+    }).join("");
+    $("rapid").innerHTML = '<div class="spread"><h2>' + esc(rp.set.n) + '</h2><span class="big">' + esc(S.teams[rp.who].n) + " +" + ok * 100 + "</span></div>" +
+      '<p class="muted" style="margin:8px 0 12px">Read the models together. Ask: which ones were hard?</p><div class="targets">' + list + "</div>" +
+      '<div class="row" style="margin-top:14px"><button class="primary" id="rpNext">Next team →</button></div>';
+    $("rpNext").onclick = function () { nextTurn(); initRapid(); };
+  }
+  function stopTimersOnly() { timers.forEach(clearInterval); timers = []; }
+
+  // ================================================================ GRAMMAR AUCTION
+  var au = null;
+  function initAuction() {
+    au = { items: shuffle(AUCTION).slice(0, 8), bets: {}, money: S.teams.map(function () { return 1000; }), shown: false };
+    auctionDraw();
+  }
+  function spent(t) { var s = 0; for (var k in au.bets) if (+k.split("-")[1] === t) s += au.bets[k]; return s; }
+  function auctionDraw() {
+    var th = S.teams.map(function (t, i) { return "<th>" + esc(t.n) + '<br><span class="money" id="m' + i + '">$' + (au.shown ? au.money[i] : au.money[i] - spent(i)) + "</span></th>"; }).join("");
+    var rows = au.items.map(function (it, r) {
+      var cls = au.shown ? (it.c ? "win" : "lose") : "";
+      var cells = S.teams.map(function (_, t) {
+        var b = au.bets[r + "-" + t] || 0;
+        return au.shown ? "<td><b class=\"money\" style=\"font-size:1rem\">" + (b ? (it.c ? "+" : "−") + "$" + b : "—") + "</b></td>"
+          : '<td><span class="bet"><button data-b="' + r + "-" + t + '" data-d="-100" aria-label="Bet less">−</button><b>$' + b + '</b><button data-b="' + r + "-" + t + '" data-d="100" aria-label="Bet more">+</button></span></td>';
+      }).join("");
+      return '<tr class="' + cls + '"><td>' + esc(it.s) + (au.shown ? '<span class="fixline">' + (it.c ? "✓ Correct" : "✗ " + esc(it.f)) + "</span>" : "") + "</td>" + cells + "</tr>";
+    }).join("");
+    $("auction").innerHTML = '<div class="spread"><h2>Grammar Auction</h2>' + (au.shown ? '<button class="ghost" id="auNew">New auction</button>' : '<button class="gold" id="auRev">Reveal!</button>') + "</div>" +
+      '<p class="muted" style="margin:8px 0 6px">' + (au.shown ? "Correct sentences pay the bet. Wrong ones lose it. Now fix the wrong ones out loud." : "Each team has $1,000. Bet only on sentences you think are correct. Teams discuss in English!") + "</p>" +
+      '<div class="auct"><table><thead><tr><th>Sentence</th>' + th + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
+      (au.shown ? '<div class="row" style="margin-top:12px"><button class="primary" id="auAdd">Add profits to the scoreboard</button><span class="flash" id="auMsg"></span></div>' : "");
+    if (!au.shown) {
+      $("auction").querySelectorAll("[data-b]").forEach(function (b) {
+        b.onclick = function () {
+          var k = b.dataset.b, t = +k.split("-")[1], d = +b.dataset.d, cur = au.bets[k] || 0, nv = cur + d;
+          if (nv < 0) return; if (d > 0 && spent(t) + d > au.money[t]) return;
+          au.bets[k] = nv; auctionDraw();
+        };
+      });
+      $("auRev").onclick = function () {
+        au.items.forEach(function (it, r) { S.teams.forEach(function (_, t) { var b = au.bets[r + "-" + t] || 0; au.money[t] += it.c ? b : -b; }); });
+        au.shown = true; auctionDraw();
+      };
+    } else {
+      $("auNew").onclick = initAuction;
+      $("auAdd").onclick = function () {
+        au.money.forEach(function (m, t) { award(t, m - 1000); });
+        $("auAdd").disabled = true; $("auMsg").textContent = "Profit (money − $1,000) added for each team.";
+      };
+    }
+  }
+
+  // ================================================================ DEAL ROOM
+  function initDeal() {
+    var opts = DEALS.map(function (d, i) { return '<option value="' + i + '">' + esc(d.n) + "</option>"; }).join("");
+    var tOpts = S.teams.map(function (t, i) { return '<option value="' + i + '">' + esc(t.n) + "</option>"; }).join("");
+    $("deal").innerHTML = '<div class="spread"><h2>Deal Room</h2><span class="timer" id="dlT">5:00</span></div>' +
+      '<div class="row" style="margin:10px 0"><label class="small">Scenario <select id="dlSc">' + opts + '</select></label>' +
+      '<label class="small">Side A <select id="dlA">' + tOpts + '</select></label><label class="small">Side B <select id="dlB">' + tOpts + "</select></label>" +
+      '<button class="gold" id="dlGo">Start 5 minutes</button></div><div id="dlBox"></div>';
+    $("dlA").value = String(S.cur); $("dlB").value = String((S.cur + 1) % S.teams.length);
+    $("dlSc").onchange = dealDraw; $("dlA").onchange = dealDraw; $("dlB").onchange = dealDraw;
+    var twistAt = null;
+    $("dlGo").onclick = function () {
+      stopTimersOnly();
+      countdown($("dlT"), 300, function () { $("dlMsg").textContent = "Time! Close the deal or say no."; });
+      twistAt = setTimeout(function () { var tw = $("dlTw"); if (tw) tw.hidden = false; }, 150000); timers.push(twistAt);
+    };
+    dealDraw();
+  }
+  function dealDraw() {
+    var d = DEALS[+$("dlSc").value], A = +$("dlA").value, B = +$("dlB").value;
+    function side(s, ti, pre) {
+      return '<div class="role"><span class="tag">' + esc(S.teams[ti].n) + "</span><h4>" + esc(s.r) + '</h4><ul style="margin:0; padding-left:20px">' + s.g.map(function (g) { return "<li>" + esc(g) + "</li>"; }).join("") + "</ul>" +
+        targetsHtml(DEAL_TARGETS, pre) + '<div class="row"><button class="ghost" data-tog="1">Show targets</button><button class="primary" data-dp="' + pre + '" data-ti="' + ti + '">Give points</button></div></div>';
+    }
+    $("dlBox").innerHTML = '<p class="big" style="font-size:1.3rem">' + esc(d.ctx) + "</p>" +
+      '<div class="roles">' + side(d.a, A, "a") + side(d.b, B, "b") + "</div>" +
+      '<div class="twist" id="dlTw" hidden>' + esc(d.tw) + '</div><div class="row"><button class="ghost" id="dlTwB">Show the twist now</button><span class="flash" id="dlMsg"></span></div>' +
+      '<p class="muted small" style="margin-top:10px">The twist appears by itself at 2:30. Each ✓ target = 100 points.</p>';
+    wireTargets($("dlBox"));
+    $("dlBox").querySelectorAll("[data-tog]").forEach(function (b) { wireToggle(b, b.closest(".role").querySelector(".targets")); });
+    $("dlTwB").onclick = function () { $("dlTw").hidden = false; };
+    $("dlBox").querySelectorAll("[data-dp]").forEach(function (b) {
+      b.onclick = function () {
+        var ok = b.closest(".role").querySelectorAll(".y.on").length, ti = +b.dataset.ti;
+        award(ti, ok * 100); b.disabled = true; $("dlMsg").textContent = S.teams[ti].n + " +" + ok * 100;
+      };
+    });
+  }
+
+  // ================================================================ CONSEQUENCE CHAIN
+  var ch = null;
+  function initChain() {
+    var opts = CHAIN.map(function (c, i) { return '<option value="' + i + '">' + esc(c) + "</option>"; }).join("");
+    $("chain").innerHTML = '<div class="spread"><h2>Consequence Chain</h2><span class="timer" id="chT">0:20</span></div>' +
+      '<div class="row" style="margin:10px 0"><label class="small">Start <select id="chSc">' + opts + '</select></label>' +
+      '<label class="small">Mode <select id="chMode"><option value="1">Real (first conditional)</option><option value="2">Imagine (second conditional)</option></select></label>' +
+      '<button class="ghost" id="chRand">Random</button><button class="gold" id="chGo">Start chain</button></div><div id="chBox"></div>';
+    $("chSc").value = String(Math.floor(Math.random() * CHAIN.length));
+    $("chRand").onclick = function () { $("chSc").value = String(Math.floor(Math.random() * CHAIN.length)); };
+    $("chGo").onclick = function () { ch = { start: CHAIN[+$("chSc").value], mode: $("chMode").value, links: [] }; chainDraw(); };
+  }
+  function chainDraw() {
+    var ex = ch.mode === "1" ? "If we work 4 days a week, people will be happier. → If people are happier, they'll work better. → ..." : "If we worked 4 days a week, people would be happier. → If people were happier, they would work better. → ...";
+    var last = ch.links.filter(function (l) { return l.ok && l.res; }).slice(-1)[0];
+    var links = ch.links.map(function (l) { return '<div class="' + (l.ok ? "" : "brk") + '"><span>' + (l.res ? esc(l.res) : (l.ok ? "Link" : "Broken link")) + '</span><span class="who">' + esc(l.who) + "</span></div>"; }).join("");
+    $("chBox").innerHTML = '<p class="tag">Starting point · ' + (ch.mode === "1" ? "Real: If + present, will" : "Imagine: If + past, would") + "</p>" +
+      '<p style="margin:6px 0 10px"><span class="starter">' + esc(last ? "…" + last.res : ch.start) + "</span></p>" +
+      '<p class="muted small">Example: ' + esc(ex) + "</p>" +
+      '<div class="card" style="margin-top:12px"><span class="tag">' + esc(curName()) + " adds a link · 20 seconds</span>" +
+      '<label class="small" style="display:block; margin:8px 0">Optional: type the consequence they said (it becomes the next starting point)<input type="text" id="chRes" style="width:100%" placeholder="people will be happier"></label>' +
+      '<div class="row"><button class="okb" id="chY">✓ Good link +100</button><button class="nob" id="chN">✗ Broken</button></div></div>' +
+      '<h3 style="margin:16px 0 8px">Chain · ' + ch.links.filter(function (l) { return l.ok; }).length + " links</h3><div class=\"links\">" + links + "</div>";
+    stopTimersOnly(); countdown($("chT"), 20);
+    function add(ok) {
+      var who = S.cur;
+      ch.links.push({ ok: ok, res: $("chRes").value.trim(), who: S.teams[who].n });
+      if (ok) award(who, 100);
+      nextTurn(); chainDraw();
+    }
+    $("chY").onclick = function () { add(true); };
+    $("chN").onclick = function () { add(false); };
+    $("chRes").focus();
+  }
+
+  // ================================================================ START
+  window.addEventListener("beforeunload", save);
+
+
+  // ================================================================ NOTEBOOK, ERROR COURT, PROGRESS (same Supabase table as English Lab: lab_events)
+  // No names in the database: each player gets a short code made from a hash of the name. The group itself is WGRP.
+  var SUPA = { url: "https://xpqjejiezbxaxsdodkyb.supabase.co", key: "sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd" };
+  var CST = {
+    c0: "Zero conditional (If + present, present)",
+    c1: "First conditional (If + present, will)",
+    c2: "Second conditional (If + past, would)",
+    "t.will": "Trap: no will after if",
+    "t.would": "Trap: no would after if",
+    "t.were": "Trap: If I were (not If I am)",
+    "t.unless": "Trap: unless, no double negative",
+    "t.tense": "Trap: second conditional question (if you lost...)",
+    other: "Other (not conditionals)"
+  };
+  var LSX = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    json: function (k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  };
+  function todayStr() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function uid() { return "wi-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); }
+  function codeFor(name) { // W + 5 characters from a hash of the name: stable, and the name is not stored
+    var l = name.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    var h = 2166136261;
+    for (var i = 0; i < l.length; i++) { h ^= l.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return "W" + (h % 60466176).toString(36).toUpperCase().padStart(5, "0");
+  }
+  function players() { // [{n, c}], plus the whole group
+    var used = {}, out = [];
+    S.teams.forEach(function (t) {
+      var c = codeFor(t.n);
+      if (used[c] || c === "WGRP") return; // same name twice: one entry
+      used[c] = 1; out.push({ n: t.n, c: c });
+    });
+    out.push({ n: "Whole group", c: "WGRP" });
+    return out;
+  }
+  function nameOf(c) { var p = players().filter(function (x) { return x.c === c; })[0]; return p ? p.n : c; }
+
+  async function rpc(fn, args, timeout) {
+    var ctl = new AbortController(); var t = setTimeout(function () { ctl.abort(); }, timeout || 9000);
+    try {
+      var res = await fetch(SUPA.url + "/rest/v1/rpc/" + fn, { method: "POST", headers: { apikey: SUPA.key, "content-type": "application/json" }, body: JSON.stringify(args), signal: ctl.signal });
+      if (!res.ok) return { ok: false, status: res.status };
+      var tx = await res.text(); return { ok: true, data: tx ? JSON.parse(tx) : null };
+    } catch (e) { return { ok: false, status: 0 }; } finally { clearTimeout(t); }
+  }
+  var DBOK = null;
+  function pending() { return LSX.json("wiPending", []); }
+  function setPending(a) { LSX.set("wiPending", JSON.stringify(a)); }
+  function paintDbs() {
+    var n = pending().length, e = $("nbDbs"), st, tx;
+    if (DBOK === true && !n) { st = "ok"; tx = "Saved online"; }
+    else if (DBOK === true) { st = "warn"; tx = n + " waiting to sync"; }
+    else if (DBOK === false) { st = "bad"; tx = n ? n + " saved only on this device" : "Database off"; }
+    else { st = "warn"; tx = "Connecting…"; }
+    e.className = "nbs " + st; e.textContent = tx;
+  }
+  async function flush() {
+    var q = pending(); if (!TOKEN) { paintDbs(); return; }
+    if (!q.length) { if (DBOK === null) { var r0 = await rpc("lab_list", { p_token: TOKEN, p_student: "WGRP" }, 9000); DBOK = r0.ok ? true : (r0.status === 0 ? null : false); } paintDbs(); return; }
+    var left = [];
+    for (var i = 0; i < q.length; i++) {
+      var e = q[i];
+      var r = await rpc("lab_add", { p_token: TOKEN, p_id: e.id, p_student: e.student, p_session: e.session, p_kind: e.kind, p_data: e.data });
+      if (r.ok) DBOK = true; else { left.push(e); if (r.status !== 0) DBOK = false; }
+    }
+    setPending(left); paintDbs();
+  }
+  // today's notes live on this device too, so the Error Court works even offline
+  function todayNotes() { return LSX.json("wiNotes_" + todayStr(), []); }
+  function setTodayNotes(a) { LSX.set("wiNotes_" + todayStr(), JSON.stringify(a)); }
+
+  var nbKind = "fix";
+  function paintWho() {
+    var ps = players(), prev = $("nbWho").value;
+    var opts = ps.map(function (p) { return '<option value="' + p.c + '">' + esc(p.n) + "</option>"; }).join("");
+    $("nbWho").innerHTML = opts; if (prev && ps.some(function (p) { return p.c === prev; })) $("nbWho").value = prev;
+    var pv = $("progWho").value; $("progWho").innerHTML = opts; if (pv && ps.some(function (p) { return p.c === pv; })) $("progWho").value = pv;
+    $("codes").innerHTML = "Codes saved in the database instead of names: " + ps.map(function (p) { return esc(p.n) + ' <span class="code">' + p.c + "</span>"; }).join(" · ") +
+      ". Write each name the same way every class (accents and capitals do not matter) so the progress adds up.";
+  }
+  $("nbStruct").innerHTML = Object.keys(CST).map(function (k) { return '<option value="' + k + '">' + esc(CST[k]) + "</option>"; }).join("");
+  function setKind(k) { nbKind = k; $("nbFix").classList.toggle("on", k === "fix"); $("nbGood").classList.toggle("on", k === "good"); $("nbBetterL").hidden = k === "good"; }
+  $("nbFix").onclick = function () { setKind("fix"); };
+  $("nbGood").onclick = function () { setKind("good"); };
+  $("nbOpen").onclick = function () { $("nb").hidden = false; paintWho(); renderNb(); $("nbSaid").focus(); };
+  $("nbClose").onclick = function () { $("nb").hidden = true; };
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("nb").hidden) $("nb").hidden = true; });
+  $("nbSave").onclick = async function () {
+    var said = $("nbSaid").value.trim(), better = $("nbBetter").value.trim();
+    if (!said) { $("nbMsg").className = "flash bad"; $("nbMsg").textContent = "Write what they said."; return; }
+    var e = { id: uid(), student: $("nbWho").value, session: todayStr(), kind: "note",
+      data: { app: "whatif", kind: nbKind, said: said, better: nbKind === "fix" ? better : "", s: $("nbStruct").value } };
+    var t = todayNotes(); t.push(e); setTodayNotes(t);
+    var q = pending(); q.push(e); setPending(q);
+    $("nbSaid").value = ""; $("nbBetter").value = ""; renderNb();
+    await flush();
+    var ok = !pending().some(function (p) { return p.id === e.id; });
+    $("nbMsg").className = "flash" + (ok ? "" : " bad"); $("nbMsg").textContent = ok ? "Saved ✓" : "Saved on this device (it syncs when the database answers)";
+    setTimeout(function () { $("nbMsg").textContent = ""; }, 3500);
+    $("nbSaid").focus();
+  };
+  $("nbSaid").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("nbSave").click(); });
+  $("nbBetter").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("nbSave").click(); });
+  function noteHtml(e, withDel) {
+    var d = e.data;
+    return '<div class="note ' + (d.kind === "good" ? "gd" : "fx") + '"><span class="meta">' + esc(nameOf(e.student)) + " · " + esc(CST[d.s] || d.s) + "</span>" +
+      '<span class="said">' + esc(d.said) + "</span>" + (d.better ? '<span class="better">→ ' + esc(d.better) + "</span>" : "") +
+      (withDel ? '<button class="del" data-del="' + e.id + '">Delete</button>' : "") + "</div>";
+  }
+  function renderNb() {
+    var t = todayNotes().slice().reverse();
+    $("nbList").innerHTML = t.length ? t.map(function (e) { return noteHtml(e, true); }).join("") : '<p class="muted small">Nothing yet today.</p>';
+    paintDbs();
+  }
+  $("nbList").addEventListener("click", async function (e) {
+    var b = e.target.closest("[data-del]"); if (!b) return;
+    if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Sure? Click again"; return; }
+    var id = b.dataset.del;
+    setTodayNotes(todayNotes().filter(function (x) { return x.id !== id; }));
+    setPending(pending().filter(function (x) { return x.id !== id; }));
+    renderNb();
+    if (TOKEN) await rpc("lab_del", { p_token: TOKEN, p_id: id });
+  });
+
+  function renderCourt() {
+    var t = todayNotes(), wins = t.filter(function (e) { return e.data.kind === "good"; }), cases = shuffle(t.filter(function (e) { return e.data.kind !== "good"; }));
+    $("courtCount").textContent = wins.length + " wins · " + cases.length + " cases";
+    if (!t.length) { $("court").innerHTML = '<p class="muted">The Notebook is empty today. Open it (orange button) and take notes while they play.</p>'; return; }
+    var h = "";
+    if (wins.length) h += '<h3 style="margin-bottom:8px">Wins</h3><div style="display:grid; gap:8px; margin-bottom:18px">' + wins.map(function (e) { return '<div class="win">' + esc(e.data.said) + "</div>"; }).join("") + "</div>";
+    if (cases.length) h += '<h3 style="margin-bottom:8px">Cases</h3><div style="display:grid; gap:14px">' + cases.map(function (e, i) {
+      return '<div class="card"><span class="tag">Case ' + (i + 1) + " · " + esc(CST[e.data.s] || "") + '</span><div class="bug" style="margin-top:8px">' + esc(e.data.said) + "</div>" +
+        '<div class="row" style="margin-top:10px"><button class="ghost" data-rev="' + i + '">Reveal the better version</button></div><div id="cv' + i + '" style="margin-top:8px"></div></div>';
+    }).join("") + "</div>";
+    $("court").innerHTML = h;
+    $("court").querySelectorAll("[data-rev]").forEach(function (b) {
+      b.onclick = function () { var e = cases[+b.dataset.rev]; $("cv" + b.dataset.rev).innerHTML = '<div class="model"><small>Better</small>' + esc(e.data.better || "(no better version written)") + "</div>"; };
+    });
+  }
+
+  $("progWho").onchange = renderProg;
+  async function renderProg() {
+    var c = $("progWho").value || "WGRP", box = $("prog");
+    box.innerHTML = '<p class="muted">Loading…</p>';
+    var r = TOKEN ? await rpc("lab_list", { p_token: TOKEN, p_student: c }, 15000) : { ok: false, status: 0 };
+    var ev;
+    if (r.ok) { DBOK = true; ev = (r.data || []).map(function (e) { return { id: e.id, student: e.student, session: String(e.session).slice(0, 10), kind: e.kind, data: e.data }; }); }
+    else { DBOK = r.status === 0 ? DBOK : false; ev = []; }
+    var ids = {}; ev.forEach(function (e) { ids[e.id] = 1; });
+    pending().forEach(function (e) { if (e.student === c && !ids[e.id]) ev.push(e); });
+    paintDbs();
+    ev = ev.filter(function (e) { return e.kind === "note" && e.data && e.data.app === "whatif"; });
+    if (!ev.length) { box.innerHTML = '<p class="muted">' + (r.ok ? "No notes for " + esc(nameOf(c)) + " yet." : "The database did not answer. Notes saved on this device appear here when it does.") + "</p>"; return; }
+    var by = {}, sess = {};
+    ev.forEach(function (e) {
+      var k = e.data.s || "other"; by[k] = by[k] || { g: 0, f: 0 }; by[k][e.data.kind === "good" ? "g" : "f"]++;
+      sess[e.session] = sess[e.session] || { g: 0, f: 0 }; sess[e.session][e.data.kind === "good" ? "g" : "f"]++;
+    });
+    var g = ev.filter(function (e) { return e.data.kind === "good"; }).length;
+    var h = '<div class="stats"><div class="stat"><b>' + Object.keys(sess).length + '</b><span class="muted small">classes with notes</span></div>' +
+      '<div class="stat"><b>' + g + '</b><span class="muted small">good</span></div><div class="stat"><b>' + (ev.length - g) + '</b><span class="muted small">to fix</span></div></div>';
+    h += '<h3 style="margin:18px 0 4px">By structure</h3><div class="prow muted small"><span>Structure</span><span>Good</span><span>Fix</span><span class="pct">% good</span></div>';
+    Object.keys(CST).forEach(function (k) {
+      var x = by[k]; if (!x) return;
+      h += '<div class="prow"><span>' + esc(CST[k]) + "</span><span>" + x.g + "</span><span>" + x.f + '</span><span class="pct">' + Math.round(100 * x.g / (x.g + x.f)) + "%</span></div>";
+    });
+    h += '<h3 style="margin:18px 0 4px">By class</h3>';
+    Object.keys(sess).sort().reverse().forEach(function (d) { var x = sess[d]; h += '<div class="prow"><span>' + d + "</span><span>" + x.g + "</span><span>" + x.f + '</span><span class="pct">' + Math.round(100 * x.g / (x.g + x.f)) + "%</span></div>"; });
+    h += '<h3 style="margin:18px 0 8px">Latest notes</h3><div style="display:grid; gap:8px">' + ev.slice(-12).reverse().map(function (e) { return noteHtml(e, false); }).join("") + "</div>";
+    box.innerHTML = h;
+  }
+
+  // ================================================================ TEACHER KEY (same check as lab.html and the Panel del profe)
+  var TOKEN_SHA = "27636e092d3ac7cf89eeb70e4ce5fc47e4669c34bb8c1b0669520a456ec3a805";
+  var enc = new TextEncoder();
+  function cleanKey(k) { return (k || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+  function hex(b) { return Array.prototype.map.call(new Uint8Array(b), function (x) { return x.toString(16).padStart(2, "0"); }).join(""); }
+  async function sha256Hex(t) { return hex(await crypto.subtle.digest("SHA-256", enc.encode(t))); }
+  async function teacherToken(key) {
+    var base = await crypto.subtle.importKey("raw", enc.encode("cca-profe|" + cleanKey(key)), "PBKDF2", false, ["deriveBits"]);
+    return hex(await crypto.subtle.deriveBits({ name: "PBKDF2", salt: enc.encode("cca-db-token"), iterations: 250000, hash: "SHA-256" }, base, 256));
+  }
+  var started = false, TOKEN = null;
+  function start(tk) {
+    if (started) return; started = true; TOKEN = tk;
+    $("vLogin").hidden = true; $("vApp").hidden = false; $("nbOpen").hidden = false;
+    menu(); renderScores(); show("tMenu"); paintWho(); renderNb(); flush();
+    setInterval(function () { if (pending().length) flush(); }, 30000);
+  }
+  async function enter(key, remember) {
+    $("lgMsg").textContent = "Comprobando...";
+    if (!(window.crypto && crypto.subtle)) { $("lgMsg").textContent = "Abre esta página con https:// para poder entrar."; return; }
+    var tk = await teacherToken(key);
+    if ((await sha256Hex(tk)) !== TOKEN_SHA) { $("lgMsg").textContent = "Esa clave no es correcta."; return; }
+    if (remember) { try { localStorage.setItem("ccaProfe", cleanKey(key)); } catch (e) {} }
+    start(tk);
+  }
+  $("lgGo").addEventListener("click", function () { enter($("lgKey").value, $("lgRem").checked); });
+  $("lgKey").addEventListener("keydown", function (e) { if (e.key === "Enter") $("lgGo").click(); });
+  (async function boot() {
+    var saved = null; try { saved = localStorage.getItem("ccaProfe"); } catch (e) {}
+    if (saved && window.crypto && crypto.subtle) {
+      try { var tk = await teacherToken(saved); if ((await sha256Hex(tk)) === TOKEN_SHA) { start(tk); return; } } catch (e) {}
+    }
+    $("vLogin").hidden = false; $("lgKey").focus();
+  })();
+})();
+</script>
+</body>
+</html>
