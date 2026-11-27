@@ -1,8 +1,8 @@
 // Class passes: the teacher signs "code + expiry date"; any game page can check the signature
 // by itself (no server, no teacher page left open). The signing key is sealed with the teacher
 // key (PBKDF2 + AES-GCM), so only someone who knows the teacher key can create passes.
-const PUB = "BK1uzhYS6rMtXJrk8h/8f4rOqgq/L+VjEajILLS8gqkJQrrErWIHW46aTwAyUj/pwN6DXzbD4ci6a+ctizOOWcQ=";
-const BOX = {"s":"pijM0FClOF3g0ZTAipV3MA==","iv":"1ethQJbbbh7Rd+JJ","ct":"B87/agH/p6/ZzwNItDfQ4Z/DSC9gHc2KJNvEsI1iQ0UoKu83QIExg56LmROkPgbrLQ2hERwbvH8PqLKxkeR18dDgQ0Mw/BlcIAP6lqxiWWENE649TjamePHwZX8PunpyHjeyfcVr2T+TkPTi/lS4dprpGt4/L05wRDRTl3fHp/Vk3G+UIO1n4FuuDS3sXKfpOi1FxrVSFw0SeH/vk3wYIi6Jb7JSFsxvut0b4gG9TPTMVwPg5Sl3n1ZLmBFjNgznbxbUHyT80CeziHFlIGiLBYsF23K4mLiCzh/k5oL9"};
+const PUB = "BNW1yN2FCC45Tfr5Iw70pXpvztcW8zDDfZI/iWH38HWgSV7PdLuCThFNcbZD5etLlcrrIG/L7SQ8BN/pIE6tQjw=";
+const BOX = {"s":"jePjG1RsfpLuBDAxoNuIsg==","iv":"3z3pFWL67fqPNcZV","ct":"mTTsybZVUo+c6xbLCg/5TbBlG/pPp17jk5ChWT3J163fPCpzYFp4fanW2TdoyZfaP/vhymfMy3EUPSB3eZ5JPWZumqd90NDxnWum3h5+oCFwlNshH4lwoOZNqITB4vvjQjBsC/2yj/4b3Gy59pnSlS45pCsyNnVyL0Tzpfw22lSpXq9/v4acpeXj0UzeFnTgrXFYzfwbW5EegnztR415WQcIHbZy5QBaf03EAQMU/1sa9UnRczkxRu+xFiQEQB9x7//uELnbwYnbfdK8koYw4OrCOWyB/j6ZWAXY7SRl"};
 const enc = new TextEncoder();
 const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const b64u = (u8) => btoa(String.fromCharCode(...u8)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
