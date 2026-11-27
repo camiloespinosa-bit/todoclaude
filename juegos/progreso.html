@@ -9,82 +9,160 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Poppins:wght@400;500;600;700;800&display=swap">
 <style>
-/* Student view of the English Lab: read only, opened with a private link (progreso.html#PA.<key>). */
+/* Student view of the English Lab: read only, opened with a private link (progreso.html#PA.<key>).
+   Mastery is ordinal (new < practicing < mastered): one hue, light to dark, validated for light and dark surfaces. */
 :root{
-  --bg:#F2F7F9; --surface:#FFFFFF; --surface-2:#E8F1F4; --ink:#12303F; --muted:#4E6B79; --line:#CFDFE5;
-  --brand:#2C5F7C; --on-brand:#FFFFFF; --focus:#F57C00; --hdr-a:#1D3F54; --hdr-b:#2C5F7C; --hdr-soft:#BCD9E1;
-  --orange:#F57C00; --gold:#FDD835;
-  --good:#2F7D32; --good-bg:#E3F2E1; --bad:#B3261E; --bad-bg:#FBE9E7; --mid:#8A5A00; --mid-bg:#FFF4D6;
+  --bg:#F2F7F9; --surface:#FFFFFF; --surface-2:#E8F1F4; --ink:#12303F; --muted:#4E6B79; --line:#CFDFE5; --grid:#E3ECF0;
+  --brand:#2C5F7C; --focus:#F57C00; --hdr-a:#1D3F54; --hdr-b:#2C5F7C; --hdr-soft:#BCD9E1;
+  --accent:#F57C00;
+  --prac:#62A8BA; --dom:#1D4F6B; --on-prac:#0b0b0b; --on-dom:#ffffff; --series:#2C5F7C;
+  --good:#2F7D32; --good-bg:#E3F2E1; --bad:#B3261E; --fix-bg:#FFF3E6;
   --font:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
-    --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
-    --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10; color-scheme:dark;
+    --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B; --grid:#1F4152;
+    --brand:#57A6B5; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+    --prac:#3B7F93; --dom:#A9E2EA; --on-prac:#ffffff; --on-dom:#0b0b0b; --series:#57A6B5;
+    --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --fix-bg:#3A2A14; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
-  --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
-  --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10; color-scheme:dark;
+  --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B; --grid:#1F4152;
+  --brand:#57A6B5; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+  --prac:#3B7F93; --dom:#A9E2EA; --on-prac:#ffffff; --on-dom:#0b0b0b; --series:#57A6B5;
+  --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --fix-bg:#3A2A14; color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.5;
   padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:16px 48px}
-button{font-family:inherit; font-size:inherit; color:inherit; cursor:pointer}
-button:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+button,summary{font-family:inherit; font-size:inherit; color:inherit; cursor:pointer}
+button:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
 h1,h2,h3,p{margin:0}
 h1,h2,h3{text-wrap:balance; line-height:1.15}
 .wrap{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:16px}
 .muted{color:var(--muted)} .small{font-size:.86rem} .mono{font-family:var(--mono)}
-.hero{background:linear-gradient(135deg,var(--hdr-a),var(--hdr-b)); color:#fff; border-radius:20px; padding:clamp(20px,5vw,32px)}
+
+.hero{background:linear-gradient(135deg,var(--hdr-a),var(--hdr-b)); color:#fff; border-radius:22px; padding:clamp(20px,5vw,30px); position:relative; overflow:hidden}
+.hero::after{content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(245,124,0,.35), transparent 70%)}
 .kick{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; color:var(--hdr-soft)}
-.hero h1{font-size:clamp(2rem,8vw,2.9rem); font-weight:800; letter-spacing:-.02em; margin:6px 0 4px}
-.hero p{color:var(--hdr-soft)}
-.stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:16px}
-.stat{background:rgba(255,255,255,.1); border-radius:14px; padding:10px 12px}
-.stat b{display:block; font-size:1.7rem; font-weight:800; line-height:1.1}
-.stat span{font-size:.78rem; color:var(--hdr-soft)}
-.panel{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px,4vw,22px)}
-.panel h2{font-size:1.35rem}
-.es{font-size:.84rem; color:var(--muted); margin:2px 0 12px}
+.hero h1{font-size:clamp(2rem,8vw,2.9rem); font-weight:800; letter-spacing:-.02em; margin:6px 0 4px; position:relative}
+.hero p{color:var(--hdr-soft); position:relative}
+.hero .pill{display:inline-flex; gap:6px; align-items:center; margin-top:12px; background:rgba(255,255,255,.12); border-radius:999px; padding:4px 12px; font-size:.85rem; position:relative}
+
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:clamp(16px,4vw,22px)}
+.ph2{display:flex; align-items:center; gap:10px}
+.ph2 .ic{width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--surface-2); font-size:1.1rem; flex:none}
+.panel h2{font-size:1.3rem}
+.es{font-size:.84rem; color:var(--muted); margin:4px 0 14px}
+
+/* ring */
+.ringrow{display:grid; grid-template-columns:auto minmax(0,1fr); gap:18px; align-items:center}
+.ring{width:168px; height:168px; position:relative}
+.ring svg{width:100%; height:100%; transform:rotate(-90deg)}
+.ring .arc{transition:stroke-dasharray 1.1s cubic-bezier(.2,.8,.2,1)}
+.ring .mid{position:absolute; inset:0; display:grid; place-items:center; text-align:center}
+.ring .mid b{display:block; font-size:2.6rem; font-weight:800; line-height:1}
+.ring .mid span{font-size:.78rem; color:var(--muted)}
+.legend{display:grid; gap:8px}
+.lg{display:grid; grid-template-columns:14px minmax(0,1fr) auto; gap:8px; align-items:center; font-size:.92rem}
+.sw{width:14px; height:14px; border-radius:4px}
+.sw.dom{background:var(--dom)} .sw.prac{background:var(--prac)} .sw.new{background:var(--surface-2); box-shadow:inset 0 0 0 1px var(--line)}
+.lg b{font-weight:700}
+.tiles{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:16px}
+.tile{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:10px 12px}
+.tile b{display:block; font-size:1.5rem; font-weight:800; line-height:1.15}
+.tile span{font-size:.76rem; color:var(--muted)}
+
+/* journey */
+.journey svg{width:100%; height:auto; display:block; overflow:visible}
+.journey .st{cursor:pointer}
+.journey .lbl{font-size:10.5px; fill:var(--ink); font-family:var(--font); font-weight:600}
+.journey .lbl2{font-size:9.5px; fill:var(--muted); font-family:var(--font)}
+.journey .num{font-size:13px; font-weight:800; font-family:var(--font)}
+@keyframes pulse{0%{r:21; opacity:.9}100%{r:30; opacity:0}}
+.journey .pulse{animation:pulse 1.8s ease-out infinite}
+.udetail{margin-top:10px; border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg)}
+.udetail h3{font-size:1.02rem; margin-bottom:8px}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{border-radius:999px; padding:4px 12px; font-size:.84rem; font-weight:600}
+.chip small{font-family:var(--mono); font-weight:400; margin-left:4px; opacity:.85}
+.chip.new{background:var(--surface-2); color:var(--muted)}
+.chip.prac{background:var(--prac); color:var(--on-prac)}
+.chip.dom{background:var(--dom); color:var(--on-dom)}
+.chip.dom::before{content:"★ "}
+
+/* line chart */
+.chart svg{width:100%; height:auto; display:block; overflow:visible}
+.chart .ax{font-size:10px; fill:var(--muted); font-family:var(--mono)}
+.chart .val{font-size:12px; font-weight:700; fill:var(--ink); font-family:var(--font)}
+.chart .hit{fill:transparent; cursor:pointer}
+.chart .hit:focus{outline:none}
+.chart .hit:focus + .dotfocus, .chart .hit:hover + .dotfocus{opacity:1}
+.chart .dotfocus{opacity:0; transition:opacity .15s}
+.draw{stroke-dasharray:var(--len); stroke-dashoffset:var(--len); animation:draw 1.2s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.note{font-size:.84rem; color:var(--muted); margin-top:8px}
+
+/* area bars */
+.areas{display:grid; gap:14px}
+.area{display:grid; gap:6px}
+.area .top{display:flex; justify-content:space-between; gap:10px; align-items:baseline}
+.area .nm{font-weight:600}
+.area .nm small{display:block; font-weight:400; font-size:.78rem; color:var(--muted)}
+.area .ct{font-family:var(--mono); font-size:.85rem; color:var(--muted); white-space:nowrap}
+.seg{display:flex; gap:2px; height:12px}
+.seg i{display:block; height:100%; border-radius:999px; min-width:0}
+.seg .dom{background:var(--dom)} .seg .prac{background:var(--prac)} .seg .new{background:var(--surface-2)}
+
+/* calendar */
+.cal{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:5px; max-width:280px}
+.cal .h{font-family:var(--mono); font-size:.68rem; color:var(--muted); text-align:center}
+.cal .d{aspect-ratio:1; border-radius:7px; background:var(--surface-2)}
+.cal .d.c{background:var(--series)}
+.cal .d.f{background:transparent; box-shadow:inset 0 0 0 1px var(--grid)}
+.cal .d.t{box-shadow:0 0 0 2px var(--accent)}
+.calrow{display:grid; grid-template-columns:minmax(0,280px) minmax(0,1fr); gap:20px; align-items:center}
+.big{font-size:2.4rem; font-weight:800; line-height:1}
+
+/* tables (accessible twins) */
+details.tv{margin-top:10px}
+details.tv summary{font-size:.86rem; color:var(--muted); list-style:none}
+details.tv summary::before{content:"▸ "}
+details.tv[open] summary::before{content:"▾ "}
+table{width:100%; border-collapse:collapse; margin-top:8px; font-size:.86rem}
+th,td{text-align:left; padding:6px 8px; border-bottom:1px solid var(--line)}
+td.n{font-variant-numeric:tabular-nums; text-align:right}
+
+/* phrases */
 .list{display:grid; gap:8px}
 .ph{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg)}
-.ph.win{border-left:6px solid var(--good)}
-.ph.fix{border-left:6px solid var(--orange)}
+.ph.win{border-left:6px solid var(--good); background:var(--good-bg)}
+.ph.fix{border-left:6px solid var(--accent); background:var(--fix-bg)}
 .ph .said{font-weight:600; font-size:1.05rem}
 .ph .was{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--bad)}
 .ph .better{color:var(--good); font-weight:700; font-size:1.08rem; margin-top:4px}
 .ph .meta{font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-top:4px}
-.ph .hideb{margin-top:6px; border:1px dashed var(--good); background:var(--good-bg); color:var(--good); border-radius:10px; padding:6px 12px; font-weight:700; font-size:.9rem}
+.ph .hideb{margin-top:6px; border:1px dashed var(--good); background:var(--surface); color:var(--good); border-radius:10px; padding:6px 12px; font-weight:700; font-size:.9rem}
 .toggle{display:flex; align-items:center; gap:8px; font-size:.9rem; margin-bottom:10px}
 .more{margin-top:10px; border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 14px; font-weight:600}
-.unit{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg); display:grid; gap:8px}
-.unit.here{border:2px solid var(--orange); background:var(--surface)}
-.unit h3{font-size:1.02rem}
-.unit .here-tag{font-family:var(--mono); font-size:.68rem; background:var(--orange); color:#fff; border-radius:999px; padding:1px 8px; margin-left:6px; vertical-align:middle}
-.chips{display:flex; flex-wrap:wrap; gap:6px}
-.chip{border-radius:999px; padding:4px 12px; font-size:.84rem; font-weight:600; border:1px solid var(--line)}
-.chip small{font-family:var(--mono); font-weight:400; margin-left:4px}
-.chip.new{background:var(--surface-2); color:var(--muted)}
-.chip.prac{background:var(--mid-bg); color:var(--mid); border-color:var(--mid)}
-.chip.dom{background:var(--good-bg); color:var(--good); border-color:var(--good)}
-.chip.dom::before{content:"★ "}
-.legend{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px}
-.cls{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:4px 12px; align-items:center; padding:10px 0; border-top:1px solid var(--line)}
-.cls:first-child{border-top:none}
-.cls .d{font-weight:700}
-.cls .g{color:var(--muted); font-size:.85rem}
-.cls .p{font-family:var(--mono); font-weight:700}
-.bar{grid-column:1/-1; height:6px; border-radius:99px; background:var(--surface-2); overflow:hidden}
-.bar i{display:block; height:100%; background:var(--good)}
+
 .honest{border-left:6px solid var(--brand); background:var(--surface-2); border-radius:10px; padding:10px 14px; font-size:.86rem}
 .center{text-align:center; padding:40px 16px}
 .center h2{font-size:1.5rem; margin-bottom:8px}
-@media (max-width:560px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr))} }
-@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+
+#tip{position:fixed; z-index:50; pointer-events:none; background:var(--ink); color:var(--surface); border-radius:10px; padding:8px 12px; font-size:.84rem; line-height:1.35; max-width:240px; white-space:pre-line; box-shadow:0 8px 24px rgba(0,0,0,.25); opacity:0; transition:opacity .12s}
+#tip.on{opacity:1}
+.fade{animation:fade .6s ease both}
+@keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+
+@media (max-width:560px){
+  .ringrow{grid-template-columns:1fr; justify-items:center}
+  .legend{width:100%}
+  .calrow{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} .draw{stroke-dashoffset:0} }
 </style>
 </head>
 <body>
@@ -92,43 +170,74 @@ h1,h2,h3{text-wrap:balance; line-height:1.15}
   <section id="vMsg" class="panel center"><h2 id="msgT">Loading your map…</h2><p class="muted" id="msgP"></p></section>
 
   <div id="vApp" class="wrap" hidden>
-    <header class="hero">
+    <header class="hero fade">
       <p class="kick">Gimnasio del Cerebro · English Lab</p>
       <h1 id="hName"></h1>
       <p id="hSub"></p>
-      <div class="stats" id="stats"></div>
+      <span class="pill" id="hPill"></span>
     </header>
 
-    <section class="panel">
-      <h2>Your wins</h2>
+    <section class="panel fade">
+      <div class="ph2"><span class="ic" aria-hidden="true">🎯</span><div><h2>Your progress</h2></div></div>
+      <p class="es">Las estructuras de tu plan que ya estás usando</p>
+      <div class="ringrow">
+        <div class="ring" id="ring"></div>
+        <div class="legend" id="ringLegend"></div>
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </section>
+
+    <section class="panel fade">
+      <div class="ph2"><span class="ic" aria-hidden="true">🗺️</span><div><h2>Your journey</h2></div></div>
+      <p class="es">Tu camino por las 12 unidades. Toca una estación para ver sus estructuras.</p>
+      <div class="journey" id="journey"></div>
+      <div class="udetail" id="udetail"></div>
+    </section>
+
+    <section class="panel fade">
+      <div class="ph2"><span class="ic" aria-hidden="true">📈</span><div><h2>Class by class</h2></div></div>
+      <p class="es">El porcentaje de objetivos que lograste en cada clase</p>
+      <div class="chart" id="chart"></div>
+    </section>
+
+    <section class="panel fade">
+      <div class="ph2"><span class="ic" aria-hidden="true">🧩</span><div><h2>Your areas</h2></div></div>
+      <p class="es">Cómo vas en cada área del inglés</p>
+      <div class="legend" style="grid-auto-flow:column; justify-content:start; gap:14px; margin-bottom:14px" aria-hidden="true">
+        <span class="lg" style="grid-template-columns:14px auto"><i class="sw dom"></i>Mastered</span>
+        <span class="lg" style="grid-template-columns:14px auto"><i class="sw prac"></i>Practicing</span>
+        <span class="lg" style="grid-template-columns:14px auto"><i class="sw new"></i>New</span>
+      </div>
+      <div class="areas" id="areas"></div>
+      <details class="tv"><summary>See as a table · ver como tabla</summary><div id="areasTable"></div></details>
+    </section>
+
+    <section class="panel fade">
+      <div class="ph2"><span class="ic" aria-hidden="true">🔥</span><div><h2>Your rhythm</h2></div></div>
+      <p class="es" id="calEs">Tus días de clase, semana por semana</p>
+      <div class="calrow">
+        <div class="cal" id="cal"></div>
+        <div id="calStats" style="display:grid; gap:14px"></div>
+      </div>
+    </section>
+
+    <section class="panel fade">
+      <div class="ph2"><span class="ic" aria-hidden="true">🏆</span><div><h2>Your wins</h2></div></div>
       <p class="es">Frases que dijiste muy bien en clase</p>
       <div class="list" id="wins"></div>
     </section>
 
-    <section class="panel">
-      <h2>Phrases to polish</h2>
+    <section class="panel fade">
+      <div class="ph2"><span class="ic" aria-hidden="true">✨</span><div><h2>Phrases to polish</h2></div></div>
       <p class="es">Lo que dijiste y una versión mejor. Practica: tapa la respuesta, dila en voz alta y luego revisa.</p>
       <label class="toggle"><input type="checkbox" id="practice"> Practice mode: hide the better version</label>
       <div class="list" id="fixes"></div>
     </section>
 
-    <section class="panel">
-      <h2>Your map</h2>
-      <p class="es">Tu mapa de estructuras, unidad por unidad</p>
-      <div class="legend"><span class="chip new">New · nueva</span><span class="chip prac">Practicing · en práctica</span><span class="chip dom">Mastered · dominada</span></div>
-      <p class="muted small" id="rule" style="margin-bottom:12px"></p>
-      <div class="list" id="map"></div>
-    </section>
-
-    <section class="panel">
-      <h2>Your classes</h2>
-      <p class="es">Tus clases y los objetivos que lograste</p>
-      <div id="classes"></div>
-    </section>
-
     <p class="honest">These are notes from your live classes, marked by your teacher. They show how you are moving; they are not an official level test.<br><span class="muted">Son registros de tus clases en vivo. Muestran tu avance; no son un examen oficial de nivel.</span></p>
   </div>
 </div>
+<div id="tip" role="status" aria-live="polite"></div>
 
 <script src="lab-data.js?v=3"></script>
 <script>
@@ -141,19 +250,30 @@ h1,h2,h3{text-wrap:balance; line-height:1.15}
   var GAMEN = { spin: "Spin & Speak", jeopardy: "Jeopardy", mission: "Hidden Mission", chain: "Story Chain", box: "Mystery Box", bingo: "Structure Bingo",
     escape: "Escape Room", rapid: "Rapid Transform", duel: "Translation Duel", auction: "Grammar Auction", bug: "Spot the Bug", court: "Error Court", note: "Notebook" };
   var STATUS = { new: "New", prac: "Practicing", dom: "Mastered" };
+  // the five areas of English; every structure id belongs to one
+  var AREAS = [
+    ["tenses", "Verb tenses", "Tiempos verbales", /^(a1\.(be|ps|ps3|psq|pc|was|past|going)|b1\.(base|state|past|pastc|usedto|fut|ppexp|ppvs|ppjust|since|ppc|pastp|passive|report))$/],
+    ["connect", "Connect & give opinions", "Conectar y opinar", /^b1\.(contrast|cause|hedge|compar|rel)$/],
+    ["modals", "Modals & 'if'", "Modales y condicionales", /^(a1\.can|b1\.(advice|deduce|cond1|cond2))$/],
+    ["blocks", "Building blocks", "Las bases: palabras y frases", /^(a1\.(poss|qw|there|prep|art|like)|b1\.(gerinf|phrasal))$/],
+    ["traps", "Spanish traps", "Trampas del español", /^es\./]
+  ];
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]; }); }
-  function day(s) { var p = String(s).slice(0, 10).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }
+  function dObj(s) { var p = String(s).slice(0, 10).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function day(s) { return dObj(s).toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }
+  function iso(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
   function short(id) { return ST[id] ? ST[id][0].replace(/^Spanish trap: /, "") : id; }
   function message(t, p) { $("vMsg").hidden = false; $("vApp").hidden = true; $("msgT").textContent = t; $("msgP").textContent = p || ""; }
+  var NS = "http://www.w3.org/2000/svg";
 
   var hash = decodeURIComponent(location.hash.replace(/^#/, "")), dot = hash.indexOf(".");
   var code = dot > 0 ? hash.slice(0, dot).toUpperCase() : "", key = dot > 0 ? hash.slice(dot + 1) : "";
   var stu = D.STUDENTS[code];
   if (!stu || key.length < 16) { message("This link is not complete", "Ask your teacher for your link. · Pídele a tu profe tu enlace."); return; }
 
-  var EV = [], SHOWN = { wins: 6, fixes: 6 }, REVEALED = {};
+  var EV = [], SHOWN = { wins: 6, fixes: 6 }, REVEALED = {}, SEL = null, M = null;
 
   async function load() {
     var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 12000), r;
@@ -163,34 +283,184 @@ h1,h2,h3{text-wrap:balance; line-height:1.15}
     clearTimeout(t);
     if (!r.ok) { message("This link is not active", "Ask your teacher for a new link. · Pídele a tu profe un enlace nuevo."); return; }
     EV = (await r.json()).map(function (e) { return { session: String(e.session).slice(0, 10), kind: e.kind, data: e.data || {} }; });
-    render();
+    M = model(); render();
   }
 
-  function render() {
-    $("vMsg").hidden = true; $("vApp").hidden = false;
+  // ---------------------------------------------------------------- numbers behind every chart
+  function model() {
     var events = EV.filter(function (e) { return !D.isClear(e); });
     var at = D.attemptsOf(events), days = [];
     events.forEach(function (e) { if (days.indexOf(e.session) < 0) days.push(e.session); });
     days.sort();
-    var rounds = events.filter(function (e) { return e.kind === "round"; });
-    var unit = rounds.length ? Math.max.apply(null, rounds.filter(function (e) { return e.session === days[days.length - 1]; }).map(function (e) { return e.data.unit || 0; }).concat([0])) : 0;
-    document.title = stu.name + "'s English Map · Gimnasio del Cerebro";
-    $("hName").textContent = stu.name + "'s English map";
-    $("hSub").textContent = days.length ? "Last class: " + day(days[days.length - 1]) + " · Unit " + (unit + 1) + ": " + stu.units[unit].n : "Your map starts with your first class.";
-
-    // status of every structure
-    var st = {}, okn = {};
-    D.levelStructs(stu).forEach(function (id) {
+    var lastRounds = events.filter(function (e) { return e.kind === "round" && e.session === days[days.length - 1]; });
+    var unit = lastRounds.length ? Math.max.apply(null, lastRounds.map(function (e) { return e.data.unit || 0; })) : 0;
+    var ids = D.levelStructs(stu), st = {}, okn = {};
+    ids.forEach(function (id) {
       var L = at.filter(function (a) { return a.s === id; });
       st[id] = D.statusOf(L); okn[id] = [L.filter(function (a) { return a.ok; }).length, L.length];
     });
-    var counts = { dom: 0, prac: 0 }; Object.keys(st).forEach(function (id) { if (counts[st[id]] != null) counts[st[id]]++; });
-    var hits = at.filter(function (a) { return a.ok; }).length;
-    $("stats").innerHTML = [[days.length, "Classes · clases"], [counts.dom, "Mastered · dominadas"], [counts.prac, "Practicing · en práctica"], [at.length ? Math.round(hits / at.length * 100) + "%" : "–", "Targets hit · logrados"]]
-      .map(function (x) { return "<div class='stat'><b>" + x[0] + "</b><span>" + x[1] + "</span></div>"; }).join("");
+    var perDay = days.map(function (d) {
+      var A = at.filter(function (a) { return a.session === d; }), ok = A.filter(function (a) { return a.ok; }).length;
+      var games = []; events.forEach(function (e) { if (e.session !== d) return; var g = e.kind === "note" ? "note" : e.data.game; if (games.indexOf(g) < 0) games.push(g); });
+      return { d: d, ok: ok, n: A.length, pct: A.length ? Math.round(ok / A.length * 100) : null, games: games };
+    });
+    return { events: events, at: at, days: days, unit: unit, ids: ids, st: st, okn: okn, perDay: perDay };
+  }
+  function countSt(list) { var c = { dom: 0, prac: 0, new: 0 }; list.forEach(function (id) { c[M.st[id]]++; }); return c; }
+  function chip(id) { var c = M.okn[id]; return "<span class='chip " + M.st[id] + "' tabindex='0' data-tip='" + esc(short(id) + "\n" + STATUS[M.st[id]] + (c[1] ? " · " + c[0] + " of " + c[1] + " right" : "")) + "'>" + esc(short(id)) + (c[1] ? "<small>" + c[0] + "/" + c[1] + "</small>" : "") + "</span>"; }
 
-    // wins and fixes (newest first)
-    var notes = events.filter(function (e) { return e.kind === "note"; }).slice().reverse();
+  function render() {
+    $("vMsg").hidden = true; $("vApp").hidden = false;
+    document.title = stu.name + "'s English Map · Gimnasio del Cerebro";
+    $("hName").textContent = stu.name + "'s English map";
+    $("hSub").textContent = M.days.length ? "Last class: " + day(M.days[M.days.length - 1]) + " · Unit " + (M.unit + 1) + ": " + stu.units[M.unit].n : "Your map starts with your first class.";
+    $("hPill").textContent = M.days.length + (M.days.length === 1 ? " class" : " classes") + " · " + stu.level;
+    renderRing(); renderJourney(); renderChart(); renderAreas(); renderCal(); renderPhrases();
+  }
+
+  // ---------------------------------------------------------------- 1. ring
+  function renderRing() {
+    var c = countSt(M.ids), T = M.ids.length, r = 66, C = 2 * Math.PI * r, gap = c.dom && c.prac ? 3 : 0;
+    var lenD = c.dom / T * C, lenP = c.prac / T * C;
+    var svg = "<svg viewBox='0 0 160 160' role='img' aria-label='" + (c.dom + c.prac) + " of " + T + " structures in use: " + c.dom + " mastered, " + c.prac + " practicing, " + c.new + " new'>" +
+      "<circle cx='80' cy='80' r='" + r + "' fill='none' stroke='var(--surface-2)' stroke-width='14'/>" +
+      (c.dom ? "<circle class='arc' cx='80' cy='80' r='" + r + "' fill='none' stroke='var(--dom)' stroke-width='14' stroke-linecap='round' stroke-dasharray='0 " + C + "' data-to='" + Math.max(0, lenD - gap) + " " + C + "'/>" : "") +
+      (c.prac ? "<circle class='arc' cx='80' cy='80' r='" + r + "' fill='none' stroke='var(--prac)' stroke-width='14' stroke-linecap='round' stroke-dasharray='0 " + C + "' stroke-dashoffset='" + (-lenD) + "' data-to='" + Math.max(0, lenP - gap) + " " + C + "'/>" : "") +
+      "</svg>";
+    $("ring").innerHTML = svg + "<div class='mid'><div><b>" + (c.dom + c.prac) + "</b><span>of " + T + " structures<br>in use</span></div></div>";
+    requestAnimationFrame(function () { requestAnimationFrame(function () { document.querySelectorAll("#ring .arc").forEach(function (a) { a.setAttribute("stroke-dasharray", a.dataset.to); }); }); });
+    $("ringLegend").innerHTML = [["dom", "Mastered", "Dominadas", c.dom], ["prac", "Practicing", "En práctica", c.prac], ["new", "New", "Por estrenar", c.new]].map(function (x) {
+      return "<div class='lg'><i class='sw " + x[0] + "'></i><span>" + x[1] + " <span class='muted small'>· " + x[2] + "</span></span><b>" + x[3] + "</b></div>";
+    }).join("") + "<p class='muted small'>Mastered = " + Math.round(D.MASTER.pct * 100) + "% or more in " + D.MASTER.sessions + " different classes.</p>";
+    var hits = M.at.filter(function (a) { return a.ok; }).length;
+    var wins = M.events.filter(function (e) { return e.kind === "note" && e.data.type === "good"; }).length;
+    $("tiles").innerHTML = [[M.days.length, "Classes · clases"], [M.at.length ? Math.round(hits / M.at.length * 100) + "%" : "–", "Targets hit · logrados"], [wins, "Wins · frases top"]]
+      .map(function (x) { return "<div class='tile'><b>" + x[0] + "</b><span>" + x[1] + "</span></div>"; }).join("");
+  }
+
+  // ---------------------------------------------------------------- 2. journey (12 stations, serpentine, 3 per row)
+  function unitState(u) {
+    var c = countSt(u.s);
+    return { c: c, n: u.s.length, state: c.dom === u.s.length ? "dom" : (c.dom + c.prac) ? "prac" : "new" };
+  }
+  function renderJourney() {
+    var units = stu.units, cols = 3, W = 340, rowH = 104, padX = 56, top = 34;
+    var rows = Math.ceil(units.length / cols), H = top + (rows - 1) * rowH + 60;
+    var pos = units.map(function (u, i) {
+      var r = Math.floor(i / cols), k = i % cols; if (r % 2) k = cols - 1 - k;
+      return { x: padX + k * (W - 2 * padX) / (cols - 1), y: top + r * rowH };
+    });
+    var here = M.days.length ? M.unit : -1;
+    // path through every station; the walked part (up to the current unit) is solid
+    function seg(a, b) {
+      if (a.y === b.y) return "M" + a.x + " " + a.y + " L" + b.x + " " + b.y;
+      var side = a.x > W / 2 ? 1 : -1, bx = a.x + side * 34;
+      return "M" + a.x + " " + a.y + " C" + bx + " " + a.y + " " + bx + " " + b.y + " " + b.x + " " + b.y;
+    }
+    var s = "<svg viewBox='0 0 " + W + " " + H + "' role='img' aria-label='Journey through " + units.length + " units. You are in unit " + (here + 1) + ".'>";
+    for (var i = 0; i < units.length - 1; i++) s += "<path d='" + seg(pos[i], pos[i + 1]) + "' fill='none' stroke='" + (i < here ? "var(--series)" : "var(--grid)") + "' stroke-width='" + (i < here ? 4 : 3) + "' stroke-linecap='round'/>";
+    units.forEach(function (u, i) {
+      var p = pos[i], us = unitState(u), fill = us.state === "dom" ? "var(--dom)" : us.state === "prac" ? "var(--prac)" : "var(--surface)";
+      var ink = us.state === "dom" ? "var(--on-dom)" : us.state === "prac" ? "var(--on-prac)" : "var(--muted)";
+      var tip = "Unit " + (i + 1) + ": " + u.n + "\n" + us.c.dom + " mastered · " + us.c.prac + " practicing · " + us.c.new + " new";
+      s += "<g class='st' tabindex='0' role='button' data-unit='" + i + "' data-tip='" + esc(tip) + "' aria-label='" + esc(tip.replace("\n", ". ")) + "'>";
+      s += "<circle cx='" + p.x + "' cy='" + p.y + "' r='26' fill='transparent'/>";
+      if (i === here) s += "<circle class='pulse' cx='" + p.x + "' cy='" + p.y + "' r='21' fill='none' stroke='var(--accent)' stroke-width='2'/>";
+      s += "<circle cx='" + p.x + "' cy='" + p.y + "' r='18' fill='" + fill + "' stroke='" + (i === here ? "var(--accent)" : us.state === "new" ? "var(--line)" : "var(--surface)") + "' stroke-width='" + (i === here ? 3 : 2) + "'/>";
+      s += "<text class='num' x='" + p.x + "' y='" + (p.y + 4.5) + "' text-anchor='middle' fill='" + ink + "'>" + (us.state === "dom" ? "★" : i + 1) + "</text>";
+      var name = u.n.length > 18 ? u.n.slice(0, 17) + "…" : u.n;
+      s += "<text class='lbl' x='" + p.x + "' y='" + (p.y + 34) + "' text-anchor='middle'>" + esc(name) + "</text>";
+      s += "<text class='lbl2' x='" + p.x + "' y='" + (p.y + 46) + "' text-anchor='middle'>" + (i === here ? "you are here" : (us.c.dom + us.c.prac) + "/" + us.n) + "</text>";
+      s += "</g>";
+    });
+    $("journey").innerHTML = s + "</svg>";
+    if (SEL == null) SEL = Math.max(0, here);
+    paintUnit();
+  }
+  function paintUnit() {
+    var u = stu.units[SEL];
+    $("udetail").innerHTML = "<h3>Unit " + (SEL + 1) + ": " + esc(u.n) + (SEL === M.unit && M.days.length ? " · <span style='color:var(--accent)'>you are here</span>" : "") + "</h3><div class='chips'>" + u.s.map(chip).join("") + "</div>";
+  }
+
+  // ---------------------------------------------------------------- 3. line chart: % targets hit per class
+  function renderChart() {
+    var P = M.perDay.filter(function (x) { return x.n; }), el = $("chart");
+    var table = "<details class='tv'><summary>See as a table · ver como tabla</summary><table><thead><tr><th>Class</th><th>Games</th><th class='n'>Right</th><th class='n'>%</th></tr></thead><tbody>" +
+      M.perDay.slice().reverse().map(function (x) { return "<tr><td>" + day(x.d) + "</td><td>" + x.games.map(function (g) { return GAMEN[g] || g; }).join(", ") + "</td><td class='n'>" + (x.n ? x.ok + "/" + x.n : "–") + "</td><td class='n'>" + (x.pct == null ? "–" : x.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></details>";
+    if (P.length < 3) { el.innerHTML = "<p class='muted'>Your chart appears after 3 classes. · Tu gráfica aparece después de 3 clases.</p>" + table; return; }
+    var W = 340, H = 190, L = 36, R = 22, T = 18, B = 30, pw = W - L - R, ph = H - T - B;
+    var x = function (i) { return L + (P.length === 1 ? pw / 2 : i * pw / (P.length - 1)); }, y = function (v) { return T + ph - v / 100 * ph; };
+    var s = "<svg viewBox='0 0 " + W + " " + H + "' role='img' aria-label='Targets hit per class: " + P.map(function (p) { return day(p.d) + " " + p.pct + "%"; }).join(", ") + "'>";
+    [0, 50, 100].forEach(function (v) { s += "<line x1='" + L + "' x2='" + (W - R) + "' y1='" + y(v) + "' y2='" + y(v) + "' stroke='var(--grid)' stroke-width='1'/><text class='ax' x='" + (L - 6) + "' y='" + (y(v) + 3.5) + "' text-anchor='end'>" + v + "%</text>"; });
+    var pts = P.map(function (p, i) { return [x(i), y(p.pct)]; });
+    var line = pts.map(function (q, i) { return (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join(" ");
+    s += "<path d='" + line + " L" + pts[pts.length - 1][0].toFixed(1) + " " + y(0) + " L" + pts[0][0].toFixed(1) + " " + y(0) + " Z' fill='var(--series)' opacity='.1'/>";
+    var len = 0; for (var i = 1; i < pts.length; i++) len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    s += "<path class='draw' style='--len:" + Math.ceil(len) + "' d='" + line + "' fill='none' stroke='var(--series)' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>";
+    var step = Math.max(1, Math.ceil(P.length / 6));
+    P.forEach(function (p, i) {
+      var q = pts[i], last = i === P.length - 1;
+      if (i % step === 0 || last) s += "<text class='ax' x='" + q[0] + "' y='" + (H - 8) + "' text-anchor='middle'>" + day(p.d) + "</text>";
+      s += "<circle cx='" + q[0] + "' cy='" + q[1] + "' r='" + (last ? 5 : 4) + "' fill='var(--series)' stroke='var(--surface)' stroke-width='2'/>";
+      var hw = Math.max(14, pw / P.length / 2);
+      s += "<rect class='hit' tabindex='0' x='" + (q[0] - hw) + "' y='" + T + "' width='" + hw * 2 + "' height='" + ph + "' data-tip='" + esc(day(p.d) + "\n" + p.ok + " of " + p.n + " targets · " + p.pct + "%\n" + p.games.map(function (g) { return GAMEN[g] || g; }).join(", ")) + "'/>";
+      s += "<circle class='dotfocus' cx='" + q[0] + "' cy='" + q[1] + "' r='8' fill='none' stroke='var(--accent)' stroke-width='2' pointer-events='none'/>";
+    });
+    var lp = pts[pts.length - 1], lv = P[P.length - 1].pct;
+    s += "<text class='val' x='" + Math.min(lp[0], W - 4) + "' y='" + (lp[1] - 12 < T + 4 ? lp[1] + 22 : lp[1] - 12) + "' text-anchor='end'>" + lv + "%</text>";
+    s += "</svg>";
+    var first = P[0].pct, d = lv - first;
+    var noteTxt = d > 5 ? "Up " + d + " points since your first class. · Subiste " + d + " puntos desde tu primera clase." : d < -5 ? "Harder topics bring the line down for a while; that's normal. · Los temas nuevos bajan la línea un tiempo; es normal." : "Steady. · Estable.";
+    el.innerHTML = s + "<p class='note'>" + noteTxt + " Each class has different games and levels, so compare the trend, not one dot.</p>" + table;
+  }
+
+  // ---------------------------------------------------------------- 4. areas: segmented bars
+  function renderAreas() {
+    var rows = AREAS.map(function (a) {
+      var ids = M.ids.filter(function (id) { return a[3].test(id); }), c = countSt(ids);
+      return { a: a, ids: ids, c: c, n: ids.length };
+    }).filter(function (r) { return r.n; });
+    $("areas").innerHTML = rows.map(function (r) {
+      function part(k) { return r.c[k] ? "<i class='" + k + "' style='flex:" + r.c[k] + "'></i>" : ""; }
+      var tip = r.a[1] + "\n" + r.c.dom + " mastered · " + r.c.prac + " practicing · " + r.c.new + " new";
+      return "<div class='area' tabindex='0' data-tip='" + esc(tip) + "' aria-label='" + esc(tip.replace("\n", ": ")) + "'><div class='top'><span class='nm'>" + esc(r.a[1]) + "<small>" + esc(r.a[2]) + "</small></span><span class='ct'>" + (r.c.dom + r.c.prac) + " of " + r.n + "</span></div>" +
+        "<div class='seg' aria-hidden='true'>" + part("dom") + part("prac") + part("new") + "</div></div>";
+    }).join("");
+    $("areasTable").innerHTML = "<table><thead><tr><th>Area</th><th class='n'>Mastered</th><th class='n'>Practicing</th><th class='n'>New</th></tr></thead><tbody>" +
+      rows.map(function (r) { return "<tr><td>" + esc(r.a[1]) + "</td><td class='n'>" + r.c.dom + "</td><td class='n'>" + r.c.prac + "</td><td class='n'>" + r.c.new + "</td></tr>"; }).join("") + "</tbody></table>";
+  }
+
+  // ---------------------------------------------------------------- 5. rhythm: last 8 weeks
+  function renderCal() {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var dow = (today.getDay() + 6) % 7, mon0 = new Date(today); mon0.setDate(today.getDate() - dow);
+    // from the week of her first class: at least 4 weeks, at most 8
+    var firstWk = M.days.length ? Math.floor((mon0 - dObj(M.days[0])) / 864e5 / 7) + 1 : 1;
+    var nW = Math.max(4, Math.min(8, firstWk)), start = new Date(mon0); start.setDate(mon0.getDate() - 7 * (nW - 1));
+    var by = {}; M.perDay.forEach(function (p) { by[p.d] = p; });
+    var h = ["M", "T", "W", "T", "F", "S", "S"].map(function (x) { return "<span class='h' aria-hidden='true'>" + x + "</span>"; }).join("");
+    for (var i = 0; i < nW * 7; i++) {
+      var d = new Date(start); d.setDate(start.getDate() + i);
+      var k = iso(d), p = by[k], fut = d > today, isT = +d === +today;
+      var tip = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }) + (p ? "\nClass" + (p.n ? " · " + p.ok + "/" + p.n + " targets" : "") : fut ? "" : "\nNo class");
+      h += "<span class='d" + (p ? " c" : "") + (fut ? " f" : "") + (isT ? " t" : "") + "'" + (fut ? " aria-hidden='true'" : " tabindex='0' role='img' aria-label='" + esc(tip.replace("\n", ": ")) + "' data-tip='" + esc(tip) + "'") + "></span>";
+    }
+    $("cal").innerHTML = h;
+    $("calEs").textContent = "Tus días de clase en las últimas " + nW + " semanas";
+    // weeks in a row with at least one class (this week counts if it already has one)
+    function wk(s) { var d = dObj(s), w = (d.getDay() + 6) % 7; d.setDate(d.getDate() - w); return iso(d); }
+    var weeks = {}; M.days.forEach(function (s) { weeks[wk(s)] = 1; });
+    var mon = new Date(today); mon.setDate(today.getDate() - dow);
+    var streak = 0, cur = new Date(mon); if (!weeks[iso(cur)]) cur.setDate(cur.getDate() - 7);
+    while (weeks[iso(cur)]) { streak++; cur.setDate(cur.getDate() - 7); }
+    var thisWeek = M.days.filter(function (s) { return wk(s) === iso(mon); }).length;
+    $("calStats").innerHTML = "<div><span class='big'>" + streak + "</span> <span class='muted'>" + (streak === 1 ? "week" : "weeks") + " in a row</span><div class='muted small'>Semanas seguidas con clase</div></div>" +
+      "<div><span class='big'>" + thisWeek + "</span> <span class='muted'>" + (thisWeek === 1 ? "class" : "classes") + " this week</span><div class='muted small'>Clases esta semana</div></div>";
+  }
+
+  // ---------------------------------------------------------------- phrases
+  function renderPhrases() {
+    var notes = M.events.filter(function (e) { return e.kind === "note"; }).slice().reverse();
     var wins = notes.filter(function (n) { return n.data.type === "good"; }), fixes = notes.filter(function (n) { return n.data.type === "fix"; });
     $("wins").innerHTML = wins.length ? wins.slice(0, SHOWN.wins).map(function (n) {
       return "<div class='ph win'><div class='said'>“" + esc(n.data.said) + "”</div><div class='meta'>" + day(n.session) + (n.data.s ? " · " + esc(short(n.data.s)) : "") + "</div></div>";
@@ -204,34 +474,40 @@ h1,h2,h3{text-wrap:balance; line-height:1.15}
         "<div class='meta'>" + day(n.session) + (n.data.s ? " · " + esc(short(n.data.s)) : "") + "</div></div>";
     }).join("") + (fixes.length > SHOWN.fixes ? "<button class='more' data-more='fixes'>Show " + Math.min(10, fixes.length - SHOWN.fixes) + " more</button>" : "")
       : "<p class='muted'>Nothing to polish yet. · Todavía no hay frases para pulir.</p>";
-
-    // map by unit, then the extra structures she practiced
-    $("rule").textContent = "Mastered = " + Math.round(D.MASTER.pct * 100) + "% or more in " + D.MASTER.sessions + " different classes. · Dominada = " + Math.round(D.MASTER.pct * 100) + "% o más en " + D.MASTER.sessions + " clases distintas.";
-    function chip(id) { var c = okn[id]; return "<span class='chip " + st[id] + "' title='" + STATUS[st[id]] + "'>" + esc(short(id)) + (c[1] ? "<small>" + c[0] + "/" + c[1] + "</small>" : "") + "</span>"; }
-    var inUnits = {};
-    var h = stu.units.map(function (u, i) {
-      u.s.forEach(function (id) { inUnits[id] = 1; });
-      return "<div class='unit" + (i === unit && days.length ? " here" : "") + "'><h3>" + (i + 1) + ". " + esc(u.n) + (i === unit && days.length ? "<span class='here-tag'>you are here</span>" : "") + "</h3><div class='chips'>" + u.s.map(chip).join("") + "</div></div>";
-    }).join("");
-    var extra = Object.keys(st).filter(function (id) { return !inUnits[id] && okn[id][1]; });
-    if (extra.length) h += "<div class='unit'><h3>Also practiced · también practicaste</h3><div class='chips'>" + extra.map(chip).join("") + "</div></div>";
-    $("map").innerHTML = h;
-
-    // classes
-    $("classes").innerHTML = days.length ? days.slice().reverse().map(function (d) {
-      var ev = events.filter(function (e) { return e.session === d; }), A = at.filter(function (a) { return a.session === d; });
-      var games = []; ev.forEach(function (e) { var g = e.kind === "note" ? "note" : e.data.game; if (games.indexOf(g) < 0) games.push(g); });
-      var ok = A.filter(function (a) { return a.ok; }).length, pct = A.length ? Math.round(ok / A.length * 100) : 0;
-      return "<div class='cls'><span class='d'>" + day(d) + "</span><span class='g'>" + games.map(function (g) { return GAMEN[g] || g; }).join(" · ") + "</span><span class='p'>" + (A.length ? ok + "/" + A.length : "–") + "</span><div class='bar'><i style='width:" + pct + "%'></i></div></div>";
-    }).join("") : "<p class='muted'>No classes yet. · Todavía no hay clases.</p>";
   }
 
+  // ---------------------------------------------------------------- tooltip (hover, focus and tap)
+  var tip = $("tip"), tipFor = null;
+  function showTip(el, cx, cy) {
+    tip.textContent = el.getAttribute("data-tip"); tip.classList.add("on"); tipFor = el;
+    var r = el.getBoundingClientRect(), x = cx != null ? cx : r.left + r.width / 2, y = cy != null ? cy : r.top;
+    var tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(window.innerWidth - tw - 8, x - tw / 2)) + "px";
+    tip.style.top = (y - th - 12 < 8 ? y + 18 : y - th - 12) + "px";
+  }
+  function hideTip() { tip.classList.remove("on"); tipFor = null; }
+  document.addEventListener("pointerover", function (e) { var el = e.target.closest && e.target.closest("[data-tip]"); if (el && e.pointerType === "mouse") showTip(el, e.clientX, e.clientY); });
+  document.addEventListener("pointermove", function (e) { if (tipFor && e.pointerType === "mouse") { var el = e.target.closest && e.target.closest("[data-tip]"); if (el) showTip(el, e.clientX, e.clientY); else hideTip(); } });
+  document.addEventListener("pointerout", function (e) { if (e.pointerType === "mouse" && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest("[data-tip]"))) hideTip(); });
+  document.addEventListener("focusin", function (e) { if (e.target.getAttribute && e.target.getAttribute("data-tip")) showTip(e.target); });
+  document.addEventListener("focusout", hideTip);
+  window.addEventListener("scroll", hideTip, { passive: true });
+
   document.addEventListener("click", function (e) {
+    var st = e.target.closest && e.target.closest("[data-unit]");
+    if (st) { SEL = +st.getAttribute("data-unit"); paintUnit(); showTip(st); return; }
+    var t = e.target.closest && e.target.closest("[data-tip]");
+    if (t && e.pointerType !== "mouse") { if (tipFor === t) hideTip(); else showTip(t); return; }
+    if (!t) hideTip();
     var b = e.target.closest("button"); if (!b) return;
-    if (b.dataset.more) { SHOWN[b.dataset.more] += 10; render(); }
-    if (b.dataset.reveal != null) { REVEALED[b.dataset.reveal] = 1; render(); }
+    if (b.dataset.more) { SHOWN[b.dataset.more] += 10; renderPhrases(); }
+    if (b.dataset.reveal != null) { REVEALED[b.dataset.reveal] = 1; renderPhrases(); }
   });
-  $("practice").addEventListener("change", function () { REVEALED = {}; render(); });
+  document.addEventListener("keydown", function (e) {
+    if ((e.key === "Enter" || e.key === " ") && e.target.getAttribute && e.target.getAttribute("data-unit") != null) { e.preventDefault(); SEL = +e.target.getAttribute("data-unit"); paintUnit(); }
+    if (e.key === "Escape") hideTip();
+  });
+  $("practice").addEventListener("change", function () { REVEALED = {}; renderPhrases(); });
   load();
 })();
 </script>
