@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>My English Map · Gimnasio del Cerebro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+/* Student view of the English Lab: read only, opened with a private link (progreso.html#PA.<key>). */
+:root{
+  --bg:#F2F7F9; --surface:#FFFFFF; --surface-2:#E8F1F4; --ink:#12303F; --muted:#4E6B79; --line:#CFDFE5;
+  --brand:#2C5F7C; --on-brand:#FFFFFF; --focus:#F57C00; --hdr-a:#1D3F54; --hdr-b:#2C5F7C; --hdr-soft:#BCD9E1;
+  --orange:#F57C00; --gold:#FDD835;
+  --good:#2F7D32; --good-bg:#E3F2E1; --bad:#B3261E; --bad-bg:#FBE9E7; --mid:#8A5A00; --mid-bg:#FFF4D6;
+  --font:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+    --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+    --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1D29; --surface:#132B3A; --surface-2:#1A3A4C; --ink:#E7F1F5; --muted:#9FB8C4; --line:#27495B;
+  --brand:#57A6B5; --on-brand:#0C1D29; --hdr-a:#0F2A3B; --hdr-b:#1B4660;
+  --good:#7CC47F; --good-bg:#1F3320; --bad:#FF8A7A; --bad-bg:#3E1E1B; --mid:#FFCF66; --mid-bg:#3A2E10; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:16px 48px}
+button{font-family:inherit; font-size:inherit; color:inherit; cursor:pointer}
+button:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance; line-height:1.15}
+.wrap{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:16px}
+.muted{color:var(--muted)} .small{font-size:.86rem} .mono{font-family:var(--mono)}
+.hero{background:linear-gradient(135deg,var(--hdr-a),var(--hdr-b)); color:#fff; border-radius:20px; padding:clamp(20px,5vw,32px)}
+.kick{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; color:var(--hdr-soft)}
+.hero h1{font-size:clamp(2rem,8vw,2.9rem); font-weight:800; letter-spacing:-.02em; margin:6px 0 4px}
+.hero p{color:var(--hdr-soft)}
+.stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:16px}
+.stat{background:rgba(255,255,255,.1); border-radius:14px; padding:10px 12px}
+.stat b{display:block; font-size:1.7rem; font-weight:800; line-height:1.1}
+.stat span{font-size:.78rem; color:var(--hdr-soft)}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:clamp(16px,4vw,22px)}
+.panel h2{font-size:1.35rem}
+.es{font-size:.84rem; color:var(--muted); margin:2px 0 12px}
+.list{display:grid; gap:8px}
+.ph{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg)}
+.ph.win{border-left:6px solid var(--good)}
+.ph.fix{border-left:6px solid var(--orange)}
+.ph .said{font-weight:600; font-size:1.05rem}
+.ph .was{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--bad)}
+.ph .better{color:var(--good); font-weight:700; font-size:1.08rem; margin-top:4px}
+.ph .meta{font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-top:4px}
+.ph .hideb{margin-top:6px; border:1px dashed var(--good); background:var(--good-bg); color:var(--good); border-radius:10px; padding:6px 12px; font-weight:700; font-size:.9rem}
+.toggle{display:flex; align-items:center; gap:8px; font-size:.9rem; margin-bottom:10px}
+.more{margin-top:10px; border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 14px; font-weight:600}
+.unit{border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg); display:grid; gap:8px}
+.unit.here{border:2px solid var(--orange); background:var(--surface)}
+.unit h3{font-size:1.02rem}
+.unit .here-tag{font-family:var(--mono); font-size:.68rem; background:var(--orange); color:#fff; border-radius:999px; padding:1px 8px; margin-left:6px; vertical-align:middle}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{border-radius:999px; padding:4px 12px; font-size:.84rem; font-weight:600; border:1px solid var(--line)}
+.chip small{font-family:var(--mono); font-weight:400; margin-left:4px}
+.chip.new{background:var(--surface-2); color:var(--muted)}
+.chip.prac{background:var(--mid-bg); color:var(--mid); border-color:var(--mid)}
+.chip.dom{background:var(--good-bg); color:var(--good); border-color:var(--good)}
+.chip.dom::before{content:"★ "}
+.legend{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px}
+.cls{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:4px 12px; align-items:center; padding:10px 0; border-top:1px solid var(--line)}
+.cls:first-child{border-top:none}
+.cls .d{font-weight:700}
+.cls .g{color:var(--muted); font-size:.85rem}
+.cls .p{font-family:var(--mono); font-weight:700}
+.bar{grid-column:1/-1; height:6px; border-radius:99px; background:var(--surface-2); overflow:hidden}
+.bar i{display:block; height:100%; background:var(--good)}
+.honest{border-left:6px solid var(--brand); background:var(--surface-2); border-radius:10px; padding:10px 14px; font-size:.86rem}
+.center{text-align:center; padding:40px 16px}
+.center h2{font-size:1.5rem; margin-bottom:8px}
+@media (max-width:560px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="vMsg" class="panel center"><h2 id="msgT">Loading your map…</h2><p class="muted" id="msgP"></p></section>
+
+  <div id="vApp" class="wrap" hidden>
+    <header class="hero">
+      <p class="kick">Gimnasio del Cerebro · English Lab</p>
+      <h1 id="hName"></h1>
+      <p id="hSub"></p>
+      <div class="stats" id="stats"></div>
+    </header>
+
+    <section class="panel">
+      <h2>Your wins</h2>
+      <p class="es">Frases que dijiste muy bien en clase</p>
+      <div class="list" id="wins"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Phrases to polish</h2>
+      <p class="es">Lo que dijiste y una versión mejor. Practica: tapa la respuesta, dila en voz alta y luego revisa.</p>
+      <label class="toggle"><input type="checkbox" id="practice"> Practice mode: hide the better version</label>
+      <div class="list" id="fixes"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Your map</h2>
+      <p class="es">Tu mapa de estructuras, unidad por unidad</p>
+      <div class="legend"><span class="chip new">New · nueva</span><span class="chip prac">Practicing · en práctica</span><span class="chip dom">Mastered · dominada</span></div>
+      <p class="muted small" id="rule" style="margin-bottom:12px"></p>
+      <div class="list" id="map"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Your classes</h2>
+      <p class="es">Tus clases y los objetivos que lograste</p>
+      <div id="classes"></div>
+    </section>
+
+    <p class="honest">These are notes from your live classes, marked by your teacher. They show how you are moving; they are not an official level test.<br><span class="muted">Son registros de tus clases en vivo. Muestran tu avance; no son un examen oficial de nivel.</span></p>
+  </div>
+</div>
+
+<script src="lab-data.js?v=3"></script>
+<script>
+(function () {
+  "use strict";
+  var SUPA = { url: "https://xpqjejiezbxaxsdodkyb.supabase.co", key: "sb_publishable_lZIw2yjnXLgt9llOBG-5fA_9MMDJktd" };
+  var Q = new URLSearchParams(location.search);
+  var DB_URL = (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && Q.get("db") || SUPA.url).replace(/\/$/, "");
+  var D = window.LAB_DATA, ST = D.ST;
+  var GAMEN = { spin: "Spin & Speak", jeopardy: "Jeopardy", mission: "Hidden Mission", chain: "Story Chain", box: "Mystery Box", bingo: "Structure Bingo",
+    escape: "Escape Room", rapid: "Rapid Transform", duel: "Translation Duel", auction: "Grammar Auction", bug: "Spot the Bug", court: "Error Court", note: "Notebook" };
+  var STATUS = { new: "New", prac: "Practicing", dom: "Mastered" };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]; }); }
+  function day(s) { var p = String(s).slice(0, 10).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }
+  function short(id) { return ST[id] ? ST[id][0].replace(/^Spanish trap: /, "") : id; }
+  function message(t, p) { $("vMsg").hidden = false; $("vApp").hidden = true; $("msgT").textContent = t; $("msgP").textContent = p || ""; }
+
+  var hash = decodeURIComponent(location.hash.replace(/^#/, "")), dot = hash.indexOf(".");
+  var code = dot > 0 ? hash.slice(0, dot).toUpperCase() : "", key = dot > 0 ? hash.slice(dot + 1) : "";
+  var stu = D.STUDENTS[code];
+  if (!stu || key.length < 16) { message("This link is not complete", "Ask your teacher for your link. · Pídele a tu profe tu enlace."); return; }
+
+  var EV = [], SHOWN = { wins: 6, fixes: 6 }, REVEALED = {};
+
+  async function load() {
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 12000), r;
+    try {
+      r = await fetch(DB_URL + "/rest/v1/rpc/lab_view", { method: "POST", headers: { apikey: SUPA.key, "content-type": "application/json" }, body: JSON.stringify({ p_student: code, p_key: key }), signal: ctl.signal });
+    } catch (e) { clearTimeout(t); message("No connection", "Check your internet and open the link again. · Revisa tu internet y vuelve a abrir el enlace."); return; }
+    clearTimeout(t);
+    if (!r.ok) { message("This link is not active", "Ask your teacher for a new link. · Pídele a tu profe un enlace nuevo."); return; }
+    EV = (await r.json()).map(function (e) { return { session: String(e.session).slice(0, 10), kind: e.kind, data: e.data || {} }; });
+    render();
+  }
+
+  function render() {
+    $("vMsg").hidden = true; $("vApp").hidden = false;
+    var events = EV.filter(function (e) { return !D.isClear(e); });
+    var at = D.attemptsOf(events), days = [];
+    events.forEach(function (e) { if (days.indexOf(e.session) < 0) days.push(e.session); });
+    days.sort();
+    var rounds = events.filter(function (e) { return e.kind === "round"; });
+    var unit = rounds.length ? Math.max.apply(null, rounds.filter(function (e) { return e.session === days[days.length - 1]; }).map(function (e) { return e.data.unit || 0; }).concat([0])) : 0;
+    document.title = stu.name + "'s English Map · Gimnasio del Cerebro";
+    $("hName").textContent = stu.name + "'s English map";
+    $("hSub").textContent = days.length ? "Last class: " + day(days[days.length - 1]) + " · Unit " + (unit + 1) + ": " + stu.units[unit].n : "Your map starts with your first class.";
+
+    // status of every structure
+    var st = {}, okn = {};
+    D.levelStructs(stu).forEach(function (id) {
+      var L = at.filter(function (a) { return a.s === id; });
+      st[id] = D.statusOf(L); okn[id] = [L.filter(function (a) { return a.ok; }).length, L.length];
+    });
+    var counts = { dom: 0, prac: 0 }; Object.keys(st).forEach(function (id) { if (counts[st[id]] != null) counts[st[id]]++; });
+    var hits = at.filter(function (a) { return a.ok; }).length;
+    $("stats").innerHTML = [[days.length, "Classes · clases"], [counts.dom, "Mastered · dominadas"], [counts.prac, "Practicing · en práctica"], [at.length ? Math.round(hits / at.length * 100) + "%" : "–", "Targets hit · logrados"]]
+      .map(function (x) { return "<div class='stat'><b>" + x[0] + "</b><span>" + x[1] + "</span></div>"; }).join("");
+
+    // wins and fixes (newest first)
+    var notes = events.filter(function (e) { return e.kind === "note"; }).slice().reverse();
+    var wins = notes.filter(function (n) { return n.data.type === "good"; }), fixes = notes.filter(function (n) { return n.data.type === "fix"; });
+    $("wins").innerHTML = wins.length ? wins.slice(0, SHOWN.wins).map(function (n) {
+      return "<div class='ph win'><div class='said'>“" + esc(n.data.said) + "”</div><div class='meta'>" + day(n.session) + (n.data.s ? " · " + esc(short(n.data.s)) : "") + "</div></div>";
+    }).join("") + (wins.length > SHOWN.wins ? "<button class='more' data-more='wins'>Show " + Math.min(10, wins.length - SHOWN.wins) + " more</button>" : "")
+      : "<p class='muted'>Your best sentences will appear here. · Aquí aparecerán tus mejores frases.</p>";
+    var practice = $("practice").checked;
+    $("fixes").innerHTML = fixes.length ? fixes.slice(0, SHOWN.fixes).map(function (n, i) {
+      var show = !practice || REVEALED[i];
+      return "<div class='ph fix'><div class='was'>" + esc(n.data.said) + "</div>" +
+        (n.data.better ? (show ? "<div class='better'>→ " + esc(n.data.better) + "</div>" : "<button class='hideb' data-reveal='" + i + "'>Show the better version · ver</button>") : "") +
+        "<div class='meta'>" + day(n.session) + (n.data.s ? " · " + esc(short(n.data.s)) : "") + "</div></div>";
+    }).join("") + (fixes.length > SHOWN.fixes ? "<button class='more' data-more='fixes'>Show " + Math.min(10, fixes.length - SHOWN.fixes) + " more</button>" : "")
+      : "<p class='muted'>Nothing to polish yet. · Todavía no hay frases para pulir.</p>";
+
+    // map by unit, then the extra structures she practiced
+    $("rule").textContent = "Mastered = " + Math.round(D.MASTER.pct * 100) + "% or more in " + D.MASTER.sessions + " different classes. · Dominada = " + Math.round(D.MASTER.pct * 100) + "% o más en " + D.MASTER.sessions + " clases distintas.";
+    function chip(id) { var c = okn[id]; return "<span class='chip " + st[id] + "' title='" + STATUS[st[id]] + "'>" + esc(short(id)) + (c[1] ? "<small>" + c[0] + "/" + c[1] + "</small>" : "") + "</span>"; }
+    var inUnits = {};
+    var h = stu.units.map(function (u, i) {
+      u.s.forEach(function (id) { inUnits[id] = 1; });
+      return "<div class='unit" + (i === unit && days.length ? " here" : "") + "'><h3>" + (i + 1) + ". " + esc(u.n) + (i === unit && days.length ? "<span class='here-tag'>you are here</span>" : "") + "</h3><div class='chips'>" + u.s.map(chip).join("") + "</div></div>";
+    }).join("");
+    var extra = Object.keys(st).filter(function (id) { return !inUnits[id] && okn[id][1]; });
+    if (extra.length) h += "<div class='unit'><h3>Also practiced · también practicaste</h3><div class='chips'>" + extra.map(chip).join("") + "</div></div>";
+    $("map").innerHTML = h;
+
+    // classes
+    $("classes").innerHTML = days.length ? days.slice().reverse().map(function (d) {
+      var ev = events.filter(function (e) { return e.session === d; }), A = at.filter(function (a) { return a.session === d; });
+      var games = []; ev.forEach(function (e) { var g = e.kind === "note" ? "note" : e.data.game; if (games.indexOf(g) < 0) games.push(g); });
+      var ok = A.filter(function (a) { return a.ok; }).length, pct = A.length ? Math.round(ok / A.length * 100) : 0;
+      return "<div class='cls'><span class='d'>" + day(d) + "</span><span class='g'>" + games.map(function (g) { return GAMEN[g] || g; }).join(" · ") + "</span><span class='p'>" + (A.length ? ok + "/" + A.length : "–") + "</span><div class='bar'><i style='width:" + pct + "%'></i></div></div>";
+    }).join("") : "<p class='muted'>No classes yet. · Todavía no hay clases.</p>";
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.more) { SHOWN[b.dataset.more] += 10; render(); }
+    if (b.dataset.reveal != null) { REVEALED[b.dataset.reveal] = 1; render(); }
+  });
+  $("practice").addEventListener("change", function () { REVEALED = {}; render(); });
+  load();
+})();
+</script>
+</body>
+</html>

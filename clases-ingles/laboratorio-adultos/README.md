@@ -13,6 +13,13 @@ App de clase en vivo. El profe juzga y marca; la página registra cada acierto p
 - Progreso: New / Practicing / Mastered (Mastered = 80 % o más en 3 clases distintas). Son datos de práctica, no una prueba de nivel.
 - Entrada: misma clave del Panel del profe (si ya entraste en profe.html en ese dispositivo, entra sola).
 
+## Vista de progreso para la estudiante
+Página: `juegos/progreso.html`, de solo lectura, pensada para celular. La estudiante ve su mapa por unidades, sus clases, sus frases logradas y sus frases para pulir (con modo práctica que tapa la respuesta).
+- El profe crea el enlace en lab.html > Progress > "Create link", y lo copia o lo envía por WhatsApp.
+- El enlace lleva una llave secreta después de `#`, por ejemplo `progreso.html#PA.<llave>`. En Supabase solo se guarda la huella de esa llave (tabla `lab_views`).
+- "New link" o "Turn off" apagan el enlace anterior al instante. Con el enlace de una estudiante no se pueden leer los datos de otra.
+- El contenido (estructuras, planes, juegos) vive en `juegos/lab-data.js`, compartido por lab.html y progreso.html.
+
 ## Activar la base de datos (una sola vez)
 1. supabase.com > tu proyecto (el mismo de saga.sql) > SQL Editor.
 2. Pega todo `lab.sql` y pulsa Run. Se puede repetir sin problema.
