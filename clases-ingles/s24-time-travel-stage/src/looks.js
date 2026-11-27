@@ -37,6 +37,8 @@ export const SLOTS = [
   { id: 'shoes', label: 'Shoes', kind: 'color', noun: 'shoes', colors: COLORS },
   { id: 'scarf', label: 'Scarf', kind: 'color', noun: 'scarf', colors: COLORS, none: true },
   { id: 'hat', label: 'Hats', kind: 'item' },
+  { id: 'hatColor', label: 'Hat color', kind: 'color', noun: 'hat', colors: COLORS },
+  { id: 'belt', label: 'Belt', kind: 'item' },
   { id: 'glasses', label: 'Glasses', kind: 'item' },
   { id: 'back', label: 'On my back', kind: 'item' },
   { id: 'ears', label: 'Ears', kind: 'item' },
@@ -54,8 +56,8 @@ export const ITEMS = [
   { id: 'print-heart', slot: 'print', value: 'heart', name: 'heart T-shirt', price: 20 },
   { id: 'print-bolt', slot: 'print', value: 'bolt', name: 'lightning T-shirt', price: 25 },
   { id: 'hat-none', slot: 'hat', value: 'none', name: 'no hat', price: 0 },
-  { id: 'hat-cap', slot: 'hat', value: 'cap', name: 'red cap', price: 25 },
-  { id: 'hat-beanie', slot: 'hat', value: 'beanie', name: 'purple beanie', price: 25 },
+  { id: 'hat-cap', slot: 'hat', value: 'cap', name: 'cap', price: 25 },
+  { id: 'hat-beanie', slot: 'hat', value: 'beanie', name: 'beanie', price: 25 },
   { id: 'hat-sun', slot: 'hat', value: 'sunhat', name: 'sun hat', price: 30 },
   { id: 'hat-crown', slot: 'hat', value: 'crown', name: 'gold crown', price: 60 },
   { id: 'glasses-none', slot: 'glasses', value: 'none', name: 'no glasses', price: 0 },
@@ -66,6 +68,8 @@ export const ITEMS = [
   { id: 'back-clock', slot: 'back', value: 'clockpack', name: 'time backpack', price: 0 },
   { id: 'back-pack', slot: 'back', value: 'backpack', name: 'green backpack', price: 30 },
   { id: 'back-cape', slot: 'back', value: 'cape', name: 'hero cape', price: 50 },
+  { id: 'belt-on', slot: 'belt', value: 'belt', name: 'belt', price: 0 },
+  { id: 'belt-none', slot: 'belt', value: 'none', name: 'no belt', price: 0 },
   { id: 'ears-none', slot: 'ears', value: 'none', name: 'nothing', price: 0 },
   { id: 'ears-phones', slot: 'ears', value: 'headphones', name: 'headphones', price: 35 },
 ];
@@ -77,7 +81,7 @@ export function defaultLook(P) {
   return {
     skin: P.skin || '#E9B48A', hair: P.hair, hairStyle: P.long ? 'long' : 'short',
     shirt: P.suit, pants: '#1D3F54', shoes: '#F7FAFC', scarf: P.scarf,
-    print: 'none', hat: 'none', glasses: 'goggles', back: 'clockpack', ears: 'none',
+    print: 'none', hat: 'none', hatColor: '#E53935', belt: 'belt', glasses: 'goggles', back: 'clockpack', ears: 'none',
   };
 }
 export const itemById = (id) => ITEMS.find((i) => i.id === id);

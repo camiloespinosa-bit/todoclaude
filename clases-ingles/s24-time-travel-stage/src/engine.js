@@ -401,8 +401,9 @@ function start() {
       body.add(at(mesh(new THREE.BoxGeometry(0.9, 0.94, 0.6), coat), 0, 1.38, 0));
       body.add(at(mesh(new THREE.BoxGeometry(0.06, 0.8, 0.02), '#ECEFF1'), 0, 1.38, 0.31));
     }
-    body.add(at(mesh(new THREE.BoxGeometry(0.86, 0.14, 0.56), '#1D3F54'), 0, 1.02, 0));
-    if (p.hero) {
+    const belt = p.belt !== 'none';
+    if (belt) body.add(at(mesh(new THREE.BoxGeometry(0.86, 0.14, 0.56), '#1D3F54'), 0, 1.02, 0));
+    if (p.hero && belt) {
       const buckle = at(mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.05, 10), '#FDD835'), 0, 1.02, 0.29);
       buckle.rotation.x = Math.PI / 2;
       body.add(buckle);
@@ -514,18 +515,21 @@ function start() {
       head.add(at(mesh(new THREE.BoxGeometry(0.1, 0.03, 0.03), '#3E2723'), 0, 0.06, 0.48));
     }
     // hats
+    // the kid picks the hat color in My Look ("Hat color"); the brim / band is a darker shade
+    const hatCol = wear.has('cap') ? '#E53935' : p.hatColor || (hat === 'beanie' ? '#7E57C2' : '#E53935');
+    const hatDark = '#' + new THREE.Color(hatCol).multiplyScalar(0.78).getHexString();
     if (hat === 'cap') {
-      head.add(at(mesh(new THREE.SphereGeometry(0.53, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.5), '#E53935'), 0, 0.06, 0));
-      head.add(at(mesh(new THREE.BoxGeometry(0.56, 0.05, 0.42), '#C62828'), 0, 0.1, 0.55));
+      head.add(at(mesh(new THREE.SphereGeometry(0.53, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.5), hatCol), 0, 0.06, 0));
+      head.add(at(mesh(new THREE.BoxGeometry(0.56, 0.05, 0.42), hatDark), 0, 0.1, 0.55));
     } else if (hat === 'beanie') {
-      head.add(at(mesh(new THREE.SphereGeometry(0.54, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.52), '#7E57C2'), 0, 0.05, 0));
-      const band = at(mesh(new THREE.TorusGeometry(0.5, 0.07, 6, 18), '#5E35B1'), 0, 0.08, 0);
+      head.add(at(mesh(new THREE.SphereGeometry(0.54, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.52), hatCol), 0, 0.05, 0));
+      const band = at(mesh(new THREE.TorusGeometry(0.5, 0.07, 6, 18), hatDark), 0, 0.08, 0);
       band.rotation.x = Math.PI / 2;
       head.add(band, at(mesh(new THREE.SphereGeometry(0.14, 8, 6), '#FFFFFF'), 0, 0.62, 0));
     } else if (hat === 'sunhat') {
       head.add(at(mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.05, 20), '#E8C770'), 0, 0.3, 0));
       head.add(at(mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.36, 16), '#E8C770'), 0, 0.48, 0));
-      head.add(at(mesh(new THREE.CylinderGeometry(0.51, 0.51, 0.08, 16), '#E53935'), 0, 0.36, 0));
+      head.add(at(mesh(new THREE.CylinderGeometry(0.51, 0.51, 0.08, 16), hatCol), 0, 0.36, 0));
     } else if (hat === 'crown') {
       const gold = { emissive: '#8D6E00', emissiveIntensity: 0.35, metalness: 0.4, roughness: 0.35 };
       head.add(at(mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.22, 16, 1, true), '#FDD835', gold), 0, 0.55, 0));
