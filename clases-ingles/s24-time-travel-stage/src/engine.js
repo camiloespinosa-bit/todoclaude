@@ -1881,6 +1881,8 @@ function start() {
     // directions in the town: the card goes to the side so the map stays visible
     const mapView = !!(S.Q && !S.Q.done && ['follow', 'guide', 'order'].includes(S.Q.def.type));
     el.classList.toggle('side', mapView);
+    // Story Order: the story track is on the right of the island, so the card goes left
+    el.classList.toggle('left', mapView && S.Q.def.type === 'order');
     document.body.classList.toggle('mapview', mapView);
     $('h-tlab').innerHTML = lab;
     $('h-ts').innerHTML = s;
