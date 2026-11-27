@@ -72,3 +72,43 @@ revoke all on function public.lab_del(text, text) from public;
 grant execute on function public.lab_add(text, text, text, date, text, jsonb) to anon, authenticated;
 grant execute on function public.lab_list(text, text) to anon, authenticated;
 grant execute on function public.lab_del(text, text) to anon, authenticated;
+
+-- ---------- Vista de progreso de la estudiante (progreso.html) ----------
+-- Cada estudiante tiene un enlace secreto: progreso.html#PA.<llave>. Aquí solo se guarda la huella SHA-256
+-- de esa llave. El profe crea o cambia el enlace (el anterior deja de funcionar); la estudiante solo puede
+-- leer sus propios registros, nunca escribir ni ver los de otra.
+create table if not exists public.lab_views (
+  student     text primary key,
+  key_sha256  text not null,
+  updated_at  timestamptz not null default now()
+);
+alter table public.lab_views enable row level security;
+revoke all on public.lab_views from anon, authenticated;
+
+create or replace function public.lab_set_view(p_token text, p_student text, p_key_sha256 text)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not lab_ok(p_token) then raise exception 'lab_set_view: not allowed'; end if;
+  if p_student !~ '^[A-Z0-9]{2,6}$' or p_key_sha256 !~ '^[0-9a-f]{64}$' then raise exception 'lab_set_view: bad input'; end if;
+  insert into lab_views (student, key_sha256) values (p_student, p_key_sha256)
+  on conflict (student) do update set key_sha256 = excluded.key_sha256, updated_at = now();
+end $$;
+
+create or replace function public.lab_view(p_student text, p_key text)
+returns table (session date, kind text, data jsonb)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if p_key is null or length(p_key) < 16 or not exists (
+       select 1 from lab_views v where v.student = p_student
+         and v.key_sha256 = encode(sha256(convert_to(p_key, 'UTF8')), 'hex')) then
+    raise exception 'lab_view: not allowed';
+  end if;
+  return query
+    select e.session, e.kind, e.data from lab_events e
+    where e.student = p_student order by e.session, e.created_at limit 20000;
+end $$;
+
+revoke all on function public.lab_set_view(text, text, text) from public;
+revoke all on function public.lab_view(text, text) from public;
+grant execute on function public.lab_set_view(text, text, text) to anon, authenticated;
+grant execute on function public.lab_view(text, text) to anon, authenticated;
