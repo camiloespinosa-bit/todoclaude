@@ -2182,7 +2182,10 @@ function start() {
       if (old.runId && NET.room && WEB) DB.save({ run: old.runId, room: NET.room, game: GAME.id, player: S.player, state: null, status: 'restarted' });
     }
     showResume(null);
-    if (NET.tx) listenCommands();
+    if (NET.tx) {
+      listenCommands();
+      listenMates();
+    }
     const n = WORLDS.length;
     S.results = Array.from({ length: n }, () => []);
     S.stars = Array(n).fill(0);
@@ -3558,6 +3561,127 @@ function start() {
       schedulePush();
     }
   }
+  // ---------- Classmates in the same world (online only) ----------
+  // Each device sends where its traveler is (a few times per second) on pos/p{idx};
+  // the other device draws that traveler as a "ghost" that walks but never takes part in the challenges.
+  const MATES = {};
+  const MATE = { sendT: 0, last: '', lookKey: '', waveT: 0 };
+  function mateOf(idx) {
+    if (!MATES[idx]) {
+      const g = new THREE.Group();
+      g.visible = false;
+      scene.add(g);
+      const label = textSprite('', { bg: '#1D3F54', font: 112, scale: 0.6 });
+      label.position.y = 4.1;
+      g.add(label);
+      MATES[idx] = { g, label, M: null, lookKey: '', st: null, pos: V(), yaw: 0, seen: 0, phase: 0, waveT: 0, labelText: '' };
+    }
+    return MATES[idx];
+  }
+  function listenMates() {
+    if (!NET.tx) return;
+    if (NET.unsubMates) NET.unsubMates.forEach((u) => u());
+    NET.unsubMates = [
+      NET.tx.sub('pos/+', (k, d) => {
+        const idx = +k.split('/')[1].slice(1);
+        if (!d || idx === S.player || !PLAYERS[idx]) return;
+        const m = mateOf(idx);
+        m.st = d;
+        m.seen = performance.now();
+        const key = JSON.stringify(d.look || {});
+        if (d.look && key !== m.lookKey) {
+          m.lookKey = key;
+          if (m.M) m.g.remove(m.M.root, m.M.blob);
+          m.M = makeAvatar({ ...d.look, hero: true });
+          m.M.blob.position.y = 0.03;
+          m.g.add(m.M.root, m.M.blob);
+          // ghosts are a little see-through, so nobody mixes them up with their own traveler
+          m.M.root.traverse((o) => {
+            if (o.material) {
+              o.material = o.material.clone();
+              o.material.transparent = true;
+              o.material.opacity = 0.82;
+            }
+          });
+        }
+        if (!m.g.visible || m.pos.distanceTo(V(d.x, d.y, d.z)) > 12) m.pos.set(d.x, d.y, d.z);
+      }),
+      NET.tx.sub('wave/+', (k, d) => {
+        const idx = +k.split('/')[1].slice(1);
+        if (idx === S.player || !PLAYERS[idx]) return;
+        const m = mateOf(idx);
+        m.waveT = 2.2;
+        if (m.g.visible) {
+          sfx.good();
+          feedback(`${PLAYERS[idx].name}: Hi! 👋`, true);
+        }
+      }),
+    ];
+  }
+  function sendPos(dt) {
+    if (!NET.tx || NET.role !== 'player' || S.mode !== 'play') return;
+    // real clock (not game time): slow devices run the game clock slower
+    const now = performance.now();
+    const moving = Math.hypot(AV.vel.x, AV.vel.z) > 0.3 || !AV.onGround;
+    if (now < (MATE.next || 0)) return;
+    MATE.next = now + (moving ? 250 : 1500);
+    const look = { ...lookOf(S.player), wear: AV.wear || [] };
+    const msg = {
+      game: GAME.id, wi: S.wi, x: +AV.pos.x.toFixed(2), y: +AV.pos.y.toFixed(2), z: +AV.pos.z.toFixed(2), yaw: +AV.yaw.toFixed(2),
+      sp: +Math.hypot(AV.vel.x, AV.vel.z).toFixed(1), quest: S.Q && !S.Q.done ? S.Q.def.name : '', look,
+    };
+    NET.tx.publish(`pos/p${S.player}`, msg, false).catch(() => {});
+  }
+  function wave() {
+    if (S.mode !== 'play') return;
+    MATE.waveT = 2.2;
+    sfx.click();
+    if (NET.tx) NET.tx.publish(`wave/p${S.player}`, { t: Date.now() }, false).catch(() => {});
+  }
+  function updateMates(dt, t) {
+    let any = false;
+    for (const [idx, m] of Object.entries(MATES)) {
+      const d = m.st;
+      const fresh = d && performance.now() - m.seen < 6000;
+      const here = fresh && m.M && S.mode === 'play' && d.game === GAME.id && d.wi === S.wi && +idx !== S.player;
+      m.g.visible = !!here;
+      if (!here) continue;
+      any = true;
+      // glide toward the last known spot (messages arrive a few times per second)
+      const k = 1 - Math.exp(-dt * 8);
+      m.pos.lerp(V(d.x, d.y, d.z), k);
+      m.g.position.copy(m.pos);
+      let dy = d.yaw - m.yaw;
+      dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+      m.yaw += dy * k;
+      m.M.root.rotation.y = m.yaw;
+      m.phase += dt * (4 + d.sp * 1.3);
+      const amt = Math.min(1, d.sp / SPEED);
+      const leg = Math.sin(m.phase) * 0.8 * amt;
+      m.M.legL.rotation.x = leg;
+      m.M.legR.rotation.x = -leg;
+      m.M.armL.rotation.x = -leg;
+      if (m.waveT > 0) {
+        m.waveT -= dt;
+        m.M.armR.rotation.set(Math.PI - 0.4, 0, 0.5 + Math.sin(t * 14) * 0.45);
+      } else m.M.armR.rotation.set(leg, 0, 0);
+      const text = `${PLAYERS[idx].name}${d.quest ? ` · ${d.quest}` : ''}${m.waveT > 0 ? ' 👋' : ''}`;
+      if (text !== m.labelText) {
+        m.labelText = text;
+        m.label.userData.draw(text, PLAYERS[idx].suit);
+      }
+    }
+    document.body.classList.toggle('hasmate', any);
+    // my own wave
+    if (MATE.waveT > 0 && AV.model) {
+      MATE.waveT -= dt;
+      AV.model.armR.rotation.set(Math.PI - 0.4, 0, 0.5 + Math.sin(t * 14) * 0.45);
+    }
+  }
+  $('btn-wave').tabIndex = -1;
+  $('btn-wave').addEventListener('mousedown', (e) => e.preventDefault());
+  $('btn-wave').addEventListener('click', wave);
+
   function listenCommands() {
     if (!NET.tx) return;
     if (NET.unsubCmd) NET.unsubCmd();
@@ -4166,6 +4290,7 @@ function start() {
         if (MOVE[e.code]) keys.add(MOVE[e.code]);
         if (k === ' ') AV.jumpBuf = 0.15;
         if (e.code === 'KeyC' && !e.repeat) nextCam();
+        if (e.code === 'KeyY' && !e.repeat) wave();
         if (e.code === 'KeyL' && !e.repeat && !(S.Q && S.Q.chat)) openLook();
         if ((k === 'k' || k === 'K') && !e.repeat) skip();
         if (k === 'Enter' && !e.repeat && S.Q && !S.Q.done && HANDLERS[S.Q.def.type].next) HANDLERS[S.Q.def.type].next(S.Q);
@@ -4527,6 +4652,8 @@ function start() {
     if (S.mode === 'look') AV.yaw = Math.sin(t * 0.7) * 0.7;
     if (S.mode === 'play' || S.mode === 'talk' || S.mode === 'finale') updateAvatar(dt);
     if (S.mode !== 'title' && S.mode !== 'brief' && S.mode !== 'teacher') animateAvatar(dt, t);
+    sendPos(dt);
+    updateMates(dt, t);
 
     if (W && W.group.visible) {
       for (const pk of W.pickups) {
@@ -4720,6 +4847,8 @@ function start() {
   // Test / debug hooks (harmless in class).
   window.__TTS = {
     S, AV, TALK_SECONDS, GAME: () => GAME,
+    mates: () => Object.entries(MATES).map(([i, m]) => ({ i, has: !!m.st, vis: m.g.visible, wi: m.st && m.st.wi, game: m.st && m.st.game, M: !!m.M, age: Math.round(performance.now() - m.seen) })),
+    net: () => ({ role: NET.role, room: NET.room, tx: !!NET.tx, mates: !!NET.unsubMates, player: S.player, mode: S.mode, wi: S.wi }),
     WORLDS: WORLDS.map((w) => ({ key: w.key, quests: w.quests.map((q) => q.type) })),
     world: () => W,
     quest: () => (S.Q ? { type: S.Q.def.type, idx: S.Q.idx, max: S.Q.max, score: S.Q.score, done: !!S.Q.done, started: !!S.Q.started, phase: S.Q.phase, ready: S.Q.ready } : null),

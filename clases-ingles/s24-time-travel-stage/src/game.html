@@ -180,6 +180,8 @@ h1 .p { color: var(--orange); } h1 .n { color: var(--turq); } h1 .f { color: var
 .goalchip.on { display: block; }
 .goalchip b { color: #00897B; }
 .goalchip.ready { background: #FFF8E1; outline: 3px solid #FDD835; animation: stagePulse 1.6s ease-in-out infinite; }
+.wavebtn { top: calc(2.6vh + 7.8em); right: calc(2.4vw + 8.6em); display: none; color: var(--orange); }
+body.hasmate .wavebtn { display: flex; }
 .exitbtn { top: calc(2.6vh + 5.2em); color: #C62828; }
 #exit-no { background: var(--blue); }
 #O-exit .btns { flex-direction: row; justify-content: center; gap: 1vw; }
@@ -419,6 +421,7 @@ body.is-profe #btn-teacher { display: inline-flex; }
     <button class="card cambtn exitbtn" id="btn-exit" type="button" title="Exit (Esc)">Exit</button>
     <button class="card cambtn lookhud" id="btn-look-hud" type="button" title="My Look (L)">👕 <span>My Look</span></button>
     <div class="card goalchip" id="h-goal"></div>
+    <button class="card cambtn wavebtn" id="btn-wave" type="button" title="Say hi (Y)">👋 <span>Hi!</span></button>
     <div class="hint" id="h-hint"></div>
     <div class="card task" id="h-task">
       <div class="lab" id="h-tlab"></div>
