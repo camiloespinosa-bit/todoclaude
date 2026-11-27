@@ -10,8 +10,8 @@
 
 create table if not exists public.saga_config (k text primary key, v text not null);
 alter table public.saga_config enable row level security;
-insert into public.saga_config (k, v) values ('teacher_token_sha256', '27636e092d3ac7cf89eeb70e4ce5fc47e4669c34bb8c1b0669520a456ec3a805')
-  on conflict (k) do nothing;
+insert into public.saga_config (k, v) values ('teacher_token_sha256', '311384dadec2f57f2cd3f752a1cdc2b7ec16ca4db1334ae8ec86cd9a4cf37250')
+  on conflict (k) do update set v = excluded.v;
 revoke all on public.saga_config from anon, authenticated;
 
 create table if not exists public.lab_events (
