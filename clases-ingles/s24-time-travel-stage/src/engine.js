@@ -2623,7 +2623,12 @@ function start() {
         Q.step = 0;
         Q.attempts = 0;
         Q.slots = shuffle([0, 1, 2, 3]); // tile k shows line Q.slots[k]
+        // a new story while standing on the track: back to its start, so no stone counts by surprise
+        if (W.ladder.some((l) => Math.abs(AV.pos.x - l.x) < LADDER.half && Math.abs(AV.pos.z - LADDER.z) < LADDER.half)) {
+          placeAvatar(V(LADDER.xs[0] - 3, 0, LADDER.z), -Math.PI / 2);
+        }
         W.ladder.forEach((l, k) => {
+          l.on = false;
           l.done = false;
           l.tile.material = mat(k < 4 ? '#E3EAF0' : '#CFD8DC');
           l.sp.visible = k < 4;
