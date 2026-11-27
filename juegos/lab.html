@@ -295,8 +295,8 @@ textarea{width:100%; min-height:64px; resize:vertical}
       <!-- JEOPARDY -->
       <section id="tJeo" class="panel" hidden>
         <div class="spread"><h2>Jeopardy</h2>
-          <div class="row"><span class="muted small">Today</span><span class="score" id="jeoScore">0</span><span class="muted small" id="jeoBest"></span>
-          <select id="jeoBoard" aria-label="Board"></select><button class="ghost" id="jeoReset">Clear board</button></div></div>
+          <div class="row"><span class="muted small">Board score</span><span class="score" id="jeoScore">0</span><span class="muted small" id="jeoBest"></span>
+          <select id="jeoBoard" aria-label="Board"></select><button class="ghost" id="jeoReset" title="Start this board again from zero (the saved answers stay in Progress)">Clear board</button></div></div>
         <div class="board" id="board" style="margin-top:12px"></div>
         <div id="jeoCard" style="margin-top:14px"></div>
       </section>
@@ -1152,6 +1152,7 @@ textarea{width:100%; min-height:64px; resize:vertical}
     var ids = {}; server.forEach(function (e) { ids[e.id] = 1; });
     var mine = pending().filter(function (e) { return e.student === S.who && !ids[e.id]; });
     S.events = server.concat(mine);
+    S.loaded = Date.now();
     paintDbs();
   }
   async function addEvent(kind, data) {
@@ -1214,10 +1215,11 @@ textarea{width:100%; min-height:64px; resize:vertical}
     var days = sessionDays().filter(function (d) { return d < S.day; });
     var last = days[days.length - 1];
     if (!last) return { day: null, games: [] };
-    var g = []; S.events.forEach(function (e) { if (e.session === last && e.kind === "round" && g.indexOf(e.data.game) < 0) g.push(e.data.game); });
+    var g = []; S.events.forEach(function (e) { if (e.session === last && e.kind === "round" && !isClear(e) && g.indexOf(e.data.game) < 0) g.push(e.data.game); });
     return { day: last, games: g };
   }
-  function sessionDays() { var d = []; S.events.forEach(function (e) { if (d.indexOf(e.session) < 0) d.push(e.session); }); return d.sort(); }
+  function isClear(e) { return e.kind === "round" && e.data.game === "jeoclear"; }
+  function sessionDays() { var d = []; S.events.forEach(function (e) { if (!isClear(e) && d.indexOf(e.session) < 0) d.push(e.session); }); return d.sort(); }
   function renderTab() {
     renderShell();
     ({ tPlan: renderPlan, tMenu: renderMenu, tSpin: renderSpin, tJeo: renderJeo, tBingo: renderBingo, tBug: renderBug, tBox: renderBox, tCourt: renderCourt, tProg: renderProg,
@@ -1255,11 +1257,14 @@ textarea{width:100%; min-height:64px; resize:vertical}
   // ---------------------------------------------------------------- SPIN
   var SP = { deck: [], cur: null, T: null, rot: 0 };
   var WCOL = ["--w1", "--w2", "--w3", "--w4", "--w5", "--w6", "--w7", "--w8"];
-  function spinDeck() {
-    var s = stu(), all = $("spinAll").checked;
-    var cards = s.spin.filter(function (c) { return all ? c.u <= S.unit : c.u === S.unit; });
-    if (cards.length < 8) { var extra = shuffle(s.spin.filter(function (c) { return cards.indexOf(c) < 0 && c.u <= S.unit; })); cards = cards.concat(extra).slice(0, 8); }
-    if (cards.length < 8) { var more = s.spin.filter(function (c) { return cards.indexOf(c) < 0; }); cards = cards.concat(more.slice(0, 8 - cards.length)); }
+  // situations already saved in any class stay off the wheel; "Fill the wheel again" brings them back
+  function spinDeck(withPlayed) {
+    var s = stu(), all = $("spinAll").checked, played = {};
+    if (!withPlayed) S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "spin") played[e.data.prompt] = 1; });
+    var pool = s.spin.filter(function (c) { return !played[c.p]; });
+    var cards = pool.filter(function (c) { return all ? c.u <= S.unit : c.u === S.unit; });
+    if (cards.length < 8) { var extra = shuffle(pool.filter(function (c) { return cards.indexOf(c) < 0 && c.u <= S.unit; })); cards = cards.concat(extra).slice(0, 8); }
+    if (cards.length < 8) { var more = pool.filter(function (c) { return cards.indexOf(c) < 0; }); cards = cards.concat(more.slice(0, 8 - cards.length)); }
     return shuffle(cards).slice(0, 8);
   }
   function drawWheel() {
@@ -1280,7 +1285,7 @@ textarea{width:100%; min-height:64px; resize:vertical}
     $("spinGo").disabled = !n;
   }
   function renderSpin() {
-    if (!SP.deck.length || SP.who !== S.who || SP.unit !== S.unit) { SP.deck = spinDeck(); SP.who = S.who; SP.unit = S.unit; SP.cur = null; drawWheel(); paintSpinCard(); }
+    if (!SP.refilled && (!SP.deck.length || SP.who !== S.who || SP.unit !== S.unit || SP.loaded !== S.loaded)) { SP.deck = spinDeck(); SP.who = S.who; SP.unit = S.unit; SP.loaded = S.loaded; SP.cur = null; drawWheel(); paintSpinCard(); }
   }
   function doSpin() {
     if (!SP.deck.length) return;
@@ -1306,12 +1311,25 @@ textarea{width:100%; min-height:64px; resize:vertical}
   var JE = { done: {}, cur: null, T: null, score: 0 };
   function boardIdx() { var k = S.who + "|" + S.unit; if (JE.bk !== k) { JE.bk = k; var b = 0; stu().jeo.forEach(function (x, i) { if (x.u <= S.unit) b = i; }); JE.b = b; } return JE.b; }
   function board() { return stu().jeo[boardIdx()]; }
-  function jeoKey() { return "labJeo_" + S.who + "_" + boardIdx() + "_" + S.day; }
+  function jeoKey() { return S.who + "_" + boardIdx(); }
+  // tiles played on this board since it was last cleared: { "c-r": points }, from the saved rounds
+  function jeoState(bi) {
+    var bd = stu().jeo[bi], where = {}, done = {}, score = 0;
+    bd.tiles.forEach(function (col, c) { col.forEach(function (t, r) { where[t.p] = c + "-" + r; }); });
+    S.events.forEach(function (e) {
+      if (e.kind !== "round" || (e.data.board || 0) !== bi) return;
+      if (e.data.game === "jeoclear") { done = {}; score = 0; return; }
+      if (e.data.game !== "jeopardy" || !where[e.data.prompt]) return;
+      var k = where[e.data.prompt]; if (done[k] != null) score -= done[k];
+      done[k] = e.data.points || 0; score += done[k];
+    });
+    return { done: done, score: score };
+  }
   function renderJeo() {
-    var s = stu(), bd = board(), saved = LS.json(jeoKey(), null);
-    if (JE.key !== jeoKey()) { JE.key = jeoKey(); JE.done = saved ? saved.done : {}; JE.score = saved ? saved.score : 0; JE.cur = null; }
-    var played = {}; S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "jeopardy") played[e.data.board || 0] = (played[e.data.board || 0] || 0) + 1; });
-    $("jeoBoard").innerHTML = s.jeo.map(function (x, i) { return "<option value='" + i + "'" + (i === boardIdx() ? " selected" : "") + ">Board: " + esc(x.n) + (played[i] ? " · " + played[i] + " tiles played" : " · new") + "</option>"; }).join("");
+    var s = stu(), bd = board(), st = jeoState(boardIdx());
+    if (JE.key !== jeoKey()) { JE.key = jeoKey(); JE.cur = null; }
+    JE.done = st.done; JE.score = st.score;
+    $("jeoBoard").innerHTML = s.jeo.map(function (x, i) { var n = Object.keys(jeoState(i).done).length; return "<option value='" + i + "'" + (i === boardIdx() ? " selected" : "") + ">Board: " + esc(x.n) + (n ? " · " + n + " / 25 tiles" : " · new") + "</option>"; }).join("");
     var h = bd.cats.map(function (c) { return "<div class='cat'>" + esc(c) + "</div>"; }).join("");
     for (var r = 0; r < 5; r++) for (var c = 0; c < 5; c++) {
       var k = c + "-" + r, d = JE.done[k];
@@ -1319,10 +1337,8 @@ textarea{width:100%; min-height:64px; resize:vertical}
     }
     $("board").innerHTML = h;
     $("jeoScore").textContent = Math.round(JE.score);
-    var best = 0; var per = {};
-    S.events.forEach(function (e) { if (e.kind === "round" && e.data.game === "jeopardy" && e.session !== S.day) per[e.session] = (per[e.session] || 0) + (e.data.points || 0); });
-    Object.keys(per).forEach(function (d) { best = Math.max(best, per[d]); });
-    $("jeoBest").textContent = best ? "· best before: " + Math.round(best) : "";
+    var left = 25 - Object.keys(JE.done).length;
+    $("jeoBest").textContent = left === 25 ? "· new board" : left ? "· " + left + " tiles left" : "· board complete! 🎉";
     paintJeoCard();
   }
   function paintJeoCard() {
@@ -1456,7 +1472,7 @@ textarea{width:100%; min-height:64px; resize:vertical}
       .map(function (x) { return "<div class='stat'><b>" + x[1] + "</b><span class='muted small'>" + x[0] + "</span></div>"; }).join("");
     $("progSessions").innerHTML = days.length ? days.slice().reverse().map(function (d) {
       var ev = S.events.filter(function (e) { return e.session === d; }), A = at.filter(function (a) { return a.session === d; });
-      var games = []; ev.forEach(function (e) { var g = e.kind === "note" ? "note" : e.data.game; if (games.indexOf(g) < 0) games.push(g); });
+      var games = []; ev.forEach(function (e) { if (isClear(e)) return; var g = e.kind === "note" ? "note" : e.data.game; if (games.indexOf(g) < 0) games.push(g); });
       var ok = A.filter(function (a) { return a.ok; }).length;
       return "<div class='prow'><div class='nm'>" + fmtDay(d) + "<small>" + games.map(function (g) { return GAMEN[g] || g; }).join(" · ") + "</small></div><span></span><div class='bar'></div><span class='pct'>" + (A.length ? ok + "/" + A.length : "–") + "</span></div>";
     }).join("") : "<p class='muted'>No classes saved yet.</p>";
@@ -1467,6 +1483,7 @@ textarea{width:100%; min-height:64px; resize:vertical}
   function csv() {
     var rows = [["date", "student", "game", "unit", "prompt", "structure", "target", "result"]];
     S.events.forEach(function (e) {
+      if (isClear(e)) return;
       if (e.kind === "round") (e.data.targets || []).forEach(function (t) { rows.push([e.session, stu().name, GAMEN[e.data.game] || e.data.game, (e.data.unit || 0) + 1, e.data.prompt, t.s, t.t, t.ok ? "hit" : "not yet"]); });
       else rows.push([e.session, stu().name, "Notebook", "", e.data.said + (e.data.better ? " → " + e.data.better : ""), e.data.s || "", e.data.type, e.data.type === "good" ? "hit" : "not yet"]);
     });
@@ -1683,14 +1700,14 @@ textarea{width:100%; min-height:64px; resize:vertical}
   // ---------------------------------------------------------------- events
   document.addEventListener("click", function (ev) {
     var b = ev.target.closest("button"); if (!b) return;
-    if (b.dataset.who) { S.who = b.dataset.who; S.unit = +(LS.get("labUnit_" + S.who) || 0); LS.set("labWho", S.who); SP.deck = []; loadEvents().then(renderTab); renderTab(); return; }
+    if (b.dataset.who) { S.who = b.dataset.who; S.unit = +(LS.get("labUnit_" + S.who) || 0); LS.set("labWho", S.who); SP.deck = []; SP.refilled = false; loadEvents().then(renderTab); renderTab(); return; }
     if (b.dataset.tab) { S.tab = b.dataset.tab; LS.set("labTab", S.tab); renderTab(); return; }
     if (b.dataset.unit) { setUnit(+b.dataset.unit); return; }
     // spin
     if (b.id === "spinGo") { doSpin(); return; }
     if (b.dataset.sp != null) { SP.T.items[+b.dataset.sp].ok = b.dataset.v === "1"; paintSpinCard(); return; }
     if (b.id === "spReveal") { SP.T.hidden = !SP.T.hidden; paintSpinCard(); return; }
-    if (b.id === "spRefill") { SP.deck = spinDeck(); SP.cur = null; drawWheel(); paintSpinCard(); return; }
+    if (b.id === "spRefill") { SP.deck = spinDeck(true); SP.refilled = true; SP.cur = null; drawWheel(); paintSpinCard(); return; }
     if (b.id === "spSave") { var c = SP.cur, T = SP.T; b.disabled = true; SP.deck = SP.deck.filter(function (x) { return x !== c; }); drawWheel(); saveRound("spin", c.p, T.items).then(function (ok) { SP.cur = null; paintSpinCard(); var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = ok ? "Saved ✓ Spin again!" : "Saved on this device (will sync later)"; $("spinCard").appendChild(m); }); return; }
     // jeopardy
     if (b.dataset.jt) { var p = b.dataset.jt.split("-"); JE.cur = { c: +p[0], r: +p[1] }; JE.T = mkTargets(board().tiles[JE.cur.c][JE.cur.r].t); paintJeoCard(); $("jeoCard").scrollIntoView({ behavior: "smooth", block: "nearest" }); return; }
@@ -1700,12 +1717,13 @@ textarea{width:100%; min-height:64px; resize:vertical}
     if (b.id === "jeSave") {
       var tile = board().tiles[JE.cur.c][JE.cur.r], val = VALUES[JE.cur.r], hit = JE.T.items.filter(function (x) { return x.ok; }).length;
       var pts = Math.round(val * hit / JE.T.items.length);
-      JE.done[JE.cur.c + "-" + JE.cur.r] = pts; JE.score += pts; LS.set(jeoKey(), JSON.stringify({ done: JE.done, score: JE.score }));
-      var items = JE.T.items; JE.cur = null; renderJeo();
-      saveRound("jeopardy", tile.p, items, { tileValue: val, points: pts, board: boardIdx() }).then(function (ok) { var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = (ok ? "Saved ✓ " : "Saved on this device · ") + "+" + pts + " points"; $("jeoCard").appendChild(m); });
+      var items = JE.T.items; JE.cur = null;
+      var saving = saveRound("jeopardy", tile.p, items, { tileValue: val, points: pts, board: boardIdx() }); // the round is in S.events right away
+      renderJeo();
+      saving.then(function (ok) { var m = document.createElement("p"); m.className = "flash" + (ok ? "" : " bad"); m.textContent = (ok ? "Saved ✓ " : "Saved on this device · ") + "+" + pts + " points"; $("jeoCard").appendChild(m); });
       return;
     }
-    if (b.id === "jeoReset") { armed(b, function () { JE.done = {}; JE.score = 0; LS.set(jeoKey(), null); JE.cur = null; renderJeo(); }); return; }
+    if (b.id === "jeoReset") { armed(b, function () { JE.cur = null; addEvent("round", { game: "jeoclear", board: boardIdx(), unit: S.unit, prompt: "Clear board", targets: [] }); renderJeo(); }); return; }
     // bingo
     if (b.dataset.bg != null) { var i = +b.dataset.bg; BG.on[i] = BG.on[i] ? 0 : 1; renderBingo(); return; }
     if (b.id === "bingoNew") { newBingo(); renderBingo(); return; }
@@ -1824,11 +1842,11 @@ textarea{width:100%; min-height:64px; resize:vertical}
     }
     if (b.dataset.del) { armed(b, function () { delEvent(b.dataset.del).then(function () { paintNb(); if (S.tab === "tCourt") renderCourt(); }); }); return; }
   });
-  function setUnit(i) { S.unit = i; LS.set("labUnit_" + S.who, String(i)); SP.deck = []; renderTab(); }
+  function setUnit(i) { S.unit = i; LS.set("labUnit_" + S.who, String(i)); SP.deck = []; SP.refilled = false; renderTab(); }
   $("unitSel").addEventListener("change", function () { setUnit(+this.value); });
   $("dateSel").addEventListener("change", function () { S.day = this.value || todayStr(); JE.key = null; renderTab(); });
   $("jeoBoard").addEventListener("change", function () { JE.b = +this.value; JE.bk = S.who + "|" + S.unit; JE.key = null; renderJeo(); });
-  $("spinAll").addEventListener("change", function () { SP.deck = []; renderSpin(); });
+  $("spinAll").addEventListener("change", function () { SP.deck = []; SP.refilled = false; renderSpin(); });
   document.addEventListener("change", function (e) { if (e.target && e.target.id === "erRoom") { loadRoom(+e.target.value); renderEscape(); } });
   document.addEventListener("keydown", function (e) { if (e.target && e.target.id === "erCode" && e.key === "Enter") $("erGo").click(); });
   $("nbSaid").addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("nbSave").click(); });
